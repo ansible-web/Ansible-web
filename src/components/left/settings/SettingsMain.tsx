@@ -196,18 +196,7 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
             </span>
           )}
         </ListItem>
-        <ListItem
-          leftElement={<Icon className="icon ListItem-main-icon" name="toncoin" />}
-          narrow
-          onClick={() => openStarsBalanceModal({ currency: TON_CURRENCY_CODE })}
-        >
-          {lang('MenuTon')}
-          {Boolean(tonBalance) && (
-            <span className="settings-item__current-value">
-              {convertCurrencyFromBaseUnit(tonBalance.amount, tonBalance.currency)}
-            </span>
-          )}
-        </ListItem>
+        {/* BeHappy: TON menu hidden */}
         {isGiveawayAvailable && (
           <ListItem
             icon="gift"

@@ -24,7 +24,6 @@ export default function createMockedForumTopic(chatId: string, topicId: number, 
     unreadCount = 0,
     unreadMentionsCount = 0,
     unreadReactionsCount = 0,
-    unreadPollVotesCount = 0,
     ...rest
   } = forumTopic;
 
@@ -38,7 +37,6 @@ export default function createMockedForumTopic(chatId: string, topicId: number, 
     unreadCount,
     unreadMentionsCount,
     unreadReactionsCount,
-    unreadPollVotesCount,
     fromId: createMockedTypePeer(chatId, mockData),
     peer: createMockedTypePeer(chatId, mockData),
     ...rest,

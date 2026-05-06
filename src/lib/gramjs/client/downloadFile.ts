@@ -222,6 +222,7 @@ async function downloadFile2(
 
     // Check again after waiting for capacity
     if (progressCallback?.isCanceled) {
+      hasEnded = true;
       dcManager.releaseWorker(senderIndex, limit);
       deferred?.resolve();
       break;

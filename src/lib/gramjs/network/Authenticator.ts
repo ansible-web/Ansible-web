@@ -75,6 +75,10 @@ export async function doAuthentication(sender: MTProtoPlainSender, log: any) {
     }
   }
   if (targetFingerprint === undefined || targetKey === undefined) {
+    // eslint-disable-next-line no-console
+    console.error('SERVER fingerprints:', resPQ.serverPublicKeyFingerprints.map((f: bigint) => f.toString()));
+    // eslint-disable-next-line no-console
+    console.error('CLIENT fingerprints:', [...SERVER_KEYS.keys()].map((f) => f.toString()));
     throw new SecurityError(
       'Step 2 could not find a valid key for fingerprints',
     );

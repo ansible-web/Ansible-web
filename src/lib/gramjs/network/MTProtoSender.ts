@@ -698,7 +698,7 @@ export default class MTProtoSender {
         if (!this.userDisconnected) {
           this._log.warn('Connection closed while receiving data');
           // eslint-disable-next-line no-console
-          console.error(e);
+          console.error('[MVSY-DEBUG] recv() error:', e?.constructor?.name, e?.message, e?.code, e);
           this.reconnect();
         }
         this._recvLoopHandle = undefined;
@@ -718,6 +718,8 @@ export default class MTProtoSender {
           // A step while decoding had the incorrect data. This message
           // should not be considered safe and it should be ignored.
           this._log.warn(`Security error while unpacking a received message: ${e.message}`);
+          // eslint-disable-next-line no-console
+          console.error(`[MVSY-DEBUG] SecurityError: ${e.message}`);
           continue;
         } else if (e instanceof InvalidBufferError) {
           // 404 means that the server has "forgotten" our auth key and we need to create a new one.
@@ -728,6 +730,8 @@ export default class MTProtoSender {
             // reconnecting should be enough usually
             // since the data we sent and received is probably wrong now.
             this._log.warn(`Invalid buffer ${e.code} for dc ${this._dcId}`);
+            // eslint-disable-next-line no-console
+            console.error(`[MVSY-DEBUG] InvalidBufferError code=${e.code} dc=${this._dcId}`, e);
             this.reconnect();
           }
           this._recvLoopHandle = undefined;
@@ -735,7 +739,7 @@ export default class MTProtoSender {
         } else {
           this._log.error('Unhandled error while receiving data');
           // eslint-disable-next-line no-console
-          console.error(e);
+          console.error('[MVSY-DEBUG] Unhandled decrypt/parse error:', e?.constructor?.name, e?.message, e);
           this.reconnect();
           this._recvLoopHandle = undefined;
           return;

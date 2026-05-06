@@ -102,7 +102,7 @@ export async function computeDigest(
   try {
     checkPrimeAndGood(algo.p, algo.g);
   } catch (e) {
-    throw new Error('bad p/g in password', { cause: e });
+    throw new Error('bad p/g in password');
   }
 
   const value = modExp(BigInt(algo.g),
@@ -134,7 +134,7 @@ export async function computeCheck(request: Api.account.Password, password: stri
   try {
     checkPrimeAndGood(algo.p, g);
   } catch (e) {
-    throw new Error('bad p/g in password', { cause: e });
+    throw new Error('bad p/g in password');
   }
   if (!isGoodLarge(B, p)) {
     throw new Error('bad b in check');

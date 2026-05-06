@@ -1141,7 +1141,7 @@ class TelegramClient {
 
     const state = new RequestState(request, abortSignal);
 
-    let attempt;
+    let attempt = 0;
     for (attempt = 0; attempt < this._requestRetries; attempt++) {
       sender.addStateToQueue(state);
       try {

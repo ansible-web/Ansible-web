@@ -141,7 +141,7 @@ async function signInUser(
 ): Promise<Api.TypeUser> {
   let phoneNumber;
   let phoneCodeHash;
-  let isCodeViaApp;
+  let isCodeViaApp = false;
   lastUsedMethod = 'phoneNumber';
 
   while (true) {
@@ -182,7 +182,7 @@ async function signInUser(
   }
 
   let phoneCode;
-  let isRegistrationRequired;
+  let isRegistrationRequired = false;
   let termsOfService;
 
   // eslint-disable-next-line no-constant-condition
@@ -277,11 +277,15 @@ async function signInUserWithQrCode(
         break;
       }
 
+      // eslint-disable-next-line no-console
+      console.log('[QR] Calling ExportLoginToken...');
       const result = await client.invoke(new Api.auth.ExportLoginToken({
         apiId,
         apiHash,
         exceptIds,
       }));
+      // eslint-disable-next-line no-console
+      console.log('[QR] ExportLoginToken result:', result?.className);
       if (!(result instanceof Api.auth.LoginToken)) {
         throw new Error('Unexpected');
       }
@@ -380,7 +384,7 @@ export async function signInUserWithPasskey(
   client: TelegramClient,
   apiCredentials: ApiCredentials,
   authParams: UserAuthParams,
-  credentialJson: AuthenticationResponseJSON,
+  credentialJson: PublicKeyCredentialJSON,
 ): Promise<Api.TypeUser> {
   try {
     if (!credentialJson.response.userHandle) {
