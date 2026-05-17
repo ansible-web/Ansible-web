@@ -167,7 +167,7 @@ type OAuthLinkBuilderParams = Omit<BuilderParams<OAuthLink>, 'url'> & {
   url: string;
 };
 
-const ELIGIBLE_HOSTNAMES = new Set(['behappy.rest', 'ansible.rest']);
+const ELIGIBLE_HOSTNAMES = new Set(['behappy.rest', 'ansible.rest', 'web.ansible.rest']);
 
 export function isDeepLink(link: string): boolean {
   return Boolean(link.match(RE_TME_LINK) || link.match(RE_TG_LINK));

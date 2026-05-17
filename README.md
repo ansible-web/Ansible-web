@@ -51,7 +51,7 @@ independently maintained.
 
 ## Try it
 
-Hosted instance: <https://ansible.rest/>
+Hosted instance: <https://web.ansible.rest/>
 
 Source release archives: <https://github.com/behappy-web/behappy-web/releases>
 
