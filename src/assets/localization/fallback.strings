@@ -2493,8 +2493,8 @@
 "TitleRating" = "Rating";
 "RatingReflectsActivity" = "This rating reflects **{name}'s** activity on BeHappy. It is based on:";
 "RatingYourReflectsActivity" = "This rating reflects your activity on BeHappy. It is based on:";
-"RatingGiftsFromTelegram" = "Gifts from Telegram";
-"RatingGiftsFromTelegramDesc" = "100% of the Stars spent on gifts purchased from Telegram.";
+"RatingGiftsFromTelegram" = "Gifts from BeHappy";
+"RatingGiftsFromTelegramDesc" = "100% of the Stars spent on gifts purchased from BeHappy.";
 "RatingGiftsAndPostsFromUsers" = "Gifts and Posts from Users";
 "RatingGiftsAndPostsFromUsersDesc" = "20% of the Stars spent on gifts or posts from users and channels.";
 "RatingRefundsAndConversions" = "Refunds and Conversions";
@@ -2513,9 +2513,9 @@
 "ContextMenuHintMouse" = "To edit or reply, close this menu. Then right click on a message.";
 "ContextMenuHintTouch" = "To edit or reply, close this menu. Then long tap on a message.";
 "GiftValueForSaleOnFragment" = "for sale on Fragment";
-"GiftValueForSaleOnTelegram" = "for sale on Telegram";
+"GiftValueForSaleOnTelegram" = "for sale on BeHappy";
 "GiftAuctionForSaleOnFragment" = "{count} for sale on Fragment >";
-"GiftAuctionForSaleOnTelegram" = "{count} for sale on Telegram >";
+"GiftAuctionForSaleOnTelegram" = "{count} for sale on BeHappy >";
 "EmbeddedMessageNoCaption" = "Caption removed";
 "EditMedia" = "Edit Media";
 "Draw" = "Draw";
