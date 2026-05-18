@@ -14,7 +14,7 @@
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": ["tg"]
+        "schemes": ["bh"]
       }
     }
   },

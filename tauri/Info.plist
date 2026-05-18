@@ -9,7 +9,7 @@
         <string>rest.ansible.BeHappy</string>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>tg</string>
+          <string>bh</string>
         </array>
       </dict>
     </array>
