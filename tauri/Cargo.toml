@@ -1,10 +1,10 @@
  [package]
-name = "telegram_air"
+name = "behappy"
 version = "2.10.3"
-description = "Telegram Air"
-authors = ["Alexander Zinchuk"]
+description = "BeHappy"
+authors = ["BeHappy"]
 license = "GPLv3"
-repository = "https://github.com/Ajaxy/telegram-tt"
+repository = "https://github.com/behappy-web/behappy-web"
 edition = "2024"
 rust-version = "1.93"
 
