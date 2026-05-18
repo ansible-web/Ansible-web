@@ -22,7 +22,7 @@
     "active": true,
     "createUpdaterArtifacts": false,
     "category": "SocialNetworking",
-    "copyright": "Telegram Air",
+    "copyright": "© BeHappy",
     "externalBin": [],
     "icon": [
       "icons/32x32.png",
@@ -53,6 +53,6 @@
       }
     }
   },
-  "identifier": "org.telegram.TelegramAirBeta",
-  "productName": "Telegram Air"
+  "identifier": "rest.ansible.BeHappy",
+  "productName": "BeHappy"
 }
