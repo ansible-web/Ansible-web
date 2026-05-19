@@ -186,10 +186,10 @@ export function getDisplayName(entity: Entity) {
 export function getDC(dcId: number, downloadDC = false) {
   // TODO Move to external config
   // MVSy (BeHappy) server — all DCs point to our server
-  // Uses wss:// via nginx reverse proxy (ws.behappy.rest → localhost:8443)
+  // Uses wss:// via nginx reverse proxy (ws.ansible.rest → backend WS)
   return {
     id: dcId,
-    ipAddress: 'ws.behappy.rest',
+    ipAddress: 'ws.ansible.rest',
     port: 443,
   };
   // TODO chose based on current connection method

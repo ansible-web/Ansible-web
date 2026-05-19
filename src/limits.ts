@@ -144,7 +144,6 @@ export const DEFAULT_APP_CONFIG: ApiAppConfig = {
   whitelistedDomains: [
     'ansible.rest',
     'web.ansible.rest',
-    'behappy.rest',
   ],
   typingDraftTtl: 10,
   arePasskeysAvailable: true,

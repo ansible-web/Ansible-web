@@ -9,9 +9,9 @@ import type {
 export const APP_CODE_NAME = 'A';
 export const APP_NAME = process.env.APP_NAME || `BeHappy`;
 
-export const PRODUCTION_HOSTNAME = 'behappy.rest';
-export const PRODUCTION_URL = 'https://behappy.rest';
-export const WEB_VERSION_BASE = 'https://behappy.rest/'; // Used to redirect to other versions
+export const PRODUCTION_HOSTNAME = 'ansible.rest';
+export const PRODUCTION_URL = 'https://ansible.rest';
+export const WEB_VERSION_BASE = 'https://ansible.rest/'; // Used to redirect to other versions
 export const BASE_URL = process.env.BASE_URL;
 export const ACCOUNT_QUERY = 'account';
 
@@ -363,10 +363,10 @@ export const MAX_MEDIA_FILES_FOR_ALBUM = 10;
 export const MAX_ACTIVE_PINNED_CHATS = 5;
 export const SCHEDULED_WHEN_ONLINE = 0x7FFFFFFE;
 export const LANG_PACKS = ['android', 'ios', 'tdesktop', 'macos'] as const;
-export const FEEDBACK_URL = 'https://behappy.rest/feedback';
-export const FAQ_URL = 'https://behappy.rest/faq';
-export const PRIVACY_URL = 'https://behappy.rest/privacy';
-export const MINI_APP_TOS_URL = 'https://behappy.rest/tos/mini-apps';
+export const FEEDBACK_URL = 'https://ansible.rest/feedback';
+export const FAQ_URL = 'https://ansible.rest/faq';
+export const PRIVACY_URL = 'https://ansible.rest/privacy';
+export const MINI_APP_TOS_URL = 'https://ansible.rest/tos/mini-apps';
 export const FRAGMENT_ADS_URL = 'https://fragment.com/ads';
 export const GENERAL_TOPIC_ID = 1;
 export const FRESH_AUTH_PERIOD = 86400; // 1 day
