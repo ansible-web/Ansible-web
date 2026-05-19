@@ -10,7 +10,6 @@ import { disableStrict, enableStrict } from '../../lib/fasterdom/stricterdom';
 import { selectSharedSettings } from '../../global/selectors/sharedState';
 import buildClassName from '../../util/buildClassName';
 import { oldSetLanguage } from '../../util/oldLangProvider';
-import { LOCAL_TGS_URLS } from '../common/helpers/animatedAssets';
 import { navigateBack } from './helpers/backNavigation';
 import { getSuggestedLanguage } from './helpers/getSuggestedLanguage';
 
@@ -22,11 +21,11 @@ import useLastCallback from '../../hooks/useLastCallback';
 import useMediaTransitionDeprecated from '../../hooks/useMediaTransitionDeprecated';
 import useMultiaccountInfo from '../../hooks/useMultiaccountInfo';
 
-import AnimatedIcon from '../common/AnimatedIcon';
 import Button from '../ui/Button';
 import Loading from '../ui/Loading';
 
 import blankUrl from '../../assets/blank.png';
+import behappyLogoUrl from '../../assets/telegram-logo-filled.svg';
 
 type StateProps = {
   auth: GlobalState['auth'];
@@ -183,12 +182,12 @@ const AuthCode = ({
               ref={qrCodeRef}
               style={`width: ${QR_SIZE}px; height: ${QR_SIZE}px`}
             />
-            <AnimatedIcon
-              tgsUrl={LOCAL_TGS_URLS.QrPlane}
-              size={QR_PLANE_SIZE}
+            <img
+              src={behappyLogoUrl}
+              width={QR_PLANE_SIZE}
+              height={QR_PLANE_SIZE}
               className="qr-plane"
-              nonInteractive
-              noLoop={false}
+              alt="BeHappy"
             />
           </div>
           {!isQrMounted && <div className="qr-loading"><Loading /></div>}
