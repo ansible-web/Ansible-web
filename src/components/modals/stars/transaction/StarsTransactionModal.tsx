@@ -181,7 +181,7 @@ const StarsTransactionModal: FC<OwnProps & StateProps> = ({
         {!sticker && !transaction.isPostsSearch && (
           <InteractiveSparkles
             className={buildClassName(styles.starsBackground)}
-            color="gold"
+            color="blue"
             onRequestAnimation={handleRequestAnimation}
             centerShift={AVATAR_SPARKLES_CENTER_SHIFT}
           />

@@ -147,7 +147,7 @@ const StarsSubscriptionModal: FC<OwnProps & StateProps> = ({
         </div>
         <InteractiveSparkles
           className={buildClassName(styles.starsBackground)}
-          color="gold"
+          color="blue"
           onRequestAnimation={handleRequestAnimation}
           centerShift={AVATAR_SPARKLES_CENTER_SHIFT}
         />

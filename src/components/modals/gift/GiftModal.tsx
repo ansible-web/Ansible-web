@@ -497,7 +497,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
           />
           <InteractiveSparkles
             className={styles.logoBackground}
-            color="gold"
+            color="blue"
             centerShift={AVATAR_SPARKLES_CENTER_SHIFT}
             onRequestAnimation={handleRequestAnimation}
           />
