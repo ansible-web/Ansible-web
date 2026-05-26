@@ -6,12 +6,12 @@ import useUniqueId from '../../../hooks/useUniqueId';
 
 import styles from './StarIcon.module.scss';
 
-// Re-pointed to the diamond bitmap so the `<StarIcon type="gold">` raster
-// path renders the BeHappy diamond instead of a yellow TG star. SVG paths
-// (PremiumStarIcon / RegularStarIcon below) still use the star outline —
-// they're sized 14×15 and used inline in text where a tiny coloured glyph
-// is what fits; switching them would need new vector art.
-import StarWebp from '../../../assets/diamond.png';
+// Re-pointed to the dedicated diamond glyph (60×60 RGBA, blue, sharp at
+// small sizes) so `<StarIcon type="gold">` renders the BeHappy diamond
+// instead of a yellow TG star. SVG paths (PremiumStarIcon /
+// RegularStarIcon below) still use the star outline — they're 14×15
+// inline glyphs and need their own vector art for a clean swap.
+import StarWebp from '../../../assets/icons/star/diamond.webp';
 
 type OwnProps = {
   type?: 'gold' | 'premium' | 'regular';
