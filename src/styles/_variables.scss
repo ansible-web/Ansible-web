@@ -209,9 +209,12 @@
 
     --color-deleted-account: #9eaab5;
     --color-archive: #9eaab5;
-    --stars-gradient: linear-gradient(90deg, #FFAA00 0%, #FFCD3A 100%);
+    // Stars → Diamonds rebrand: keep CSS var names stable so we don't have
+    // to rename every component, but flip the colours from gold to the
+    // BeHappy diamond blue palette.
+    --stars-gradient: linear-gradient(90deg, #0084ff 0%, #4eaaff 100%);
 
-    --color-stars: #FFAA00;
+    --color-stars: #0084ff;
     --color-heart: #ff3c32;
 
     --color-gift-uncommon: #40A920;
