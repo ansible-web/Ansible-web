@@ -1,7 +1,7 @@
 {
-    "name": "BeHappy",
-    "short_name": "BeHappy",
-    "description": "BeHappy is a fast and secure messaging app.",
+    "name": "Ansible",
+    "short_name": "Ansible",
+    "description": "Ansible is a fast and secure messaging app.",
     "start_url": "./",
     "gcm_sender_id": "122867383838",
     "icons": [
