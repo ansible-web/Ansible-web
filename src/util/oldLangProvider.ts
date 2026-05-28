@@ -225,11 +225,26 @@ function getPluralOption(amount: number) {
 
 function processTemplate(template: string, value: any) {
   value = Array.isArray(value) ? value : [value];
-  const translationSlices = template.split(SUBSTITUTION_REGEX);
+
+  // Web-format placeholders ({count}, {count2}, {name}, ...) — used by the
+  // new lang() API and by all strings imported via TG Translation Platform.
+  // The legacy %d/%s/%@ split below doesn't see them, so do an upfront pass
+  // and substitute every `{anyKey}` with the next positional value.
+  let prepared = template;
+  let braceIndex = 0;
+  prepared = prepared.replace(/\{[a-zA-Z_][\w]*\}/g, () => {
+    const sub = value[braceIndex] !== undefined ? String(value[braceIndex]) : '';
+    braceIndex += 1;
+    return sub;
+  });
+
+  const translationSlices = prepared.split(SUBSTITUTION_REGEX);
   const initialValue = translationSlices.shift();
 
   return translationSlices.reduce((result, str, index) => {
-    return `${result}${String(value[index] ?? '')}${str}`;
+    // After the brace pass we've already consumed `braceIndex` slots of
+    // `value`. Shift legacy %x positions to start at the leftover ones.
+    return `${result}${String(value[braceIndex + index] ?? '')}${str}`;
   }, initialValue || '');
 }
 
