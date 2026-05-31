@@ -761,6 +761,7 @@ export interface ApiMessage {
   fromRank?: string;
 
   isTypingDraft?: boolean; // Local field
+  wasTypingDraft?: boolean; // Local field
 }
 
 export interface ApiReactions {
