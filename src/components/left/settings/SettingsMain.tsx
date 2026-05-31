@@ -11,6 +11,7 @@ import {
   selectIsGiveawayGiftsPurchaseAvailable,
   selectIsPremiumPurchaseBlocked,
 } from '../../../global/selectors';
+import buildClassName from '../../../util/buildClassName';
 import { convertCurrencyFromBaseUnit } from '../../../util/formatCurrency';
 
 import useFlag from '../../../hooks/useFlag';
@@ -22,8 +23,11 @@ import Icon from '../../common/icons/Icon';
 import DiamondIcon from '../../common/icons/DiamondIcon';
 import ChatExtra from '../../common/profile/ChatExtra';
 import ProfileInfo from '../../common/profile/ProfileInfo';
+import Island from '../../gili/layout/Island';
 import ConfirmDialog from '../../ui/ConfirmDialog';
 import ListItem from '../../ui/ListItem';
+
+import styles from './SettingsMain.module.scss';
 
 type OwnProps = {
   isActive?: boolean;
@@ -80,8 +84,8 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
   });
 
   return (
-    <div className="settings-content custom-scroll">
-      <div className="settings-main-menu self-profile">
+    <div className={buildClassName(styles.root, 'settings-main-scroll', 'custom-scroll')}>
+      <div className={styles.selfProfile}>
         {currentUserId && (
           <ProfileInfo
             peerId={currentUserId}
@@ -96,142 +100,130 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
           />
         )}
       </div>
-      <div className="settings-main-menu">
-        <ListItem
-          icon="settings"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.General })}
-        >
-          {lang('TelegramGeneralSettingsViewController')}
-        </ListItem>
-        <ListItem
-          icon="animations"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.Performance })}
-        >
-          {lang('MenuAnimations')}
-        </ListItem>
-        <ListItem
-          icon="unmute"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.Notifications })}
-        >
-          {lang('Notifications')}
-        </ListItem>
-        <ListItem
-          icon="data"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.DataStorage })}
-        >
-          {lang('DataSettings')}
-        </ListItem>
-        <ListItem
-          icon="lock"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.Privacy })}
-        >
-          {lang('PrivacySettings')}
-        </ListItem>
-        <ListItem
-          icon="folder"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.Folders })}
-        >
-          {lang('Filters')}
-        </ListItem>
-        <ListItem
-          icon="active-sessions"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.ActiveSessions })}
-        >
-          {lang('SessionsTitle')}
-          {sessionCount > 0 && (<span className="settings-item__current-value">{sessionCount}</span>)}
-        </ListItem>
-        <ListItem
-          icon="language"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.Language })}
-        >
-          {lang('Language')}
-          <span className="settings-item__current-value">{lang.languageInfo.nativeName}</span>
-        </ListItem>
-        <ListItem
-          icon="stickers"
-          narrow
-
-          onClick={() => openSettingsScreen({ screen: SettingsScreens.Stickers })}
-        >
-          {lang('MenuStickers')}
-        </ListItem>
-      </div>
-      <div className="settings-main-menu">
-        {canBuyPremium && (
+      <div className={styles.menuSection}>
+        <Island>
           <ListItem
-            leftElement={<DiamondIcon className="icon ListItem-main-icon" type="premium" size="big" />}
+            icon="settings"
             narrow
-
-            onClick={() => openPremiumModal()}
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.General })}
           >
-            {lang('TelegramPremium')}
+            {lang('TelegramGeneralSettingsViewController')}
           </ListItem>
-        )}
-        <ListItem
-          leftElement={<DiamondIcon className="icon ListItem-main-icon" type="gold" size="big" />}
-          narrow
-
-          onClick={() => openStarsBalanceModal({})}
-        >
-          {lang('MenuStars')}
-          {Boolean(starsBalance) && (
-            <span className="settings-item__current-value">
-              {formatStarsAmount(lang, starsBalance)}
-            </span>
+          <ListItem
+            icon="animations"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.Performance })}
+          >
+            {lang('MenuAnimations')}
+          </ListItem>
+          <ListItem
+            icon="unmute"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.Notifications })}
+          >
+            {lang('Notifications')}
+          </ListItem>
+          <ListItem
+            icon="data"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.DataStorage })}
+          >
+            {lang('DataSettings')}
+          </ListItem>
+          <ListItem
+            icon="lock"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.Privacy })}
+          >
+            {lang('PrivacySettings')}
+          </ListItem>
+          <ListItem
+            icon="folder"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.Folders })}
+          >
+            {lang('Filters')}
+          </ListItem>
+          <ListItem
+            icon="active-sessions"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.ActiveSessions })}
+          >
+            {lang('SessionsTitle')}
+            {sessionCount > 0 && (<span className="settings-item__current-value">{sessionCount}</span>)}
+          </ListItem>
+          <ListItem
+            icon="language"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.Language })}
+          >
+            {lang('Language')}
+            <span className="settings-item__current-value">{lang.languageInfo.nativeName}</span>
+          </ListItem>
+          <ListItem
+            icon="stickers"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.Stickers })}
+          >
+            {lang('MenuStickers')}
+          </ListItem>
+        </Island>
+        <Island>
+          {canBuyPremium && (
+            <ListItem
+              leftElement={<DiamondIcon className="icon ListItem-main-icon" type="premium" size="big" />}
+              narrow
+              onClick={() => openPremiumModal()}
+            >
+              {lang('TelegramPremium')}
+            </ListItem>
           )}
-        </ListItem>
-        {/* Ansible: TON menu hidden */}
-        {isGiveawayAvailable && (
           <ListItem
-            icon="gift"
+            leftElement={<DiamondIcon className="icon ListItem-main-icon" type="gold" size="big" />}
             narrow
-
-            onClick={() => openGiftRecipientPicker()}
+            onClick={() => openStarsBalanceModal({})}
           >
-            {lang('MenuSendGift')}
+            {lang('MenuStars')}
+            {Boolean(starsBalance) && (
+              <span className="settings-item__current-value">
+                {formatStarsAmount(lang, starsBalance)}
+              </span>
+            )}
           </ListItem>
-        )}
-      </div>
-      <div className="settings-main-menu">
-        <ListItem
-          icon="ask-support"
-          narrow
-          onClick={openSupportDialog}
-        >
-          {lang('AskAQuestion')}
-        </ListItem>
-        <ListItem
-          icon="help"
-          narrow
-
-          onClick={() => openUrl({ url: FAQ_URL })}
-        >
-          {lang('MenuTelegramFaq')}
-        </ListItem>
-        <ListItem
-          icon="privacy-policy"
-          narrow
-
-          onClick={() => openUrl({ url: PRIVACY_URL })}
-        >
-          {lang('MenuPrivacyPolicy')}
-        </ListItem>
+          {/* Ansible: TON menu hidden */}
+          {isGiveawayAvailable && (
+            <ListItem
+              icon="gift"
+              narrow
+              onClick={() => openGiftRecipientPicker()}
+            >
+              {lang('MenuSendGift')}
+            </ListItem>
+          )}
+        </Island>
+        <Island>
+          <ListItem
+            icon="ask-support"
+            narrow
+            onClick={openSupportDialog}
+          >
+            {lang('AskAQuestion')}
+          </ListItem>
+          <ListItem
+            icon="help"
+            narrow
+            onClick={() => openUrl({ url: FAQ_URL })}
+          >
+            {lang('MenuTelegramFaq')}
+          </ListItem>
+          <ListItem
+            icon="privacy-policy"
+            narrow
+            onClick={() => openUrl({ url: PRIVACY_URL })}
+          >
+            {lang('MenuPrivacyPolicy')}
+          </ListItem>
+        </Island>
       </div>
       <ConfirmDialog
         isOpen={isSupportDialogOpen}

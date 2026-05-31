@@ -25,6 +25,7 @@ type OwnProps = {
   tabIndex?: number;
   title?: string;
   teactExperimentControlled?: boolean;
+  noMargin?: boolean;
   inputMode?: 'text' | 'none' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search';
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   onInput?: (e: FormEvent<HTMLInputElement>) => void;
@@ -52,6 +53,7 @@ const InputText = ({
   tabIndex,
   title,
   teactExperimentControlled,
+  noMargin,
   onChange,
   onInput,
   onKeyPress,
@@ -69,6 +71,7 @@ const InputText = ({
     disabled && 'disabled',
     readOnly && 'disabled',
     labelText && 'with-label',
+    noMargin && 'no-margin',
     className,
   );
 

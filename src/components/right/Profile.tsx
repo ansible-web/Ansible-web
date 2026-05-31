@@ -1252,7 +1252,6 @@ const Profile = ({
           chatOrUserId={profileId}
           isSavedDialog={isSavedDialog}
           isOwnProfile={isOwnProfile}
-          withIslands
           className={styles.chatExtraBlock}
           style={createVtnStyle('chatExtraBlock', true)}
         />
