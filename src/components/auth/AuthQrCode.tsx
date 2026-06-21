@@ -25,7 +25,7 @@ import Button from '../ui/Button';
 import Loading from '../ui/Loading';
 
 import blankUrl from '../../assets/blank.png';
-import ansibleLogoUrl from '../../assets/telegram-logo-filled.svg';
+import ansibleLogoUrl from '../../assets/ansible-logo-filled.svg';
 
 type StateProps = {
   auth: GlobalState['auth'];

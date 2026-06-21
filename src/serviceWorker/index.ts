@@ -13,7 +13,7 @@ import { handleClientMessage as handleShareMessage, respondForShare } from './sh
 declare const self: ServiceWorkerGlobalScope;
 
 const RE_NETWORK_FIRST_ASSETS = /\.(wasm|html)$/;
-const RE_CACHE_FIRST_ASSETS = /[\da-f]{20}.*\.(js|css|woff2?|svg|png|jpg|jpeg|tgs|json|wasm)$/;
+const RE_CACHE_FIRST_ASSETS = /[\da-f]{20}.*\.(js|css|woff2?|svg|png|jpg|jpeg|ass|json|wasm)$/;
 const ACTIVATE_TIMEOUT = 3000;
 
 self.addEventListener('install', (e) => {

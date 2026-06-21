@@ -9,9 +9,9 @@ import type {
 export const APP_CODE_NAME = 'A';
 export const APP_NAME = process.env.APP_NAME || `Ansible`;
 
-export const PRODUCTION_HOSTNAME = 'ansible.rest';
-export const PRODUCTION_URL = 'https://ansible.rest';
-export const WEB_VERSION_BASE = 'https://ansible.rest/'; // Used to redirect to other versions
+export const PRODUCTION_HOSTNAME = process.env.WEB_DOMAIN || 'web.ansible.su';
+export const PRODUCTION_URL = `https://${PRODUCTION_HOSTNAME}`;
+export const WEB_VERSION_BASE = `https://${PRODUCTION_HOSTNAME}/`; // Used to redirect to other versions
 export const BASE_URL = process.env.BASE_URL;
 export const ACCOUNT_QUERY = 'account';
 
@@ -28,7 +28,7 @@ export const DEBUG_LOG_FILENAME = 'tt-log.json';
 export const STRICTERDOM_ENABLED = DEBUG;
 export const FORCE_FALLBACK_LANG = DEBUG;
 
-export const BETA_CHANGELOG_URL = 'https://telegra.ph/WebA-Beta-03-20';
+export const BETA_CHANGELOG_URL = 'https://ansible.su/changelog';
 
 export const DEBUG_ALERT_MSG = 'Shoot!\nSomething went wrong, please see the error details in Dev Tools Console.';
 export const DEBUG_GRAMJS = false;
@@ -153,7 +153,7 @@ export const PREVIEW_AVATAR_COUNT = 3;
 
 export const DRAFT_DEBOUNCE = 10000; // 10s
 export const SEND_MESSAGE_ACTION_INTERVAL = 3000; // 3s
-// 10000s from https://corefork.ansible.rest/api/url-authorization#automatic-authorization
+// 10000s from https://corefork.ansible.su/api/url-authorization#automatic-authorization
 export const APP_CONFIG_REFETCH_INTERVAL = 10000 * 1000;
 export const GENERAL_REFETCH_INTERVAL = 60 * 60 * 1000; // 1h
 
@@ -266,7 +266,7 @@ export const SVG_EXTENSIONS = new Set(['svg', 'svgz']);
 export const VIDEO_WEBM_TYPE = 'video/webm';
 export const GIF_MIME_TYPE = 'image/gif';
 
-export const LOTTIE_STICKER_MIME_TYPE = 'application/x-tgsticker';
+export const LOTTIE_STICKER_MIME_TYPE = 'application/x-ansible-sticker';
 export const VIDEO_STICKER_MIME_TYPE = VIDEO_WEBM_TYPE;
 
 export const SUPPORTED_PHOTO_CONTENT_TYPES = new Set([
@@ -294,8 +294,8 @@ export const CONTENT_TYPES_WITH_PREVIEW = new Set([
   ...SUPPORTED_VIDEO_CONTENT_TYPES,
 ]);
 
-export const STORYBOARD_MIME = 'application/x-tgstoryboard';
-export const STORYBOARD_MAP_MIME = 'application/x-tgstoryboardmap';
+export const STORYBOARD_MIME = 'application/x-ansible-storyboard';
+export const STORYBOARD_MAP_MIME = 'application/x-ansible-storyboardmap';
 
 // Taken from https://github.com/telegramdesktop/tdesktop/blob/41d9a9fcbd0c809c60ddbd9350791b1436aff7d9/Telegram/SourceFiles/ui/boxes/choose_language_box.cpp#L28
 export const SUPPORTED_TRANSLATION_LANGUAGES = [
@@ -322,13 +322,13 @@ export const RE_MENTION_TEMPLATE = '(@[\\w\\d_-]+)';
 export const RE_TG_LINK = /^as:(\/\/)?/i;
 export const RE_TME_LINK = /^(https?:\/\/)?([-a-zA-Z0-9@:%_+~#=]{1,32}\.)?t\.me(?=[:/?#]|$)/i;
 export const RE_TELEGRAM_LINK = /^(https?:\/\/)?telegram\.org\//i;
-export const TME_LINK_PREFIX = 'https://ansible.rest/';
+export const TME_LINK_PREFIX = 'https://ansible.su/';
 export const BOT_FATHER_USERNAME = 'botfather';
 export const USERNAME_PURCHASE_ERROR = 'USERNAME_PURCHASE_AVAILABLE';
 export const MESSAGE_ID_REQUIRED_ERROR = 'MESSAGE_ID_REQUIRED';
 export const PURCHASE_USERNAME = 'auction';
 export const ACCEPTABLE_USERNAME_ERRORS = new Set([USERNAME_PURCHASE_ERROR, 'USERNAME_INVALID']);
-export const TME_WEB_DOMAINS = new Set(['ansible.rest', 'web.ansible.rest']);
+export const TME_WEB_DOMAINS = new Set(['ansible.su', 'web.ansible.su']);
 export const WEB_APP_PLATFORM = 'weba';
 export const LANG_PACK = 'weba';
 
@@ -363,11 +363,11 @@ export const MAX_MEDIA_FILES_FOR_ALBUM = 10;
 export const MAX_ACTIVE_PINNED_CHATS = 5;
 export const SCHEDULED_WHEN_ONLINE = 0x7FFFFFFE;
 export const LANG_PACKS = ['android', 'ios', 'tdesktop', 'macos'] as const;
-export const FEEDBACK_URL = 'https://ansible.rest/feedback';
-export const FAQ_URL = 'https://ansible.rest/faq';
-export const PRIVACY_URL = 'https://ansible.rest/privacy';
-export const MINI_APP_TOS_URL = 'https://ansible.rest/tos/mini-apps';
-export const FRAGMENT_ADS_URL = 'https://fragment.com/ads';
+export const FEEDBACK_URL = 'https://ansible.su/feedback';
+export const FAQ_URL = 'https://ansible.su/faq';
+export const PRIVACY_URL = 'https://ansible.su/privacy';
+export const MINI_APP_TOS_URL = 'https://ansible.su/tos/mini-apps';
+export const FRAGMENT_ADS_URL = 'https://ansible.su/ads';
 export const GENERAL_TOPIC_ID = 1;
 export const FRESH_AUTH_PERIOD = 86400; // 1 day
 export const GIVEAWAY_BOOST_PER_PREMIUM = 4;

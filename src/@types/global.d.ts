@@ -99,7 +99,7 @@ declare module '*.txt' {
   const url: string;
   export default url;
 }
-declare module '*.tgs' {
+declare module '*.ass' {
   const url: string;
   export default url;
 }

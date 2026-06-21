@@ -8,7 +8,7 @@ import { IS_TAURI } from './browser/globalEnvironment';
 import { hasStoredSession } from './sessions';
 
 const WEBSYNC_URLS = [
-  'ansible.rest',
+  'ansible.su',
 ].map((domain) => `https://${domain}/_websync_?`);
 const WEBSYNC_VERSION = `${APP_VERSION} ${APP_CODE_NAME}`;
 const WEBSYNC_KEY = 'tgme_sync';
@@ -31,7 +31,7 @@ let lastTimeout: NodeJS.Timeout | undefined;
 export const forceWebsync = (authed: boolean) => {
   if (IS_MOCKED_CLIENT || IS_TAURI) return undefined;
   // Ansible: websync (cross-tab login-state propagation via remote <script>)
-  // disabled — endpoint /_websync_ нет на ansible.rest (404 spam в console),
+  // disabled — endpoint /_websync_ нет на ansible.su (404 spam в console),
   // и cross-tab sync на одном домене уже работает через BroadcastChannel
   // / shared sessions API. Leaving stub чтоб не trigger обратные эффекты
   // в caller.

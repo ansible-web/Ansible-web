@@ -40,8 +40,8 @@ const {
 
 const CSP = `
   default-src 'self';
-  connect-src 'self' wss://*.ansible.rest blob: http: https: ${APP_ENV === 'development' ? 'wss: ipc:' : ''};
-  script-src 'self' 'wasm-unsafe-eval' https://ansible.rest/_websync_;
+  connect-src 'self' wss://*.ansible.su blob: http: https: ${APP_ENV === 'development' ? 'wss: ipc:' : ''};
+  script-src 'self' 'wasm-unsafe-eval' https://ansible.su/_websync_;
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob: https://ss3.4sqi.net/img/categories_v2/;
   media-src 'self' blob: data:;
@@ -164,7 +164,7 @@ export default function createConfig(
           ],
         },
         {
-          test: /\.(woff(2)?|ttf|eot|svg|png|jpg|tgs|webp)(\?v=\d+\.\d+\.\d+)?$/,
+          test: /\.(woff(2)?|ttf|eot|svg|png|jpg|ass|webp)(\?v=\d+\.\d+\.\d+)?$/,
           type: 'asset/resource',
         },
         {
@@ -228,6 +228,9 @@ export default function createConfig(
         APP_TITLE,
         ANSIBLE_API_ID: undefined,
         ANSIBLE_API_HASH: undefined,
+        // Домены среды инжектятся as-ship'ом из Vault (--env dev|master). Дефолты = прод.
+        WEB_DOMAIN: 'web.ansible.su',
+        APEX_DOMAIN: 'ansible.su',
         // eslint-disable-next-line no-null/no-null
         TEST_SESSION: null,
         BASE_URL,

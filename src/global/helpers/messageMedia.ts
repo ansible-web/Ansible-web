@@ -560,7 +560,7 @@ export function getMediaFilename(media: DownloadableMedia) {
   }
 
   if (media.mediaType === 'sticker') {
-    const extension = media.isLottie ? 'tgs' : media.isVideo ? 'webm' : 'webp';
+    const extension = media.isLottie ? 'ass' : media.isVideo ? 'webm' : 'webp';
     return `${media.id}.${extension}`;
   }
 

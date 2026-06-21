@@ -184,12 +184,12 @@ export function getDisplayName(entity: Entity) {
  * @return {{port: number, ipAddress: string, id: number}}
  */
 export function getDC(dcId: number, downloadDC = false) {
-  // TODO Move to external config
-  // MVSy (BeHappy) server — all DCs point to our server
-  // Uses wss:// via nginx reverse proxy (ws.ansible.rest → backend WS)
+  // Ansible/MVSy — per-DC subdomains (Telegram-style: dws<dcId>.web.<domain>).
+  // WEB_DOMAIN injected at build (as-ship --env); default = prod. dws1 = СПб.
+  const web = process.env.WEB_DOMAIN || 'web.ansible.su';
   return {
     id: dcId,
-    ipAddress: 'ws.ansible.rest',
+    ipAddress: `dws${dcId}${downloadDC ? '-1' : ''}.${web}`,
     port: 443,
   };
   // TODO chose based on current connection method

@@ -16,7 +16,7 @@ import useAsync from './useAsync';
 import useMedia from './useMedia';
 import useOldLang from './useOldLang';
 
-import telegramLogoPath from '../assets/telegram-logo-filled.svg';
+import telegramLogoPath from '../assets/ansible-logo-filled.svg';
 
 const LOGO_DIMENSIONS = { width: 200, height: 200 };
 const MINIMAL_SIZE = 115; // spec says 100, but on Chrome 93 it's not showing
