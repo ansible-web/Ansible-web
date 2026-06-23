@@ -616,7 +616,7 @@ function renderVoice(
                   stroke-linejoin="round"
                   rx="6"
                   ry="6"
-                  stroke="white"
+                  stroke="currentColor"
                   stroke-dashoffset="1"
                   stroke-dasharray="32,68"
                 />
