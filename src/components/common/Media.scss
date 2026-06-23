@@ -34,3 +34,19 @@
     object-fit: cover;
   }
 }
+
+.roundTopStart {
+  border-start-start-radius: var(--border-radius-island);
+}
+
+.roundTopEnd {
+  border-start-end-radius: var(--border-radius-island);
+}
+
+.roundBottomStart {
+  border-end-start-radius: var(--border-radius-island);
+}
+
+.roundBottomEnd {
+  border-end-end-radius: var(--border-radius-island);
+}
