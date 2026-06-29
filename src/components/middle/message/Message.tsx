@@ -1475,7 +1475,7 @@ const Message = ({
             {hasText && !hasAnimatedEmoji && (
               <div className={textContentClass} dir="auto">
                 {renderMessageText()}
-                {isNewTextPending && renderMessageTextAnimation()}
+                {isNewTextPending && (isSummaryPending || Boolean(translatedText)) && renderMessageTextAnimation()}
                 {hasFactCheck && (
                   <FactCheck factCheck={factCheck} isToggleDisabled={isInSelectMode} />
                 )}
@@ -1531,7 +1531,7 @@ const Message = ({
         {hasText && !hasAnimatedEmoji && (
           <div className={textContentClass} dir="auto">
             {renderMessageText()}
-            {isNewTextPending && renderMessageTextAnimation()}
+            {isNewTextPending && (isSummaryPending || Boolean(translatedText)) && renderMessageTextAnimation()}
             {!hasContentAfterText && isMetaInText && renderReactionsAndMeta()}
           </div>
         )}
