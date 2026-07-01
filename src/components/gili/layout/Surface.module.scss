@@ -2,7 +2,10 @@
 
 @layer ui.layout {
   .root {
-    padding-inline: 1rem;
+    --surface-inline-padding: 1rem 1rem;
+    --surface-breakout-margin: -1rem -1rem;
+
+    padding-inline: var(--surface-inline-padding);
     background-color: var(--color-background-secondary);
   }
 
