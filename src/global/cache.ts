@@ -384,6 +384,14 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
     cached.chats.listIds = initialState.chats.listIds;
   }
 
+  if (cached.cacheVersion < 4) {
+    cached.cacheVersion = 4;
+    // Backend serialization for stickers/custom emoji changed (thumbnails/attributes);
+    // drop cached sets and custom emoji so they are re-fetched fresh from the server.
+    cached.stickers = initialState.stickers;
+    cached.customEmojis = initialState.customEmojis;
+  }
+
   if (!cached.auth) {
     cached.auth = initialState.auth;
     cached.auth.rememberMe = untypedCached.rememberMe;
