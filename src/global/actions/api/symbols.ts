@@ -278,7 +278,7 @@ addActionHandler('loadDefaultTopicIcons', async (global): Promise<void> => {
   setGlobal(global);
 });
 
-addActionHandler('loadDefaultStatusIcons', async (global, actions): Promise<void> => {
+addActionHandler('loadDefaultStatusIcons', async (global): Promise<void> => {
   const stickerSet = await callApi('fetchDefaultStatusEmojis');
   if (!stickerSet) {
     return;
@@ -291,13 +291,6 @@ addActionHandler('loadDefaultStatusIcons', async (global, actions): Promise<void
   global = updateStickerSet(global, fullSet.id, fullSet);
   global = { ...global, defaultStatusIconsId: fullSet.id };
   setGlobal(global);
-
-  // Preload the docs into customEmojis so status badges/pickers render instantly
-  // (no broken-placeholder flash on first display). Mirrors loadUserCollectibleStatuses.
-  const ids = stickers.map(({ id }) => id).filter(Boolean);
-  if (ids.length) {
-    actions.loadCustomEmojis({ ids });
-  }
 });
 
 addActionHandler('loadUserCollectibleStatuses', async (global, actions): Promise<void> => {
