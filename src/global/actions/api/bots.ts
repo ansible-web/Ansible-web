@@ -45,6 +45,7 @@ import {
 import {
   activateWebAppIfOpen,
   addWebAppToOpenList,
+  removeWebAppFromOpenList,
   replaceInlineBotSettings,
   replaceInlineBotsIsLoading,
 } from '../../reducers/bots';
@@ -1065,10 +1066,23 @@ addActionHandler('callAttachBot', (global, actions, payload): ActionReturnType =
   if ('chatId' in payload) {
     const { chatId, threadId = MAIN_THREAD_ID, url } = payload;
     actions.openThread({ chatId, threadId, tabId });
+
+    const launchBotId = isFromBotMenu ? chatId : bot.id;
+    // The bot's mini-app may already be open (e.g. the recipient picker was
+    // launched from inside the wallet itself). Re-launching would only
+    // re-focus the stale instance and drop the chosen recipient, so close it
+    // first — the fresh launch then carries the new peer and the backend
+    // returns start_param=send_<peerId>, landing on the send screen.
+    const openKey = getWebAppKey({ botId: launchBotId });
+    if (openKey && isWepAppOpened(global, { botId: launchBotId }, tabId)) {
+      global = removeWebAppFromOpenList(global, openKey, true, tabId);
+      setGlobal(global);
+    }
+
     actions.requestWebView({
       url,
       peerId: chatId,
-      botId: (isFromBotMenu ? chatId : bot.id),
+      botId: launchBotId,
       theme,
       buttonText: '',
       isFromBotMenu,
