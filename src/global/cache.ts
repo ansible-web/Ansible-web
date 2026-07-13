@@ -392,6 +392,13 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
     cached.customEmojis = initialState.customEmojis;
   }
 
+  if (cached.cacheVersion < 5) {
+    cached.cacheVersion = 5;
+    // A default sticker set is now served to every user via getAllStickers; drop
+    // cached sticker sets so it appears in "added" without a manual cache clear.
+    cached.stickers = initialState.stickers;
+  }
+
   if (!cached.auth) {
     cached.auth = initialState.auth;
     cached.auth.rememberMe = untypedCached.rememberMe;
