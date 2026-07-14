@@ -60,6 +60,7 @@ export type OwnProps = {
   messageListType?: MessageListType;
   paidMessagesStars?: number;
   canInsertDate?: boolean;
+  menuPositionX: 'left' | 'right';
   onFileSelect: (files: File[]) => void;
   onDateInsert: (text: ApiFormattedText) => void;
   onPollCreate: NoneToVoidFunction;
@@ -89,6 +90,7 @@ const AttachMenu = ({
   messageListType,
   paidMessagesStars,
   canInsertDate,
+  menuPositionX,
   onFileSelect,
   onDateInsert,
   onMenuOpen,
@@ -232,7 +234,7 @@ const AttachMenu = ({
             id="attach-menu-controls"
             isOpen={isMenuOpen}
             autoClose
-            positionX="right"
+            positionX={menuPositionX}
             positionY="bottom"
             onClose={closeAttachMenu}
             className="AttachMenu--menu fluid"

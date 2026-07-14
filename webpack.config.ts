@@ -145,9 +145,15 @@ export default function createConfig(
     module: {
       rules: [
         {
+          // AudioWorklet source must reach the browser untranspiled and unbundled,
+          // otherwise `AudioWorkletGlobalScope` blows up on the module wrapper
+          test: /recorderWorklet\.js$/,
+          type: 'asset/resource',
+        },
+        {
           test: /\.(ts|tsx|js|mjs|cjs)$/,
           loader: 'babel-loader',
-          exclude: /node_modules/,
+          exclude: [/node_modules/, /recorderWorklet\.js$/],
         },
         {
           test: /\.css$/,

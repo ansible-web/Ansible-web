@@ -1222,6 +1222,13 @@ export interface LangPair {
   'ComposerStoryPlaceholderLocked': undefined;
   'ComposerPlaceholderNoText': undefined;
   'AriaComposerCancelVoice': undefined;
+  'VoiceRecordMicError': undefined;
+  'AriaComposerPauseVoice': undefined;
+  'AriaComposerResumeVoice': undefined;
+  'AriaComposerPauseVideo': undefined;
+  'AriaComposerResumeVideo': undefined;
+  'AriaComposerPlayVoice': undefined;
+  'AriaComposerPausePlayback': undefined;
   'PreviewEditMessage': undefined;
   'FileDropZoneTitle': undefined;
   'FileDropZoneQuick': undefined;

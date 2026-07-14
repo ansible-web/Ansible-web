@@ -55,7 +55,7 @@ import {
   STARS_CURRENCY_CODE,
   VIDEO_RECORDING_FILENAME,
 } from '../../config';
-import { requestMeasure, requestNextMutation } from '../../lib/fasterdom/fasterdom';
+import { requestMeasure, requestMutation, requestNextMutation } from '../../lib/fasterdom/fasterdom';
 import {
   canEditMedia,
   getAllowedAttachmentOptions,
@@ -120,7 +120,7 @@ import {
   IS_IOS, IS_VIDEO_RECORDING_SUPPORTED, IS_VOICE_RECORDING_SUPPORTED,
 } from '../../util/browser/windowEnvironment';
 import buildClassName from '../../util/buildClassName';
-import { formatMediaDuration, formatVoiceRecordDuration } from '../../util/dates/oldDateFormat';
+import { formatMediaDuration } from '../../util/dates/oldDateFormat';
 import { processDeepLink } from '../../util/deeplink';
 import { tryParseDeepLink } from '../../util/deepLinkParser';
 import deleteLastCharacterOutsideSelection from '../../util/deleteLastCharacterOutsideSelection';
@@ -135,6 +135,7 @@ import { MEMO_EMPTY_ARRAY } from '../../util/memo';
 import parseHtmlAsFormattedText from '../../util/parseHtmlAsFormattedText';
 import { insertHtmlInSelection } from '../../util/selection';
 import { getServerTime } from '../../util/serverTime';
+import stopEvent from '../../util/stopEvent';
 import windowSize from '../../util/windowSize';
 import { DEFAULT_MAX_MESSAGE_LENGTH } from '../../limits';
 import applyIosAutoCapitalizationFix from '../middle/composer/helpers/applyIosAutoCapitalizationFix';
@@ -150,6 +151,7 @@ import { getTextWithEntitiesAsHtml } from './helpers/renderTextWithEntities';
 import useInterval from '../../hooks/schedulers/useInterval';
 import useTimeout from '../../hooks/schedulers/useTimeout';
 import useContextMenuHandlers from '../../hooks/useContextMenuHandlers';
+import useCurrentOrPrev from '../../hooks/useCurrentOrPrev';
 import useDerivedState from '../../hooks/useDerivedState';
 import useEffectWithPrevDeps from '../../hooks/useEffectWithPrevDeps';
 import useFlag from '../../hooks/useFlag';
@@ -159,10 +161,10 @@ import useLang from '../../hooks/useLang';
 import useLastCallback from '../../hooks/useLastCallback';
 import useOldLang from '../../hooks/useOldLang';
 import usePeerColor from '../../hooks/usePeerColor';
-import usePrevious from '../../hooks/usePrevious';
 import usePreviousDeprecated from '../../hooks/usePreviousDeprecated';
 import useSchedule from '../../hooks/useSchedule';
 import useSendMessageAction from '../../hooks/useSendMessageAction';
+import useShowTransition from '../../hooks/useShowTransition';
 import useShowTransitionDeprecated from '../../hooks/useShowTransitionDeprecated';
 import { useStateRef } from '../../hooks/useStateRef';
 import useSyncEffect from '../../hooks/useSyncEffect';
@@ -202,6 +204,7 @@ import SendAsMenu from '../middle/composer/SendAsMenu.async';
 import StickerTooltip from '../middle/composer/StickerTooltip.async';
 import SymbolMenuButton from '../middle/composer/SymbolMenuButton';
 import ToDoListModal from '../middle/composer/ToDoListModal.async';
+import VoiceRecordBar from '../middle/composer/VoiceRecordBar';
 import WebPagePreview from '../middle/composer/WebPagePreview';
 import MessageEffect from '../middle/message/MessageEffect';
 import ReactionSelector from '../middle/message/reactions/ReactionSelector';
@@ -357,6 +360,7 @@ const MOBILE_KEYBOARD_HIDE_DELAY_MS = 100;
 const SELECT_MODE_TRANSITION_MS = 200;
 const SENDING_ANIMATION_DURATION = 350;
 const MOUNT_ANIMATION_DURATION = 430;
+const PAID_STARS_CLOSE_DURATION = 300;
 
 const Composer = ({
   type,
@@ -775,14 +779,16 @@ const Composer = ({
   const {
     startRecordingVoice,
     stopRecordingVoice,
+    cancelRecordingVoice,
     pauseRecordingVoice,
+    resumeRecordingVoice,
+    toggleViewOnceEnabled,
+    subscribeToRecordingPeaks,
     activeVoiceRecording,
-    currentRecordTime,
+    isRecordingPaused,
     recordButtonRef: mainButtonRef,
-    startRecordTimeRef,
     isViewOnceEnabled,
     setIsViewOnceEnabled,
-    toogleViewOnceEnabled,
   } = useVoiceRecording();
 
   const {
@@ -790,17 +796,28 @@ const Composer = ({
     stopRecordingVideo,
     finishRecordingVideo,
     discardRecordingVideo,
+    pauseRecordingVideo,
+    resumeRecordingVideo,
     activeVideoRecording,
     previewStream,
-    currentRecordTime: videoCurrentRecordTime,
-    startRecordTimeRef: videoStartRecordTimeRef,
-    getProgress,
+    isVideoRecordingStarting,
+    isVideoRecordingReady,
+    isVideoRecordingPaused,
     isRecordingFinished,
+    getProgress,
+    subscribeToVideoRecordingPeaks,
   } = useVideoRecording();
 
   const activeRecording = activeVoiceRecording || activeVideoRecording;
-  const recordTime = activeVideoRecording ? videoCurrentRecordTime : currentRecordTime;
-  const recordTimeStartRef = activeVideoRecording ? videoStartRecordTimeRef : startRecordTimeRef;
+  const [isEmbeddedMessageOpen, setIsEmbeddedMessageOpen] = useState(false);
+
+  useEffect(() => {
+    if (!activeRecording) return;
+    const input = document.getElementById(editableInputId);
+    if (input && document.activeElement === input) {
+      input.blur();
+    }
+  }, [activeRecording, editableInputId]);
 
   const shouldSendRecordingStatus = isForCurrentMessageList && !isInStoryViewer;
   useInterval(() => {
@@ -1033,15 +1050,15 @@ const Composer = ({
 
   // Handle chat change (should be placed after `useDraft` and `useEditing`)
   const resetComposerRef = useStateRef(resetComposer);
-  const stopRecordingVoiceRef = useStateRef(stopRecordingVoice);
+  const cancelRecordingVoiceRef = useStateRef(cancelRecordingVoice);
   useEffect(() => {
     return () => {
       // eslint-disable-next-line react-hooks-static-deps/exhaustive-deps
-      stopRecordingVoiceRef.current();
+      cancelRecordingVoiceRef.current();
       // eslint-disable-next-line react-hooks-static-deps/exhaustive-deps
       resetComposerRef.current();
     };
-  }, [chatId, threadId, resetComposerRef, stopRecordingVoiceRef]);
+  }, [chatId, threadId, resetComposerRef, cancelRecordingVoiceRef]);
 
   const areAllGiftsDisallowed = useMemo(() => {
     if (!disallowedGifts) {
@@ -1110,13 +1127,16 @@ const Composer = ({
     handleContextMenuHide,
   } = useContextMenuHandlers(mainButtonRef, !(mainButtonState === MainButtonState.Send && canShowCustomSendMenu));
 
+  const canSwitchRecordMode = CAN_SWITCH_RECORD_MODE
+    && canSendVoiceByPrivacy && canSendVoices && canSendRoundVideos;
+
   const {
     isContextMenuOpen: isRecordModeMenuOpen,
     handleContextMenu: handleRecordModeContextMenu,
     handleContextMenuClose: handleRecordModeMenuClose,
     handleContextMenuHide: handleRecordModeMenuHide,
   } = useContextMenuHandlers(
-    mainButtonRef, !(mainButtonState === MainButtonState.Record && CAN_SWITCH_RECORD_MODE),
+    mainButtonRef, !(mainButtonState === MainButtonState.Record && canSwitchRecordMode),
   );
 
   const handleSelectRecordMode = useLastCallback((mode: RecordMode) => {
@@ -2019,7 +2039,11 @@ const Composer = ({
           if (!canSendVoiceByPrivacy) {
             showNotification({
               message: isRecordingVideoMode
-                ? { key: 'VideoMessagesRestrictedByPrivacy', variables: { user: chat?.title ?? '' } }
+                ? {
+                  key: 'VideoMessagesRestrictedByPrivacy',
+                  variables: { user: chat?.title ?? '' },
+                  options: { withNodes: true, withMarkdown: true },
+                }
                 : oldLang('VoiceMessagesRestrictedByPrivacy', chat?.title),
             });
           } else if (isRecordingVideoMode ? !canSendRoundVideos : !canSendVoices) {
@@ -2060,8 +2084,8 @@ const Composer = ({
   let mainButtonContextMenuHandler: typeof handleContextMenu | undefined;
   if (mainButtonState === MainButtonState.Send && canShowCustomSendMenu) {
     mainButtonContextMenuHandler = handleContextMenu;
-  } else if (mainButtonState === MainButtonState.Record && CAN_SWITCH_RECORD_MODE) {
-    mainButtonContextMenuHandler = handleRecordModeContextMenu;
+  } else if (mainButtonState === MainButtonState.Record) {
+    mainButtonContextMenuHandler = canSwitchRecordMode ? handleRecordModeContextMenu : stopEvent;
   }
 
   let sendButtonAriaLabel = 'SendMessage';
@@ -2082,9 +2106,11 @@ const Composer = ({
 
   const fullClassName = buildClassName(
     'Composer',
+    isInMessageList && 'is-chat-composer',
     !isSelectModeActive && 'shown',
     isHoverDisabled && 'hover-disabled',
     isMounted && 'mounted',
+    isEmbeddedMessageOpen && 'with-embedded',
     className,
   );
 
@@ -2215,8 +2241,44 @@ const Composer = ({
 
   const effectEmoji = areEffectsSupported && effect?.emoticon;
 
-  const shouldRenderPaidBadge = Boolean(paidMessagesStars && mainButtonState === MainButtonState.Send);
-  const prevShouldRenderPaidBadge = usePrevious(shouldRenderPaidBadge);
+  const {
+    ref: voiceRecordBarRef, shouldRender: shouldRenderVoiceRecordBar,
+  } = useShowTransition<HTMLDivElement>({
+    isOpen: Boolean(activeRecording),
+    withShouldRender: true,
+  });
+  const renderedRecording = useCurrentOrPrev(activeRecording);
+
+  const {
+    ref: roundVideoRecorderRef, shouldRender: shouldRenderRoundVideoRecorder,
+  } = useShowTransition<HTMLDivElement>({
+    isOpen: isVideoRecordingStarting || Boolean(activeVideoRecording && previewStream),
+    withShouldRender: true,
+    className: false,
+  });
+  const renderedVideoRecording = useCurrentOrPrev(activeVideoRecording);
+  const renderedPreviewStream = useCurrentOrPrev(previewStream);
+
+  const isPaidSend = Boolean(paidMessagesStars && mainButtonState === MainButtonState.Send);
+  const { ref: paidStarsRef, shouldRender: shouldRenderPaidStars } = useShowTransition({
+    isOpen: isPaidSend,
+    withShouldRender: true,
+    className: 'slow',
+    closeDuration: PAID_STARS_CLOSE_DURATION,
+  });
+
+  useEffect(() => {
+    const starsEl = paidStarsRef.current;
+    const buttonEl = mainButtonRef.current;
+    if (!starsEl || !buttonEl) return;
+
+    requestMeasure(() => {
+      const width = starsEl.scrollWidth + 1;
+      requestMutation(() => {
+        buttonEl.style.setProperty('--paid-stars-width', `${width}px`);
+      });
+    });
+  }, [shouldRenderPaidStars, starsForAllMessages, paidStarsRef, mainButtonRef]);
 
   return (
     <div className={fullClassName}>
@@ -2313,11 +2375,29 @@ const Composer = ({
         onClick={handleBotCommandSelect}
         onClose={closeChatCommandTooltip}
       />
+      {isInMessageList && (
+        <>
+          <ComposerEmbeddedMessage
+            onClear={handleEmbeddedClear}
+            onIsOpenChange={setIsEmbeddedMessageOpen}
+            shouldForceShowEditing={Boolean(shouldForceShowEditing && editingMessage)}
+            chatId={chatId}
+            threadId={threadId}
+            messageListType={messageListType}
+          />
+          <WebPagePreview
+            chatId={chatId}
+            threadId={threadId}
+            isDisabled={!canAttachEmbedLinks || hasAttachments || !hasText}
+            isEditing={Boolean(editingMessage)}
+          />
+        </>
+      )}
       <div className={
         buildClassName('composer-wrapper', isInStoryViewer && 'with-story-tweaks', isNeedPremium && 'is-need-premium')
       }
       >
-        {!isNeedPremium && (
+        {isInStoryViewer && !isNeedPremium && (
           <svg className="svg-appendix" width="9" height="20">
             <defs>
               <filter
@@ -2351,37 +2431,29 @@ const Composer = ({
           </svg>
         )}
         {isInMessageList && (
-          <>
-            <InlineBotTooltip
-              isOpen={isInlineBotTooltipOpen}
-              botId={inlineBotId}
-              isGallery={isInlineBotTooltipGallery}
-              inlineBotResults={inlineBotResults}
-              switchPm={inlineBotSwitchPm}
-              switchWebview={inlineBotSwitchWebview}
-              loadMore={loadMoreForInlineBot}
-              isSavedMessages={isChatWithSelf}
-              canSendGifs={canSendGifs}
-              isCurrentUserPremium={isCurrentUserPremium}
-              onSelectResult={handleInlineBotSelect}
-              onClose={closeInlineBotTooltip}
-            />
-            <ComposerEmbeddedMessage
-              onClear={handleEmbeddedClear}
-              shouldForceShowEditing={Boolean(shouldForceShowEditing && editingMessage)}
-              chatId={chatId}
-              threadId={threadId}
-              messageListType={messageListType}
-            />
-            <WebPagePreview
-              chatId={chatId}
-              threadId={threadId}
-              isDisabled={!canAttachEmbedLinks || hasAttachments || !hasText}
-              isEditing={Boolean(editingMessage)}
-            />
-          </>
+          <InlineBotTooltip
+            isOpen={isInlineBotTooltipOpen}
+            botId={inlineBotId}
+            isGallery={isInlineBotTooltipGallery}
+            inlineBotResults={inlineBotResults}
+            switchPm={inlineBotSwitchPm}
+            switchWebview={inlineBotSwitchWebview}
+            loadMore={loadMoreForInlineBot}
+            isSavedMessages={isChatWithSelf}
+            canSendGifs={canSendGifs}
+            isCurrentUserPremium={isCurrentUserPremium}
+            onSelectResult={handleInlineBotSelect}
+            onClose={closeInlineBotTooltip}
+          />
         )}
-        <div className={buildClassName('message-input-wrapper', peerColorClass)} style={peerColorStyle}>
+        <div
+          className={buildClassName(
+            'message-input-wrapper',
+            peerColorClass,
+            activeRecording && 'is-voice-recording',
+          )}
+          style={peerColorStyle}
+        >
           {isInMessageList && (
             <>
               {withBotMenuButton && (
@@ -2395,7 +2467,7 @@ const Composer = ({
               {withBotCommands && (
                 <ResponsiveHoverButton
                   className={buildClassName(
-                    'bot-commands', 'composer-action-button',
+                    'bot-commands', 'composer-action-button', isBotCommandMenuOpen && 'activated',
                   )}
                   round
                   disabled={botCommands === undefined}
@@ -2403,7 +2475,7 @@ const Composer = ({
                   onActivate={handleActivateBotCommandMenu}
                   ariaLabel="Open bot command keyboard"
                 >
-                  <Icon name="bot-commands-filled" />
+                  <Icon name="menu" />
                 </ResponsiveHoverButton>
               )}
               {canShowSendAs && sendAsPeer && (
@@ -2426,31 +2498,35 @@ const Composer = ({
               )}
             </>
           )}
-          {((!isComposerBlocked || canSendGifs || canSendStickers) && !isNeedPremium && !isAccountFrozen) && (
-            <SymbolMenuButton
+          {!isNeedPremium && (
+            <AttachMenu
               chatId={chatId}
               threadId={threadId}
-              isMobile={isMobile}
-              isReady={isReady}
-              isSymbolMenuOpen={isSymbolMenuOpen}
-              openSymbolMenu={openSymbolMenu}
-              closeSymbolMenu={closeSymbolMenu}
-              canSendStickers={canSendStickers}
-              canSendGifs={canSendGifs}
-              isMessageComposer={isInMessageList}
-              onGifSelect={handleGifSelect}
-              onGifAddCaption={handleGifAddCaption}
-              onStickerSelect={handleStickerSelect}
-              onCustomEmojiSelect={handleCustomEmojiSelect}
-              onRemoveSymbol={removeSymbol}
-              onEmojiSelect={insertTextAndUpdateCursor}
-              closeBotCommandMenu={closeBotCommandMenu}
-              closeSendAsMenu={closeSendAsMenu}
-              isSymbolMenuForced={isSymbolMenuForced}
-              canSendPlainText={!isComposerBlocked}
-              inputCssSelector={editableInputCssSelector}
-              idPrefix={type}
-              forceDarkTheme={isInStoryViewer}
+              editingMessage={editingMessage}
+              canEditMedia={canMediaBeReplaced}
+              isButtonVisible={!activeRecording}
+              canAttachMedia={canAttachMedia}
+              canAttachPolls={canAttachPolls}
+              canAttachToDoLists={canAttachToDoLists}
+              canSendPhotos={canSendPhotos}
+              canSendVideos={canSendVideos}
+              canSendDocuments={canSendDocuments}
+              canSendAudios={canSendAudios}
+              canInsertDate={!isComposerBlocked}
+              onFileSelect={handleFileSelect}
+              onDateInsert={handleFormattedDateInsert}
+              onPollCreate={openPollModal}
+              onTodoListCreate={handleTodoListCreate}
+              isScheduled={isInScheduledList}
+              attachBots={isInMessageList ? attachBots : undefined}
+              peerType={attachMenuPeerType}
+              shouldCollectDebugLogs={shouldCollectDebugLogs}
+              theme={theme}
+              onMenuOpen={onAttachMenuOpen}
+              onMenuClose={onAttachMenuClose}
+              messageListType={messageListType}
+              paidMessagesStars={paidMessagesStars}
+              menuPositionX={isInMessageList ? 'left' : 'right'}
             />
           )}
           <Button
@@ -2537,7 +2613,7 @@ const Composer = ({
                         className="composer-action-button"
                         color="translucent"
                         onClick={handleGiftClick}
-                        iconName="gift"
+                        iconName="closed-gift"
                       />
                     )}
                     {shouldShowSuggestedPostButton && (
@@ -2567,46 +2643,57 @@ const Composer = ({
               </Transition>
             </>
           )}
-          {activeRecording && Boolean(recordTime) && (
-            <span className="recording-state">
-              {formatVoiceRecordDuration(recordTime - recordTimeStartRef.current!)}
-            </span>
-          )}
-          {activeVideoRecording && previewStream && (
-            <RoundVideoRecorder
-              previewStream={previewStream}
-              getProgress={getProgress}
-              isFrozen={isRecordingFinished}
+          {shouldRenderVoiceRecordBar && renderedRecording && (
+            <VoiceRecordBar
+              ref={voiceRecordBarRef}
+              recording={renderedRecording}
+              isVideo={Boolean(activeVideoRecording)}
+              isPaused={activeVideoRecording ? (isVideoRecordingPaused || isRecordingFinished) : isRecordingPaused}
+              canSendOneTimeMedia={canSendOneTimeMedia}
+              isViewOnceEnabled={isViewOnceEnabled}
+              onPause={activeVideoRecording ? pauseRecordingVideo : pauseRecordingVoice}
+              onResume={activeVideoRecording ? resumeRecordingVideo : resumeRecordingVoice}
+              onCancel={activeVideoRecording ? discardRecordingVideo : cancelRecordingVoice}
+              onToggleViewOnce={toggleViewOnceEnabled}
+              subscribeToPeaks={activeVideoRecording ? subscribeToVideoRecordingPeaks : subscribeToRecordingPeaks}
             />
           )}
-          {!isNeedPremium && (
-            <AttachMenu
+          {shouldRenderRoundVideoRecorder && (
+            <RoundVideoRecorder
+              ref={roundVideoRecorderRef}
+              previewStream={renderedPreviewStream}
+              isReady={isVideoRecordingReady}
+              isPaused={isVideoRecordingPaused}
+              isFrozen={isRecordingFinished}
+              getProgress={getProgress}
+              getPlaybackEl={renderedVideoRecording?.getPlaybackEl}
+            />
+          )}
+          {((!isComposerBlocked || canSendGifs || canSendStickers) && !isNeedPremium && !isAccountFrozen) && (
+            <SymbolMenuButton
               chatId={chatId}
               threadId={threadId}
-              editingMessage={editingMessage}
-              canEditMedia={canMediaBeReplaced}
-              isButtonVisible={!activeRecording}
-              canAttachMedia={canAttachMedia}
-              canAttachPolls={canAttachPolls}
-              canAttachToDoLists={canAttachToDoLists}
-              canSendPhotos={canSendPhotos}
-              canSendVideos={canSendVideos}
-              canSendDocuments={canSendDocuments}
-              canSendAudios={canSendAudios}
-              canInsertDate={!isComposerBlocked}
-              onFileSelect={handleFileSelect}
-              onDateInsert={handleFormattedDateInsert}
-              onPollCreate={openPollModal}
-              onTodoListCreate={handleTodoListCreate}
-              isScheduled={isInScheduledList}
-              attachBots={isInMessageList ? attachBots : undefined}
-              peerType={attachMenuPeerType}
-              shouldCollectDebugLogs={shouldCollectDebugLogs}
-              theme={theme}
-              onMenuOpen={onAttachMenuOpen}
-              onMenuClose={onAttachMenuClose}
-              messageListType={messageListType}
-              paidMessagesStars={paidMessagesStars}
+              isMobile={isMobile}
+              isReady={isReady}
+              isSymbolMenuOpen={isSymbolMenuOpen}
+              openSymbolMenu={openSymbolMenu}
+              closeSymbolMenu={closeSymbolMenu}
+              canSendStickers={canSendStickers}
+              canSendGifs={canSendGifs}
+              isMessageComposer={isInMessageList}
+              onGifSelect={handleGifSelect}
+              onGifAddCaption={handleGifAddCaption}
+              onStickerSelect={handleStickerSelect}
+              onCustomEmojiSelect={handleCustomEmojiSelect}
+              onRemoveSymbol={removeSymbol}
+              onEmojiSelect={insertTextAndUpdateCursor}
+              closeBotCommandMenu={closeBotCommandMenu}
+              closeSendAsMenu={closeSendAsMenu}
+              isSymbolMenuForced={isSymbolMenuForced}
+              canSendPlainText={!isComposerBlocked}
+              inputCssSelector={editableInputCssSelector}
+              idPrefix={type}
+              forceDarkTheme={isInStoryViewer}
             />
           )}
           {isInMessageList && Boolean(botKeyboardMessageId) && (
@@ -2653,30 +2740,6 @@ const Composer = ({
           onClose={closeEmojiTooltip}
         />
       </div>
-      {canSendOneTimeMedia && activeRecording && (
-        <Button
-          className={buildClassName('view-once', isViewOnceEnabled && 'active')}
-          round
-          color="secondary"
-          ariaLabel={activeVideoRecording
-            ? lang('PlayOnceVideoMessageTooltip')
-            : oldLang('Chat.PlayOnceVoiceMessageTooltip')}
-          onClick={toogleViewOnceEnabled}
-        >
-          <Icon name="view-once" />
-          <Icon name="one-filled" />
-        </Button>
-      )}
-      {activeRecording && (
-        <Button
-          round
-          color="danger"
-          className="cancel"
-          onClick={activeVideoRecording ? discardRecordingVideo : stopRecordingVoice}
-          ariaLabel="Cancel recording"
-          iconName="delete"
-        />
-      )}
       {isInStoryViewer && !activeRecording && (
         <Button
           round
@@ -2711,6 +2774,8 @@ const Composer = ({
           !isReady && 'not-ready',
           activeRecording && 'recording',
           isRecordingVideoMode && 'record-video',
+          Boolean(paidMessagesStars) && 'has-paid-stars',
+          isPaidSend && 'paid',
         )}
         disabled={areRecordingsNotAllowed}
         allowDisabledClick
@@ -2719,33 +2784,21 @@ const Composer = ({
         onClick={mainButtonHandler}
         onContextMenu={mainButtonContextMenuHandler}
       >
-        <Icon name="send" />
-        <Icon name="microphone-alt" />
+        <Icon name="new-send" className="main-button-state-icon" />
+        <Icon name="microphone" />
         <Icon name="round-video" />
-        {onForward && <Icon name="forward" />}
-        {isInMessageList && <Icon name="schedule" />}
-        {isInMessageList && <Icon name="check" />}
-        <Button
-          className={buildClassName(
-            'paidStarsBadge',
-            shouldRenderPaidBadge && 'visible',
-            prevShouldRenderPaidBadge && !shouldRenderPaidBadge && 'hiding',
-            !prevShouldRenderPaidBadge && !shouldRenderPaidBadge && 'hidden',
-          )}
-          nonInteractive
-          size="tiny"
-          color="stars"
-          pill
-          fluid
-        >
-          <div className="paidStarsBadgeText">
+        {onForward && <Icon name="forward" className="main-button-state-icon" />}
+        {isInMessageList && <Icon name="schedule" className="main-button-state-icon" />}
+        {isInMessageList && <Icon name="check-bold" className="main-button-state-icon" />}
+        {shouldRenderPaidStars && (
+          <div ref={paidStarsRef} className="paidStars">
             <Icon name="star" />
             <AnimatedCounter
               ref={counterRef}
               text={lang.number(starsForAllMessages)}
             />
           </div>
-        </Button>
+        )}
       </Button>
       {effectEmoji && (
         <span className="effect-icon" onClick={handleRemoveEffect}>
@@ -2783,7 +2836,7 @@ const Composer = ({
           canPlayAnimatedEmojis={canPlayAnimatedEmojis}
         />
       )}
-      {CAN_SWITCH_RECORD_MODE && (
+      {canSwitchRecordMode && (
         <RecordModeMenu
           isOpen={isRecordModeMenuOpen}
           onSelectMode={handleSelectRecordMode}

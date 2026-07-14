@@ -1165,7 +1165,6 @@ const MessageList = ({
   const className = buildClassName(
     'MessageList custom-scroll',
     noAvatars && 'no-avatars',
-    !canPost && 'no-composer',
     !hasFooter && 'no-footer',
     type === 'pinned' && 'type-pinned',
     withBottomShift && 'with-bottom-shift',
