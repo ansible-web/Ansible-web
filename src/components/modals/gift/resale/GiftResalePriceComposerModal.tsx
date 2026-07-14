@@ -20,7 +20,6 @@ import useLang from '../../../../hooks/useLang';
 import useLastCallback from '../../../../hooks/useLastCallback';
 
 import Button from '../../../ui/Button';
-import Checkbox from '../../../ui/Checkbox';
 import InputText from '../../../ui/InputText';
 import Modal from '../../../ui/Modal';
 
@@ -54,7 +53,10 @@ const GiftResalePriceComposerModal = ({
   } = getActions();
   const isOpen = Boolean(modal);
   const [price, setPrice] = useState<number | undefined>(undefined);
-  const [isPriceInTon, setIsPriceInTon] = useState(false);
+  // own-TON: у нас только кристаллы (XTR), поэтому валюта зафиксирована. Тумблер
+  // «Принимать только TON» убран (см. маркер ниже). Если появится свой TON —
+  // вернуть setIsPriceInTon и Checkbox, и вся ветвистость по isPriceInTon оживёт.
+  const [isPriceInTon] = useState(false);
 
   const renderingModal = useCurrentOrPrev(modal);
   const { gift: typeGift } = renderingModal || {};
@@ -157,16 +159,12 @@ const GiftResalePriceComposerModal = ({
         )}
       </div>
 
-      <Checkbox
-        className={styles.checkBox}
-        label={lang('OnlyAcceptTON')}
-        checked={isPriceInTon}
-        onCheck={setIsPriceInTon}
-      />
-
-      <div className={styles.checkBoxDescription}>
-        {lang('OnlyAcceptTONDescription')}
-      </div>
+      {/* own-TON MARKER: у нас только кристаллы, поэтому выбор валюты убран.
+          Когда появится свой TON — вернуть тумблер сюда (нужен setIsPriceInTon):
+          <Checkbox className={styles.checkBox} label={lang('OnlyAcceptTON')}
+            checked={isPriceInTon} onCheck={setIsPriceInTon} />
+          <div className={styles.checkBoxDescription}>{lang('OnlyAcceptTONDescription')}</div>
+      */}
 
       <Button inline noForcedUpperCase disabled={!isPriceCorrect} onClick={handleSellGift}>
         {isPriceCorrect && lang('ButtonSellGift', {
