@@ -157,6 +157,7 @@ export interface AccountSettings {
   shouldSuggestStickers: boolean;
   shouldSuggestCustomEmoji: boolean;
   shouldUpdateStickerSetOrder: boolean;
+  lastRecordMessageMode?: 'voice' | 'video';
   hasPassword?: boolean;
   isSensitiveEnabled?: boolean;
   canChangeSensitive?: boolean;

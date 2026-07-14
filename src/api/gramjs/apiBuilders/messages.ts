@@ -50,6 +50,7 @@ import {
 } from '../../../config';
 import { getEmojiOnlyCountForMessage } from '../../../global/helpers/getEmojiOnlyCountForMessage';
 import { addTimestampEntities } from '../../../util/dates/timestamp';
+import { generateWaveform } from '../../../util/generateWaveform';
 import { omitUndefined } from '../../../util/iteratees';
 import { toJSNumber } from '../../../util/numbers';
 import { getServerTime } from '../../../util/serverTime';
@@ -697,6 +698,7 @@ export function buildUploadingMedia(
     shouldSendAsFile,
     shouldSendAsSpoiler,
     ttlSeconds,
+    isRoundVideo,
   } = attachment;
 
   if (!shouldSendAsFile) {
@@ -716,7 +718,7 @@ export function buildUploadingMedia(
           },
         };
       }
-      if (SUPPORTED_VIDEO_CONTENT_TYPES.has(mimeType)) {
+      if (isRoundVideo || SUPPORTED_VIDEO_CONTENT_TYPES.has(mimeType)) {
         const { width, height, duration } = attachment.quick;
         return {
           video: {
@@ -731,7 +733,10 @@ export function buildUploadingMedia(
             ...(previewBlobUrl && { thumbnail: { width, height, dataUri: previewBlobUrl } }),
             size,
             isSpoiler: shouldSendAsSpoiler,
+            isRound: isRoundVideo,
+            waveform: isRoundVideo ? generateWaveform(duration || 0) : undefined,
           },
+          ttlSeconds,
         };
       }
     }

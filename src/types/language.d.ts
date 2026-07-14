@@ -63,6 +63,7 @@ export interface LangPair {
   'MessageUnsupported': undefined;
   'ConversationDefaultRestrictedMedia': undefined;
   'AccDescrVoiceMessage': undefined;
+  'AccDescrVideoMessage': undefined;
   'BotSettings': undefined;
   'Privacy': undefined;
   'BotHelp': undefined;
@@ -591,6 +592,8 @@ export interface LangPair {
   'MediaviewProfilePhoto': undefined;
   'AccActionPlay': undefined;
   'AttachAudio': undefined;
+  'AttachVideoMessage': undefined;
+  'PlayOnceVideoMessageTooltip': undefined;
   'NewContactAdd': undefined;
   'NewContactBlock': undefined;
   'ReportSpamAndLeave': undefined;
@@ -603,6 +606,8 @@ export interface LangPair {
   'AttachmentMenuPhotoOrVideo': undefined;
   'AttachDocument': undefined;
   'Poll': undefined;
+  'VideoMessagePermissionDenied': undefined;
+  'VideoMessageRecordError': undefined;
   'SendMessageAsTitle': undefined;
   'Message': undefined;
   'RecentStickers': undefined;
@@ -2327,6 +2332,9 @@ export interface LangPairWithVariables<V = LangVariable> {
     'time': V;
   };
   'NoVoiceMessagesAllowed': {
+    'user': V;
+  };
+  'VideoMessagesRestrictedByPrivacy': {
     'user': V;
   };
   'ErrorFloodTime': {

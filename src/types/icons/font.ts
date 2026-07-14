@@ -241,6 +241,7 @@ export type FontIconName =
   | 'revenue-split'
   | 'revote'
   | 'rotate'
+  | 'round-video'
   | 'save-story'
   | 'saved-messages'
   | 'schedule'
