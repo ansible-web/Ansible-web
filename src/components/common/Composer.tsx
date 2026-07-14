@@ -145,6 +145,7 @@ import buildAttachment, {
 } from '../middle/composer/helpers/buildAttachment';
 import { buildCustomEmojiHtml } from '../middle/composer/helpers/customEmoji';
 import { isSelectionInsideInput } from '../middle/composer/helpers/selection';
+import { armSendCollapseReserve } from '../middle/helpers/messageListReserves';
 import renderText from './helpers/renderText';
 import { getTextWithEntitiesAsHtml } from './helpers/renderTextWithEntities';
 
@@ -635,6 +636,8 @@ const Composer = ({
     handleWithConfirmation: handleActionWithPaymentConfirmation,
   } = usePaidMessageConfirmation(starsForAllMessages, isStarsBalanceModalOpen, starsBalance);
 
+  const isPaidSendDeferred = starsForAllMessages > 0 && !shouldPaidMessageAutoApprove;
+
   const hasWebPagePreview = !hasAttachments && canAttachEmbedLinks && !noWebPage
     && webPagePreview?.webpageType === 'full';
   const isComposerBlocked = isSendTextBlocked && !editingMessage;
@@ -990,8 +993,16 @@ const Composer = ({
     getHtml,
   });
 
-  const resetComposer = useLastCallback((shouldPreserveInput = false) => {
+  const resetComposer = useLastCallback((shouldPreserveInput = false, shouldSkipCollapseLatch = false) => {
     if (!shouldPreserveInput) {
+      if (!shouldSkipCollapseLatch) {
+        const footer = inputRef.current?.closest<HTMLElement>('.middle-column-footer');
+        const scroller = footer?.parentElement?.querySelector<HTMLElement>(':scope > .MessageList');
+        if (scroller) {
+          armSendCollapseReserve(scroller);
+        }
+      }
+
       setHtml('');
     }
 
@@ -1056,7 +1067,7 @@ const Composer = ({
       // eslint-disable-next-line react-hooks-static-deps/exhaustive-deps
       cancelRecordingVoiceRef.current();
       // eslint-disable-next-line react-hooks-static-deps/exhaustive-deps
-      resetComposerRef.current();
+      resetComposerRef.current(false, true);
     };
   }, [chatId, threadId, resetComposerRef, cancelRecordingVoiceRef]);
 
@@ -1293,9 +1304,11 @@ const Composer = ({
 
     clearDraft({ chatId, threadId, isLocalOnly: true });
 
+    const shouldSkipCollapseLatch = Boolean(editingMessage) || Boolean(scheduledAt && !isInScheduledList);
+
     // Wait until message animation starts
     requestMeasure(() => {
-      resetComposer();
+      resetComposer(false, shouldSkipCollapseLatch);
     });
   });
 
@@ -1409,7 +1422,7 @@ const Composer = ({
 
       // Wait until message animation starts
       requestMeasure(() => {
-        resetComposer();
+        resetComposer(false, Boolean(scheduledAt && !isInScheduledList));
       });
     },
   );
@@ -1669,7 +1682,7 @@ const Composer = ({
           currentMessageList!,
         );
         requestMeasure(() => {
-          resetComposer(shouldPreserveInput);
+          resetComposer(shouldPreserveInput, !isInScheduledList || isPaidSendDeferred);
         });
       });
     } else {
@@ -1685,7 +1698,7 @@ const Composer = ({
       clearDraft({ chatId, threadId, isLocalOnly: true });
 
       requestMeasure(() => {
-        resetComposer(shouldPreserveInput);
+        resetComposer(shouldPreserveInput, isPaidSendDeferred);
       });
     }
   });
@@ -1733,7 +1746,7 @@ const Composer = ({
 
     clearDraft({ chatId, threadId, isLocalOnly: true });
     requestMeasure(() => {
-      resetComposer();
+      resetComposer(false, Boolean(isScheduleRequested && !isInScheduledList) || isPaidSendDeferred);
     });
   });
 
