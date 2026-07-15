@@ -42,7 +42,6 @@ import GiftRarityBadge from '../../../common/GiftRarityBadge';
 import Icon from '../../../common/icons/Icon';
 import SafeLink from '../../../common/SafeLink';
 import Button from '../../../ui/Button';
-import Checkbox from '../../../ui/Checkbox';
 import ConfirmDialog from '../../../ui/ConfirmDialog';
 import Link from '../../../ui/Link';
 import TableInfoModal, { type TableData } from '../../common/TableInfoModal';
@@ -105,7 +104,9 @@ const GiftInfoModal = ({
   const lang = useLang();
   const oldLang = useOldLang();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  const [shouldPayInTon, setShouldPayInTon] = useState<boolean>(false);
+  // own-TON MARKER: платёж в TON убран (1018) — цена только в кристаллах (XTR).
+  // Оставлено как всегда-false, чтобы ветки цены не переписывать; сеттер снят вместе с чекбоксом.
+  const [shouldPayInTon] = useState<boolean>(false);
 
   const uniqueGiftHeaderRef = useRef<HTMLDivElement>();
 
@@ -308,13 +309,13 @@ const GiftInfoModal = ({
         <Button className={styles.buyButton} onClick={handleBuyGift}>
           <span>
             {lang('ButtonBuyGift', {
-              stars: formatCurrency(lang, resellPrice.amount, resellPrice.currency, { asFontIcon: true }),
+              stars: formatCurrency(lang, resellPrice.amount, resellPrice.currency, { asFontIcon: false }),
             }, { withNodes: true })}
           </span>
           {resellPrice?.currency === TON_CURRENCY_CODE && Boolean(resellPriceInStars) && (
             <span className={styles.footerHint}>
               {lang('GiftBuyEqualsTo', {
-                stars: formatStarsAsIcon(lang, resellPriceInStars.amount, { asFont: true }),
+                stars: formatStarsAsIcon(lang, resellPriceInStars.amount),
               }, { withNodes: true })}
             </span>
           )}
@@ -519,7 +520,7 @@ const GiftInfoModal = ({
         {Boolean(resellPrice?.amount) && (
           <div className={styles.giftResalePriceContainer}>
             {formatCurrency(lang, resellPrice.amount, resellPrice.currency, {
-              asFontIcon: true,
+              asFontIcon: false,
               iconClassName: styles.giftResalePriceStar,
             })}
           </div>
@@ -876,7 +877,7 @@ const GiftInfoModal = ({
           confirmLabel={lang('ButtonBuyGift', {
             stars: confirmPrice?.currency === TON_CURRENCY_CODE
               ? formatTonAsIcon(lang, confirmPrice.amount, { shouldConvertFromNanos: true })
-              : formatStarsAsIcon(lang, confirmPrice.amount, { asFont: true }),
+              : formatStarsAsIcon(lang, confirmPrice.amount),
           }, { withNodes: true })}
           confirmHandler={handleConfirmBuyGift}
         >
@@ -923,20 +924,9 @@ const GiftInfoModal = ({
                 })}
               </p>
             )}
-          {!uniqueGift.resaleTonOnly && (
-            <>
-              <Checkbox
-                className={styles.checkBox}
-                label={lang('LabelPayInTON')}
-                checked={shouldPayInTon}
-                onCheck={setShouldPayInTon}
-              />
-
-              <div className={styles.checkBoxDescription}>
-                {lang('DescriptionPayInTON')}
-              </div>
-            </>
-          )}
+          {/* own-TON MARKER: чекбокс «Оплатить в TON» убран (1018) — оплата только в кристаллах.
+              Для возврата восстановить <Checkbox label=LabelPayInTON checked=shouldPayInTon
+              onCheck=setShouldPayInTon/> + <div>DescriptionPayInTON</div> (и вернуть сеттер на L108). */}
         </ConfirmDialog>
       )}
       {savedGift && (

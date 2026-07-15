@@ -64,7 +64,7 @@ const GiftTransferConfirmModal = ({ modal, selectedPeer }: OwnProps & StateProps
       confirmLabel={gift.transferStars
         ? lang(
           'GiftTransferConfirmButton',
-          { amount: formatStarsAsIcon(lang, gift.transferStars, { asFont: true }) },
+          { amount: formatStarsAsIcon(lang, gift.transferStars) },
           { withNodes: true },
         ) : lang('GiftTransferConfirmButtonFree')}
       confirmHandler={handleConfirm}

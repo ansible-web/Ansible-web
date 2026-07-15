@@ -186,7 +186,6 @@ function GiftItemDiamond({
     }
 
     return formatStarsAsIcon(lang, formattedPrice || 0, {
-      asFont: true,
       className: styles.star,
     });
   }, [withTransferBadge, priceCurrency, formattedPrice, isAuction, lang]);

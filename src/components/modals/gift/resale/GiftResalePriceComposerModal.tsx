@@ -169,7 +169,7 @@ const GiftResalePriceComposerModal = ({
       <Button inline noForcedUpperCase disabled={!isPriceCorrect} onClick={handleSellGift}>
         {isPriceCorrect && lang('ButtonSellGift', {
           stars: isPriceInTon ? formatTonAsIcon(lang, price)
-            : formatStarsAsIcon(lang, price, { asFont: true }),
+            : formatStarsAsIcon(lang, price),
         }, { withNodes: true })}
         {!isPriceCorrect && lang('Sell')}
       </Button>

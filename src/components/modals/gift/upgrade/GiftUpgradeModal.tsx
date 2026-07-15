@@ -20,7 +20,7 @@ import useLastCallback from '../../../../hooks/useLastCallback';
 
 import AnimatedCounter from '../../../common/AnimatedCounter';
 import CustomEmoji from '../../../common/CustomEmoji';
-import Icon from '../../../common/icons/Icon';
+import DiamondIcon from '../../../common/icons/DiamondIcon';
 import Button from '../../../ui/Button';
 import Checkbox from '../../../ui/Checkbox';
 import Link from '../../../ui/Link';
@@ -144,7 +144,7 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
 
   const formattedPriceElement = useMemo(() => (upgradeStars ? (
     <span>
-      <Icon name="star" />
+      <DiamondIcon type="gold" size="adaptive" />
       <AnimatedCounter text={lang.number(upgradeStars)} />
     </span>
   ) : undefined), [lang, upgradeStars]);

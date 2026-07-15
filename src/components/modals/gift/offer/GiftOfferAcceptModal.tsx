@@ -162,7 +162,7 @@ const GiftOfferAcceptModal = ({
     : formatStarsAsText(lang, receiveAmount);
   const formattedReceiveAmountAsIcon = isPriceInTon
     ? formatTonAsIcon(lang, receiveAmount, { shouldConvertFromNanos: true })
-    : formatStarsAsIcon(lang, receiveAmount, { asFont: true });
+    : formatStarsAsIcon(lang, receiveAmount);
 
   return (
     <ConfirmDialog

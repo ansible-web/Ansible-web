@@ -376,9 +376,9 @@ function GiftComposer({
 
   function renderFooter() {
     const amount = shouldPayByStars && hasPremiumByStars
-      ? formatStarsAsIcon(lang, giftByStars.amount, { asFont: true })
+      ? formatStarsAsIcon(lang, giftByStars.amount)
       : isStarGift
-        ? formatStarsAsIcon(lang, gift.stars + (shouldPayForUpgrade ? gift.upgradeStars! : 0), { asFont: true })
+        ? formatStarsAsIcon(lang, gift.stars + (shouldPayForUpgrade ? gift.upgradeStars! : 0))
         : isPremiumGift ? formatCurrency(lang, gift.amount, gift.currency) : undefined;
 
     const giftsPerRound = giftAuction?.gift.giftsPerRound;

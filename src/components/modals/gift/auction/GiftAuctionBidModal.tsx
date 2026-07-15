@@ -363,8 +363,7 @@ const GiftAuctionBidModal = ({
       <Button noForcedUpperCase inline onClick={handleSubmit}>
         {lang(userState?.bidAmount ? 'GiftAuctionAddToBid' : 'GiftAuctionPlaceBidButton', {
           amount: formatStarsAsIcon(lang,
-            userState?.bidAmount ? selectedBidAmount - userState.bidAmount : selectedBidAmount,
-            { asFont: true }),
+            userState?.bidAmount ? selectedBidAmount - userState.bidAmount : selectedBidAmount),
         }, { withNodes: true })}
       </Button>
       <ConfirmDialog

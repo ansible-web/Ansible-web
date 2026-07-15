@@ -197,7 +197,7 @@ const SavedGift = ({
         >
           {resellPrice.currency === 'TON'
             ? formatTonAsIcon(lang, resellPrice.amount, { shouldConvertFromNanos: true, className: styles.star })
-            : formatStarsAsIcon(lang, resellPrice.amount, { asFont: true, className: styles.star })}
+            : formatStarsAsIcon(lang, resellPrice.amount, { className: styles.star })}
         </Button>
       )}
       {ribbonText && (

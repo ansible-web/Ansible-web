@@ -67,7 +67,7 @@ const GiftDescriptionRemoveModal = ({
       title={lang('RemoveGiftDescriptionTitle')}
       onClose={closeGiftDescriptionRemoveModal}
       confirmLabel={lang('RemoveGiftDescriptionButton', {
-        amount: formatStarsAsIcon(lang, price, { asFont: true }),
+        amount: formatStarsAsIcon(lang, price),
       }, { withNodes: true })}
       confirmHandler={handleConfirm}
     >
