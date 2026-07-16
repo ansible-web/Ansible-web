@@ -1210,6 +1210,18 @@ async function payInputStarInvoice<T extends GlobalState>(
   if (balance === undefined) return;
 
   if (balance.amount < price) {
+    // Tell the user upfront exactly how much they are short (1019) instead of
+    // silently opening the top-up sheet, which reads as "nothing happened".
+    // Diamonds (XTR) only — the TON path has no crystal wording.
+    if (!isTon) {
+      actions.showNotification({
+        message: {
+          key: 'StarsBuyNotEnough',
+          variables: { count: price - balance.amount },
+        },
+        tabId,
+      });
+    }
     actions.openStarsBalanceModal({ currency, tabId });
     return;
   }

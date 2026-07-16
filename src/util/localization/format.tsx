@@ -65,8 +65,11 @@ export function formatStarsAsIcon(lang: LangFn, amount: number | string, options
   withWrapper?: boolean;
 }) {
   const { asFont, className, containerClassName, withWrapper } = options || {};
+  // Rebrand: crystals (XTR) always render as the diamond glyph, never a star.
+  // asFont keeps the monochrome in-text font icon (inherits text color/size);
+  // the non-font branch uses the colored gem.
   const icon = asFont
-    ? <Icon name="star" className={buildClassName('in-text-icon', className)} />
+    ? <Icon name="diamond" className={buildClassName('in-text-icon', className)} />
     : <DiamondIcon type="gold" className={className} size="adaptive" />;
 
   if (containerClassName || withWrapper) {

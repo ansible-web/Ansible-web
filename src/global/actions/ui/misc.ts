@@ -11,7 +11,6 @@ import { IS_TAURI } from '../../../util/browser/globalEnvironment';
 import { IS_WAVE_TRANSFORM_SUPPORTED } from '../../../util/browser/windowEnvironment';
 import { getAllMultitabTokens, getCurrentTabId, reestablishMasterToSelf } from '../../../util/establishMultitabRole';
 import { getAllNotificationsCount } from '../../../util/folderManager';
-import getIsAppUpdateNeeded from '../../../util/getIsAppUpdateNeeded';
 import { shouldShowErrorDialog } from '../../../util/getReadableErrorText';
 import { compact, unique } from '../../../util/iteratees';
 import { refreshFromCache } from '../../../util/localization';
@@ -46,6 +45,9 @@ import { selectDraft, selectEditingId } from '../../selectors/threads';
 import { getIsMobile, getIsTablet } from '../../../hooks/useAppLayout';
 
 export const APP_VERSION_URL = 'version.txt';
+// build.txt carries a per-build fingerprint (decoupled from the human version.txt)
+// so a redeploy triggers the update prompt without bumping the release version.
+const APP_BUILD_URL = 'build.txt';
 const FLOOD_PREMIUM_WAIT_NOTIFICATION_DURATION = 6000;
 const MAX_STORED_EMOJIS = 8 * 4; // Represents four rows of recent emojis
 
@@ -744,12 +746,15 @@ addActionHandler('closeMapModal', (global, actions, payload): ActionReturnType =
 });
 
 addActionHandler('checkAppVersion', (global): ActionReturnType => {
-  fetch(`${APP_VERSION_URL}?${Date.now()}`)
+  fetch(`${APP_BUILD_URL}?${Date.now()}`)
     .then((response) => response.text())
-    .then((version) => {
-      version = version.trim();
+    .then((build) => {
+      const deployedBuild = build.trim();
 
-      if (getIsAppUpdateNeeded(version, APP_VERSION)) {
+      // Any difference from this bundle's baked fingerprint = a newer deploy is
+      // live. The human version.txt is intentionally NOT used here — it stays at
+      // the release version and can be identical across deploys.
+      if (deployedBuild && deployedBuild !== APP_BUILD) {
         global = getGlobal();
         global = {
           ...global,

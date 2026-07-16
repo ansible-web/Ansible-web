@@ -2247,6 +2247,7 @@
 "StoryTooltipStickerSent" = "Sticker Sent!";
 "StoryTooltipReactionSent" = "Reaction Sent!";
 "StarsNeededTextSendPaidMessages" = "Buy **Diamonds** to send messages.";
+"StarsBuyNotEnough" = "Not enough Diamonds — you need {count} more.";
 "PaidMessageTransaction_one" = "Fee for {count} Message";
 "PaidMessageTransaction_other" = "Fee for {count} Messages";
 "PaidMessageTransactionDescription" = "You receive **{percent}** of the price that you charge for each incoming message.";

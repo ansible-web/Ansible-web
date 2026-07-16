@@ -21,23 +21,26 @@ import {
 import { PRODUCTION_URL } from './src/config.ts';
 import { version as pkgVersion } from './package.json' with { type: 'json' };
 
-// APP_VERSION must change on EVERY deploy so the in-app update check (fetch
-// version.txt vs the baked APP_VERSION, src/global/actions/ui/misc.ts) fires
-// without a human bumping anything. Patch segment = the CI build number
-// (TeamCity sets BUILD_NUMBER) or, for local builds, the git commit count.
-// Kept strictly numeric major.minor.patch — getIsAppUpdateNeeded and
-// semverCompare require /^\d+\.\d+(\.\d+)?$/, so a git SHA cannot be used.
-const BUILD_ID = (process.env.BUILD_NUMBER || '').replace(/[^\d]/g, '')
+// Human/release version — stays whatever package.json says (e.g. 0.2.4), the
+// founder bumps it for real releases. Shown in the menu (MainMenuDropdown) and
+// emitted as version.txt. It is NOT what drives the update check anymore.
+const appVersion = pkgVersion;
+
+// Per-build fingerprint that DOES change every deploy, decoupled from the release
+// version, so the in-app update check fires on every deploy without bumping the
+// human version. Prefer the CI build number (TeamCity sets BUILD_NUMBER), else the
+// git short SHA, else a timestamp. Emitted as build.txt and baked as APP_BUILD;
+// misc.ts compares them with a plain string !== (no semver format constraint).
+const APP_BUILD = (process.env.BUILD_NUMBER || '').replace(/[^\w.-]/g, '')
   || (() => {
     try {
-      return execSync('git rev-list --count HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
+      return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
         .toString().trim();
     } catch {
-      return '0';
+      return '';
     }
   })()
-  || '0';
-const appVersion = `${pkgVersion.split('.').slice(0, 2).join('.')}.${BUILD_ID}`;
+  || String(Date.now());
 
 const {
   HEAD,
@@ -257,6 +260,7 @@ export default function createConfig(
       // Updates each dev re-build to provide current git branch or commit hash
       new DefinePlugin({
         APP_VERSION: JSON.stringify(appVersion),
+        APP_BUILD: JSON.stringify(APP_BUILD),
         APP_REVISION: DefinePlugin.runtimeValue(() => {
           const { branch, commit } = getGitMetadata();
           const shouldDisplayOnlyCommit = APP_ENV === 'staging' || !branch || branch === 'HEAD';
@@ -268,15 +272,19 @@ export default function createConfig(
           fileDependencies: [CHANGELOG_PATH],
         }),
       }),
-      // Emit version.txt into the build output so the deployed value can NEVER
-      // drift from the baked APP_VERSION — both come from `appVersion`. Replaces
-      // the old manual public/version.txt + npm `postversion` hook.
+      // Emit version.txt (human release version, = package.json) and build.txt
+      // (per-build fingerprint) into the build output. version.txt is for
+      // display/ops; build.txt is what the update check compares (misc.ts), so
+      // every deploy fires an update without touching the human version. Both are
+      // baked (APP_VERSION / APP_BUILD) so the served files can never drift from
+      // the bundle. Replaces the old manual public/version.txt + postversion hook.
       {
         apply: (compiler: Compiler) => {
-          compiler.hooks.afterEmit.tap('EmitVersionTxt', () => {
+          compiler.hooks.afterEmit.tap('EmitVersionFiles', () => {
             const outputPath = compiler.options.output?.path;
             if (outputPath) {
               writeFileSync(path.join(outputPath, 'version.txt'), `${appVersion}\n`);
+              writeFileSync(path.join(outputPath, 'build.txt'), `${APP_BUILD}\n`);
             }
           });
         },

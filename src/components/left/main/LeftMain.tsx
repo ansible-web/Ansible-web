@@ -137,21 +137,21 @@ const LeftMain: FC<OwnProps> = ({
   // Auto-apply a detected web update without the user tapping "Update": reload as
   // soon as the tab is backgrounded, so it never interrupts what they're doing.
   // Tauri keeps its explicit download/install flow. A sessionStorage guard keyed
-  // on the CURRENT baked APP_VERSION prevents a reload loop if the deployed
-  // version.txt and the baked APP_VERSION ever disagree.
+  // on the CURRENT baked APP_BUILD prevents a reload loop if the deployed build
+  // fingerprint and the baked one ever disagree.
   useEffect(() => {
     if (!isAppUpdateAvailable || tauriUpdate) return undefined;
 
     const GUARD_KEY = 'as_update_autoreloaded_from';
     try {
-      if (sessionStorage.getItem(GUARD_KEY) === APP_VERSION) return undefined;
+      if (sessionStorage.getItem(GUARD_KEY) === APP_BUILD) return undefined;
     } catch {
       return undefined; // storage unavailable (private mode) → keep the manual button
     }
 
     const reload = () => {
       try {
-        sessionStorage.setItem(GUARD_KEY, APP_VERSION);
+        sessionStorage.setItem(GUARD_KEY, APP_BUILD);
       } catch {
         // ignore — worst case the guard is a no-op and the button still works
       }

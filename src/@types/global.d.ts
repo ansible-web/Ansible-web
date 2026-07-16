@@ -6,6 +6,7 @@ declare module '*.css';
 declare module '*.scss';
 
 declare const APP_VERSION: string;
+declare const APP_BUILD: string;
 declare const APP_REVISION: string;
 declare const CHANGELOG_DATETIME: number | undefined;
 

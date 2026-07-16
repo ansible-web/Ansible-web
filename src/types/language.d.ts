@@ -432,6 +432,23 @@ export interface LangPair {
   'PrivacyLastSeen': undefined;
   'PrivacyProfilePhoto': undefined;
   'PrivacyForwards': undefined;
+  'PrivacyBio': undefined;
+  'PrivacyBioTitle': undefined;
+  'PrivacyBirthday': undefined;
+  'PrivacyBirthdayTitle': undefined;
+  'PrivacyMessages': undefined;
+  'PrivacyMessagesTitle': undefined;
+  'PrivacyMessagesContactsAndPremium': undefined;
+  'PrivacyVoiceMessages': undefined;
+  'PrivacyVoiceMessagesTitle': undefined;
+  'PrivacyVoiceMessagesInfo': undefined;
+  'PrivacyPhoneInfo': undefined;
+  'PrivacyPremium': undefined;
+  'PrivacyUserTypes': undefined;
+  'PrivacyLastSeenPremium': undefined;
+  'PrivacyLastSeenPremiumForPremium': undefined;
+  'PrivacyLastSeenPremiumInfo': undefined;
+  'PrivacyLastSeenPremiumInfoForPremium': undefined;
   'AutodownloadGroupChats': undefined;
   'AlwaysShareWith': undefined;
   'NeverShareWith': undefined;
@@ -3227,6 +3244,9 @@ export interface LangPairWithVariables<V = LangVariable> {
   };
   'ConfirmDialogRemoveFeeRefundStars': {
     'amount': V;
+  };
+  'StarsBuyNotEnough': {
+    'count': V;
   };
   'PaidMessageTransactionDescription': {
     'percent': V;

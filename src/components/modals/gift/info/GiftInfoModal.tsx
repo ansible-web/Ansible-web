@@ -723,11 +723,14 @@ const GiftInfoModal = ({
       ]);
 
       if (gift.valueAmount && gift.valueCurrency) {
-        const formattedValue = formatCurrencyAsString(gift.valueAmount, gift.valueCurrency, lang.code);
+        // Crystals (XTR) render as the diamond icon, not the "XTR" currency code.
+        const formattedValue = gift.valueCurrency === STARS_CURRENCY_CODE
+          ? formatStarsAsIcon(lang, gift.valueAmount)
+          : formatCurrencyAsString(gift.valueAmount, gift.valueCurrency, lang.code);
         tableData.push([
           lang('GiftInfoValue'),
           <span className={styles.uniqueValue}>
-            {lang('GiftInfoValueAmount', { amount: formattedValue })}
+            {lang('GiftInfoValueAmount', { amount: formattedValue }, { withNodes: true })}
             <BadgeButton onClick={handleOpenValueModal}>
               {lang('GiftInfoValueLinkMore')}
             </BadgeButton>

@@ -4,6 +4,7 @@ import { getActions } from '../../../../global';
 
 import type { TabState } from '../../../../global/types';
 
+import { STARS_CURRENCY_CODE } from '../../../../config';
 import { formatDateToString } from '../../../../util/dates/oldDateFormat';
 import { formatCurrencyAsString } from '../../../../util/formatCurrency';
 import { formatStarsAsIcon } from '../../../../util/localization/format';
@@ -56,6 +57,12 @@ const GiftInfoValueModal: FC<OwnProps> = ({
 
     if (!giftAttributes) return undefined;
 
+    // Crystals (XTR) render as the diamond icon, not the "XTR" currency code.
+    const isCrystals = valueInfo.currency === STARS_CURRENCY_CODE;
+    const fmtValue = (amount: number) => (isCrystals
+      ? formatStarsAsIcon(lang, amount)
+      : formatCurrencyAsString(amount, valueInfo.currency, lang.code));
+
     const header = (
       <div className={styles.header}>
         <AnimatedIconFromSticker
@@ -69,7 +76,7 @@ const GiftInfoValueModal: FC<OwnProps> = ({
           fluid
           nonInteractive
         >
-          {formatCurrencyAsString(valueInfo.value, valueInfo.currency, lang.code)}
+          {fmtValue(valueInfo.value)}
         </Button>
         <div className={styles.description}>
           {lang('GiftValueDescription', { giftName: gift.title }, {
@@ -91,9 +98,13 @@ const GiftInfoValueModal: FC<OwnProps> = ({
       lang('GiftValueTitleInitialPrice'),
       <span className={styles.initialPrice}>
         {formatStarsAsIcon(lang, valueInfo.initialSaleStars, { className: styles.starIcon })}
-        {' (~ '}
-        {formatCurrencyAsString(valueInfo.initialSalePrice, valueInfo.currency, lang.code)}
-        )
+        {!isCrystals && (
+          <>
+            {' (~ '}
+            {formatCurrencyAsString(valueInfo.initialSalePrice, valueInfo.currency, lang.code)}
+            )
+          </>
+        )}
       </span>,
     ]);
 
@@ -107,21 +118,21 @@ const GiftInfoValueModal: FC<OwnProps> = ({
     if (valueInfo.lastSalePrice) {
       tableData.push([
         lang('GiftValueTitleLastPrice'),
-        formatCurrencyAsString(valueInfo.lastSalePrice, valueInfo.currency, lang.code),
+        fmtValue(valueInfo.lastSalePrice),
       ]);
     }
 
     if (valueInfo.floorPrice) {
       tableData.push([
         lang('GiftValueTitleMinimumPrice'),
-        formatCurrencyAsString(valueInfo.floorPrice, valueInfo.currency, lang.code),
+        fmtValue(valueInfo.floorPrice),
       ]);
     }
 
     if (valueInfo.averagePrice) {
       tableData.push([
         lang('GiftValueTitleAveragePrice'),
-        formatCurrencyAsString(valueInfo.averagePrice, valueInfo.currency, lang.code),
+        fmtValue(valueInfo.averagePrice),
       ]);
     }
 
