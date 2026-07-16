@@ -134,6 +134,42 @@ const LeftMain: FC<OwnProps> = ({
     }
   });
 
+  // Auto-apply a detected web update without the user tapping "Update": reload as
+  // soon as the tab is backgrounded, so it never interrupts what they're doing.
+  // Tauri keeps its explicit download/install flow. A sessionStorage guard keyed
+  // on the CURRENT baked APP_VERSION prevents a reload loop if the deployed
+  // version.txt and the baked APP_VERSION ever disagree.
+  useEffect(() => {
+    if (!isAppUpdateAvailable || tauriUpdate) return undefined;
+
+    const GUARD_KEY = 'as_update_autoreloaded_from';
+    try {
+      if (sessionStorage.getItem(GUARD_KEY) === APP_VERSION) return undefined;
+    } catch {
+      return undefined; // storage unavailable (private mode) → keep the manual button
+    }
+
+    const reload = () => {
+      try {
+        sessionStorage.setItem(GUARD_KEY, APP_VERSION);
+      } catch {
+        // ignore — worst case the guard is a no-op and the button still works
+      }
+      window.location.reload();
+    };
+
+    if (document.hidden) {
+      reload();
+      return undefined;
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) reload();
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isAppUpdateAvailable, tauriUpdate]);
+
   const handleSelectNewChannel = useLastCallback(() => {
     openLeftColumnContent({ contentKey: LeftColumnContent.NewChannelStep1 });
   });

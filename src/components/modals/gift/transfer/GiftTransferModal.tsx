@@ -4,7 +4,6 @@ import {
 import { getActions, getGlobal, withGlobal } from '../../../../global';
 
 import type { TabState } from '../../../../global/types';
-import type { UniqueCustomPeer } from '../../../../types';
 
 import { ALL_FOLDER_ID } from '../../../../config';
 import { selectCanGift } from '../../../../global/selectors';
@@ -30,14 +29,11 @@ type StateProps = {
   currentUserId?: string;
 };
 
-type Categories = 'withdraw';
-
 const GiftTransferModal = ({
   modal, contactIds, currentUserId,
 }: OwnProps & StateProps) => {
   const {
     closeGiftTransferModal,
-    openGiftWithdrawModal,
     openGiftTransferConfirmModal,
   } = getActions();
   const isOpen = Boolean(modal);
@@ -63,27 +59,6 @@ const GiftTransferModal = ({
   });
 
   const isLoading = currentResultsQuery !== searchQuery;
-
-  const categories = useMemo(() => {
-    if (currentResultsQuery) return MEMO_EMPTY_ARRAY;
-
-    return [{
-      type: 'withdraw',
-      isCustomPeer: true,
-      avatarIcon: 'toncoin',
-      peerColorId: 5,
-      title: lang('GiftTransferTON'),
-    }] satisfies UniqueCustomPeer<Categories>[];
-  }, [lang, currentResultsQuery]);
-
-  const handleCategoryChange = useLastCallback((category: Categories) => {
-    if (category !== 'withdraw') return;
-
-    openGiftWithdrawModal({
-      gift: renderingModal!.gift,
-    });
-    closeGiftTransferModal();
-  });
 
   const displayIds = useMemo(() => {
     if (isLoading) return MEMO_EMPTY_ARRAY;
@@ -113,10 +88,8 @@ const GiftTransferModal = ({
       shouldAdaptToSearch
       withFixedHeight
     >
-      <PeerPicker<Categories>
+      <PeerPicker<never>
         itemIds={displayIds}
-        categories={categories}
-        onSelectedCategoryChange={handleCategoryChange}
         withDefaultPadding
         withPeerUsernames
         isSearchable
