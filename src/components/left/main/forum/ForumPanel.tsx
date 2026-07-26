@@ -293,7 +293,6 @@ const ForumPanel = ({
           chatId={chat.id}
           threadId={MAIN_THREAD_ID}
           messageListType="thread"
-          canExpandActions={false}
           isForForum
           isMobile={isMobile}
           onTopicSearch={onTopicSearch}

@@ -79,10 +79,8 @@ export type OwnProps = {
   chatId: string;
   threadId: ThreadId;
   isOpen: boolean;
-  withExtraActions: boolean;
   anchor: IAnchorPosition;
   isChannel?: boolean;
-  canStartBot?: boolean;
   canSubscribe?: boolean;
   canSearch?: boolean;
   canCall?: boolean;
@@ -98,7 +96,6 @@ export type OwnProps = {
   pendingJoinRequests?: number;
   canTranslate?: boolean;
   channelMonoforumId?: string;
-  onSubscribeChannel: () => void;
   onSearchClick: () => void;
   onAsMessagesClick: () => void;
   onClose: () => void;
@@ -143,9 +140,9 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
   chatId,
   threadId,
   isOpen,
-  withExtraActions,
   anchor,
   isChannel,
+  canSubscribe,
   botCommands,
   botPrivacyPolicyUrl,
   withForumActions,
@@ -154,8 +151,6 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
   isBotForum,
   isForumAsMessages,
   isChatInfoShown,
-  canStartBot,
-  canSubscribe,
   canReportChat,
   canSearch,
   canCall,
@@ -190,7 +185,6 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
   noForwardsPeerEnabled,
   channelMonoforumId,
   onJoinRequestsClick,
-  onSubscribeChannel,
   onSearchClick,
   onAsMessagesClick,
   onClose,
@@ -203,6 +197,7 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
     restartBot,
     requestMasterAndJoinGroupCall,
     createGroupCall,
+    joinChannel,
     openLinkedChat,
     openAddContactDialog,
     openFrozenAccountModal,
@@ -290,14 +285,6 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
   const closeDeleteModal = useLastCallback(() => {
     setIsDeleteModalOpen(false);
     onClose();
-  });
-
-  const handleStartBot = useLastCallback(() => {
-    if (isAccountFrozen) {
-      openFrozenAccountModal();
-    } else {
-      sendBotCommand({ command: '/start' });
-    }
   });
 
   const handleRestartBot = useLastCallback(() => {
@@ -408,15 +395,6 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
     closeMenu();
   });
 
-  const handleSubscribe = useLastCallback(() => {
-    if (isAccountFrozen) {
-      openFrozenAccountModal();
-    } else {
-      onSubscribeChannel();
-    }
-    closeMenu();
-  });
-
   const handleVideoCall = useLastCallback(() => {
     if (isAccountFrozen) {
       openFrozenAccountModal();
@@ -514,6 +492,15 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
     }
 
     openDisableSharingAboutModal({ userId: chatId });
+  });
+
+  const handleSubscribe = useLastCallback(() => {
+    if (isAccountFrozen) {
+      openFrozenAccountModal();
+    } else {
+      joinChannel({ chatId });
+    }
+    closeMenu();
   });
 
   const handleSendChannelMessage = useLastCallback(() => {
@@ -618,6 +605,14 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
               <MenuSeparator />
             </>
           )}
+          {canSubscribe && (
+            <MenuItem
+              icon={isChannel ? 'channel' : 'group'}
+              onClick={handleSubscribe}
+            >
+              {oldLang(isChannel ? 'ProfileJoinChannel' : 'ProfileJoinGroup')}
+            </MenuItem>
+          )}
           {channelMonoforumId && (
             <MenuItem
               icon="message"
@@ -673,22 +668,6 @@ const HeaderMenuContainer: FC<OwnProps & StateProps> = ({
               onClick={handleOpenAsMessages}
             >
               {oldLang('lng_forum_view_as_messages')}
-            </MenuItem>
-          )}
-          {withExtraActions && canStartBot && (
-            <MenuItem
-              icon="bots"
-              onClick={handleStartBot}
-            >
-              {oldLang('BotStart')}
-            </MenuItem>
-          )}
-          {withExtraActions && canSubscribe && (
-            <MenuItem
-              icon={isChannel ? 'channel' : 'group'}
-              onClick={handleSubscribe}
-            >
-              {oldLang(isChannel ? 'ProfileJoinChannel' : 'ProfileJoinGroup')}
             </MenuItem>
           )}
           {canShowBoostModal && !canViewBoosts && (
