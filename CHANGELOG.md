@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 - Initial fork from upstream Telegram Web A.
 - MVSy 1.0 protocol layer (replaces MTProto 2.0 in GramJS).
-- Connection to BeHappy backend (`mvsy.behappy.rest`).
+- Connection to BeHappy backend (`mvsy.ansible.su`).
 - BeHappy branding: app name, favicon, splash, color scheme, fonts.
 
 ### Removed

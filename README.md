@@ -1,6 +1,6 @@
 # Ansible Web
 
-Web client for the [Ansible](https://ansible.rest) messaging service.
+Web client for the [Ansible](https://ansible.su) messaging service.
 
 > **This project is a fork of [Telegram Web A](https://github.com/Ajaxy/telegram-tt).**
 > It is licensed under [GPL v3](LICENSE), the same terms as the upstream
@@ -40,7 +40,7 @@ The complete list of changes from upstream is tracked in
 | | Telegram Web A | Ansible Web |
 |---|---|---|
 | License | GPL v3 | GPL v3 — same |
-| Backend | Telegram DCs | Ansible servers (`mvsy.ansible.rest`) |
+| Backend | Telegram DCs | Ansible servers (`mvsy.ansible.su`) |
 | Protocol | MTProto 2.0 (via GramJS) | MVSy 1.0 (via custom GramJS fork) |
 | Trademarks | Telegram Web A | Ansible |
 | Account compatibility | Telegram accounts | Ansible accounts (separate system) |
@@ -51,7 +51,7 @@ independently maintained.
 
 ## Try it
 
-Hosted instance: <https://web.ansible.rest/>
+Hosted instance: <https://web.ansible.su/>
 
 Source release archives: <https://github.com/ansible-web/ansible-web/releases>
 
@@ -97,6 +97,6 @@ as trademarks of this product.
 
 ## Contact
 
-- General: <https://ansible.rest>
+- General: <https://ansible.su>
 - Source code questions: open an issue on this repository
-- License compliance / DMCA: <legal@ansible.rest>
+- License compliance / DMCA: <legal@ansible.su>
