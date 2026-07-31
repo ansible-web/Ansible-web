@@ -335,7 +335,7 @@ const PaidReactionModal = ({
                 key={`${reactor.user?.id || 'anonymous'}-${countText}`}
                 peer={peer}
                 badgeText={countText}
-                badgeIcon="star"
+                badgeIcon="diamond"
                 badgeClassName={styles.topBadge}
                 text={text}
               />
@@ -357,7 +357,7 @@ const PaidReactionModal = ({
         {lang('SendPaidReaction', { amount: starsAmount }, {
           withNodes: true,
           specialReplacement: {
-            [STARS_ICON_PLACEHOLDER]: <Icon name="star" className="in-text-icon" />,
+            [STARS_ICON_PLACEHOLDER]: <Icon name="diamond" className="in-text-icon" />,
           },
         })}
       </Button>

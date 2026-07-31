@@ -4,14 +4,13 @@ import { memo, useEffect, useRef } from '../../../../lib/teact/teact';
 import type { ApiReaction, ApiReactionCustomEmoji, ApiReactionPaid } from '../../../../api/types';
 
 import buildClassName from '../../../../util/buildClassName';
-import { LOCAL_TGS_URLS } from '../../../common/helpers/animatedAssets';
 import { REM } from '../../../common/helpers/mediaDimensions';
 
 import useContextMenuHandlers from '../../../../hooks/useContextMenuHandlers';
 import useLastCallback from '../../../../hooks/useLastCallback';
 
-import AnimatedIcon from '../../../common/AnimatedIcon';
 import CustomEmoji from '../../../common/CustomEmoji';
+import DiamondIcon from '../../../common/icons/DiamondIcon';
 import Icon from '../../../common/icons/Icon';
 
 import styles from './ReactionSelectorReaction.module.scss';
@@ -84,11 +83,7 @@ const ReactionSelectorCustomReaction: FC<OwnProps> = ({
       onContextMenu={handleContextMenu}
     >
       {reaction.type === 'paid' ? (
-        <AnimatedIcon
-          tgsUrl={LOCAL_TGS_URLS.StarReaction}
-          size={REACTION_SIZE}
-          noLoop={false}
-        />
+        <DiamondIcon type="gold" size="adaptive" style={`width: ${REACTION_SIZE}px; height: ${REACTION_SIZE}px`} />
       ) : (
         <CustomEmoji
           documentId={reaction.documentId}

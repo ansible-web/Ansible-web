@@ -9,7 +9,6 @@ import type { ObserveFn } from '../../../hooks/useIntersectionObserver';
 import { EMOJI_SIZE_PICKER } from '../../../config';
 import { getDocumentMediaHash, isSameReaction } from '../../../global/helpers';
 import buildClassName from '../../../util/buildClassName';
-import { LOCAL_TGS_URLS } from '../helpers/animatedAssets';
 
 import useContextMenuHandlers from '../../../hooks/useContextMenuHandlers';
 import useCoordsInSharedCanvas from '../../../hooks/useCoordsInSharedCanvas';
@@ -19,6 +18,7 @@ import useMediaTransitionDeprecated from '../../../hooks/useMediaTransitionDepre
 
 import AnimatedIconWithPreview from '../AnimatedIconWithPreview';
 import CustomEmoji from '../CustomEmoji';
+import DiamondIcon from '../icons/DiamondIcon';
 
 import styles from './ReactionEmoji.module.scss';
 
@@ -78,7 +78,8 @@ const ReactionEmoji: FC<OwnProps> = ({
     }
   }, [handleContextMenuClose, onContextMenu, handleContextMenuHide, isContextMenuOpen, reaction]);
 
-  const tgsUrl = reaction.type === 'paid' ? LOCAL_TGS_URLS.StarReaction : mediaData;
+  const isPaid = reaction.type === 'paid';
+  const tgsUrl = mediaData;
   const handleClick = useLastCallback(() => {
     onClick(reaction);
   });
@@ -112,6 +113,8 @@ const ReactionEmoji: FC<OwnProps> = ({
           withTranslucentThumb
           forceAlways={forcePlayback}
         />
+      ) : isPaid ? (
+        <DiamondIcon type="gold" size="adaptive" style={`width: ${EMOJI_SIZE_PICKER}px; height: ${EMOJI_SIZE_PICKER}px`} />
       ) : (
         <AnimatedIconWithPreview
           tgsUrl={tgsUrl}

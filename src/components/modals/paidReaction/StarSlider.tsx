@@ -265,7 +265,7 @@ const StarSlider = ({
               )}
             >
               <div className={styles.floatingBadgeTitle}>
-                <Icon name="star" className={styles.floatingBadgeIcon} />
+                <Icon name="diamond" className={styles.floatingBadgeIcon} />
                 <AnimatedCounter text={badgeText} />
               </div>
               <div className={styles.floatingBadgeDescription}>
