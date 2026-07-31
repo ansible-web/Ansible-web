@@ -25,7 +25,13 @@ type OwnProps = {
   onChange: (value: string) => void;
 };
 
-const LINK_PREFIX_REGEX = /https:\/\/t\.me\/?/i;
+// Derived from TME_LINK_PREFIX rather than hardcoded: the field renders
+// `${TME_LINK_PREFIX}${username}`, so a literal t.me pattern stops matching the
+// moment the prefix is rebranded — and handleUsernameChange then rejects every
+// keystroke, making the public-link field impossible to type into.
+const LINK_PREFIX_REGEX = new RegExp(
+  `^${TME_LINK_PREFIX.replace(/\/$/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/?`, 'i',
+);
 
 const runDebouncedForCheckUsername = debounce((cb) => cb(), 250, false);
 
