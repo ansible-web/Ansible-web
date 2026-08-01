@@ -71,6 +71,10 @@ export function hasActiveHandler(key: string) {
 }
 
 function handleKeyDown(e: KeyboardEvent) {
+  if (e.isComposing) {
+    return;
+  }
+
   const handlerName = keyToHandlerName[e.key];
   if (!handlerName) {
     return;
