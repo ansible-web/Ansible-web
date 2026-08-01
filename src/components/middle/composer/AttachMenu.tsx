@@ -33,6 +33,7 @@ import useOldLang from '../../../hooks/useOldLang';
 import Icon from '../../common/icons/Icon';
 import Menu from '../../ui/Menu';
 import MenuItem from '../../ui/MenuItem';
+import MenuSeparator from '../../ui/MenuSeparator';
 import ResponsiveHoverButton from '../../ui/ResponsiveHoverButton';
 import AttachBotItem from './AttachBotItem';
 import FormattedDateModal from './FormattedDateModal';
@@ -286,16 +287,21 @@ const AttachMenu = ({
               <MenuItem icon="calendar" onClick={handleDateMenuClick}>{lang('GiftInfoDate')}</MenuItem>
             )}
 
-            {!editingMessage && !canEditMedia && !isScheduled && bots?.map((bot) => (
-              <AttachBotItem
-                bot={bot}
-                chatId={chatId}
-                threadId={threadId}
-                theme={theme}
-                onMenuOpened={markAttachmentBotMenuOpen}
-                onMenuClosed={unmarkAttachmentBotMenuOpen}
-              />
-            ))}
+            {!editingMessage && !canEditMedia && !isScheduled && Boolean(bots?.length) && (
+              <>
+                <MenuSeparator />
+                {bots.map((bot) => (
+                  <AttachBotItem
+                    bot={bot}
+                    chatId={chatId}
+                    threadId={threadId}
+                    theme={theme}
+                    onMenuOpened={markAttachmentBotMenuOpen}
+                    onMenuClosed={unmarkAttachmentBotMenuOpen}
+                  />
+                ))}
+              </>
+            )}
           </Menu>
         </>
       )}

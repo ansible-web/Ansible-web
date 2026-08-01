@@ -10,6 +10,13 @@ Authors.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.1] - 2026-08-01
+
+### Changed
+- Attach menu: attachment bots are separated from the system entries by a divider,
+  matching Telegram. Ported as a single hunk from upstream #7080, whose remaining
+  215 files (the tiptap input rewrite) depend on Layer 227 and stay out.
+
 ## [0.3.0] - 2026-08-01
 
 Second wave of the upstream Telegram Web A redesign, ported from
@@ -41,6 +48,14 @@ on top of the v0.2.x base.
   settings and active sessions restyled (#7047, #7057, #7054, #7053, #7069, #6975).
 - Diamond icon vertical alignment inside list items (#7104, applied to `DiamondIcon`).
 - `Esc` and `Enter` are ignored while an IME composition is active (#7043, partial).
+
+### Fixed
+- Round video messages no longer carry a `TELEGRAM` caption and the Telegram
+  paper-plane logo. The upstream recorder rasterizes the watermark into the very
+  canvas the stream is captured from, so it was baked into every sent file rather
+  than merely overlaid in the UI.
+- The Ogg container of voice messages no longer advertises `telegram-web-a` as its vendor.
+- The in-app "what's new" digest describes the redesign instead of the old welcome text.
 
 ### Notes
 - MTProto stays on **Layer 224**; upstream Layer 225/227 commits and everything
