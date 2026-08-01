@@ -1,8 +1,8 @@
 .MessageSelectToolbar {
   position: absolute;
   z-index: 20;
-  inset-inline: var(--footer-side-inset);
   bottom: var(--composer-bottom-gap-mobile);
+  inset-inline: var(--footer-side-inset);
 
   display: flex;
   justify-content: center;
