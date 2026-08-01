@@ -207,7 +207,7 @@ function buildOpusHead(channels: number, inputSampleRate: number): Uint8Array {
 }
 
 function buildOpusTags(): Uint8Array {
-  const vendor = new TextEncoder().encode('telegram-web-a');
+  const vendor = new TextEncoder().encode('ansible-web');
   const tags = new Uint8Array(8 + 4 + vendor.length + 4);
   const view = new DataView(tags.buffer);
   tags.set([0x4F, 0x70, 0x75, 0x73, 0x54, 0x61, 0x67, 0x73], 0); // 'OpusTags'

@@ -31,18 +31,12 @@ const BACKGROUND_DIM_ALPHA = 0.1;
 const PEAK_TAP_BUFFER_SIZE = 2048;
 const PLAYBACK_DURATION_TIMEOUT_MS = 2000;
 
-const WATERMARK_TEXT = 'TELEGRAM';
+const WATERMARK_TEXT = 'ANSIBLE';
 const WATERMARK_ALPHA = 0.9;
 const WATERMARK_FONT_PX = 12;
 const WATERMARK_LETTER_SPACING = 4;
 const WATERMARK_TEXT_ARC_RADIUS = CANVAS_RADIUS + 20;
 const WATERMARK_TEXT_CENTER_ANGLE = (45 * Math.PI) / 180;
-// eslint-disable-next-line @stylistic/max-len
-const WATERMARK_PLANE_PATH = 'M4.219 14.363s10.066-4.358 13.425-5.746c6.393-2.643 7.72-3.102 8.586-3.117.19-.003.616.044.892.266.233.188.297.442.327.62s.07.583.039.9c-.347 3.617-1.846 12.395-2.608 16.447-.323 1.714-.958 2.289-1.573 2.345-1.337.122-2.352-.878-3.647-1.721-2.026-1.32-3.17-2.142-5.138-3.43-2.272-1.488-.799-2.306.496-3.643.34-.35 6.23-5.674 6.343-6.157.015-.06.028-.285-.107-.404-.134-.119-.333-.078-.476-.046-.305.069-9.71 6.378-9.71 6.378s-1.379.94-2.497.916c-.822-.017-2.403-.462-3.578-.841-1.442-.466-2.588-.712-2.488-1.503.078-.618 1.713-1.264 1.713-1.264';
-const WATERMARK_PLANE_VIEWBOX = 32;
-const WATERMARK_PLANE_SIZE = 28;
-const WATERMARK_PLANE_CENTER_X = ROUND_VIDEO_RECORDING_SIZE * 0.1;
-const WATERMARK_PLANE_CENTER_Y = ROUND_VIDEO_RECORDING_SIZE * 0.9;
 
 export async function start(
   onTick: (elapsedMs: number) => void,
@@ -363,13 +357,6 @@ async function createWatermarkCanvas() {
   const ctx = canvas.getContext('2d')!;
 
   ctx.fillStyle = `rgba(255, 255, 255, ${WATERMARK_ALPHA})`;
-  const planeScale = WATERMARK_PLANE_SIZE / WATERMARK_PLANE_VIEWBOX;
-  ctx.save();
-  ctx.translate(WATERMARK_PLANE_CENTER_X, WATERMARK_PLANE_CENTER_Y);
-  ctx.scale(planeScale, planeScale);
-  ctx.translate(-WATERMARK_PLANE_VIEWBOX / 2, -WATERMARK_PLANE_VIEWBOX / 2);
-  ctx.fill(new Path2D(WATERMARK_PLANE_PATH));
-  ctx.restore();
 
   const arcRadius = WATERMARK_TEXT_ARC_RADIUS;
   const startOffset = arcRadius * (Math.PI - WATERMARK_TEXT_CENTER_ANGLE);
@@ -392,7 +379,7 @@ async function createWatermarkCanvas() {
     });
     ctx.drawImage(img, 0, 0);
   } catch (err) {
-    // No curved text if the SVG fails to rasterize — the plane glyph alone is enough
+    // No watermark if the SVG fails to rasterize — the recording itself is unaffected
   }
 
   return canvas;
