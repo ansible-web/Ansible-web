@@ -70,7 +70,7 @@ type ReactorData = {
 
 const MAX_TOP_REACTORS = 3;
 const DEFAULT_STARS_AMOUNT = 50;
-const MAX_REACTION_AMOUNT = 2500;
+const MAX_REACTION_AMOUNT = 10000;
 const ANONYMOUS_PEER: CustomPeer = {
   avatarIcon: 'author-hidden',
   customPeerAvatarColor: '#9eaab5',

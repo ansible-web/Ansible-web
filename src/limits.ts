@@ -110,7 +110,7 @@ export const DEFAULT_APP_CONFIG: ApiAppConfig = {
     '_tgr_',
   ],
   isStarsGiftEnabled: true,
-  paidReactionMaxAmount: 2500,
+  paidReactionMaxAmount: 10000,
   starsUsdWithdrawRateX1000: 1300,
   storyChangelogUserId: '777000',
   maxPinnedStoriesCount: 3,
