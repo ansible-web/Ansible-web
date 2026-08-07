@@ -329,15 +329,15 @@ export const SUPPORTED_TRANSLATION_LANGUAGES = [
 export const RE_LINK_TEMPLATE = '((ftp|https?):\\/\\/)?((www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z][-a-zA-Z0-9]{1,62})\\b([-a-zA-Z0-9()@:%_+.,~#?&/=]*)';
 export const RE_MENTION_TEMPLATE = '(@[\\w\\d_-]+)';
 export const RE_TG_LINK = /^as:(\/\/)?/i;
-export const RE_TME_LINK = /^(https?:\/\/)?([-a-zA-Z0-9@:%_+~#=]{1,32}\.)?(ansible\.su|t\.me)(?=[:/?#]|$)/i;
+export const RE_TME_LINK = /^(https?:\/\/)?([-a-zA-Z0-9@:%_+~#=]{1,32}\.)?(asme\.su)(?=[:/?#]|$)/i;
 export const RE_TELEGRAM_LINK = /^(https?:\/\/)?telegram\.org\//i;
-export const TME_LINK_PREFIX = 'https://ansible.su/';
+export const TME_LINK_PREFIX = 'https://asme.su/';
 export const BOT_FATHER_USERNAME = 'botfather';
 export const USERNAME_PURCHASE_ERROR = 'USERNAME_PURCHASE_AVAILABLE';
 export const MESSAGE_ID_REQUIRED_ERROR = 'MESSAGE_ID_REQUIRED';
 export const PURCHASE_USERNAME = 'auction';
 export const ACCEPTABLE_USERNAME_ERRORS = new Set([USERNAME_PURCHASE_ERROR, 'USERNAME_INVALID']);
-export const TME_WEB_DOMAINS = new Set(['ansible.su', 'web.ansible.su']);
+export const TME_WEB_DOMAINS = new Set(['asme.su']);
 export const WEB_APP_PLATFORM = 'weba';
 export const LANG_PACK = 'weba';
 

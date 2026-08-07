@@ -927,7 +927,7 @@
 "EmptyGroupInfoSubtitle" = "Groups can have:";
 "EmptyGroupInfoLine1" = "• Up to {count} members";
 "EmptyGroupInfoLine2" = "• Persistent chat history";
-"EmptyGroupInfoLine3" = "• Public links such as ansible.su/title";
+"EmptyGroupInfoLine3" = "• Public links such as asme.su/title";
 "EmptyGroupInfoLine4" = "• Admins with different rights";
 "Reactions" = "Reactions";
 "ChatListMarkAllAsRead" = "Mark All as Read";
@@ -1295,7 +1295,7 @@
 "ChatPerFolderLimitTitle" = "Chats per Folder";
 "GroupsAndChannelsLimitSubtitle" = "Join up to {count} channels and large groups";
 "PinChatsLimitSubtitle" = "Pin up to {count} chats in your main chat list";
-"PublicLinksLimitSubtitle" = "Reserve up to {count} ansible.su/username links";
+"PublicLinksLimitSubtitle" = "Reserve up to {count} asme.su/username links";
 "SavedGifsLimitSubtitle" = "Save up to {count} GIFs in your Favorite GIFs";
 "FavoriteStickersLimitSubtitle" = "Save up to {count} stickers in your Favorite stickers";
 "BioLimitSubtitle" = "Add more characters and use links in your bio";

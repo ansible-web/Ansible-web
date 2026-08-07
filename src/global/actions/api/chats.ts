@@ -1695,7 +1695,7 @@ addActionHandler('openTelegramLink', async (global, actions, payload): Promise<v
     return;
   }
 
-  const hostname = TME_WEB_DOMAINS.has(uri.hostname) ? 't.me' : uri.hostname;
+  const hostname = TME_WEB_DOMAINS.has(uri.hostname) ? 'asme.su' : uri.hostname;
   const hostParts = hostname.split('.');
   if (hostParts.length > 3) return;
 
