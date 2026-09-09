@@ -114,7 +114,11 @@ const ReactionEmoji: FC<OwnProps> = ({
           forceAlways={forcePlayback}
         />
       ) : isPaid ? (
-        <DiamondIcon type="gold" size="adaptive" style={`width: ${EMOJI_SIZE_PICKER}px; height: ${EMOJI_SIZE_PICKER}px`} />
+        <DiamondIcon
+          type="gold"
+          size="adaptive"
+          style={`width: ${EMOJI_SIZE_PICKER}px; height: ${EMOJI_SIZE_PICKER}px`}
+        />
       ) : (
         <AnimatedIconWithPreview
           tgsUrl={tgsUrl}

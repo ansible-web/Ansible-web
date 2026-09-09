@@ -14,8 +14,8 @@ import useFlag from '../../../hooks/useFlag';
 import useLang from '../../../hooks/useLang';
 import useOldLang from '../../../hooks/useOldLang';
 
-import Icon from '../../common/icons/Icon';
 import DiamondIcon from '../../common/icons/DiamondIcon';
+import Icon from '../../common/icons/Icon';
 import Button from '../../ui/Button';
 
 import styles from './DiamondTopupOptionList.module.scss';

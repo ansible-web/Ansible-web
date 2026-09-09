@@ -109,14 +109,14 @@ const GiftResalePriceComposerModal = ({
   return (
     <Modal
       isOpen={isOpen}
-      title={isPriceInTon ? lang('PriceInTON') : lang('PriceInStars')}
+      title={isPriceInTon ? lang('PriceInGram') : lang('PriceInStars')}
       hasCloseButton
       isSlim
       onClose={handleClose}
     >
       <div className={styles.inputPrice}>
         <InputText
-          label={isPriceInTon ? lang('EnterPriceInTon') : lang('EnterPriceInStars')}
+          label={isPriceInTon ? lang('EnterPriceInGram') : lang('EnterPriceInStars')}
           onChange={handleChangePrice}
           value={price?.toString()}
           inputMode="numeric"

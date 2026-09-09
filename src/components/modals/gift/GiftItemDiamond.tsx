@@ -181,6 +181,7 @@ function GiftItemDiamond({
     if (priceCurrency === TON_CURRENCY_CODE) {
       return formatTonAsIcon(lang, formattedPrice || 0, {
         shouldConvertFromNanos: true,
+        isMono: true,
         className: styles.star,
       });
     }

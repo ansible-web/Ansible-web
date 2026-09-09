@@ -38,7 +38,7 @@ function initFallback() {
   fallbackInitPromise ??= (async () => {
     try {
       const { default: OpusRecorder } = await import('opus-recorder');
-      const encoderPath = new URL('opus-recorder/dist/encoderWorker.min', import.meta.url).href;
+      const encoderPath = (await import('opus-recorder/dist/encoderWorker.min.js?url')).default;
       opusMediaRecorder = new OpusRecorder({ encoderPath, reuseWorker: true });
     } catch (err) {
       // Drop failed initialization so the next attempt can retry

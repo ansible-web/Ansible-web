@@ -2,24 +2,23 @@ import type { FC } from '../../../lib/teact/teact';
 import { memo, useEffect } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
-import type { ApiStarsAmount, ApiTonAmount } from '../../../api/types';
+import type { ApiStarsAmount } from '../../../api/types';
 import { SettingsScreens } from '../../../types';
 
-import { FAQ_URL, PRIVACY_URL, TON_CURRENCY_CODE } from '../../../config';
+import { FAQ_URL, PRIVACY_URL } from '../../../config';
 import { formatStarsAmount } from '../../../global/helpers/payments';
 import {
   selectIsGiveawayGiftsPurchaseAvailable,
   selectIsPremiumPurchaseBlocked,
 } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
-import { convertCurrencyFromBaseUnit } from '../../../util/formatCurrency';
+import { formatStarsAsIcon } from '../../../util/localization/format';
 
 import useFlag from '../../../hooks/useFlag';
 import useHistoryBack from '../../../hooks/useHistoryBack';
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
 
-import Icon from '../../common/icons/Icon';
 import DiamondIcon from '../../common/icons/DiamondIcon';
 import ChatExtra from '../../common/profile/ChatExtra';
 import ProfileInfo from '../../common/profile/ProfileInfo';
@@ -40,7 +39,6 @@ type StateProps = {
   canBuyPremium?: boolean;
   isGiveawayAvailable?: boolean;
   starsBalance?: ApiStarsAmount;
-  tonBalance?: ApiTonAmount;
 };
 
 const SettingsMain: FC<OwnProps & StateProps> = ({
@@ -50,7 +48,6 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
   canBuyPremium,
   isGiveawayAvailable,
   starsBalance,
-  tonBalance,
   onReset,
 }) => {
   const {
@@ -104,71 +101,121 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
       <div className={styles.menuSection}>
         <Island>
           <ListItem
-            icon="settings"
+            icon="account-filled"
+            iconBg="blue"
+            multiline
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.EditProfile })}
+          >
+            <span className="title">{lang('SettingsAccount')}</span>
+            <span className="subtitle">{lang('SettingsAccountDesc')}</span>
+          </ListItem>
+
+          <ListItem
+            icon="settings-filled"
+            iconBg="orange"
+            multiline
             narrow
             onClick={() => openSettingsScreen({ screen: SettingsScreens.General })}
           >
-            {lang('TelegramGeneralSettingsViewController')}
+            <span className="title">{lang('TelegramGeneralSettingsViewController')}</span>
+            <span className="subtitle">{lang('SettingsGeneralDesc')}</span>
           </ListItem>
+
           <ListItem
-            icon="animations"
-            narrow
-            onClick={() => openSettingsScreen({ screen: SettingsScreens.Performance })}
-          >
-            {lang('MenuAnimations')}
-          </ListItem>
-          <ListItem
-            icon="unmute"
+            icon="notifications-filled"
+            iconBg="red"
+            multiline
             narrow
             onClick={() => openSettingsScreen({ screen: SettingsScreens.Notifications })}
           >
-            {lang('Notifications')}
+            <span className="title">{lang('Notifications')}</span>
+            <span className="subtitle">{lang('SettingsNotificationsDesc')}</span>
           </ListItem>
+
           <ListItem
-            icon="data"
-            narrow
-            onClick={() => openSettingsScreen({ screen: SettingsScreens.DataStorage })}
-          >
-            {lang('DataSettings')}
-          </ListItem>
-          <ListItem
-            icon="lock"
+            icon="lock-filled"
+            iconBg="gray"
+            multiline
             narrow
             onClick={() => openSettingsScreen({ screen: SettingsScreens.Privacy })}
           >
-            {lang('PrivacySettings')}
+            <span className="title">{lang('PrivacySettings')}</span>
+            <span className="subtitle">{lang('SettingsPrivacyDesc')}</span>
           </ListItem>
+
           <ListItem
-            icon="folder"
+            icon="piechart-filled"
+            iconBg="green"
+            multiline
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.DataStorage })}
+          >
+            <span className="title">{lang('DataSettings')}</span>
+            <span className="subtitle">{lang('SettingsDataDesc')}</span>
+          </ListItem>
+
+          <ListItem
+            icon="folder-filled"
+            iconBg="blue"
+            multiline
             narrow
             onClick={() => openSettingsScreen({ screen: SettingsScreens.Folders })}
           >
-            {lang('Filters')}
+            <span className="title">{lang('Filters')}</span>
+            <span className="subtitle">{lang('SettingsFoldersDesc')}</span>
           </ListItem>
+
           <ListItem
-            icon="active-sessions"
+            icon="animations-filled"
+            iconBg="purple"
+            multiline
             narrow
-            onClick={() => openSettingsScreen({ screen: SettingsScreens.ActiveSessions })}
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.Performance })}
           >
-            {lang('SessionsTitle')}
-            {sessionCount > 0 && (<span className="settings-item__current-value">{sessionCount}</span>)}
+            <span className="title">{lang('MenuAnimations')}</span>
+            <span className="subtitle">{lang('SettingsPerformanceDesc')}</span>
           </ListItem>
+
           <ListItem
-            icon="language"
-            narrow
-            onClick={() => openSettingsScreen({ screen: SettingsScreens.Language })}
-          >
-            {lang('Language')}
-            <span className="settings-item__current-value">{lang.languageInfo.nativeName}</span>
-          </ListItem>
-          <ListItem
-            icon="stickers"
+            icon="smile-filled"
+            iconBg="pink"
+            multiline
             narrow
             onClick={() => openSettingsScreen({ screen: SettingsScreens.Stickers })}
           >
-            {lang('MenuStickers')}
+            <span className="title">{lang('MenuStickers')}</span>
+            <span className="subtitle">{lang('SettingsStickersDesc')}</span>
+          </ListItem>
+
+          <ListItem
+            icon="web-filled"
+            iconBg="purple"
+            multiline
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.Language })}
+          >
+            <span className="title">{lang('Language')}</span>
+            <span className="subtitle">
+              {lang('SettingsLanguageDesc', { language: lang.languageInfo?.nativeName || lang.rawCode })}
+            </span>
+          </ListItem>
+
+          <ListItem
+            icon="devices-filled"
+            iconBg="blue"
+            multiline
+            narrow
+            rightElement={sessionCount > 0
+              ? <span className="settings-item__current-value">{sessionCount}</span>
+              : undefined}
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.ActiveSessions })}
+          >
+            <span className="title">{lang('SessionsTitle')}</span>
+            <span className="subtitle">{lang('SettingsSessionsDesc')}</span>
           </ListItem>
         </Island>
+
         <Island>
           {canBuyPremium && (
             <ListItem
@@ -179,6 +226,7 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
               {lang('TelegramPremium')}
             </ListItem>
           )}
+
           <ListItem
             leftElement={<DiamondIcon className="icon ListItem-main-icon" type="gold" size="big" />}
             narrow
@@ -187,14 +235,21 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
             {lang('MenuStars')}
             {Boolean(starsBalance) && (
               <span className="settings-item__current-value">
-                {formatStarsAmount(lang, starsBalance)}
+                {formatStarsAsIcon(lang, formatStarsAmount(lang, starsBalance), {
+                  asFont: true,
+                  withIconLast: true,
+                  className: styles.balanceStar,
+                })}
               </span>
             )}
           </ListItem>
-          {/* Ansible: TON menu hidden */}
+
+          {/* Ansible: пункт TON/Gram скрыт - у нас только кристаллы */}
+
           {isGiveawayAvailable && (
             <ListItem
-              icon="gift"
+              icon="gift-filled"
+              iconBg="orange"
               narrow
               onClick={() => openGiftRecipientPicker()}
             >
@@ -202,23 +257,27 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
             </ListItem>
           )}
         </Island>
+
         <Island>
           <ListItem
-            icon="ask-support"
+            icon="support-filled"
+            iconBg="red"
             narrow
             onClick={openSupportDialog}
           >
             {lang('AskAQuestion')}
           </ListItem>
           <ListItem
-            icon="help"
+            icon="help-filled"
+            iconBg="blue"
             narrow
             onClick={() => openUrl({ url: FAQ_URL })}
           >
             {lang('MenuTelegramFaq')}
           </ListItem>
           <ListItem
-            icon="privacy-policy"
+            icon="privacy-policy-filled"
+            iconBg="green"
             narrow
             onClick={() => openUrl({ url: PRIVACY_URL })}
           >
@@ -243,7 +302,6 @@ export default memo(withGlobal<OwnProps>(
     const { currentUserId } = global;
     const isGiveawayAvailable = selectIsGiveawayGiftsPurchaseAvailable(global);
     const starsBalance = global.stars?.balance;
-    const tonBalance = global.ton?.balance;
 
     return {
       sessionCount: global.activeSessions.orderedHashes.length,
@@ -251,7 +309,6 @@ export default memo(withGlobal<OwnProps>(
       canBuyPremium: !selectIsPremiumPurchaseBlocked(global),
       isGiveawayAvailable,
       starsBalance,
-      tonBalance,
     };
   },
 )(SettingsMain));

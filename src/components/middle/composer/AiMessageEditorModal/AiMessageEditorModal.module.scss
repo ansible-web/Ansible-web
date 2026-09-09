@@ -37,8 +37,6 @@
 }
 
 .tabList {
-  position: relative;
-  z-index: 1;
   margin: 0.5rem 1rem;
   margin-bottom: 0;
 }
@@ -79,6 +77,7 @@
   padding: 0 1rem 1rem;
 
   &::before {
+    pointer-events: none;
     content: "";
 
     position: absolute;

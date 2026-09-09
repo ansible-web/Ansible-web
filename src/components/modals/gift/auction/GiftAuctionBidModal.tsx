@@ -30,8 +30,8 @@ import InputText from '../../../ui/InputText';
 import Modal from '../../../ui/Modal';
 import TextTimer from '../../../ui/TextTimer';
 import Transition from '../../../ui/Transition';
-import StarSlider from '../../paidReaction/StarSlider';
 import BalanceBlock from '../../diamonds/BalanceBlock';
+import StarSlider from '../../paidReaction/StarSlider';
 
 import styles from './GiftAuctionBidModal.module.scss';
 

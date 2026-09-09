@@ -53,22 +53,21 @@ const GiftTransferModal = ({
     ]);
   }, [contactIds, orderedChatIds]);
 
-  const { result: foundIds, currentResultsQuery } = usePeerSearch({
+  const { result: foundIds, currentResultsQuery, isSearching } = usePeerSearch({
     query: searchQuery,
     defaultValue: sortedLocalIds,
   });
-
-  const isLoading = currentResultsQuery !== searchQuery;
+  const relevantFoundIds = currentResultsQuery === searchQuery ? foundIds : undefined;
 
   const displayIds = useMemo(() => {
-    if (isLoading) return MEMO_EMPTY_ARRAY;
+    if (isSearching) return MEMO_EMPTY_ARRAY;
     const global = getGlobal();
 
-    return sortChatIds((foundIds || []).filter((peerId) => (
+    return sortChatIds((relevantFoundIds || []).filter((peerId) => (
       peerId !== currentUserId && selectCanGift(global, peerId)
     )),
     false);
-  }, [isLoading, foundIds, currentUserId]);
+  }, [isSearching, relevantFoundIds, currentUserId]);
 
   const handlePeerSelect = useLastCallback((peerId: string) => {
     if (!renderingModal?.gift) return;
@@ -94,7 +93,7 @@ const GiftTransferModal = ({
         withPeerUsernames
         isSearchable
         noScrollRestore
-        isLoading={isLoading}
+        isLoading={isSearching}
         filterValue={searchQuery}
         filterPlaceholder={lang('Search')}
         onFilterChange={setSearchQuery}

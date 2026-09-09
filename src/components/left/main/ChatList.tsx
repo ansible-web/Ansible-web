@@ -83,6 +83,7 @@ const ChatList = ({
     openChat,
     openNextChat,
     closeForumPanel,
+    closeCommunityPanel,
     toggleStoryRibbon,
     openLeftColumnContent,
   } = getActions();
@@ -170,6 +171,7 @@ const ChatList = ({
   const handleArchivedClick = useLastCallback(() => {
     openLeftColumnContent({ contentKey: LeftColumnContent.Archived });
     closeForumPanel();
+    closeCommunityPanel();
   });
 
   const handleShowStoryRibbon = useLastCallback(() => {
@@ -251,7 +253,7 @@ const ChatList = ({
       onLoadMore={getMore}
       onScroll={onScroll}
     >
-      {isAllFolder && <ChatListPanes key="panes" onHeightChange={setPanesHeight} />}
+      {!isSaved && <ChatListPanes key="panes" noBanners={!isAllFolder} onHeightChange={setPanesHeight} />}
       {shouldDisplayArchive && (
         <Archive
           key="archive"

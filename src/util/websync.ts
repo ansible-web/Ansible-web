@@ -26,7 +26,7 @@ const saveSync = (authed: boolean) => {
   }));
 };
 
-let lastTimeout: NodeJS.Timeout | undefined;
+let lastTimeout: number | undefined;
 
 export const forceWebsync = (authed: boolean) => {
   if (IS_MOCKED_CLIENT || IS_TAURI) return undefined;
@@ -36,7 +36,7 @@ export const forceWebsync = (authed: boolean) => {
   // / shared sessions API. Leaving stub чтоб не trigger обратные эффекты
   // в caller.
   return undefined;
-  // eslint-disable-next-line no-unreachable
+
   const currentTs = getTs();
 
   const { canRedirect, ts } = JSON.parse(localStorage.getItem(WEBSYNC_KEY) || '{}');

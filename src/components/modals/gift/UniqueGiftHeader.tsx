@@ -1,4 +1,3 @@
-import type React from '@teact';
 import type { TeactNode } from '@teact';
 import { memo, useMemo } from '@teact';
 import { getActions } from '../../../global';
@@ -25,8 +24,8 @@ import useFlag from '../../../hooks/useFlag';
 import useLang from '../../../hooks/useLang';
 
 import AnimatedIconFromSticker from '../../common/AnimatedIconFromSticker';
-import Icon from '../../common/icons/Icon';
 import DiamondIcon from '../../common/icons/DiamondIcon';
+import Icon from '../../common/icons/Icon';
 import RadialPatternBackground from '../../common/profile/RadialPatternBackground';
 import Transition from '../../ui/Transition';
 import UniqueGiftManageButtons from './UniqueGiftManageButtons';

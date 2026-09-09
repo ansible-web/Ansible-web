@@ -23,11 +23,13 @@ import { getPeerTitle } from '../../global/helpers/peers';
 import { selectChatMessage, selectSender } from '../../global/selectors';
 import buildClassName from '../../util/buildClassName';
 import { formatHumanDate, formatScheduledDateTime } from '../../util/dates/oldDateFormat';
+import { isUserId } from '../../util/entities/ids';
 import { convertTonFromNanos } from '../../util/formatCurrency';
 import { compact } from '../../util/iteratees';
 import { formatMessageListDate } from '../../util/localization/dateFormat';
 import { formatStarsAsText, formatTonAsText } from '../../util/localization/format';
 import { isAlbum, isDocumentGroup } from './helpers/groupMessages';
+import { consumePendingTopGrowth } from './helpers/messageListReserves';
 import { preventMessageInputBlur } from './helpers/preventMessageInputBlur';
 import { renderPeerLink } from './message/helpers/messageActions';
 
@@ -35,7 +37,6 @@ import useDerivedSignal from '../../hooks/useDerivedSignal';
 import useLang from '../../hooks/useLang';
 import useLastCallback from '../../hooks/useLastCallback';
 import useOldLang from '../../hooks/useOldLang';
-import usePreviousDeprecated from '../../hooks/usePreviousDeprecated';
 import useResizeObserver from '../../hooks/useResizeObserver';
 import useMessageObservers from './hooks/useMessageObservers';
 import useScrollHooks from './hooks/useScrollHooks';
@@ -56,6 +57,7 @@ interface OwnProps {
   chatId: string;
   threadId: ThreadId;
   messageIds: number[];
+  historyMessageIds: number[];
   messageGroups: MessageDateGroup[];
   getContainerHeight: Signal<number | undefined>;
   isViewportNewest: boolean;
@@ -75,12 +77,14 @@ interface OwnProps {
   isReplacingHistoryRef: { current: boolean };
   type: MessageListType;
   isReady: boolean;
+  isActive?: boolean;
   hasLinkedChat: boolean | undefined;
   isSchedule: boolean;
   shouldRenderAccountInfo?: boolean;
   nameChangeDate?: number;
   photoChangeDate?: number;
   noAppearanceAnimation: boolean;
+  addedMessageIds?: number[];
   isSavedDialog?: boolean;
   isQuickPreview?: boolean;
   canPost?: boolean;
@@ -110,6 +114,7 @@ const MessageListContent = ({
   chatId,
   threadId,
   messageIds,
+  historyMessageIds,
   messageGroups,
   getContainerHeight,
   isViewportNewest,
@@ -129,12 +134,14 @@ const MessageListContent = ({
   isReplacingHistoryRef,
   type,
   isReady,
+  isActive,
   hasLinkedChat,
   isSchedule,
   shouldRenderAccountInfo,
   nameChangeDate,
   photoChangeDate,
   noAppearanceAnimation,
+  addedMessageIds,
   isSavedDialog,
   isQuickPreview,
   shouldScrollToBottom,
@@ -152,7 +159,10 @@ const MessageListContent = ({
     const newHeight = entry.contentRect.height;
     const prevHeight = prevContentHeightRef.current;
     prevContentHeightRef.current = newHeight;
-    if (prevHeight === undefined) return;
+    if (prevHeight === undefined) {
+      consumePendingTopGrowth(entry.target.closest<HTMLElement>('.MessageList')!);
+      return;
+    }
 
     const growth = newHeight - prevHeight;
     if (growth > 0) onContentResize?.(growth);
@@ -164,6 +174,7 @@ const MessageListContent = ({
   const getIsReady = useDerivedSignal(() => isReady && !getIsHeavyAnimating2(), [isReady, getIsHeavyAnimating2]);
 
   const areDatesClickable = !isSavedDialog && !isSchedule;
+  const isPrivate = isUserId(chatId);
   const shouldRenderSponsoredMessage = canShowAds && isViewportNewest;
   const shouldHideComments = hasLinkedChat === false || !isChannelChat || Boolean(isChatMonoforum);
 
@@ -190,7 +201,7 @@ const MessageListContent = ({
   } = useScrollHooks({
     type,
     containerRef,
-    messageIds,
+    messageIds: historyMessageIds,
     getContainerHeight,
     isViewportNewest,
     isUnread,
@@ -312,11 +323,6 @@ const MessageListContent = ({
   }, 0);
   let appearanceIndex = 0;
 
-  const prevMessageIds = usePreviousDeprecated(messageIds);
-  const isNewMessage = Boolean(
-    messageIds && prevMessageIds && messageIds[messageIds.length - 2] === prevMessageIds[prevMessageIds.length - 1],
-  );
-
   function calculateSenderGroups(
     dateGroup: MessageDateGroup, dateGroupIndex: number, dateGroupsArray: MessageDateGroup[],
   ) {
@@ -349,7 +355,7 @@ const MessageListContent = ({
             observeIntersectionForPlaying={observeIntersectionForPlaying}
             memoFirstUnreadIdRef={memoFirstUnreadIdRef}
             appearanceOrder={messageCountToAnimate - ++appearanceIndex}
-            isJustAdded={isLastInList && isNewMessage}
+            isJustAdded={addedMessageIds?.includes(message.id)}
             isLastInList={isLastInList}
             getIsMessageListReady={getIsReady}
             onMessageUnmount={onMessageUnmount}
@@ -381,6 +387,9 @@ const MessageListContent = ({
           const isInLiveTail = liveTailStartOriginalId !== undefined && originalId >= liveTailStartOriginalId;
           const key = isServiceNotificationMessage(message)
             ? `${message.date}_${originalId}` : originalId;
+          const shouldShowGuestAvatar = isPrivate && !withUsers && Boolean(message.guestChatViaId);
+          const isJustAdded = addedMessageIds?.includes(message.id)
+            || Boolean(album?.messages.some(({ id }) => addedMessageIds?.includes(id)));
 
           return compact([
             message.id === memoUnreadDividerBeforeIdRef.current && unreadDivider,
@@ -389,20 +398,22 @@ const MessageListContent = ({
             <Message
               key={key}
               message={message}
+              containerRef={containerRef}
               observeIntersectionForBottom={observeIntersectionForReading}
               observeIntersectionForLoading={observeIntersectionForLoading}
               observeIntersectionForPlaying={observeIntersectionForPlaying}
               album={album}
               documentGroup={documentGroup}
-              noAvatars={noAvatars}
-              withAvatar={position.isLastInGroup && withUsers && !isOwn && (!isThreadTopMessage || !isComments)}
-              withSenderName={position.isFirstInGroup && withUsers && !isOwn}
+              noAvatars={noAvatars && !shouldShowGuestAvatar}
+              withAvatar={position.isLastInGroup && (withUsers || shouldShowGuestAvatar)
+                && !isOwn && (!isThreadTopMessage || !isComments)}
+              withSenderName={position.isFirstInGroup && (withUsers || shouldShowGuestAvatar) && !isOwn}
               threadId={threadId}
               messageListType={type}
               noComments={shouldHideComments}
               noReplies={!shouldHideComments || threadId !== MAIN_THREAD_ID || type === 'scheduled'}
               appearanceOrder={messageCountToAnimate - ++appearanceIndex}
-              isJustAdded={position.isLastInList && isNewMessage}
+              isJustAdded={isJustAdded}
               isThreadTop={isThreadTopMessage}
               isFirstInGroup={position.isFirstInGroup}
               isLastInGroup={position.isLastInGroup}
@@ -413,6 +424,7 @@ const MessageListContent = ({
               isQuickPreview={isQuickPreview}
               memoFirstUnreadIdRef={memoFirstUnreadIdRef}
               getIsMessageListReady={getIsReady}
+              isMessageListActive={isActive}
               onMessageUnmount={onMessageUnmount}
             />,
           ]);
@@ -479,8 +491,6 @@ const MessageListContent = ({
         return renderMessageElement(message, position, isThreadTopMessage, album);
       }).flat();
 
-      if (!withUsers) return senderGroupElements;
-
       const lastItem = senderGroup[senderGroup.length - 1];
       const lastMessage = isAlbum(lastItem)
         ? lastItem.mainMessage
@@ -503,11 +513,14 @@ const MessageListContent = ({
       const isThreadTopMessage = lastMessage.id === threadId
         || (firstMessage.id === threadId && Boolean(firstMessage.groupedId));
 
+      const shouldShowGuestAvatar = isPrivate && !withUsers && Boolean(lastMessage.guestChatViaId);
+      if (!withUsers && !shouldShowGuestAvatar) return senderGroupElements;
+
       const key = `${firstMessageId}-${lastMessageId}`;
       const id = (firstMessageId === lastMessageId) ? `message-group-${firstMessageId}`
         : `message-group-${firstMessageId}-${lastMessageId}`;
 
-      const withAvatar = withUsers && !isOwn && (!isThreadTopMessage || !isComments);
+      const withAvatar = (withUsers || shouldShowGuestAvatar) && !isOwn && (!isThreadTopMessage || !isComments);
       return compact([
         <SenderGroupContainer
           key={key}

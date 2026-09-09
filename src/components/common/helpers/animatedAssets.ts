@@ -1,4 +1,3 @@
-import BrokenGiftPreview from '../../../assets/broken-gift.svg';
 import QrPlane from '../../../assets/ass/auth/QrPlane.ass';
 import BannedDuck from '../../../assets/ass/BannedDuck.ass';
 import BrokenGift from '../../../assets/ass/BrokenGift.ass';
@@ -44,7 +43,10 @@ import Passkeys from '../../../assets/ass/settings/Passkeys.ass';
 import StarReaction from '../../../assets/ass/stars/StarReaction.ass';
 import StarReactionEffect from '../../../assets/ass/stars/StarReactionEffect.ass';
 import Unlock from '../../../assets/ass/Unlock.ass';
+import BrokenGiftPreview from '../../../assets/broken-gift.svg';
+import UtyanDisappear from '../../../assets/tgs/settings/UtyanDisappear.ass';
 import DuckNothingFoundPreview from '../../../assets/tgs-previews/DuckNothingFound.svg';
+import WritingPreview from '../../../assets/tgs-previews/message/Writing.svg';
 import SearchPreview from '../../../assets/tgs-previews/Search.svg';
 import HandStopPreview from '../../../assets/tgs-previews/settings/HandStopPreview.png';
 import PasskeysPreview from '../../../assets/tgs-previews/settings/Passkeys.svg';
@@ -55,6 +57,7 @@ export const LOCAL_TGS_PREVIEW_URLS = {
   DuckNothingFound: DuckNothingFoundPreview,
   Search: SearchPreview,
   Passkeys: PasskeysPreview,
+  Writing: WritingPreview,
 };
 
 export const LOCAL_TGS_URLS = {
@@ -98,6 +101,7 @@ export const LOCAL_TGS_URLS = {
   Search,
   DuckNothingFound,
   Passkeys,
+  UtyanDisappear,
   DuckCake,
   HandStop,
   Writing,

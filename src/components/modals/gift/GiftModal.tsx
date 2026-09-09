@@ -2,7 +2,6 @@ import type { FC } from '@teact';
 import {
   memo, useEffect,
   useMemo, useRef, useState } from '@teact';
-import type React from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
 import type {
@@ -41,12 +40,12 @@ import Checkbox from '../../ui/Checkbox';
 import InfiniteScroll from '../../ui/InfiniteScroll';
 import Modal from '../../ui/Modal';
 import Transition from '../../ui/Transition';
+import DiamondGiftCategoryList from './DiamondGiftCategoryList';
 import GiftComposer from './GiftComposer';
-import GiftItemPremium from './GiftItemPremium';
 import GiftItemDiamond from './GiftItemDiamond';
+import GiftItemPremium from './GiftItemPremium';
 import GiftModalResaleScreen from './GiftModalResaleScreen';
 import GiftResaleFilters from './GiftResaleFilters';
-import DiamondGiftCategoryList from './DiamondGiftCategoryList';
 
 import styles from './GiftModal.module.scss';
 

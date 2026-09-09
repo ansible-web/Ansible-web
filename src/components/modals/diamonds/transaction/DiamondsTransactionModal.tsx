@@ -37,8 +37,9 @@ import usePrevious from '../../../../hooks/usePrevious';
 
 import AnimatedIconFromSticker from '../../../common/AnimatedIconFromSticker';
 import Avatar from '../../../common/Avatar';
-import Icon from '../../../common/icons/Icon';
 import DiamondIcon from '../../../common/icons/DiamondIcon';
+import GramIcon from '../../../common/icons/GramIcon';
+import Icon from '../../../common/icons/Icon';
 import InteractiveSparkles from '../../../common/InteractiveSparkles';
 import SafeLink from '../../../common/SafeLink';
 import TableInfoModal, { type TableData } from '../../common/TableInfoModal';
@@ -195,7 +196,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
           {NNBSP}
           {amount.currency === STARS_CURRENCY_CODE && <DiamondIcon type="gold" size="adaptive" />}
           {amount.currency === 'TON' && (
-            <Icon name="toncoin" className={buildClassName('in-text-icon', amountColorClass)} />
+            <GramIcon isMono className={buildClassName('in-text-icon', amountColorClass)} />
           )}
           {transaction.isRefund && (
             <p className={styles.refunded}>{lang('Refunded')}</p>

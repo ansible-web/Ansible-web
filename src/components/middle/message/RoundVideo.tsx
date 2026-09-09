@@ -1,5 +1,4 @@
 import type { FC } from '../../../lib/teact/teact';
-import type React from '../../../lib/teact/teact';
 import {
   useEffect, useLayoutEffect,
   useRef, useSignal, useState,
@@ -37,8 +36,10 @@ import MediaSpoiler from '../../common/MediaSpoiler';
 import Button from '../../ui/Button';
 import OptimizedVideo from '../../ui/OptimizedVideo';
 import ProgressSpinner from '../../ui/ProgressSpinner';
+import MediaBadge from './MediaBadge';
 
 import './RoundVideo.scss';
+import styles from './media.module.scss';
 
 type OwnProps = {
   message: ApiMessage;
@@ -247,8 +248,9 @@ const RoundVideo: FC<OwnProps> = ({
           className="play"
           nonInteractive
           iconName="play"
+          iconClassName="play-icon"
         />
-        <Icon name="view-once" />
+        <Icon name="view-once" className="view-once-icon" />
       </div>
     );
   }
@@ -264,7 +266,12 @@ const RoundVideo: FC<OwnProps> = ({
   return (
     <div
       ref={ref}
-      className={buildClassName('RoundVideo', 'media-inner', isInOneTimeModal && 'non-interactive', className)}
+      className={buildClassName(
+        'RoundVideo',
+        'media-inner',
+        isInOneTimeModal && 'non-interactive',
+        className,
+      )}
       onClick={handleClick}
     >
       {fullMediaData && (
@@ -322,23 +329,23 @@ const RoundVideo: FC<OwnProps> = ({
         )}
       </div>
       {shouldRenderSpinner && (
-        <div ref={spinnerRef} className="media-loading">
+        <div ref={spinnerRef} className={buildClassName('media-loading', styles.loading)}>
           <ProgressSpinner progress={isDownloading ? downloadProgress : loadProgress} />
         </div>
       )}
       {shouldRenderSpoiler && !shouldRenderSpinner && renderPlayWrapper()}
       {!fullMediaData && !isLoadAllowed && (
-        <Icon name="download" />
+        <Icon name="download" className={buildClassName(styles.controlButton, styles.downloadButton)} />
       )}
       {!isInOneTimeModal && (
-        <div
+        <MediaBadge
           className={buildClassName(
             'message-media-duration', isMediaUnread && 'unread',
           )}
         >
           {isActivated ? formatMediaDuration(currentTime) : formatMediaDuration(video.duration)}
-          {(!isActivated || playerRef.current!.paused) && <Icon name="muted" />}
-        </div>
+          {(!isActivated || playerRef.current!.paused) && <Icon name="muted" className="muted-icon" />}
+        </MediaBadge>
       )}
       {canTranscribe && (
         <Button

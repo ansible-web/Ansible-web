@@ -4,12 +4,14 @@ import type {
   ApiBotInlineResult,
   ApiWebDocument,
 } from './bots';
+import type { ApiInstantViewPage } from './instantView';
 import type { ApiMessageAction } from './messageActions';
 import type { ApiAttachment, ApiPeerNotifySettings, ApiRestrictionReason } from './misc';
 import type {
   ApiLabeledPrice,
 } from './payments';
 import type { ApiTypePeerColor } from './peers';
+import type { ApiRichMessage } from './richMessage';
 import type { ApiStarGiftRegular, ApiStarGiftUnique, ApiTypeCurrencyAmount } from './stars';
 import type {
   ApiMessageStoryData, ApiStory, ApiWebPageStickerData, ApiWebPageStoryData,
@@ -20,6 +22,15 @@ export interface ApiDimensions {
   width: number;
   height: number;
 }
+
+export type ApiMessageReadMetric = {
+  messageId: number;
+  viewId: string;
+  timeInViewMs: number;
+  activeTimeInViewMs: number;
+  heightToViewportRatioPermille: number;
+  seenRangeRatioPermille: number;
+};
 
 export interface ApiPhotoSize extends ApiDimensions {
   type: 's' | 'm' | 'x' | 'y' | 'w';
@@ -59,7 +70,6 @@ export interface ApiSticker {
   height?: number;
   thumbnail?: ApiThumbnail;
   previewPhotoSizes?: ApiPhotoSize[];
-  isPreloadedGlobally?: boolean;
   hasEffect?: boolean;
   isFree?: boolean;
   shouldUseTextColor?: boolean;
@@ -76,6 +86,7 @@ export interface ApiStickerSet {
   hasStaticThumb?: boolean;
   hasAnimatedThumb?: boolean;
   hasVideoThumb?: boolean;
+  thumbnail?: ApiThumbnail;
   thumbCustomEmojiId?: string;
   count: number;
   stickers?: ApiSticker[];
@@ -211,6 +222,8 @@ export interface ApiPoll {
   shouldShuffleAnswers?: true;
   shouldHideResultsUntilClose?: true;
   isCreator?: true;
+  isRestrictedToSubscribers?: true;
+  allowedCountryCodes?: string[];
   question: ApiFormattedText;
   answers: ApiPollAnswer[];
   closePeriod?: number;
@@ -412,6 +425,7 @@ export interface ApiWebPageFull {
   webpageType: 'full';
   id: string;
   url: string;
+  hash: number;
   displayUrl: string;
   type?: string;
   siteName?: string;
@@ -426,6 +440,8 @@ export interface ApiWebPageFull {
   gift?: ApiStarGiftUnique;
   auction?: ApiWebPageAuctionData;
   stickers?: ApiWebPageStickerData;
+  cachedPage?: ApiInstantViewPage;
+  aiComposeToneEmojiId?: string;
   hasLargeMedia?: boolean;
 }
 
@@ -445,7 +461,7 @@ export interface ApiMessageWebPage {
   mediaSize?: WebPageMediaSize;
 }
 
-export type ApiReplyInfo = ApiMessageReplyInfo | ApiStoryReplyInfo;
+export type ApiReplyInfo = ApiMessageReplyInfo | ApiEphemeralReplyInfo | ApiStoryReplyInfo;
 
 export interface ApiMessageReplyInfo {
   type: 'message';
@@ -458,6 +474,11 @@ export interface ApiMessageReplyInfo {
   isQuote?: true;
   quoteText?: ApiFormattedText;
   quoteOffset?: number;
+}
+
+export interface ApiEphemeralReplyInfo {
+  type: 'ephemeral';
+  replyToMsgId: number;
 }
 
 export interface ApiStoryReplyInfo {
@@ -474,6 +495,11 @@ export interface ApiInputMessageReplyInfo {
   monoforumPeerId?: string;
   quoteText?: ApiFormattedText;
   quoteOffset?: number;
+}
+
+export interface ApiInputEphemeralReplyInfo {
+  type: 'ephemeral';
+  replyToMsgId: number;
 }
 
 export interface ApiSuggestedPost {
@@ -496,7 +522,8 @@ export interface ApiInputSuggestedPostInfo {
   isRejected?: true;
 }
 
-export type ApiInputReplyInfo = ApiInputMessageReplyInfo | ApiInputStoryReplyInfo;
+export type ApiInputDraftReplyInfo = ApiInputMessageReplyInfo | ApiInputEphemeralReplyInfo;
+export type ApiInputReplyInfo = ApiInputDraftReplyInfo | ApiInputStoryReplyInfo;
 
 export interface ApiMessageForwardInfo {
   date: number;
@@ -649,6 +676,44 @@ export interface ApiFormattedTextWithEmojiOnlyCount extends ApiFormattedText {
   emojiOnlyCount?: number;
 }
 
+export type ApiInputAiComposeTone = {
+  type: 'default';
+  tone: string;
+} | {
+  type: 'id';
+  id: string;
+  accessHash: string;
+} | {
+  type: 'slug';
+  slug: string;
+};
+
+export interface ApiAiComposeToneExample {
+  from: ApiFormattedText;
+  to: ApiFormattedText;
+}
+
+export interface ApiAiComposeTone {
+  id: string;
+  accessHash: string;
+  slug: string;
+  title: string;
+  isCreator?: true;
+  emojiId?: string;
+  prompt?: string;
+  installsCount?: number;
+  authorId?: string;
+  exampleEnglish?: ApiAiComposeToneExample;
+}
+
+export interface ApiAiComposeToneDefault {
+  tone: string;
+  emojiId: string;
+  title: string;
+}
+
+export type ApiAiComposeToneType = ApiAiComposeTone | ApiAiComposeToneDefault;
+
 export interface ApiComposedMessageWithAI {
   resultText: ApiFormattedText;
   diffText?: ApiFormattedText;
@@ -656,6 +721,7 @@ export interface ApiComposedMessageWithAI {
 
 export type MediaContent = {
   text?: ApiFormattedTextWithEmojiOnlyCount;
+  richMessage?: ApiRichMessage;
   photo?: ApiPhoto;
   video?: ApiVideo;
   document?: ApiDocument;
@@ -699,10 +765,15 @@ export type BoughtPaidMedia = Pick<MediaContent, 'photo' | 'video'>;
 
 export interface ApiMessage {
   id: number;
+  ephemeralBotId?: string;
+  ephemeralRandomId?: string;
+  ephemeralTopMsgId?: number;
+  isEphemeral?: true;
   chatId: string;
   content: MediaContent;
   date: number;
   isOutgoing: boolean;
+  ttlPeriod?: number;
   senderId?: string;
   replyInfo?: ApiReplyInfo;
   suggestedPostInfo?: ApiInputSuggestedPostInfo;
@@ -726,6 +797,7 @@ export interface ApiMessage {
   isKeyboardSelective?: boolean;
   viaBotId?: string;
   viaBusinessBotId?: string;
+  guestChatViaId?: string;
   postAuthorTitle?: string;
   isScheduled?: boolean;
   scheduleRepeatPeriod?: number;

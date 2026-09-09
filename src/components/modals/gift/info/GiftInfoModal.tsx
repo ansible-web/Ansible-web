@@ -888,7 +888,7 @@ const GiftInfoModal = ({
           {uniqueGift.resaleTonOnly
             && (
               <div className={styles.descriptionConfirm}>
-                {lang('ConfirmBuyGiftForTonDescription')}
+                {lang('ConfirmBuyGiftForGramDescription')}
               </div>
             )}
           <GiftTransferPreview

@@ -1,5 +1,3 @@
-@use '../../../styles/mixins';
-
 @layer ui.layout {
   .root {
     --surface-inline-padding: 1rem 1rem;
@@ -10,10 +8,20 @@
   }
 
   .scrollable {
+    --surface-inline-padding: 1rem calc(max(1rem - var(--scrollbar-width), 0px));
+    --surface-breakout-margin: -1rem calc(0rem - max(1rem - var(--scrollbar-width), 0px));
+
     scrollbar-gutter: stable;
     overflow-y: auto;
+  }
 
-    @include mixins.adapt-padding-to-scrollbar(1rem);
+  .noPadding {
+    --surface-inline-padding: 0rem 0rem;
+    --surface-breakout-margin: 0rem 0rem;
+  }
+
+  .breakout {
+    margin-inline: var(--surface-breakout-margin, 0rem 0rem);
   }
 
   .noPadding {

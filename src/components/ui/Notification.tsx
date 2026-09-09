@@ -21,8 +21,8 @@ import useLastCallback from '../../hooks/useLastCallback';
 import useShowTransitionDeprecated from '../../hooks/useShowTransitionDeprecated';
 
 import CustomEmoji from '../common/CustomEmoji';
-import Icon from '../common/icons/Icon';
 import DiamondIcon from '../common/icons/DiamondIcon';
+import Icon from '../common/icons/Icon';
 import Button from './Button';
 import Portal from './Portal';
 import RoundTimer from './RoundTimer';

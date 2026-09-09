@@ -45,6 +45,7 @@ export type OwnProps = {
   threadId?: ThreadId;
   isButtonVisible: boolean;
   canAttachMedia: boolean;
+  canAttachFiles: boolean;
   canAttachPolls: boolean;
   canAttachToDoLists: boolean;
   canSendPhotos: boolean;
@@ -58,14 +59,15 @@ export type OwnProps = {
   theme: ThemeKey;
   canEditMedia?: boolean;
   editingMessage?: ApiMessage;
-  messageListType?: MessageListType;
+  messageListType: MessageListType;
   paidMessagesStars?: number;
   canInsertDate?: boolean;
+  canExpandRichInput?: boolean;
   menuPositionX: 'left' | 'right';
   onFileSelect: (files: File[]) => void;
   onDateInsert: (text: ApiFormattedText) => void;
-  onPollCreate: NoneToVoidFunction;
   onTodoListCreate: NoneToVoidFunction;
+  onRichInputExpand: NoneToVoidFunction;
   onMenuOpen: NoneToVoidFunction;
   onMenuClose: NoneToVoidFunction;
 };
@@ -75,6 +77,7 @@ const AttachMenu = ({
   threadId,
   isButtonVisible,
   canAttachMedia,
+  canAttachFiles,
   canAttachPolls,
   canAttachToDoLists,
   canSendPhotos,
@@ -91,15 +94,17 @@ const AttachMenu = ({
   messageListType,
   paidMessagesStars,
   canInsertDate,
+  canExpandRichInput,
   menuPositionX,
   onFileSelect,
   onDateInsert,
   onMenuOpen,
   onMenuClose,
-  onPollCreate,
   onTodoListCreate,
+  onRichInputExpand,
 }: OwnProps) => {
   const {
+    openPollModal,
     updateAttachmentSettings,
   } = getActions();
   const [isAttachMenuOpen, openAttachMenu, closeAttachMenu] = useFlag();
@@ -193,6 +198,11 @@ const AttachMenu = ({
     openDateModal();
   });
 
+  const handlePollCreate = useLastCallback(() => {
+    closeAttachMenu();
+    openPollModal({ chatId, threadId, messageListType });
+  });
+
   if (!isButtonVisible && !isDateModalOpen) {
     return undefined;
   }
@@ -256,7 +266,7 @@ const AttachMenu = ({
                   : 'DescriptionRestrictedMedia')}
               </MenuItem>
             )}
-            {canAttachMedia && (
+            {canAttachMedia && canAttachFiles && (
               <>
                 {canSendVideoOrPhoto && !isFile && (
                   <MenuItem icon="photo" onClick={handleQuickSelect}>
@@ -278,13 +288,16 @@ const AttachMenu = ({
               </>
             )}
             {canAttachPolls && !editingMessage && (
-              <MenuItem icon="poll" onClick={onPollCreate}>{oldLang('Poll')}</MenuItem>
+              <MenuItem icon="poll" onClick={handlePollCreate}>{lang('Poll')}</MenuItem>
             )}
             {canAttachToDoLists && !editingMessage && (
               <MenuItem icon="select" onClick={onTodoListCreate}>{lang('TitleToDoList')}</MenuItem>
             )}
             {canInsertDate && !editingMessage && (
               <MenuItem icon="calendar" onClick={handleDateMenuClick}>{lang('GiftInfoDate')}</MenuItem>
+            )}
+            {canExpandRichInput && (
+              <MenuItem icon="article" onClick={onRichInputExpand}>{lang('AttachmentMenuArticle')}</MenuItem>
             )}
 
             {!editingMessage && !canEditMedia && !isScheduled && Boolean(bots?.length) && (

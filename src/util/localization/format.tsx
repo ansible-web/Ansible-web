@@ -5,8 +5,9 @@ import { STARS_ICON_PLACEHOLDER, TON_CURRENCY_CODE } from '../../config';
 import { convertTonFromNanos } from '../../util/formatCurrency';
 import buildClassName from '../buildClassName';
 
-import Icon from '../../components/common/icons/Icon';
 import DiamondIcon from '../../components/common/icons/DiamondIcon';
+import GramIcon from '../../components/common/icons/GramIcon';
+import Icon from '../../components/common/icons/Icon';
 
 export const NEXT_ARROW_REPLACEMENT = {
   '>': <Icon name="next-link" className="link-arrow-icon" />,
@@ -21,7 +22,7 @@ export function formatStarsAsText(lang: LangFn, amount: number) {
 
 export function formatTonAsText(lang: LangFn, amount: number, shouldConvertFromNanos?: boolean) {
   const formattedAmount = shouldConvertFromNanos ? convertTonFromNanos(Number(amount)) : amount;
-  return lang('TonAmountText', { amount: lang.preciseNumber(formattedAmount) }, { pluralValue: formattedAmount });
+  return lang('GramAmountText', { amount: lang.preciseNumber(formattedAmount) }, { pluralValue: formattedAmount });
 }
 
 export function formatTonAsIcon(
@@ -32,15 +33,25 @@ export function formatTonAsIcon(
     containerClassName?: string;
     withWrapper?: boolean;
     shouldConvertFromNanos?: boolean;
+    isMono?: boolean;
+    withIconLast?: boolean;
   }) {
-  const { className, containerClassName, withWrapper, shouldConvertFromNanos } = options || {};
+  const {
+    className, containerClassName, withWrapper, shouldConvertFromNanos, isMono, withIconLast,
+  } = options || {};
   const formattedAmount = shouldConvertFromNanos ? convertTonFromNanos(Number(amount)) : amount;
-  const icon = <Icon name="toncoin" className={buildClassName('in-text-icon', className)} />;
+  const icon = (
+    <GramIcon
+      isMono={isMono}
+      className={buildClassName('in-text-icon', withIconLast && 'in-text-icon-last', className)}
+    />
+  );
+  const key = withIconLast ? 'GramAmountIconLast' : 'GramAmount';
 
   if (containerClassName || withWrapper) {
     return (
       <span className={containerClassName}>
-        {lang('TonAmount', { amount: formattedAmount }, {
+        {lang(key, { amount: formattedAmount }, {
           withNodes: true,
           specialReplacement: {
             '💎': icon,
@@ -50,7 +61,7 @@ export function formatTonAsIcon(
     );
   }
 
-  return lang('TonAmount', { amount: formattedAmount }, {
+  return lang(key, { amount: formattedAmount }, {
     withNodes: true,
     specialReplacement: {
       '💎': icon,
@@ -63,19 +74,21 @@ export function formatStarsAsIcon(lang: LangFn, amount: number | string, options
   className?: string;
   containerClassName?: string;
   withWrapper?: boolean;
+  withIconLast?: boolean;
 }) {
-  const { asFont, className, containerClassName, withWrapper } = options || {};
-  // Rebrand: crystals (XTR) always render as the diamond glyph, never a star.
-  // asFont keeps the monochrome in-text font icon (inherits text color/size);
-  // the non-font branch uses the colored gem.
+  const { asFont, className, containerClassName, withWrapper, withIconLast } = options || {};
+  // Ребренд: XTR у нас всегда алмаз, а не звезда. asFont оставляет моно-глиф
+  // (наследует цвет и размер текста), не-font ветка рисует цветной камень.
+  const iconClassName = buildClassName(withIconLast && 'in-text-icon-last', className);
   const icon = asFont
-    ? <Icon name="diamond" className={buildClassName('in-text-icon', className)} />
-    : <DiamondIcon type="gold" className={className} size="adaptive" />;
+    ? <Icon name="diamond" className={buildClassName('in-text-icon', iconClassName)} />
+    : <DiamondIcon type="gold" className={iconClassName} size="adaptive" />;
+  const key = withIconLast ? 'StarsAmountIconLast' : 'StarsAmount';
 
   if (containerClassName || withWrapper) {
     return (
       <span className={containerClassName}>
-        {lang('StarsAmount', { amount }, {
+        {lang(key, { amount }, {
           withNodes: true,
           specialReplacement: {
             [STARS_ICON_PLACEHOLDER]: icon,
@@ -85,7 +98,7 @@ export function formatStarsAsIcon(lang: LangFn, amount: number | string, options
     );
   }
 
-  return lang('StarsAmount', { amount }, {
+  return lang(key, { amount }, {
     withNodes: true,
     specialReplacement: {
       [STARS_ICON_PLACEHOLDER]: icon,

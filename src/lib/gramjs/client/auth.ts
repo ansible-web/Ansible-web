@@ -24,7 +24,7 @@ export interface UserAuthParams {
   phoneCode: (isCodeViaApp?: boolean) => Promise<string>;
   password: (hint?: string, noReset?: boolean) => Promise<string>;
   firstAndLastNames: () => Promise<[string, string?]>;
-  qrCode: (qrCode: { token: Buffer; expires: number }) => Promise<void>;
+  qrCode: (qrCode: { token: Uint8Array; expires: number }) => Promise<void>;
   onError: (err: Error) => void;
   forceSMS?: boolean;
   initialMethod?: 'phoneNumber' | 'qrCode';
@@ -141,7 +141,7 @@ async function signInUser(
 ): Promise<Api.TypeUser> {
   let phoneNumber;
   let phoneCodeHash;
-  let isCodeViaApp = false;
+  let isCodeViaApp;
   lastUsedMethod = 'phoneNumber';
 
   while (true) {
@@ -182,7 +182,7 @@ async function signInUser(
   }
 
   let phoneCode;
-  let isRegistrationRequired = false;
+  let isRegistrationRequired;
   let termsOfService;
 
   // eslint-disable-next-line no-constant-condition
@@ -384,7 +384,7 @@ export async function signInUserWithPasskey(
   client: TelegramClient,
   apiCredentials: ApiCredentials,
   authParams: UserAuthParams,
-  credentialJson: PublicKeyCredentialJSON,
+  credentialJson: AuthenticationResponseJSON,
 ): Promise<Api.TypeUser> {
   try {
     if (!credentialJson.response.userHandle) {

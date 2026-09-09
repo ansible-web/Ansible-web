@@ -12,6 +12,7 @@ import {
   selectCanScheduleUntilOnline,
   selectChat,
   selectIsChatWithSelf,
+  selectIsStoryViewerOpen,
   selectPeerPaidMessagesStars,
   selectTabState,
 } from '../../../../global/selectors';
@@ -57,6 +58,7 @@ type StateProps = {
   isPaymentMessageConfirmDialogOpen?: boolean;
   starsBalance: number;
   isStarsBalanceModalOpen?: boolean;
+  isStoryViewerOpen?: boolean;
 };
 
 const INDEX_TO_TAB_ID = ['translate', 'style', 'fix'] as const;
@@ -81,6 +83,7 @@ const AiMessageEditorModal = ({
   isPaymentMessageConfirmDialogOpen,
   starsBalance,
   isStarsBalanceModalOpen,
+  isStoryViewerOpen,
 }: OwnProps & StateProps) => {
   const {
     closeAiMessageEditorModal,
@@ -156,13 +159,16 @@ const AiMessageEditorModal = ({
       case 'translate':
         composeWithAiMessageEditor({
           translateToLang: translateTab?.selectedLanguage,
-          changeTone: translateTab?.selectedTone,
+          tone: translateTab?.selectedTone,
           isEmojify: translateTab?.shouldEmojify,
         });
         break;
       case 'style':
         if (styleTab?.selectedTone) {
-          composeWithAiMessageEditor({ changeTone: styleTab.selectedTone, isEmojify: styleTab?.shouldEmojify });
+          composeWithAiMessageEditor({
+            tone: styleTab.selectedTone,
+            isEmojify: styleTab?.shouldEmojify,
+          });
         }
         break;
       case 'fix':
@@ -263,7 +269,7 @@ const AiMessageEditorModal = ({
       title={lang('AiMessageEditor')}
       hasCloseButton
       onClose={closeAiMessageEditorModal}
-      className={styles.modal}
+      className={buildClassName(styles.modal, isStoryViewerOpen && 'component-theme-dark')}
       headerClassName="modal-header-condensed-wide"
       dialogClassName={styles.modalDialog}
       contentClassName={styles.modalContent}
@@ -391,6 +397,7 @@ export default memo(withGlobal<OwnProps>(
       isPaymentMessageConfirmDialogOpen: tabState.isPaymentMessageConfirmDialogOpen,
       starsBalance,
       isStarsBalanceModalOpen,
+      isStoryViewerOpen: selectIsStoryViewerOpen(global),
     };
   },
 )(AiMessageEditorModal));

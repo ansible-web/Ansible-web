@@ -1,9 +1,8 @@
 .Auth {
+  overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  overflow-y: auto;
 
   width: 100%;
   height: 100%;
@@ -29,10 +28,10 @@
   width: 100%;
   max-width: 30rem;
   height: 36rem;
-
-  background: var(--color-background);
   border: 1px solid var(--color-borders);
   border-radius: 1rem;
+
+  background: var(--color-background);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
 }
 
@@ -53,17 +52,11 @@
 .auth-form {
   width: 100%;
   padding: 2.5rem 2rem 1.75rem;
-
   text-align: center;
-
-  @media (min-width: 600px) {
-    padding: 3rem 2.5rem 2rem;
-  }
 
   #logo,
   .AvatarEditable label {
     display: block;
-
     width: 5rem;
     height: 5rem;
     margin: 0 auto 1.25rem;
@@ -88,7 +81,6 @@
 
   h1 {
     margin-bottom: 0.5rem;
-
     font-size: 1.375rem;
     line-height: 1.25;
 
@@ -100,7 +92,6 @@
 
   .note {
     margin-bottom: 1.75rem;
-
     font-size: 0.875rem;
     line-height: 1.4;
     color: var(--color-text-secondary);
@@ -112,6 +103,10 @@
     .form {
       min-height: 0;
     }
+  }
+
+  @media (min-width: 600px) {
+    padding: 3rem 2.5rem 2rem;
   }
 }
 
@@ -217,8 +212,10 @@
 
   .qr-container {
     overflow: hidden;
+
     border: 1px solid var(--color-borders);
     border-radius: 1rem;
+
     background-color: white;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   }
@@ -229,8 +226,8 @@
   }
 
   .qr-note {
-    margin: 0 auto 1.5rem;
     max-width: 22rem;
+    margin: 0 auto 1.5rem;
 
     font-size: 0.9375rem;
     line-height: 1.5;

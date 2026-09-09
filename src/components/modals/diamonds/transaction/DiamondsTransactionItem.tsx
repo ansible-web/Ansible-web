@@ -28,8 +28,8 @@ import useOldLang from '../../../../hooks/useOldLang';
 
 import AnimatedIconFromSticker from '../../../common/AnimatedIconFromSticker';
 import Avatar from '../../../common/Avatar';
-import Icon from '../../../common/icons/Icon';
 import DiamondIcon from '../../../common/icons/DiamondIcon';
+import GramIcon from '../../../common/icons/GramIcon';
 import RadialPatternBackground from '../../../common/profile/RadialPatternBackground';
 import PaidMediaThumb from './PaidMediaThumb';
 
@@ -196,7 +196,7 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
         {NNBSP}
         {amount.currency === STARS_CURRENCY_CODE && <DiamondIcon type="gold" size="adaptive" />}
         {amount.currency === TON_CURRENCY_CODE && (
-          <Icon name="toncoin" className={buildClassName('in-text-icon', amountColorClass)} />
+          <GramIcon isMono className={buildClassName('in-text-icon', amountColorClass)} />
         )}
       </span>
     </div>
