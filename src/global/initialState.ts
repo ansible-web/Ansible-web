@@ -79,7 +79,7 @@ export const INITIAL_PERFORMANCE_STATE_MIN: PerformanceType = {
   textStreaming: false,
 };
 
-export const SHARED_STATE_CACHE_VERSION = 1;
+export const SHARED_STATE_CACHE_VERSION = 2;
 
 export const INITIAL_SHARED_STATE: SharedState = {
   cacheVersion: SHARED_STATE_CACHE_VERSION,
@@ -111,7 +111,10 @@ export const INITIAL_SHARED_STATE: SharedState = {
     wasTimeFormatSetManually: false,
     isConnectionStatusMinimized: true,
     canDisplayChatInTitle: true,
-    shouldAllowHttpTransport: true,
+    // 🚨 У нас HTTP-транспорт (/apiw1) сервером не поддержан: на нём даже ping
+    // (0x7ABE77EC) отвечает METHOD_NOT_IMPLEMENTED, и клиент зацикливается на
+    // переподключениях. Включать только вместе с серверной поддержкой.
+    shouldAllowHttpTransport: false,
     shouldWarnAboutFiles: true,
   },
   isInitial: true,

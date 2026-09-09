@@ -992,12 +992,15 @@ export default class MTProtoSender {
           this._log.info(`Type ${e.invalidConstructorId} not found, remaining data ${e.remaining.length} bytes`);
           continue;
         } else if (e instanceof SecurityError) {
+          // 🚨 Апстрим здесь рвёт соединение (handleSecurityError + reconnect) по
           // https://core.telegram.org/mtproto/security_guidelines#behavior-in-case-of-mismatch
+          // Нам это нельзя: одна непрошедшая проверку пачка уводит клиента в петлю
+          // переподключений, а с разрешённым HTTP — ещё и на /apiw1. Пакет
+          // отбрасываем, соединение держим (поведение форка до 0.3.3).
+          this._log.warn(`Security error while unpacking a received message: ${e.message}`);
           // eslint-disable-next-line no-console
           console.error(`[MVSY-DEBUG] SecurityError: ${e.message}`);
-          this.handleSecurityError();
-          this._recvLoopHandle = undefined;
-          return;
+          continue;
         } else if (e instanceof InvalidBufferError) {
           // 404 means that the server has "forgotten" our auth key and we need to create a new one.
           if (e.code === 404) {

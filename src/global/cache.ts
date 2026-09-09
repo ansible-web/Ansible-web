@@ -252,6 +252,10 @@ function migrateSharedCache(
         ...settings,
         themes: cachedSettings?.themes
           || (fallbackThemes ? cloneThemeSettings(fallbackThemes) : initialState.settings.themes),
+        // Версия 2: гасим запасной HTTP-транспорт, сохранённый версией 0.3.3.
+        // С ним клиент уходил на /apiw1, где наш сервер не отвечает даже на ping,
+        // и вставал в петлю переподключений.
+        shouldAllowHttpTransport: false,
       },
     };
   }
