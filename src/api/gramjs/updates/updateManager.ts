@@ -375,9 +375,14 @@ function restartShortpollFromNow(channelId: string) {
 function scheduleGetDifference() {
   if (seqTimeout) return;
 
+  // The latch is released in `finally`: a throw out of `getDifference` otherwise
+  // leaves it held, and no gap is ever recovered again for the life of the page.
   seqTimeout = setTimeout(async () => {
-    await getDifference();
-    seqTimeout = undefined;
+    try {
+      await getDifference();
+    } finally {
+      seqTimeout = undefined;
+    }
   }, UPDATE_WAIT_TIMEOUT);
 }
 
@@ -409,41 +414,48 @@ export async function getDifference() {
     isFetching: true,
   });
 
-  const response = await invoke(new GramJs.updates.GetDifference({
-    pts: localDb.commonBoxState.pts,
-    date: localDb.commonBoxState.date,
-    qts: localDb.commonBoxState.qts,
-  }));
-
-  if (!response || response instanceof GramJs.updates.DifferenceTooLong) {
-    forceSync();
-    return;
-  }
-
-  if (response instanceof GramJs.updates.DifferenceEmpty) {
-    localDb.commonBoxState.seq = response.seq;
-    localDb.commonBoxState.date = response.date;
+  // The flag is cleared in `finally` so that a throw, a timed-out `invoke` or a
+  // `differenceTooLong` cannot leave the client showing "Updating" forever.
+  try {
+    await fetchDifferenceSlices();
+  } finally {
     sendApiUpdate({
       '@type': 'updateFetchingDifference',
       isFetching: false,
     });
-    return;
   }
+}
 
-  processDifference(response);
+// Slices are consumed in a loop, so exactly one chain advances `commonBoxState`
+// at a time and the caller's `finally` runs once the whole difference is applied.
+async function fetchDifferenceSlices() {
+  while (true) {
+    const response = await invoke(new GramJs.updates.GetDifference({
+      pts: localDb.commonBoxState.pts,
+      date: localDb.commonBoxState.date,
+      qts: localDb.commonBoxState.qts,
+    }));
 
-  const newState = response instanceof GramJs.updates.DifferenceSlice ? response.intermediateState : response.state;
-  applyState(newState);
+    if (!response || response instanceof GramJs.updates.DifferenceTooLong) {
+      forceSync();
+      return;
+    }
 
-  if (response instanceof GramJs.updates.DifferenceSlice) {
-    getDifference();
-    return;
+    if (response instanceof GramJs.updates.DifferenceEmpty) {
+      localDb.commonBoxState.seq = response.seq;
+      localDb.commonBoxState.date = response.date;
+      return;
+    }
+
+    processDifference(response);
+
+    const newState = response instanceof GramJs.updates.DifferenceSlice ? response.intermediateState : response.state;
+    applyState(newState);
+
+    if (!(response instanceof GramJs.updates.DifferenceSlice)) {
+      return;
+    }
   }
-
-  sendApiUpdate({
-    '@type': 'updateFetchingDifference',
-    isFetching: false,
-  });
 }
 
 async function runChannelDifference(channelId: string, reason: ChannelDifferenceReason) {
