@@ -47,6 +47,11 @@ type CloseNotificationData = {
   chatId: string;
 };
 
+// The browser refetches both images for every notification, so they are kept small
+const NOTIFICATION_ICON = 'icon-192x192.png';
+// Rendered monochrome at about 24px from its alpha channel, so it is a dense silhouette
+const NOTIFICATION_BADGE = 'badge-96x96.png';
+
 let lastSyncAt = new Date().valueOf();
 const shownNotifications = new Set();
 const clickBuffer: Record<string, NotificationData> = {};
@@ -135,8 +140,8 @@ function showNotification({
       count: 1,
       shouldReplaceHistory,
     },
-    icon: icon || 'icon-192x192.png',
-    badge: 'icon-192x192.png',
+    icon: icon || NOTIFICATION_ICON,
+    badge: NOTIFICATION_BADGE,
     tag,
     // @ts-ignore
     vibrate: [200, 100, 200],
