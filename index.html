@@ -43,11 +43,14 @@
 
   <link rel="canonical" href="https://web.ansible.su/">
   <link rel="apple-touch-icon" sizes="180x180" href="./%TG_APPLE_ICON%.png">
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+  <!-- `data-unread-href` names the badged variant of each icon. A link without it
+       has no unread form and is left untouched, so the set of icons and the set of
+       files that exist cannot drift apart. -->
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" data-unread-href="./favicon-unread.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" data-unread-href="./favicon-unread-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" data-unread-href="./favicon-unread-32x32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./%TG_MAIN_ICON%.png">
-  <link rel="alternate icon" href="./favicon.ico" type="image/x-icon">
+  <link rel="alternate icon" href="./favicon.ico" type="image/x-icon" data-unread-href="./favicon-unread.ico">
   <link rel="manifest" id="the-manifest-placeholder" href="./%TG_MANIFEST%">
 
   <script vite-ignore src="./redirect.js"></script>

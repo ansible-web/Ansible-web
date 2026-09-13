@@ -1,21 +1,43 @@
-export default function updateIcon(asUnread: boolean) {
-  document.querySelectorAll<HTMLLinkElement>('link[rel="icon"], link[rel="alternate icon"]')
-    .forEach((link) => {
-      let href = link.href;
-      if (asUnread) {
-        if (!href.includes('favicon-unread')) {
-          href = href.replace('favicon', 'favicon-unread');
-        }
-      } else {
-        href = href.replace('favicon-unread', 'favicon');
-      }
+type IconHrefs = {
+  read: string;
+  unread: string;
+};
 
-      // The title blinks once a second while notifications are pending, so this
-      // runs that often on every icon link. Assigning an unchanged href still
-      // refetches the image — `icon-192x192.png` carries no `favicon` segment and
-      // would be re-requested on every blink for a byte-identical result.
-      if (href !== link.href) {
-        link.href = href;
-      }
-    });
+const ICON_LINK_SELECTOR = 'link[rel="icon"], link[rel="alternate icon"]';
+
+const hrefsByLink = new WeakMap<HTMLLinkElement, IconHrefs>();
+
+export default function updateIcon(asUnread: boolean) {
+  document.querySelectorAll<HTMLLinkElement>(ICON_LINK_SELECTOR).forEach((link) => {
+    const hrefs = getIconHrefs(link);
+    if (!hrefs) return;
+
+    // The page title blinks once a second while notifications are pending, so this
+    // runs that often for every icon. Assigning an unchanged `href` still refetches
+    // the image, which is a request per icon per second for an identical result.
+    const next = asUnread ? hrefs.unread : hrefs.read;
+    if (next !== link.href) {
+      link.href = next;
+    }
+  });
+}
+
+// Both forms are resolved against the document once and kept per element: `link.href`
+// reads back absolute, so comparing it against a relative attribute would never match
+// and every blink would reassign. Returns `undefined` for an icon that declares no
+// unread variant.
+function getIconHrefs(link: HTMLLinkElement): IconHrefs | undefined {
+  const cached = hrefsByLink.get(link);
+  if (cached) return cached;
+
+  const declared = link.dataset.unreadHref;
+  if (!declared) return undefined;
+
+  const hrefs: IconHrefs = {
+    read: link.href,
+    unread: new URL(declared, document.baseURI).href,
+  };
+  hrefsByLink.set(link, hrefs);
+
+  return hrefs;
 }
