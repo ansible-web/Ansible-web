@@ -46,6 +46,7 @@ import {
 import { isLocalMessageId } from '../../../util/keys/messageKey';
 import * as langProvider from '../../../util/oldLangProvider';
 import { debounce, pause, throttle } from '../../../util/schedulers';
+import { handleSetLanguageLink } from '../../../util/setLanguageLink';
 import { extractCurrentThemeParams } from '../../../util/themeStyle';
 import { callApi } from '../../../api/gramjs';
 import {
@@ -1791,6 +1792,11 @@ addActionHandler('openTelegramLink', async (global, actions, payload): Promise<v
       shouldIgnoreCache,
       tabId,
     });
+    return;
+  }
+
+  if (part1 === 'setlanguage') {
+    handleSetLanguageLink(part2, tabId);
     return;
   }
 

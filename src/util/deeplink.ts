@@ -9,6 +9,7 @@ import { LeftColumnContent, SettingsScreens } from '../types';
 import { API_CHAT_TYPES, RE_TG_LINK, TON_CURRENCY_CODE } from '../config';
 import { IS_BAD_URL_PARSER } from './browser/globalEnvironment';
 import { tryParseDeepLink } from './deepLinkParser';
+import { handleSetLanguageLink } from './setLanguageLink';
 
 export const processDeepLink = (url: string, linkContext?: LinkContext): boolean => {
   const actions = getActions();
@@ -224,6 +225,9 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
         },
       });
       break;
+    }
+    case 'setlanguage': {
+      return handleSetLanguageLink(params.lang);
     }
     case 'addstyle': {
       const { set } = params;
