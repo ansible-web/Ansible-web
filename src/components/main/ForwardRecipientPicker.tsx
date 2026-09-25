@@ -352,7 +352,7 @@ const ForwardRecipientPicker: FC<OwnProps & StateProps> = ({
           >
             {displayedTotalStars > 0 ? (
               <>
-                <Icon name="star" className="star-icon" />
+                <Icon name="diamond" className="star-icon" />
                 <AnimatedCounter text={String(displayedTotalStars)} />
               </>
             ) : <i className="icon icon-new-send" />}

@@ -319,7 +319,7 @@ const StickerButton = <T extends number | ApiSticker | ApiBotInlineMediaResult |
       )}
       {!noIcons && !noShowPremium && isPremiumSticker && !isLocked && (
         <div className="sticker-premium">
-          <Icon name="star" />
+          <Icon name="diamond" />
         </div>
       )}
       {shouldShowCloseButton && (

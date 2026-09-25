@@ -340,7 +340,7 @@ const AiMessageEditorModal = ({
             fluid
           >
             <div className={styles.paidStarsBadgeText}>
-              <Icon name="star" />
+              <Icon name="diamond" />
               <AnimatedCounter text={lang.number(starsForMessage)} />
             </div>
           </Button>

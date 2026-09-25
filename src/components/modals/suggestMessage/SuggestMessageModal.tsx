@@ -201,7 +201,7 @@ const SuggestMessageModal = ({
               noFastClick
               onClick={() => setSelectedCurrency(STARS_CURRENCY_CODE)}
             >
-              <Icon name="star" className={styles.currencyIcon} />
+              <Icon name="diamond" className={styles.currencyIcon} />
               {lang('CurrencyStars')}
             </Button>
             <Button

@@ -15,7 +15,7 @@ export default function renderKeyboardButtonText(lang: LangFn, button: ApiKeyboa
   }
 
   if (button.type === 'buy') {
-    return replaceWithTeact(button.text, STARS_ICON_PLACEHOLDER, <Icon name="star" />);
+    return replaceWithTeact(button.text, STARS_ICON_PLACEHOLDER, <Icon name="diamond" />);
   }
 
   return renderText(button.text);

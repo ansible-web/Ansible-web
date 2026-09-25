@@ -3031,7 +3031,7 @@ const Composer = ({
         {isInMessageList && <Icon name="check-bold" className="main-button-state-icon" />}
         {shouldRenderPaidStars && (
           <div ref={paidStarsRef} className="paidStars">
-            <Icon name="star" />
+            <Icon name="diamond" />
             <AnimatedCounter
               ref={counterRef}
               text={lang.number(starsForAllMessages)}

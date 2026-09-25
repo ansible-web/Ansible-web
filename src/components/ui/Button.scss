@@ -243,16 +243,14 @@
     }
 
     &.stars {
-      --ripple-color: rgba(0, 0, 0, 0.08);
+      // Stars → Diamonds rebrand: badge background follows the Ansible
+      // diamond blue palette instead of the gold Telegram stars color.
+      --ripple-color: rgba(255, 255, 255, 0.16);
       --button-text-color: var(--color-white);
-      --button-background-color: #ffb727;
+      --button-background-color: var(--color-stars);
       --button-active-text-color: var(--color-white);
-      --button-active-background-color: #ffb727cc;
-      --button-no-ripple-background-color: #ffb727;
-
-      .theme-dark & {
-        --button-background-color: #cf8920;
-      }
+      --button-active-background-color: color-mix(in srgb, var(--color-stars) 80%, transparent);
+      --button-no-ripple-background-color: var(--color-stars);
     }
 
     &.bluredStarsBadge {
