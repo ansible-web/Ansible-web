@@ -17,6 +17,7 @@ import { omit } from '../../../util/iteratees';
 import * as langProvider from '../../../util/oldLangProvider';
 import { EMOJI_DATA, EMOJI_OFFSETS } from '../../../util/phoneCallEmojiConstants';
 import { callApi } from '../../../api/gramjs';
+import { isStalePhoneCallUpdate } from '../../helpers/phoneCalls';
 import { addActionHandler, getGlobal, setGlobal } from '../../index';
 import { updateGroupCall, updateGroupCallParticipant } from '../../reducers/calls';
 import { updateTabState } from '../../reducers/tabs';
@@ -107,6 +108,9 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
     case 'updatePhoneCall': {
       if (!ARE_CALLS_SUPPORTED) return undefined;
       const { phoneCall, currentUserId } = global;
+
+      // Merged into phoneCall below, so a stale update would overwrite the current call's id/state.
+      if (isStalePhoneCallUpdate(phoneCall, update.call)) return undefined;
 
       // Another call (P2P or group) is already active - ignore here so we don't show the popup;
       // the non-async handler discards the new call as busy.

@@ -6,6 +6,7 @@ import { omit } from '../../../util/iteratees';
 import { notifyAboutCall } from '../../../util/notifications';
 import { onTickEnd } from '../../../util/schedulers';
 import { callApi } from '../../../api/gramjs';
+import { isStalePhoneCallUpdate } from '../../helpers/phoneCalls';
 import { addActionHandler, getGlobal } from '../../index';
 import { updateChat, updateChatFullInfo } from '../../reducers';
 import { removeGroupCall, updateGroupCall, updateGroupCallParticipant } from '../../reducers/calls';
@@ -88,6 +89,10 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
       } = global;
 
       const { call } = update;
+
+      // A late update of an earlier call (see isStalePhoneCallUpdate): without this check a stale
+      // discard arriving before the new call gets its id played 'end' and hung the new call up.
+      if (isStalePhoneCallUpdate(phoneCall, call)) return undefined;
 
       // Another call (P2P or group) is already active: auto-discard the new incoming call as busy.
       const isInOtherPhoneCall = Boolean(phoneCall?.id) && call.id !== phoneCall.id;

@@ -12,6 +12,7 @@ import {
 import { logDebugMessage } from '../../../util/debugConsole';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { callApi } from '../../../api/gramjs';
+import { markPhoneCallFinished } from '../../helpers/phoneCalls';
 import { addActionHandler, getGlobal, setGlobal } from '../../index';
 import {
   removeGroupCall,
@@ -379,6 +380,7 @@ addActionHandler('hangUp', (global, actions, payload): ActionReturnType => {
   if (phoneCall.state === 'discarded') {
     callApi('destroyPhoneCallState');
     stopPhoneCall();
+    markPhoneCallFinished(phoneCall.id);
 
     global = {
       ...global,
@@ -397,6 +399,7 @@ addActionHandler('hangUp', (global, actions, payload): ActionReturnType => {
   callApi('discardCall', { call: phoneCall, isPageUnload });
 
   if (phoneCall.state === 'requesting') {
+    markPhoneCallFinished(phoneCall.id);
     global = {
       ...global,
       phoneCall: undefined,
@@ -409,8 +412,14 @@ addActionHandler('hangUp', (global, actions, payload): ActionReturnType => {
     return undefined;
   }
 
+  const finishedCallId = phoneCall.id;
   setTimeout(() => {
+    // Marked only now, not on the button press: the server's discard for this very call still has to
+    // arrive in the meantime (it carries need_rating for the rating dialog).
+    markPhoneCallFinished(finishedCallId);
     global = getGlobal();
+    // A new call may have started within the delay: clear only the call that was hung up.
+    if (global.phoneCall && global.phoneCall.id !== finishedCallId) return;
     global = {
       ...global,
       phoneCall: undefined,
