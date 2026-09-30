@@ -148,6 +148,14 @@ const PhoneCall = ({
     }
   }, [connectToActivePhoneCall, phoneCall?.id, stopHangingUp]);
 
+  // The component stays mounted between calls (PhoneCall.async renders it once loaded), so the
+  // hang-up flag must end together with the call. Previously it was reset only when the NEXT call
+  // received its id: redialing after hanging up first played the 'end' sound and showed
+  // "hanging up", then switched to ringing.
+  useEffect(() => {
+    if (!phoneCall) stopHangingUp();
+  }, [phoneCall, stopHangingUp]);
+
   const forceUpdate = useForceUpdate();
 
   useInterval(forceUpdate, isConnected ? 1000 : undefined);
