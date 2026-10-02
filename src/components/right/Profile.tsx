@@ -3,7 +3,6 @@ import { memo, useEffect, useMemo, useRef, useState } from '@teact';
 import { getActions, getGlobal, withGlobal } from '../../global';
 
 import type {
-  ApiAudio,
   ApiBotPreviewMedia,
   ApiChat,
   ApiChatFullInfo,
@@ -24,7 +23,7 @@ import type { AnimationLevel, ProfileState, ProfileTabType,
   SharedMediaType, ThemeKey, ThreadId } from '../../types';
 import type { RegularLangKey } from '../../types/language';
 import { MAIN_THREAD_ID } from '../../api/types';
-import { AudioOrigin, LoadMoreDirection, MediaViewerOrigin, NewChatMembersProgress } from '../../types';
+import { LoadMoreDirection, MediaViewerOrigin, NewChatMembersProgress } from '../../types';
 
 import {
   MEMBERS_SLICE, PROFILE_SENSITIVE_AREA, SHARED_MEDIA_SLICE, SLIDE_TRANSITION_DURATION,
@@ -63,7 +62,6 @@ import {
   selectUser,
   selectUserCommonChats,
   selectUserFullInfo,
-  selectUserSavedMusic,
 } from '../../global/selectors';
 import { selectPremiumLimit } from '../../global/selectors/limits';
 import { selectMessageDownloadableMedia } from '../../global/selectors/media';
@@ -116,7 +114,6 @@ import PreviewMedia from '../common/PreviewMedia';
 import PrivateChatInfo from '../common/PrivateChatInfo';
 import ChatExtra from '../common/profile/ChatExtra';
 import ProfileInfo from '../common/profile/ProfileInfo.tsx';
-import ProfileMusic from '../common/ProfileMusic';
 import WebLink from '../common/WebLink';
 import Island from '../gili/layout/Island';
 import Surface from '../gili/layout/Surface';
@@ -161,9 +158,6 @@ type StateProps = {
   hasMembersTab?: boolean;
   hasPreviewMediaTab?: boolean;
   hasGiftsTab?: boolean;
-  hasPlaylistTab?: boolean;
-  playlistById?: Record<string, ApiAudio>;
-  playlistIds?: string[];
   gifts?: ApiSavedStarGift[];
   storyAlbums?: ApiStoryAlbum[];
   giftCollections?: ApiStarGiftCollection[];
@@ -248,7 +242,6 @@ const CONTENT_LIST_CLASS: Record<string, string> = {
   links: styles.linksList,
   audio: styles.audioList,
   voice: styles.voiceList,
-  playlist: styles.playlistList,
   gif: styles.gifList,
   stories: styles.storiesList,
   storiesArchive: styles.storiesArchiveList,
@@ -288,9 +281,6 @@ const Profile = ({
   hasMembersTab,
   hasPreviewMediaTab,
   hasGiftsTab,
-  hasPlaylistTab,
-  playlistById,
-  playlistIds,
   gifts,
   storyAlbums,
   giftCollections,
@@ -329,8 +319,6 @@ const Profile = ({
     setSharedMediaSearchType,
     loadMoreMembers,
     loadCommonChats,
-    loadSavedMusic,
-    loadSavedMusicIds,
     openChat,
     searchSharedMediaMessages,
     openMediaViewer,
@@ -393,10 +381,6 @@ const Profile = ({
 
     if (hasGiftsTab) {
       arr.push({ type: 'gifts', key: 'ProfileTabGifts' });
-    }
-
-    if (hasPlaylistTab) {
-      arr.push({ type: 'playlist', key: 'ProfileTabPlaylist' });
     }
 
     if (hasStoriesTab && isOwnProfile) {
@@ -464,7 +448,7 @@ const Profile = ({
       } satisfies TabWithPropertiesAndType;
     });
   }, [
-    isGeneralSavedMessages, hasStoriesTab, hasGiftsTab, hasPlaylistTab, hasMembersTab, hasPreviewMediaTab,
+    isGeneralSavedMessages, hasStoriesTab, hasGiftsTab, hasMembersTab, hasPreviewMediaTab,
     isTopicInfo,
     hasCommonChatsTab, isChannel, isBot, similarChannels?.length, similarBots?.length, lang, isOwnProfile,
     mainTab, chatId, canUpdateMainTab, validMainTabTypes,
@@ -587,10 +571,6 @@ const Profile = ({
   const handleLoadGifts = useLastCallback(() => {
     loadPeerSavedGifts({ peerId: chatId });
   });
-  const handleLoadSavedMusic = useLastCallback(() => {
-    if (!isSynced) return;
-    loadSavedMusic({ userId: chatId });
-  });
 
   const handleLoadMoreMembers = useLastCallback(() => {
     if (!isSynced) return;
@@ -626,7 +606,6 @@ const Profile = ({
     loadStories: handleLoadPeerStories,
     loadStoriesArchive: handleLoadStoriesArchive,
     loadMoreGifts: handleLoadGifts,
-    loadSavedMusic: handleLoadSavedMusic,
     loadCommonChats: handleLoadCommonChats,
     tabType,
     mediaSearchType,
@@ -640,7 +619,6 @@ const Profile = ({
     threadId,
     storyIds,
     giftIds,
-    playlistIds,
     pinnedStoryIds,
     archiveStoryIds,
     similarChannels,
@@ -657,9 +635,6 @@ const Profile = ({
 
   useEffect(() => {
     // Needed to tell whether each track is already on the current user's own profile
-    if (resultType === 'playlist') {
-      loadSavedMusicIds();
-    }
   }, [resultType]);
 
   const shouldRenderProfileInfo = !noProfileInfo && !isSavedMessages;
@@ -753,7 +728,11 @@ const Profile = ({
   });
 
   const handlePlayAudio = useLastCallback((messageId: number) => {
-    openAudioPlayer({ chatId: profileId, messageId });
+    openAudioPlayer({
+      item: {
+        type: 'message', chatId: profileId, threadId: MAIN_THREAD_ID, messageId,
+      },
+    });
   });
 
   const handleMemberClick = useLastCallback((id: string) => {
@@ -1045,9 +1024,6 @@ const Profile = ({
         case 'gif':
           text = oldLang('lng_media_gif_empty');
           break;
-        case 'playlist':
-          text = lang('ProfilePlaylistEmpty');
-          break;
         default:
           text = oldLang('SharedMedia.EmptyTitle');
       }
@@ -1055,20 +1031,6 @@ const Profile = ({
       return (
         <div className={buildClassName(styles.content, styles.emptyList)}>
           <NothingFound text={text} />
-        </div>
-      );
-    }
-
-    if (resultType === 'playlist') {
-      return (
-        <div className={buildClassName(styles.content, CONTENT_LIST_CLASS[resultType])}>
-          {(viewportIds as string[]).filter((id) => Boolean(playlistById?.[id])).map((id) => (
-            <ProfileMusic
-              key={id}
-              audio={playlistById![id]}
-              className="scroll-item"
-            />
-          ))}
         </div>
       );
     }
@@ -1148,7 +1110,8 @@ const Profile = ({
               key={id}
               theme={theme}
               message={messagesById[id]}
-              origin={AudioOrigin.SharedMedia}
+              variant="sharedMedia"
+              threadId={threadId}
               date={messagesById[id].date}
               className="scroll-item"
               onPlay={handlePlayAudio}
@@ -1170,7 +1133,8 @@ const Profile = ({
                 theme={theme}
                 message={message}
                 senderTitle={getSenderName(oldLang, message, chatsById, usersById)}
-                origin={AudioOrigin.SharedMedia}
+                variant="sharedMedia"
+                threadId={threadId}
                 date={message.date}
                 className="scroll-item"
                 onPlay={handlePlayAudio}
@@ -1531,9 +1495,6 @@ export default memo(withGlobal<OwnProps>(
 
     const hasGiftsTab = Boolean(peerFullInfo?.starGiftCount) && !isSavedMessages;
 
-    // `savedMusic` holds the track shown on the profile, so its presence means the peer has a playlist
-    const hasPlaylistTab = Boolean(userFullInfo?.savedMusic) && !isSavedMessages;
-    const savedMusic = hasPlaylistTab ? selectUserSavedMusic(global, chatId) : undefined;
     const activeCollectionId = selectActiveGiftsCollectionId(global, chatId);
     const peerGifts = savedGifts.collectionsByPeerId[chatId]?.[activeCollectionId];
 
@@ -1574,9 +1535,6 @@ export default memo(withGlobal<OwnProps>(
       chatsById,
       storyIds,
       hasGiftsTab,
-      hasPlaylistTab,
-      playlistById: savedMusic?.byId,
-      playlistIds: savedMusic?.ids,
       gifts: peerGifts?.gifts,
       storyAlbums,
       giftCollections,

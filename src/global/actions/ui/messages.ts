@@ -11,10 +11,13 @@ import {
   SERVICE_NOTIFICATIONS_USER_ID,
 } from '../../../config';
 import { cancelScrollBlockingAnimation, isAnimatingScroll } from '../../../util/animateScroll';
+import { areDeepEqual } from '../../../util/areDeepEqual';
+import { stop as stopPlayback } from '../../../util/audioPlayback/playbackController';
 import { IS_TOUCH_ENV } from '../../../util/browser/windowEnvironment';
 import { copyTextToClipboardFromPromise } from '../../../util/clipboard';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { compact, findLast } from '../../../util/iteratees';
+import { clearMediaSession } from '../../../util/mediaSession';
 import { Bundles, loadBundle } from '../../../util/moduleLoader';
 import {
   getMediaFilename,
@@ -34,6 +37,7 @@ import {
   updateChatMessage,
   updateFocusedMessage,
 } from '../../reducers';
+import { pushPlayedTrack } from '../../reducers/audioPlayer';
 import { updateTabState } from '../../reducers/tabs';
 import { replaceTabThreadParam, replaceThreadLocalStateParam, updateThreadReadState } from '../../reducers/threads';
 import {
@@ -55,6 +59,7 @@ import {
   selectTabState,
   selectViewportIds,
 } from '../../selectors';
+import { selectCurrentPlaylistKey } from '../../selectors/audioPlayer';
 import { selectMessageDownloadableMedia } from '../../selectors/media';
 import { selectDraft, selectReplyStack, selectThreadInfo } from '../../selectors/threads';
 import { getPeerStarsForMessage } from '../api/messages';
@@ -185,25 +190,60 @@ addActionHandler('replyToNextMessage', (global, actions, payload): ActionReturnT
 
 addActionHandler('openAudioPlayer', (global, actions, payload): ActionReturnType => {
   const {
-    chatId, threadId, messageId, origin, playbackRate, isMuted, timestamp,
+    item, source, playbackRate, isMuted, timestamp,
     tabId = getCurrentTabId(),
   } = payload;
 
   const tabState = selectTabState(global, tabId);
-  return updateTabState(global, {
+
+  const effectiveSource = source ?? tabState.audioPlayer.source;
+  const hasSourceChanged = !areDeepEqual(tabState.audioPlayer.source, effectiveSource);
+
+  if (global.audioPlayer.orderMode === 'shuffle' && (hasSourceChanged || !tabState.audioPlayer.shuffle)) {
+    actions.loadShufflePlaylist({ tabId });
+  }
+
+  if (effectiveSource?.type === 'chat' && item?.type === 'message') {
+    actions.searchChatMediaMessages({
+      chatId: effectiveSource.chatId,
+      threadId: effectiveSource.threadId,
+      mediaType: effectiveSource.mediaType,
+      currentMediaMessageId: item.messageId,
+      tabId,
+    });
+  }
+
+  if (effectiveSource?.type === 'richMessage') {
+    const { chatId, messageId } = effectiveSource;
+    if (selectChatMessage(global, chatId, messageId)?.content.richMessage?.isPart) {
+      actions.loadRichMessage({ chatId, messageId });
+    }
+  }
+
+  global = updateTabState(global, {
     audioPlayer: {
-      chatId,
-      threadId,
-      messageId,
+      ...selectTabState(global, tabId).audioPlayer,
+      activeItem: item,
       timestamp,
-      origin: origin ?? tabState.audioPlayer.origin,
+      source: effectiveSource,
       playbackRate: playbackRate || tabState.audioPlayer.playbackRate || global.audioPlayer.lastPlaybackRate,
       isPlaybackRateActive: (tabState.audioPlayer.isPlaybackRateActive === undefined
         ? global.audioPlayer.isLastPlaybackRateActive
         : tabState.audioPlayer.isPlaybackRateActive),
       isMuted: isMuted || tabState.audioPlayer.isMuted,
+      shuffle: hasSourceChanged ? undefined : selectTabState(global, tabId).audioPlayer.shuffle,
+      pendingStep: undefined,
     },
   }, tabId);
+
+  if (global.audioPlayer.orderMode === 'shuffle' && !hasSourceChanged && tabState.audioPlayer.shuffle) {
+    const playedKey = selectCurrentPlaylistKey(global, tabId);
+    if (playedKey !== undefined) {
+      global = pushPlayedTrack(global, playedKey, tabId);
+    }
+  }
+
+  return global;
 });
 
 addActionHandler('setAudioPlayerVolume', (global, actions, payload): ActionReturnType => {
@@ -263,28 +303,23 @@ addActionHandler('setAudioPlayerMuted', (global, actions, payload): ActionReturn
   }, tabId);
 });
 
-addActionHandler('setAudioPlayerOrigin', (global, actions, payload): ActionReturnType => {
-  const {
-    origin, tabId = getCurrentTabId(),
-  } = payload;
-
-  return updateTabState(global, {
-    audioPlayer: {
-      ...selectTabState(global, tabId).audioPlayer,
-      origin,
-    },
-  }, tabId);
-});
-
 addActionHandler('closeAudioPlayer', (global, actions, payload): ActionReturnType => {
   const { tabId = getCurrentTabId() } = payload || {};
   const tabState = selectTabState(global, tabId);
+
+  if (tabId === getCurrentTabId()) {
+    stopPlayback();
+    clearMediaSession();
+  }
+
   return updateTabState(global, {
     audioPlayer: {
       playbackRate: tabState.audioPlayer.playbackRate,
       isPlaybackRateActive: tabState.audioPlayer.isPlaybackRateActive,
       isMuted: tabState.audioPlayer.isMuted,
+      source: tabState.audioPlayer.source,
     },
+    isAudioPlaylistModalOpen: undefined,
   }, tabId);
 });
 

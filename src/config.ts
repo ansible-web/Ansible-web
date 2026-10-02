@@ -488,3 +488,12 @@ export const DEFAULT_RESALE_GIFTS_FILTER_OPTIONS: ResaleGiftsFilterOptions = {
 export const ACCOUNT_TTL_OPTIONS = [1, 3, 6, 12, 18, 24];
 
 export const SLOT_MACHINE_EMOJI = '🎰';
+
+// Подсистема проигрывания (перенос из апстрима вместе с плеером).
+export const MEDIA_PRELOAD_OFFSET = 9;
+export const PLAYLIST_OLDEST_ANCHOR_ID = 1;
+export const PLAYLIST_NEWEST_ANCHOR_ID = 2 ** 31 - 1;
+export const PREVIOUS_RESTART_THRESHOLD = 5;
+export const SHUFFLE_PLAYLIST_LIMIT = 10000;
+export const SHUFFLE_PRELOAD_THRESHOLD = 40;
+export const REMEMBER_SHUFFLED_ORDER_ITEMS = 16;

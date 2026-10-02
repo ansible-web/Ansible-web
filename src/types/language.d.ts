@@ -2396,6 +2396,17 @@ export interface LangPair {
   'AiMessageEditorStyleBiblical': undefined;
   'AiMessageEditorStyleViking': undefined;
   'AiMessageEditorStyleZen': undefined;
+  'AudioOpenPlaylist': undefined;
+  'AudioPlaybackOrder': undefined;
+  'AudioPlaybackRate': undefined;
+  'AudioRepeatList': undefined;
+  'AudioRepeatSong': undefined;
+  'AudioReverseOrder': undefined;
+  'AudioShowInChat': undefined;
+  'AudioShuffleList': undefined;
+  'AudioVolume': undefined;
+  'Playlist': undefined;
+  'PlaylistYourTitle': undefined;
 }
 
 export interface LangPairWithVariables<V = LangVariable> {
@@ -4152,6 +4163,9 @@ export interface LangPairWithVariables<V = LangVariable> {
   };
   'StarsBuyNotEnough': {
     'count': V;
+  };
+  'PlaylistTitle': {
+    'peer': V;
   };
 }
 

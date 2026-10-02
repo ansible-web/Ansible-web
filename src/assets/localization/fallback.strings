@@ -3264,3 +3264,14 @@
 "AiMessageEditorStyleBiblical" = "Biblical";
 "AiMessageEditorStyleViking" = "Viking";
 "AiMessageEditorStyleZen" = "Zen";
+"AudioOpenPlaylist" = "Playlist";
+"AudioPlaybackOrder" = "Playback order";
+"AudioPlaybackRate" = "Playback speed";
+"AudioRepeatList" = "Repeat list";
+"AudioRepeatSong" = "Repeat song";
+"AudioReverseOrder" = "Reverse order";
+"AudioShowInChat" = "Show in Chat";
+"AudioShuffleList" = "Shuffle list";
+"AudioVolume" = "Volume";
+"PlaylistTitle" = "{peer}'s Playlist";
+"PlaylistYourTitle" = "Your Playlist";

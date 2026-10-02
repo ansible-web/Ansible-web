@@ -268,6 +268,15 @@ export function selectEphemeralMessage<T extends GlobalState>(global: T, chatId:
   return ephemeralById?.[messageId];
 }
 
+export function selectChatMessageOrEphemeral<T extends GlobalState>(
+  global: T, chatId: string, messageId: number,
+) {
+  // У апстрима здесь ещё и «якорные» сообщения (anchorMsgId) — модель,
+  // которой в нашей базе 12.0.43 нет. Остальное слово в слово: сообщение, а если
+  // его нет — эфемерное.
+  return selectChatMessage(global, chatId, messageId) || selectEphemeralMessage(global, chatId, messageId);
+}
+
 export function selectScheduledMessage<T extends GlobalState>(global: T, chatId: string, messageId: number) {
   const chatMessages = selectChatScheduledMessages(global, chatId);
 

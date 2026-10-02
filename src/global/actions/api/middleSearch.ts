@@ -224,12 +224,12 @@ addActionHandler('searchChatMediaMessages', (global, actions, payload): ActionRe
   if (!chat) {
     return;
   }
-  let currentSearch = selectCurrentChatMediaSearch(global, tabId);
+  let currentSearch = selectCurrentChatMediaSearch(global, 'media', tabId);
 
   if (!currentSearch) {
     global = initializeChatMediaSearchResults(global, chatId, threadId, tabId);
     setGlobal(global);
-    currentSearch = selectCurrentChatMediaSearch(global, tabId);
+    currentSearch = selectCurrentChatMediaSearch(global, 'media', tabId);
     if (!currentSearch) {
       return;
     }

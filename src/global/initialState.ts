@@ -133,6 +133,8 @@ export const INITIAL_GLOBAL_STATE: GlobalState = {
   audioPlayer: {
     volume: DEFAULT_VOLUME,
     lastPlaybackRate: DEFAULT_PLAYBACK_RATE,
+    repeatMode: 'none',
+    orderMode: 'default',
   },
 
   mediaViewer: {

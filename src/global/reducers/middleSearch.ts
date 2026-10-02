@@ -343,7 +343,7 @@ export function removeIdFromSearchResults<T extends GlobalState>(
   id: number,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
-  const searchParams = selectChatMediaSearch(global, chatId, threadId, tabId);
+  const searchParams = selectChatMediaSearch(global, chatId, threadId, 'media', tabId);
   if (!searchParams) return global;
 
   const updatedSearchParams = removeIdsFromChatMediaSearchParams(id, searchParams);
@@ -376,7 +376,7 @@ export function updateChatMediaLoadingState<T extends GlobalState>(
   if (!isMediaLoadableInViewer(newMessage)) {
     return global;
   }
-  const searchParams = selectChatMediaSearch(global, chatId, threadId, tabId);
+  const searchParams = selectChatMediaSearch(global, chatId, threadId, 'media', tabId);
   if (!searchParams) return global;
   resetForwardsLoadingStateInParams(searchParams);
 
