@@ -148,7 +148,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
 
   if (isStarsGiftEnabled) {
     TYPE_OPTIONS.push({
-      name: 'TelegramStars',
+      name: 'AnsibleDiamonds',
       text: 'BoostingWinnersRandomly',
       value: 'stars_giveaway',
       img: GiftStar,
@@ -716,11 +716,11 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
             </div>
             <div className={styles.info}>
               <h3 className={styles.title}>
-                {dataStarsPrepaidGiveaway ? lang('Giveaway.Stars.Prepaid.Title', dataStarsPrepaidGiveaway?.stars)
-                  : lang('BoostingTelegramPremiumCountPlural', dataPrepaidGiveaway!.quantity)}
+                {dataStarsPrepaidGiveaway ? lang('Giveaway.Diamonds.Prepaid.Title', dataStarsPrepaidGiveaway?.stars)
+                  : lang('BoostingAnsiblePremiumCountPlural', dataPrepaidGiveaway!.quantity)}
               </h3>
               <p className={styles.month}>
-                {dataStarsPrepaidGiveaway ? lang('Giveaway.Stars.Prepaid.Desc', dataStarsPrepaidGiveaway?.quantity)
+                {dataStarsPrepaidGiveaway ? lang('Giveaway.Diamonds.Prepaid.Desc', dataStarsPrepaidGiveaway?.quantity)
                   : lang('PrepaidGiveawayMonths', dataPrepaidGiveaway?.months)}
               </p>
             </div>
@@ -781,7 +781,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
                 <div className={styles.section}>
                   <div className={styles.quantity}>
                     <h2 className={styles.giveawayTitle}>
-                      {lang('BoostingStarsOptions')}
+                      {lang('BoostingDiamondsOptions')}
                     </h2>
                     <div className={buildClassName(styles.floatingBadge, styles.floatingBadgeColor)}>
                       <Icon name="boost" className={styles.floatingBadgeIcon} />
@@ -795,12 +795,12 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
                 </div>
 
                 <div className={buildClassName(styles.subscription, styles.starSubscription)}>
-                  {renderText(lang('BoostGift.Stars.Info'))}
+                  {renderText(lang('BoostGift.Diamonds.Info'))}
                 </div>
 
                 <div className={styles.section}>
                   <h2 className={styles.giveawayTitle}>
-                    {lang('BoostingStarsQuantityPrizes')}
+                    {lang('BoostingDiamondsQuantityPrizes')}
                   </h2>
 
                   <RangeSliderWithMarks
@@ -810,7 +810,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
                   />
 
                   <div className={styles.subscription}>
-                    {renderText(lang('BoostingStarsQuantityPrizesInfo'))}
+                    {renderText(lang('BoostingDiamondsQuantityPrizesInfo'))}
                   </div>
                 </div>
               </>

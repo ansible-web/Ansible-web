@@ -82,23 +82,23 @@ const DiamondsPaymentModal = ({
     }
 
     const botName = getUserFullName(bot);
-    const starsText = oldLang('Stars.Intro.PurchasedText.Stars', amount);
+    const starsText = oldLang('Diamonds.Intro.PurchasedText.Diamonds', amount);
 
     if (paidMediaMessage) {
       const extendedMedia = paidMediaMessage.content.paidMedia!.extendedMedia as ApiMediaExtendedPreview[];
       const areAllPhotos = extendedMedia.every((media) => !media.duration);
       const areAllVideos = extendedMedia.every((media) => Boolean(media.duration));
 
-      const mediaText = areAllPhotos ? oldLang('Stars.Transfer.Photos', extendedMedia.length)
-        : areAllVideos ? oldLang('Stars.Transfer.Videos', extendedMedia.length)
+      const mediaText = areAllPhotos ? oldLang('Diamonds.Transfer.Photos', extendedMedia.length)
+        : areAllVideos ? oldLang('Diamonds.Transfer.Videos', extendedMedia.length)
           : oldLang('Media', extendedMedia.length);
 
       const channelTitle = getChatTitle(oldLang, paidMediaChat!);
-      return oldLang('Stars.Transfer.UnlockInfo', [mediaText, channelTitle, starsText]);
+      return oldLang('Diamonds.Transfer.UnlockInfo', [mediaText, channelTitle, starsText]);
     }
 
     if (subscriptionInfo) {
-      return lang('StarsSubscribeText', {
+      return lang('DiamondsSubscribeText', {
         chat: subscriptionInfo.title,
         amount,
       }, {
@@ -109,7 +109,7 @@ const DiamondsPaymentModal = ({
     }
 
     if (isBotSubscription) {
-      return lang('StarsSubscribeBotText', {
+      return lang('DiamondsSubscribeBotText', {
         name: form.title,
         amount,
         bot: botName,
@@ -118,7 +118,7 @@ const DiamondsPaymentModal = ({
       });
     }
 
-    return oldLang('Stars.Transfer.Info', [form!.title, botName, starsText]);
+    return oldLang('Diamonds.Transfer.Info', [form!.title, botName, starsText]);
   }, [
     renderingModal?.inputInvoice, bot, oldLang, amount, paidMediaMessage, subscriptionInfo, isBotSubscription, form,
     paidMediaChat, lang,
@@ -126,8 +126,8 @@ const DiamondsPaymentModal = ({
 
   const disclaimerText = useMemo(() => {
     if (subscriptionInfo) {
-      return lang('StarsSubscribeInfo', {
-        link: <SafeLink url={lang('StarsSubscribeInfoLink')} text={lang('StarsSubscribeInfoLinkText')} />,
+      return lang('DiamondsSubscribeInfo', {
+        link: <SafeLink url={lang('DiamondsSubscribeInfoLink')} text={lang('DiamondsSubscribeInfoLinkText')} />,
       }, {
         withNodes: true,
       });
@@ -192,7 +192,7 @@ const DiamondsPaymentModal = ({
         <img className={styles.paymentImageBackground} src={StarsBackground} alt="" draggable={false} />
       </div>
       <h2 className={styles.headerText}>
-        {inviteCustomPeer ? oldLang('StarsSubscribeTitle') : oldLang('StarsConfirmPurchaseTitle')}
+        {inviteCustomPeer ? oldLang('DiamondsSubscribeTitle') : oldLang('DiamondsConfirmPurchaseTitle')}
       </h2>
       {canShowPeerItem && <PeerChip className={styles.botItem} peerId={form?.botId} />}
       <div className={styles.description}>

@@ -54,7 +54,7 @@ function PaidMessagePrice({
   return (
     <>
       <h4 className="settings-item-header" dir={lang.isRtl ? 'rtl' : undefined}>
-        {lang('SectionTitleStarsForForMessages')}
+        {lang('SectionTitleDiamondsForForMessages')}
       </h4>
       <PaidMessageSlider
         defaultValue={chargeForMessages}

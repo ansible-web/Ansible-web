@@ -133,7 +133,7 @@ const PublicPostsSearchLauncher = ({
             inline
             onClick={handlePaidSearchClick}
           >
-            {lang('PublicPostsSearchForStars', {
+            {lang('PublicPostsSearchForDiamonds', {
               stars: formatStarsAsIcon(lang, starsAmount, { asFont: true }),
             }, { withNodes: true })}
           </Button>

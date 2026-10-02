@@ -324,8 +324,8 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
 
     return renderText(
       fromUser
-        ? oldLang('TelegramPremiumUserDialogTitle', getUserFullName(fromUser))
-        : oldLang(isPremium ? 'TelegramPremiumSubscribedTitle' : 'TelegramPremium'),
+        ? oldLang('AnsiblePremiumUserDialogTitle', getUserFullName(fromUser))
+        : oldLang(isPremium ? 'TelegramPremiumSubscribedTitle' : 'AnsiblePremium'),
       ['simple_markdown', 'emoji'],
     );
   }
@@ -339,16 +339,16 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
 
     if (isGift) {
       return fromUser?.id === currentUserId
-        ? oldLang('TelegramPremiumUserGiftedPremiumOutboundDialogSubtitle', getUserFullName(toUser))
-        : oldLang('TelegramPremiumUserGiftedPremiumDialogSubtitle');
+        ? oldLang('AnsiblePremiumUserGiftedPremiumOutboundDialogSubtitle', getUserFullName(toUser))
+        : oldLang('AnsiblePremiumUserGiftedPremiumDialogSubtitle');
     }
 
     if (fromUserStatusSet) {
-      return oldLang('TelegramPremiumUserStatusDialogSubtitle');
+      return oldLang('AnsiblePremiumUserStatusDialogSubtitle');
     }
 
     return fromUser
-      ? oldLang('TelegramPremiumUserDialogSubtitle')
+      ? oldLang('AnsiblePremiumUserDialogSubtitle')
       : oldLang(isPremium ? 'TelegramPremiumSubscribedSubtitle' : 'TelegramPremiumSubtitle');
   }
 
@@ -447,7 +447,7 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
             {!isPremium && !isGift && renderSubscriptionOptions()}
             <div className={buildClassName(styles.header, isHeaderHidden && styles.hiddenHeader)}>
               <h2 className={styles.premiumHeaderText}>
-                {oldLang('TelegramPremium')}
+                {oldLang('AnsiblePremium')}
               </h2>
             </div>
             <div className={buildClassName(styles.list, isPremium && styles.noButton)}>

@@ -259,14 +259,14 @@ function GiftComposer({
         {canUseStarsPayment && (
           <ListItem className={styles.switcher} narrow ripple onClick={toggleShouldPayByStars}>
             <span>
-              {lang('GiftPremiumPayWithStars', {
+              {lang('GiftPremiumPayWithDiamonds', {
                 stars: formatStarsAsIcon(lang, giftByStars.amount, { className: styles.switcherStarIcon }),
               }, { withNodes: true })}
             </span>
             <Switcher
               checked={shouldPayByStars}
               inactive
-              label={lang('GiftPremiumPayWithStarsAcc')}
+              label={lang('GiftPremiumPayWithDiamondsAcc')}
             />
           </ListItem>
         )}
@@ -277,7 +277,7 @@ function GiftComposer({
               stars: formatStarsAsIcon(lang, starBalance.amount, { className: styles.switcherStarIcon }),
               link: (
                 <Link isPrimary onClick={handleGetMoreStars}>
-                  {lang('GetMoreStarsLinkText', undefined, {
+                  {lang('GetMoreDiamondsLinkText', undefined, {
                     withNodes: true,
                     specialReplacement: NEXT_ARROW_REPLACEMENT,
                   })}

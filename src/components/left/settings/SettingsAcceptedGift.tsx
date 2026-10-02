@@ -26,7 +26,7 @@ const SettingsAcceptedGift = ({
 
   const handleOpenTelegramPremiumModal = useLastCallback(() => {
     showNotification({
-      message: lang('PrivacySubscribeToTelegramPremium'),
+      message: lang('PrivacySubscribeToAnsiblePremium'),
       action: {
         action: 'openPremiumModal',
         payload: {},

@@ -213,7 +213,7 @@ const BoostStatistics = ({
     if (hasStars) {
       customPeer = {
         ...CUSTOM_PEER_STAR_TEMPLATE,
-        title: lang('Stars', boost.stars),
+        title: lang('Diamonds', boost.stars),
       };
     }
 
@@ -332,7 +332,7 @@ const BoostStatistics = ({
                               <img
                                 src={GiftStar}
                                 className={styles.giveawayIcon}
-                                alt={lang('GiftStar')}
+                                alt={lang('GiftDiamond')}
                               />
                             ) : (
                               <img
@@ -345,12 +345,12 @@ const BoostStatistics = ({
                         <div className={styles.info}>
                           <h3>
                             {isStarsGiveaway
-                              ? lang('Giveaway.Stars.Prepaid.Title', prepaidGiveaway.stars)
-                              : lang('BoostingTelegramPremiumCountPlural', prepaidGiveaway.quantity)}
+                              ? lang('Giveaway.Diamonds.Prepaid.Title', prepaidGiveaway.stars)
+                              : lang('BoostingAnsiblePremiumCountPlural', prepaidGiveaway.quantity)}
                           </h3>
                           <p className={styles.month}>
                             {
-                              isStarsGiveaway ? lang('Giveaway.Stars.Prepaid.Desc', prepaidGiveaway.quantity)
+                              isStarsGiveaway ? lang('Giveaway.Diamonds.Prepaid.Desc', prepaidGiveaway.quantity)
                                 : lang('PrepaidGiveawayMonths', prepaidGiveaway.months)
                             }
                           </p>

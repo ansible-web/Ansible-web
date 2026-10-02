@@ -535,7 +535,7 @@ const ContextMenuContainer = ({
   const handleAppendTodoList = useLastCallback(() => {
     if (!isCurrentUserPremium) {
       showNotification({
-        message: lang('SubscribeToTelegramPremiumForAppendToDo'),
+        message: lang('SubscribeToAnsiblePremiumForAppendToDo'),
         action: {
           action: 'openPremiumModal',
           payload: { initialSection: 'todo' },

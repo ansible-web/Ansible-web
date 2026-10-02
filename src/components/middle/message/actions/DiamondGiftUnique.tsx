@@ -73,9 +73,9 @@ const DiamondGiftUniqueAction = ({
   const adaptedPatternColor = `${backdrop.patternColor.slice(0, 7)}55`;
 
   const tableData = useMemo((): TableEntry[] => [
-    [lang('ActionStarGiftUniqueModel'), model.name],
-    [lang('ActionStarGiftUniqueBackdrop'), backdrop.name],
-    [lang('ActionStarGiftUniqueSymbol'), pattern.name],
+    [lang('ActionDiamondGiftUniqueModel'), model.name],
+    [lang('ActionDiamondGiftUniqueBackdrop'), backdrop.name],
+    [lang('ActionDiamondGiftUniqueSymbol'), pattern.name],
   ], [lang, model, pattern, backdrop]);
 
   const shouldShowFrom = !isOutgoing || action.isUpgrade;
@@ -124,13 +124,13 @@ const DiamondGiftUniqueAction = ({
       <GiftRibbon
         color={action.gift.isBurned ? 'red' : adaptedPatternColor}
         text={action.gift.isBurned
-          ? lang('ActionStarGiftUniqueBurnedRibbon')
-          : lang('ActionStarGiftUniqueRibbon')}
+          ? lang('ActionDiamondGiftUniqueBurnedRibbon')
+          : lang('ActionDiamondGiftUniqueRibbon')}
       />
       <div className={styles.info}>
         <h3 className={styles.title}>
           {isSelf
-            ? (action.gift.isCrafted ? lang('ActionStarGiftCrafted') : lang('ActionStarGiftSelf'))
+            ? (action.gift.isCrafted ? lang('ActionDiamondGiftCrafted') : lang('ActionDiamondGiftSelf'))
             : lang(
               shouldShowFrom ? 'ActionStarGiftFrom' : 'ActionStarGiftTo',
               {

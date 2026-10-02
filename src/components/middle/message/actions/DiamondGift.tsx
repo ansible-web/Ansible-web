@@ -89,11 +89,11 @@ const DiamondGiftAction = ({
       ? formatStarsAsText(lang, action.starsToConvert) : undefined;
 
     if (isAuction && auctionBid !== undefined) {
-      return lang('ActionStarGiftAuctionBought', { cost: formatStarsAsText(lang, auctionBid) });
+      return lang('ActionDiamondGiftAuctionBought', { cost: formatStarsAsText(lang, auctionBid) });
     }
 
     if (action.isUpgraded) {
-      return lang('ActionStarGiftUpgraded');
+      return lang('ActionDiamondGiftUpgraded');
     }
 
     if (action.alreadyPaidUpgradeStars && !isAuction) {
@@ -158,7 +158,7 @@ const DiamondGiftAction = ({
       {Boolean(action.gift.availabilityTotal) && (
         <GiftRibbon
           color={backgroundColor || 'blue'}
-          text={lang('ActionStarGiftLimitedRibbon', {
+          text={lang('ActionDiamondGiftLimitedRibbon', {
             total: formatIntegerCompact(lang, action.gift.availabilityTotal),
           })}
         />
@@ -169,7 +169,7 @@ const DiamondGiftAction = ({
             'ActionStarGiftAuctionFor',
             { peer: renderPeerLink(recipient.id, auctionToTitle || fallbackPeerTitle) },
             { withNodes: true },
-          ) : isSelf ? lang('ActionStarGiftSelf') : lang(
+          ) : isSelf ? lang('ActionDiamondGiftSelf') : lang(
             isOutgoing ? 'ActionStarGiftTo' : 'ActionStarGiftFrom',
             {
               peer: renderPeerLink(peer?.id, peerTitle || fallbackPeerTitle),
@@ -187,7 +187,7 @@ const DiamondGiftAction = ({
       <div className={styles.actionButton}>
         <Sparkles preset="button" />
         {action.alreadyPaidUpgradeStars && !action.isUpgraded && !isOutgoing
-          ? lang('ActionStarGiftUnpack') : lang('ActionViewButton')}
+          ? lang('ActionDiamondGiftUnpack') : lang('ActionViewButton')}
       </div>
     </div>
   );

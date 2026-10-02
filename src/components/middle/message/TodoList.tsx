@@ -62,7 +62,7 @@ const TodoList = ({
 
     if (!isCurrentUserPremium) {
       showNotification({
-        message: lang('SubscribeToTelegramPremiumForToggleTask'),
+        message: lang('SubscribeToAnsiblePremiumForToggleTask'),
         action: {
           action: 'openPremiumModal',
           payload: { initialSection: 'todo' },

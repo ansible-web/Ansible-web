@@ -1735,7 +1735,7 @@ const Composer = ({
   const handleTodoListCreate = useLastCallback(() => {
     if (!isCurrentUserPremium) {
       showNotification({
-        message: lang('SubscribeToTelegramPremiumForCreateToDo'),
+        message: lang('SubscribeToAnsiblePremiumForCreateToDo'),
         action: {
           action: 'openPremiumModal',
           payload: { initialSection: 'todo' },

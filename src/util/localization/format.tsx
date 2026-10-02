@@ -17,7 +17,7 @@ export const PREVIOUS_ARROW_REPLACEMENT = {
 };
 
 export function formatStarsAsText(lang: LangFn, amount: number) {
-  return lang('StarsAmountText', { amount }, { pluralValue: amount });
+  return lang('DiamondsAmountText', { amount }, { pluralValue: amount });
 }
 
 export function formatTonAsText(lang: LangFn, amount: number, shouldConvertFromNanos?: boolean) {

@@ -151,9 +151,9 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
           onRequestAnimation={handleRequestAnimation}
           centerShift={AVATAR_SPARKLES_CENTER_SHIFT}
         />
-        <h1 className={styles.title}>{title || oldLang('StarsSubscriptionTitle')}</h1>
+        <h1 className={styles.title}>{title || oldLang('DiamondsSubscriptionTitle')}</h1>
         <span className={styles.amount}>
-          {lang('StarsPerMonth', {
+          {lang('DiamondsPerMonth', {
             amount: pricing.amount,
           }, {
             withNodes: true,
@@ -174,7 +174,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
 
     if (title) {
       tableData.push([
-        oldLang('StarsSubscriptionBotProduct'),
+        oldLang('DiamondsSubscriptionBotProduct'),
         title,
       ]);
     }
@@ -186,8 +186,8 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
       formatDateTimeToString(until * 1000, oldLang.code, true),
     ]);
 
-    const footerTos = lang('StarsTransactionTOS', {
-      link: <SafeLink url={lang('StarsTransactionTOSLink')} text={lang('StarsTransactionTOSLinkText')} />,
+    const footerTos = lang('DiamondsTransactionTOS', {
+      link: <SafeLink url={lang('DiamondsTransactionTOSLink')} text={lang('DiamondsTransactionTOSLinkText')} />,
     }, {
       withNodes: true,
     });
@@ -202,17 +202,17 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
         )}
         {canRefulfill && (
           <p className={styles.secondary}>
-            {oldLang('StarsSubscriptionRefulfillInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
+            {oldLang('DiamondsSubscriptionRefulfillInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
           </p>
         )}
         {!isCancelled && !canRefulfill && hasExpired && (
           <p className={styles.secondary}>
-            {oldLang('StarsSubscriptionExpiredInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
+            {oldLang('DiamondsSubscriptionExpiredInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
           </p>
         )}
         {!isCancelled && !canRefulfill && !hasExpired && (
           <p className={styles.secondary}>
-            {oldLang('StarsSubscriptionCancelInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
+            {oldLang('DiamondsSubscriptionCancelInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
           </p>
         )}
         {buttonState !== 'hidden' && (

@@ -311,7 +311,7 @@ export interface LangPair {
   'Settings': undefined;
   'SettingsDisableNightTheme': undefined;
   'SettingsEnableNightTheme': undefined;
-  'TelegramPremium': undefined;
+  'AnsiblePremium': undefined;
   'New': undefined;
   'TelegramFeatures': undefined;
   'ShortcutsControllerOthersLockByPasscode': undefined;
@@ -479,7 +479,7 @@ export interface LangPair {
   'AccDescrGoBack': undefined;
   'SureLogout': undefined;
   'AccountSettingsLogout': undefined;
-  'TelegramGeneralSettingsViewController': undefined;
+  'AnsibleGeneralSettingsViewController': undefined;
   'UserInfoNotificationsEnabled': undefined;
   'UserInfoNotificationsDisabled': undefined;
   'AutodownloadPrivateChats': undefined;
@@ -654,10 +654,10 @@ export interface LangPair {
   'VoipGroupPersonalAccount': undefined;
   'MenuStickers': undefined;
   'MenuAnimations': undefined;
-  'MenuStars': undefined;
+  'MenuDiamonds': undefined;
   'MenuGram': undefined;
   'MenuSendGift': undefined;
-  'MenuTelegramFaq': undefined;
+  'MenuAnsibleFaq': undefined;
   'MenuPrivacyPolicy': undefined;
   'MenuAskText': undefined;
   'SettingsPerformanceSliderTitle': undefined;
@@ -1161,7 +1161,7 @@ export interface LangPair {
   'ChatPerFolderLimitTitle': undefined;
   'BioLimitSubtitle': undefined;
   'CaptionsLimitSubtitle': undefined;
-  'TelegramPremiumUserDialogSubtitle': undefined;
+  'AnsiblePremiumUserDialogSubtitle': undefined;
   'TelegramPremiumSubscribedSubtitle': undefined;
   'TelegramPremiumSubtitle': undefined;
   'EditMessageAriaLabel': undefined;
@@ -1180,7 +1180,7 @@ export interface LangPair {
   'ConversationViewBot': undefined;
   'ConversationViewPost': undefined;
   'ConversationViewChannel': undefined;
-  'Telegram': undefined;
+  'Ansible': undefined;
   'ChatListFilterAddToFolder': undefined;
   'ChatListUnpinFromTop': undefined;
   'ChatListPinToTop': undefined;
@@ -1498,8 +1498,8 @@ export interface LangPair {
   'AriaMenuDisableNightMode': undefined;
   'AriaSettingsEditProfilePhoto': undefined;
   'MenuUIFeaturesSwitch': undefined;
-  'MenuTelegramFeatures': undefined;
-  'TelegramFeaturesUsername': undefined;
+  'MenuAnsibleFeatures': undefined;
+  'AnsibleFeaturesUsername': undefined;
   'RemoveEffect': undefined;
   'ReplyInPrivateMessage': undefined;
   'ProfileOpenAppTerms': undefined;
@@ -1511,15 +1511,15 @@ export interface LangPair {
   'MonetizationInfoGramTitle': undefined;
   'AriaSearchOlderResult': undefined;
   'AriaSearchNewerResult': undefined;
-  'StarsTransactionTOSLinkText': undefined;
-  'StarsTransactionTOSLink': undefined;
+  'DiamondsTransactionTOSLinkText': undefined;
+  'DiamondsTransactionTOSLink': undefined;
   'GiftPremiumHeader': undefined;
   'GiftPremiumDescriptionLinkCaption': undefined;
   'GiftPremiumDescriptionLink': undefined;
   'StarsGiftHeader': undefined;
   'StarsGiftHeaderSelf': undefined;
-  'StarGiftDescriptionCollectibles': undefined;
-  'StarGiftDescriptionSelf': undefined;
+  'DiamondGiftDescriptionCollectibles': undefined;
+  'DiamondGiftDescriptionSelf': undefined;
   'GiftLimited': undefined;
   'GiftSoldOut': undefined;
   'GiftMessagePlaceholder': undefined;
@@ -1619,12 +1619,12 @@ export interface LangPair {
   'GiftWithdrawSubmit': undefined;
   'AllGiftsCategory': undefined;
   'PremiumGiftDescription': undefined;
-  'StarsReactionLinkText': undefined;
-  'StarsReactionLink': undefined;
+  'DiamondsReactionLinkText': undefined;
+  'DiamondsReactionLink': undefined;
   'SentGift': undefined;
-  'StarsSubscribeInfoLinkText': undefined;
-  'StarsSubscribeInfoLink': undefined;
-  'StarsBalance': undefined;
+  'DiamondsSubscribeInfoLinkText': undefined;
+  'DiamondsSubscribeInfoLink': undefined;
+  'DiamondsBalance': undefined;
   'OpenMapWith': undefined;
   'OpenApp': undefined;
   'PopularApps': undefined;
@@ -1662,7 +1662,7 @@ export interface LangPair {
   'PrivacyDisplayGiftsButton': undefined;
   'PrivacyDisplayGift': undefined;
   'SendDisallowError': undefined;
-  'PrivacySubscribeToTelegramPremium': undefined;
+  'PrivacySubscribeToAnsiblePremium': undefined;
   'PrivacyDisableLimitedEditionStarGifts': undefined;
   'PrivacyEnableLimitedEditionStarGifts': undefined;
   'PrivacyDisableUnlimitedStarGifts': undefined;
@@ -1819,27 +1819,27 @@ export interface LangPair {
   'ActionGiftTextUnknown': undefined;
   'ActionGiftTextUnknownYou': undefined;
   'ActionGiftUniqueSent': undefined;
-  'ActionStarGiftUpgradedSelf': undefined;
-  'ActionStarGiftTransferredSelf': undefined;
-  'ActionStarGiftCraftedSelf': undefined;
-  'ActionStarGiftCrafted': undefined;
-  'ActionStarGiftTransferredUnknown': undefined;
+  'ActionDiamondGiftUpgradedSelf': undefined;
+  'ActionDiamondGiftTransferredSelf': undefined;
+  'ActionDiamondGiftCraftedSelf': undefined;
+  'ActionDiamondGiftCrafted': undefined;
+  'ActionDiamondGiftTransferredUnknown': undefined;
   'ActionStarGiftNoConvertTextYou': undefined;
   'ActionStarGiftDisplaying': undefined;
   'ActionStarGiftChannelDisplaying': undefined;
   'ActionStarGiftUpgradeTextYou': undefined;
-  'ActionStarGiftUpgraded': undefined;
-  'ActionStarGiftUnpack': undefined;
-  'ActionStarGiftUniqueRibbon': undefined;
-  'ActionStarGiftUniqueBurnedRibbon': undefined;
-  'ActionStarGiftUniqueBurnedError': undefined;
-  'ActionStarGiftUniqueModel': undefined;
-  'ActionStarGiftUniqueBackdrop': undefined;
-  'ActionStarGiftUniqueSymbol': undefined;
-  'ActionStarGiftSelf': undefined;
-  'ActionStarGiftOfferAccepted': undefined;
-  'ActionStarGiftOfferRejected': undefined;
-  'ActionStarGiftOfferHasExpired': undefined;
+  'ActionDiamondGiftUpgraded': undefined;
+  'ActionDiamondGiftUnpack': undefined;
+  'ActionDiamondGiftUniqueRibbon': undefined;
+  'ActionDiamondGiftUniqueBurnedRibbon': undefined;
+  'ActionDiamondGiftUniqueBurnedError': undefined;
+  'ActionDiamondGiftUniqueModel': undefined;
+  'ActionDiamondGiftUniqueBackdrop': undefined;
+  'ActionDiamondGiftUniqueSymbol': undefined;
+  'ActionDiamondGiftSelf': undefined;
+  'ActionDiamondGiftOfferAccepted': undefined;
+  'ActionDiamondGiftOfferRejected': undefined;
+  'ActionDiamondGiftOfferHasExpired': undefined;
   'GiftOfferReject': undefined;
   'GiftOfferAccept': undefined;
   'GiftOfferRejectTitle': undefined;
@@ -1890,8 +1890,8 @@ export interface LangPair {
   'PeerPersonalAccount': undefined;
   'PeerChannel': undefined;
   'WebAppCollapse': undefined;
-  'GiftPremiumPayWithStarsAcc': undefined;
-  'GetMoreStarsLinkText': undefined;
+  'GiftPremiumPayWithDiamondsAcc': undefined;
+  'GetMoreDiamondsLinkText': undefined;
   'StarsGiftCompleted': undefined;
   'GiftSent': undefined;
   'PrivacyDescriptionMessagesContactsAndPremium': undefined;
@@ -1900,17 +1900,17 @@ export interface LangPair {
   'RemoveFeeTitle': undefined;
   'ExceptionTitlePrivacyChargeForMessages': undefined;
   'ExceptionDescriptionPrivacyChargeForMessages': undefined;
-  'SectionTitleStarsForForMessages': undefined;
+  'SectionTitleDiamondsForForMessages': undefined;
   'SubtitlePrivacyAddUsers': undefined;
   'PrivacyPaidMessagesValue': undefined;
-  'ButtonBuyStars': undefined;
+  'ButtonBuyDiamonds': undefined;
   'TitleConfirmPayment': undefined;
   'ButtonUndo': undefined;
   'ConfirmRemoveMessageFee': undefined;
   'StoryTooltipGifSent': undefined;
   'StoryTooltipStickerSent': undefined;
   'StoryTooltipReactionSent': undefined;
-  'StarsNeededTextSendPaidMessages': undefined;
+  'DiamondsNeededTextSendPaidMessages': undefined;
   'PaidMessageTransactionTotal': undefined;
   'TitleFrozenAccount': undefined;
   'SubtitleFrozenAccount': undefined;
@@ -1920,7 +1920,7 @@ export interface LangPair {
   'DescriptionScheduledPaidMediaNotAllowed': undefined;
   'DescriptionScheduledPaidMessagesNotAllowed': undefined;
   'GroupMessagesChargePrice': undefined;
-  'RightsChargeStarsAbout': undefined;
+  'RightsChargeDiamondsAbout': undefined;
   'UnlockButtonTitle': undefined;
   'FrozenAccountModalTitle': undefined;
   'FrozenAccountViolationTitle': undefined;
@@ -1939,8 +1939,8 @@ export interface LangPair {
   'GiftSellTitle': undefined;
   'Sell': undefined;
   'InputPlaceholderGiftResalePrice': undefined;
-  'StarGiftSaleTransaction': undefined;
-  'StarGiftPurchaseTransaction': undefined;
+  'DiamondGiftSaleTransaction': undefined;
+  'DiamondGiftPurchaseTransaction': undefined;
   'ContextMenuItemMention': undefined;
   'GiftRibbonResale': undefined;
   'GiftCategoryCollectibles': undefined;
@@ -1953,7 +1953,7 @@ export interface LangPair {
   'ValueGiftSortByNumber': undefined;
   'ResellGiftsNoFound': undefined;
   'ResellGiftsClearFilters': undefined;
-  'GiftResaleStarsOnly': undefined;
+  'GiftResaleDiamondsOnly': undefined;
   'SendInStandardQuality': undefined;
   'SendInHighQuality': undefined;
   'MonoforumBadge': undefined;
@@ -1973,9 +1973,9 @@ export interface LangPair {
   'TitleSuggestMessage': undefined;
   'TitleSuggestedChanges': undefined;
   'SuggestMessageNoPrice': undefined;
-  'EnterPriceInStars': undefined;
+  'EnterPriceInDiamonds': undefined;
   'EnterPriceInGram': undefined;
-  'SuggestMessagePriceDescriptionStars': undefined;
+  'SuggestMessagePriceDescriptionDiamonds': undefined;
   'SuggestMessagePriceDescriptionGram': undefined;
   'SuggestMessageDateTimeHint': undefined;
   'SuggestMessageAnytime': undefined;
@@ -1989,7 +1989,7 @@ export interface LangPair {
   'SuggestedPostApproved': undefined;
   'SuggestedPostRejectedNotification': undefined;
   'SuggestedPostAgreementReached': undefined;
-  'CurrencyStars': undefined;
+  'CurrencyDiamonds': undefined;
   'CurrencyGram': undefined;
   'DeclineReasonPlaceholder': undefined;
   'SuggestedPostRejectedYou': undefined;
@@ -2012,9 +2012,9 @@ export interface LangPair {
   'TitleYourToDoList': undefined;
   'MenuButtonAppendTodoList': undefined;
   'PremiumMore': undefined;
-  'SubscribeToTelegramPremiumForToggleTask': undefined;
-  'SubscribeToTelegramPremiumForCreateToDo': undefined;
-  'SubscribeToTelegramPremiumForAppendToDo': undefined;
+  'SubscribeToAnsiblePremiumForToggleTask': undefined;
+  'SubscribeToAnsiblePremiumForCreateToDo': undefined;
+  'SubscribeToAnsiblePremiumForAppendToDo': undefined;
   'ToDoListErrorChooseTitle': undefined;
   'ToDoListErrorChooseTasks': undefined;
   'ToDoListTasksLimitReached': undefined;
@@ -2040,7 +2040,7 @@ export interface LangPair {
   'MiniAppUnavailableError': undefined;
   'GiftRibbonPremium': undefined;
   'PremiumGiftHeader': undefined;
-  'PriceInStars': undefined;
+  'PriceInDiamonds': undefined;
   'PriceInGram': undefined;
   'OnlyAcceptGram': undefined;
   'OnlyAcceptGramDescription': undefined;
@@ -2068,8 +2068,8 @@ export interface LangPair {
   'AllStoriesCategory': undefined;
   'TitleRating': undefined;
   'RatingYourReflectsActivity': undefined;
-  'RatingGiftsFromTelegram': undefined;
-  'RatingGiftsFromTelegramDesc': undefined;
+  'RatingGiftsFromAnsible': undefined;
+  'RatingGiftsFromAnsibleDesc': undefined;
   'RatingGiftsAndPostsFromUsers': undefined;
   'RatingGiftsAndPostsFromUsersDesc': undefined;
   'RatingRefundsAndConversions': undefined;
@@ -2083,7 +2083,7 @@ export interface LangPair {
   'ContextMenuHintMouse': undefined;
   'ContextMenuHintTouch': undefined;
   'GiftValueForSaleOnFragment': undefined;
-  'GiftValueForSaleOnTelegram': undefined;
+  'GiftValueForSaleOnAnsible': undefined;
   'EmbeddedMessageNoCaption': undefined;
   'EditMedia': undefined;
   'Draw': undefined;
@@ -2118,12 +2118,12 @@ export interface LangPair {
   'BotForumActionNewDescription': undefined;
   'BotForumTopicTitlePlaceholder': undefined;
   'DropOriginalDetailsTransaction': undefined;
-  'StarGiftReasonDropOriginalDetails': undefined;
+  'DiamondGiftReasonDropOriginalDetails': undefined;
   'GiftAnUpgradeButton': undefined;
   'GiftPrepaidUpgradeTransactionTitle': undefined;
-  'StarGiftAuctionBidTransaction': undefined;
-  'StarGiftAuctionBidRefundedTransaction': undefined;
-  'ActionStarGiftPrepaidUpgradedYou': undefined;
+  'DiamondGiftAuctionBidTransaction': undefined;
+  'DiamondGiftAuctionBidRefundedTransaction': undefined;
+  'ActionDiamondGiftPrepaidUpgradedYou': undefined;
   'UserNoteTitle': undefined;
   'UserNoteHint': undefined;
   'EditUserNoteHint': undefined;
@@ -2162,9 +2162,9 @@ export interface LangPair {
   'StealthModeButton': undefined;
   'StealthModeButtonToStory': undefined;
   'UpgradeCostDrops': undefined;
-  'StarGiftPriceDecreaseInfoLink': undefined;
-  'StarGiftUpgradeCostModalTitle': undefined;
-  'StarGiftUpgradeCostHint': undefined;
+  'DiamondGiftPriceDecreaseInfoLink': undefined;
+  'DiamondGiftUpgradeCostModalTitle': undefined;
+  'DiamondGiftUpgradeCostHint': undefined;
   'GiftRibbonAuction': undefined;
   'GiftAuctionJoin': undefined;
   'GiftAuctionLearnMore': undefined;
@@ -2202,15 +2202,15 @@ export interface LangPair {
   'GiftAuctionListRaiseBid': undefined;
   'GiftAuctionActiveTitle': undefined;
   'GiftAuctionNoActive': undefined;
-  'StarGiftInfoTitle': undefined;
-  'StarGiftInfoSubtitle': undefined;
-  'StarGiftInfoUniqueTitle': undefined;
-  'StarGiftInfoUniqueSubtitle': undefined;
-  'StarGiftInfoTradableTitle': undefined;
-  'StarGiftInfoTradableSubtitle': undefined;
-  'StarGiftInfoWearableTitle': undefined;
-  'StarGiftInfoWearableSubtitle': undefined;
-  'StarGift': undefined;
+  'DiamondGiftInfoTitle': undefined;
+  'DiamondGiftInfoSubtitle': undefined;
+  'DiamondGiftInfoUniqueTitle': undefined;
+  'DiamondGiftInfoUniqueSubtitle': undefined;
+  'DiamondGiftInfoTradableTitle': undefined;
+  'DiamondGiftInfoTradableSubtitle': undefined;
+  'DiamondGiftInfoWearableTitle': undefined;
+  'DiamondGiftInfoWearableSubtitle': undefined;
+  'DiamondGift': undefined;
   'SettingsItemPrivacyPasskeys': undefined;
   'SettingsItemPrivacyOn': undefined;
   'SettingsItemPrivacyOff': undefined;
@@ -2675,7 +2675,7 @@ export interface LangPairWithVariables<V = LangVariable> {
   'SubscribeToPremium': {
     'price': V;
   };
-  'TelegramPremiumUserDialogTitle': {
+  'AnsiblePremiumUserDialogTitle': {
     'user': V;
   };
   'OpenUrlText': {
@@ -2971,7 +2971,7 @@ export interface LangPairWithVariables<V = LangVariable> {
     'user': V;
     'link': V;
   };
-  'StarsTransactionTOS': {
+  'DiamondsTransactionTOS': {
     'link': V;
   };
   'GiftStarsOutgoing': {
@@ -2981,10 +2981,10 @@ export interface LangPairWithVariables<V = LangVariable> {
     'user': V;
     'link': V;
   };
-  'StarGiftDescription': {
+  'DiamondGiftDescription': {
     'user': V;
   };
-  'StarGiftDescriptionChannel': {
+  'DiamondGiftDescriptionChannel': {
     'peer': V;
   };
   'GiftDiscount': {
@@ -3163,16 +3163,16 @@ export interface LangPairWithVariables<V = LangVariable> {
   'StarsPay': {
     'amount': V;
   };
-  'StarsReactionTerms': {
+  'DiamondsReactionTerms': {
     'link': V;
   };
   'AriaMiniApp': {
     'bot': V;
   };
-  'StarsSubscribeInfo': {
+  'DiamondsSubscribeInfo': {
     'link': V;
   };
-  'StarsPerMonth': {
+  'DiamondsPerMonth': {
     'amount': V;
   };
   'EmojiStatusAccessText': {
@@ -3400,14 +3400,14 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionGiftUniqueReceived': {
     'user': V;
   };
-  'ActionStarGiftReceived': {
+  'ActionDiamondGiftReceived': {
     'user': V;
     'cost': V;
   };
-  'ActionStarGiftSent': {
+  'ActionDiamondGiftSent': {
     'cost': V;
   };
-  'ActionStarGiftUpgradedUser': {
+  'ActionDiamondGiftUpgradedUser': {
     'user': V;
   };
   'ActionStarGiftUpgradedChannel': {
@@ -3417,10 +3417,10 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionStarGiftUpgradedChannelYou': {
     'channel': V;
   };
-  'ActionStarGiftUpgradedMine': {
+  'ActionDiamondGiftUpgradedMine': {
     'user': V;
   };
-  'ActionStarGiftTransferred': {
+  'ActionDiamondGiftTransferred': {
     'user': V;
   };
   'ActionStarGiftTransferredChannel': {
@@ -3430,10 +3430,10 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionStarGiftTransferredChannelYou': {
     'channel': V;
   };
-  'ActionStarGiftTransferredMine': {
+  'ActionDiamondGiftTransferredMine': {
     'user': V;
   };
-  'ActionStarGiftTransferredUnknownChannel': {
+  'ActionDiamondGiftTransferredUnknownChannel': {
     'channel': V;
   };
   'ActionStarGiftSoldFromOffer': {
@@ -3446,7 +3446,7 @@ export interface LangPairWithVariables<V = LangVariable> {
     'gift': V;
     'cost': V;
   };
-  'ActionStarGiftReceivedAnonymous': {
+  'ActionDiamondGiftReceivedAnonymous': {
     'cost': V;
   };
   'ActionStarGiftSentChannel': {
@@ -3466,7 +3466,7 @@ export interface LangPairWithVariables<V = LangVariable> {
     'peer': V;
     'cost': V;
   };
-  'ActionStarGiftSelfBought': {
+  'ActionDiamondGiftSelfBought': {
     'cost': V;
   };
   'ActionStarGiftTo': {
@@ -3498,16 +3498,16 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionStarGiftUpgradeText': {
     'peer': V;
   };
-  'ActionStarGiftLimitedRibbon': {
+  'ActionDiamondGiftLimitedRibbon': {
     'total': V;
   };
-  'ActionStarGiftAuctionWon': {
+  'ActionDiamondGiftAuctionWon': {
     'cost': V;
   };
   'ActionStarGiftAuctionFor': {
     'peer': V;
   };
-  'ActionStarGiftAuctionBought': {
+  'ActionDiamondGiftAuctionBought': {
     'cost': V;
   };
   'ActionStarGiftOfferOutgoing': {
@@ -3520,7 +3520,7 @@ export interface LangPairWithVariables<V = LangVariable> {
     'cost': V;
     'gift': V;
   };
-  'ActionStarGiftOfferExpires': {
+  'ActionDiamondGiftOfferExpires': {
     'time': V;
   };
   'ActionStarGiftOfferDeclinedOutgoing': {
@@ -3666,10 +3666,10 @@ export interface LangPairWithVariables<V = LangVariable> {
   'UniqueStatusWearTitle': {
     'gift': V;
   };
-  'GiftPremiumStarsPrice': {
+  'GiftPremiumDiamondsPrice': {
     'stars': V;
   };
-  'GiftPremiumPayWithStars': {
+  'GiftPremiumPayWithDiamonds': {
     'stars': V;
   };
   'GiftPremiumDescriptionYourBalance': {
@@ -3715,7 +3715,7 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ConfirmDialogMessageRemoveFee': {
     'peer': V;
   };
-  'ConfirmDialogRemoveFeeRefundStars': {
+  'ConfirmDialogRemoveFeeRefundDiamonds': {
     'amount': V;
   };
   'PaidMessageTransactionDescription': {
@@ -3782,7 +3782,7 @@ export interface LangPairWithVariables<V = LangVariable> {
     'stars': V;
     'gift': V;
   };
-  'ModalStarsBalanceBarDescription': {
+  'ModalDiamondsBalanceBarDescription': {
     'stars': V;
   };
   'NotificationGiftCanResellAt': {
@@ -4025,7 +4025,7 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ButtonSearchPublicPosts': {
     'query': V;
   };
-  'PublicPostsSearchForStars': {
+  'PublicPostsSearchForDiamonds': {
     'stars': V;
   };
   'UnlockTimerPublicPostsSearch': {
@@ -4043,13 +4043,13 @@ export interface LangPairWithVariables<V = LangVariable> {
   'GiftAuctionForSaleOnFragment': {
     'count': V;
   };
-  'GiftAuctionForSaleOnTelegram': {
+  'GiftAuctionForSaleOnAnsible': {
     'count': V;
   };
   'GiftLockedMessage': {
     'relativeDate': V;
   };
-  'ActionStarGiftPrepaidUpgraded': {
+  'ActionDiamondGiftPrepaidUpgraded': {
     'user': V;
   };
   'ActionNewCreatorPending': {
@@ -4079,7 +4079,7 @@ export interface LangPairWithVariables<V = LangVariable> {
   'StealthModeComposerPlaceholder': {
     'timer': V;
   };
-  'StarGiftPriceDecreaseTimer': {
+  'DiamondGiftPriceDecreaseTimer': {
     'timer': V;
   };
   'GiftAuctionRoundValue': {
@@ -4530,7 +4530,7 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'ChatGroups': {
     'count': V;
   };
-  'StarsAmountText': {
+  'DiamondsAmountText': {
     'amount': V;
   };
   'BrowserMoreTabs': {
@@ -4540,11 +4540,11 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'PrizeCredits2': {
     'count': V;
   };
-  'StarsSubscribeText': {
+  'DiamondsSubscribeText': {
     'chat': V;
     'amount': V;
   };
-  'StarsSubscribeBotText': {
+  'DiamondsSubscribeBotText': {
     'name': V;
     'bot': V;
     'amount': V;
@@ -4612,7 +4612,7 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'ActionGiftPremiumTitle': {
     'months': V;
   };
-  'ActionGiftStarsTitle': {
+  'ActionGiftDiamondsTitle': {
     'amount': V;
   };
   'GramAmountText': {

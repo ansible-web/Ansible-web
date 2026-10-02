@@ -25,7 +25,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
       if (inputInvoice?.type === 'stars') {
         actions.closeStarsBalanceModal({ tabId });
         actions.showNotification({
-          message: langProvider.oldTranslate('StarsAcquiredInfo', inputInvoice.stars),
+          message: langProvider.oldTranslate('DiamondsAcquiredInfo', inputInvoice.stars),
           title: langProvider.oldTranslate('StarsAcquired'),
           icon: 'star',
           tabId,

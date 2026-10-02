@@ -44,10 +44,10 @@ const AboutDiamondGiftModal = ({
           />
         </div>
         <div className={styles.title}>
-          {lang('StarGiftInfoTitle')}
+          {lang('DiamondGiftInfoTitle')}
         </div>
         <div className={styles.subtitle}>
-          {lang('StarGiftInfoSubtitle')}
+          {lang('DiamondGiftInfoSubtitle')}
         </div>
       </div>
     );
@@ -70,9 +70,9 @@ const AboutDiamondGiftModal = ({
 
   const listItemData = useMemo(() => {
     return [
-      ['diamond', lang('StarGiftInfoUniqueTitle'), lang('StarGiftInfoUniqueSubtitle')],
-      ['auction', lang('StarGiftInfoTradableTitle'), lang('StarGiftInfoTradableSubtitle')],
-      ['crown-wear-outline', lang('StarGiftInfoWearableTitle'), lang('StarGiftInfoWearableSubtitle')],
+      ['diamond', lang('DiamondGiftInfoUniqueTitle'), lang('DiamondGiftInfoUniqueSubtitle')],
+      ['auction', lang('DiamondGiftInfoTradableTitle'), lang('DiamondGiftInfoTradableSubtitle')],
+      ['crown-wear-outline', lang('DiamondGiftInfoWearableTitle'), lang('DiamondGiftInfoWearableSubtitle')],
     ] satisfies TableAboutData;
   }, [lang]);
 

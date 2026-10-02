@@ -597,7 +597,7 @@ const ActionMessageText = ({
         const cost = renderStrong(formatStarsAsText(lang, starsAmount));
 
         if (isAuctionAcquired) {
-          return lang('ActionStarGiftAuctionWon', { cost }, { withNodes: true });
+          return lang('ActionDiamondGiftAuctionWon', { cost }, { withNodes: true });
         }
 
         if (isPrepaidUpgrade && gift.upgradeStars) {
@@ -623,18 +623,18 @@ const ActionMessageText = ({
         }
 
         if (isServiceNotificationsChat) {
-          return lang('ActionStarGiftReceivedAnonymous', { cost }, { withNodes: true });
+          return lang('ActionDiamondGiftReceivedAnonymous', { cost }, { withNodes: true });
         }
 
         if (isSavedMessages) {
-          return lang('ActionStarGiftSelfBought', { cost }, { withNodes: true });
+          return lang('ActionDiamondGiftSelfBought', { cost }, { withNodes: true });
         }
 
         if (isOutgoing) {
-          return lang('ActionStarGiftSent', { cost }, { withNodes: true });
+          return lang('ActionDiamondGiftSent', { cost }, { withNodes: true });
         }
 
-        return lang('ActionStarGiftReceived', { user: senderLink, cost }, { withNodes: true });
+        return lang('ActionDiamondGiftReceived', { user: senderLink, cost }, { withNodes: true });
       }
 
       case 'starGiftUnique': {
@@ -678,9 +678,9 @@ const ActionMessageText = ({
 
         if (isPrepaidUpgrade) {
           if (isOutgoing) {
-            return lang('ActionStarGiftPrepaidUpgradedYou');
+            return lang('ActionDiamondGiftPrepaidUpgradedYou');
           }
-          return lang('ActionStarGiftPrepaidUpgraded', { user: toLink }, { withNodes: true });
+          return lang('ActionDiamondGiftPrepaidUpgraded', { user: toLink }, { withNodes: true });
         }
 
         if (resaleAmount && !transferStars) {
@@ -714,7 +714,7 @@ const ActionMessageText = ({
 
           if (isTransferred) {
             if (isAnonymous) {
-              return lang('ActionStarGiftTransferredUnknownChannel', { channel: channelLink }, { withNodes: true });
+              return lang('ActionDiamondGiftTransferredUnknownChannel', { channel: channelLink }, { withNodes: true });
             }
 
             return translateWithYou(
@@ -724,8 +724,8 @@ const ActionMessageText = ({
         }
 
         if (isSavedMessages) {
-          if (isUpgrade) return lang('ActionStarGiftUpgradedSelf');
-          if (isTransferred) return lang('ActionStarGiftTransferredSelf');
+          if (isUpgrade) return lang('ActionDiamondGiftUpgradedSelf');
+          if (isTransferred) return lang('ActionDiamondGiftTransferredSelf');
           if (resaleAmount) {
             const amountText = formatCurrencyAmountAsText(lang, resaleAmount);
             return lang(
@@ -737,35 +737,35 @@ const ActionMessageText = ({
               { withNodes: true },
             );
           }
-          if (gift.isCrafted) return lang('ActionStarGiftCraftedSelf');
+          if (gift.isCrafted) return lang('ActionDiamondGiftCraftedSelf');
         }
 
         if (isUpgrade) {
           if (isOutgoing) {
-            return lang('ActionStarGiftUpgradedMine', { user: chatLink }, { withNodes: true });
+            return lang('ActionDiamondGiftUpgradedMine', { user: chatLink }, { withNodes: true });
           }
 
           if (isSavedMessages) {
-            return lang('ActionStarGiftUpgradedSelf');
+            return lang('ActionDiamondGiftUpgradedSelf');
           }
 
-          return lang('ActionStarGiftUpgradedUser', { user: senderLink }, { withNodes: true });
+          return lang('ActionDiamondGiftUpgradedUser', { user: senderLink }, { withNodes: true });
         }
 
         if ((isTransferred || transferStars) && !resaleAmount) {
           if (sender?.id === SERVICE_NOTIFICATIONS_USER_ID) {
-            return lang('ActionStarGiftTransferredUnknown');
+            return lang('ActionDiamondGiftTransferredUnknown');
           }
 
           if (isSavedMessages) {
-            return lang('ActionStarGiftTransferredSelf');
+            return lang('ActionDiamondGiftTransferredSelf');
           }
 
           if (isOutgoing) {
-            return lang('ActionStarGiftTransferredMine', { user: chatLink }, { withNodes: true });
+            return lang('ActionDiamondGiftTransferredMine', { user: chatLink }, { withNodes: true });
           }
 
-          return lang('ActionStarGiftTransferred', { user: senderLink }, { withNodes: true });
+          return lang('ActionDiamondGiftTransferred', { user: senderLink }, { withNodes: true });
         }
 
         if (isOutgoing) {
@@ -958,7 +958,7 @@ const ActionMessageText = ({
           const userLink = renderPeerLink(replyMessageSender?.id, replyPeerTitle || userFallbackText, asPreview);
 
           const currency = replyMessage?.suggestedPostInfo?.price?.currency || STARS_CURRENCY_CODE;
-          const currencyName = currency === TON_CURRENCY_CODE ? lang('CurrencyGram') : lang('CurrencyStars');
+          const currencyName = currency === TON_CURRENCY_CODE ? lang('CurrencyGram') : lang('CurrencyDiamonds');
 
           return lang('SuggestedPostBalanceTooLow', {
             peer: userLink,

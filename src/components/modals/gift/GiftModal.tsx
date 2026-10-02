@@ -252,24 +252,24 @@ const GiftModal: FC<OwnProps & StateProps> = ({
 
   const starGiftDescription = useMemo(() => {
     if (chat) {
-      return lang('StarGiftDescriptionChannel', { peer: getPeerTitle(lang, chat) }, {
+      return lang('DiamondGiftDescriptionChannel', { peer: getPeerTitle(lang, chat) }, {
         withNodes: true,
         withMarkdown: true,
       });
     }
 
     if (isSelf) {
-      return lang('StarGiftDescriptionSelf', undefined, {
+      return lang('DiamondGiftDescriptionSelf', undefined, {
         withNodes: true,
         renderTextFilters: ['br'],
       });
     }
 
     if (selectedCategory === 'collectible') {
-      return lang('StarGiftDescriptionCollectibles');
+      return lang('DiamondGiftDescriptionCollectibles');
     }
 
-    return lang('StarGiftDescription', {
+    return lang('DiamondGiftDescription', {
       user: getUserFullName(user)!,
     }, { withNodes: true, withMarkdown: true });
   }, [chat, isSelf, selectedCategory, user, lang]);
@@ -640,7 +640,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
             styles.starsOnlyToggle,
             wasStarsOnlyToggleShown && styles.starsOnlyToggleVisible,
           )}
-          label={lang('GiftResaleStarsOnly')}
+          label={lang('GiftResaleDiamondsOnly')}
           checked={isStarsOnly}
           isRound
           onCheck={handleStarsOnlyChange}

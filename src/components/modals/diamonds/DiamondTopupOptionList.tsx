@@ -119,7 +119,7 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
               && Boolean(perUserStarCount) && (
               <div className={styles.optionBottom}>
                 <div className={styles.perUserStars}>
-                  {renderText(oldLang('BoostGift.Stars.PerUser', formatInteger(perUserStarCount)))}
+                  {renderText(oldLang('BoostGift.Diamonds.PerUser', formatInteger(perUserStarCount)))}
                 </div>
               </div>
             )}
@@ -128,7 +128,7 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
       })}
       {!areOptionsExtended && canExtend && (
         <Button className={styles.moreOptions} isText noForcedUpperCase onClick={markOptionsExtended}>
-          {oldLang('Stars.Purchase.ShowMore')}
+          {oldLang('Diamonds.Purchase.ShowMore')}
           <Icon className={styles.iconDown} name="down" />
         </Button>
       )}

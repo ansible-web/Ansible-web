@@ -83,7 +83,7 @@ const GiftAction = ({
           {action.type === 'giftPremium' ? (
             lang('ActionGiftPremiumDuration', { duration: formatCountdownDays(lang, action.days) })
           ) : action.type === 'giftStars' ? (
-            lang('ActionGiftStarsTitle', { amount: action.stars }, { pluralValue: action.stars })
+            lang('ActionGiftDiamondsTitle', { amount: action.stars }, { pluralValue: action.stars })
           ) : renderTonTitle()}
         </h3>
         <div>

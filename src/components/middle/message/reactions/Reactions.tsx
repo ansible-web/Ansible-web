@@ -151,9 +151,9 @@ const Reactions = ({
 
     showNotification({
       localId: getMessageKey(message),
-      title: lang('StarsSentTitle'),
-      message: lang('StarsSentText', paidLocalCount),
-      actionText: lang('StarsSentUndo'),
+      title: lang('DiamondsSentTitle'),
+      message: lang('DiamondsSentText', paidLocalCount),
+      actionText: lang('DiamondsSentUndo'),
       cacheBreaker: paidLocalCount.toString(),
       action: {
         action: 'resetLocalPaidReactions',

@@ -82,10 +82,10 @@ const DiamondGiftPurchaseOffer = ({
   const hasExpired = timeLeft <= 0;
 
   const subtitle = useMemo(() => {
-    if (action.isAccepted) return lang('ActionStarGiftOfferAccepted');
-    if (action.isDeclined) return lang('ActionStarGiftOfferRejected');
-    if (hasExpired) return lang('ActionStarGiftOfferHasExpired');
-    return lang('ActionStarGiftOfferExpires', { time: formattedTime });
+    if (action.isAccepted) return lang('ActionDiamondGiftOfferAccepted');
+    if (action.isDeclined) return lang('ActionDiamondGiftOfferRejected');
+    if (hasExpired) return lang('ActionDiamondGiftOfferHasExpired');
+    return lang('ActionDiamondGiftOfferExpires', { time: formattedTime });
   }, [action.isAccepted, action.isDeclined, formattedTime, lang, hasExpired]);
 
   if (!sticker || !pattern || !backdrop) {

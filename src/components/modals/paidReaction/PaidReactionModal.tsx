@@ -313,12 +313,12 @@ const PaidReactionModal = ({
         maxValue={maxAmount}
         onChange={handleAmountChange}
       />
-      <h3 className={styles.title}>{oldLang('StarsReactionTitle')}</h3>
+      <h3 className={styles.title}>{oldLang('DiamondsReactionTitle')}</h3>
       <div className={styles.description}>
-        {renderText(oldLang('StarsReactionText', chatTitle), ['simple_markdown', 'emoji'])}
+        {renderText(oldLang('DiamondsReactionText', chatTitle), ['simple_markdown', 'emoji'])}
       </div>
       <Separator>
-        {topReactors && <div className={styles.topLabel}>{oldLang('StarsReactionTopSenders')}</div>}
+        {topReactors && <div className={styles.topLabel}>{oldLang('DiamondsReactionTopSenders')}</div>}
       </Separator>
       {topReactors && (
         <div className={styles.top}>
@@ -347,7 +347,7 @@ const PaidReactionModal = ({
         className={buildClassName(styles.checkBox, 'dialog-checkbox')}
         checked={!shouldSendAsAnonymous}
         onChange={handleShowInTopSendersChange}
-        label={oldLang('StarsReactionShowMeInTopSenders')}
+        label={oldLang('DiamondsReactionShowMeInTopSenders')}
       />
       <Button
         inline
@@ -361,8 +361,8 @@ const PaidReactionModal = ({
         })}
       </Button>
       <p className={styles.disclaimer}>
-        {lang('StarsReactionTerms', {
-          link: <SafeLink text={lang('StarsReactionLinkText')} url={lang('StarsReactionLink')} />,
+        {lang('DiamondsReactionTerms', {
+          link: <SafeLink text={lang('DiamondsReactionLinkText')} url={lang('DiamondsReactionLink')} />,
         }, {
           withNodes: true,
         })}

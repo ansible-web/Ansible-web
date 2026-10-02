@@ -202,7 +202,7 @@ const SuggestMessageModal = ({
               onClick={() => setSelectedCurrency(STARS_CURRENCY_CODE)}
             >
               <Icon name="diamond" className={styles.currencyIcon} />
-              {lang('CurrencyStars')}
+              {lang('CurrencyDiamonds')}
             </Button>
             <Button
               className={styles.currencyButton}
@@ -234,7 +234,7 @@ const SuggestMessageModal = ({
                   : formatTonAsText(lang, currentMinAmount) },
               { withNodes: true, withMarkdown: true })
               : isCurrencyStars
-                ? lang('SuggestMessagePriceDescriptionStars')
+                ? lang('SuggestMessagePriceDescriptionDiamonds')
                 : lang('SuggestMessagePriceDescriptionGram')}
           </div>
         </div>

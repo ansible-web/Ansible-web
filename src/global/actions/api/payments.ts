@@ -1293,7 +1293,7 @@ addActionHandler('openUniqueGiftBySlug', async (global, actions, payload): Promi
     const isBurned = result && 'error' in result && result.errorMessage === 'STARGIFT_ALREADY_BURNED';
     actions.showNotification({
       message: {
-        key: isBurned ? 'ActionStarGiftUniqueBurnedError' : 'GiftWasNotFound',
+        key: isBurned ? 'ActionDiamondGiftUniqueBurnedError' : 'GiftWasNotFound',
       },
       tabId,
     });

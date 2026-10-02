@@ -65,7 +65,7 @@ const SettingsPrivacyVisibility = ({
   const handleShowGiftIconInChats = useLastCallback(() => {
     if (!isCurrentUserPremium) {
       showNotification({
-        message: lang('PrivacySubscribeToTelegramPremium'),
+        message: lang('PrivacySubscribeToAnsiblePremium'),
         action: {
           action: 'openPremiumModal',
           payload: {},

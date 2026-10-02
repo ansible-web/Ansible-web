@@ -259,7 +259,7 @@ const ManageGroupPermissions: FC<OwnProps & StateProps> = ({
         )}
         {arePaidMessagesAvailable && (
           <IslandDescription dir={lang.isRtl ? 'rtl' : undefined}>
-            {lang('RightsChargeStarsAbout')}
+            {lang('RightsChargeDiamondsAbout')}
           </IslandDescription>
         )}
 

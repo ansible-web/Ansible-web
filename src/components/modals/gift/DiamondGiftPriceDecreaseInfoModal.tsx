@@ -75,8 +75,8 @@ const DiamondGiftPriceDecreaseInfoModal = ({ modal }: OwnProps) => {
         shouldSkipGradient
         className={styles.progress}
       />
-      <p className={styles.headerTitle}>{lang('StarGiftUpgradeCostModalTitle')}</p>
-      <p className={styles.headerHint}>{lang('StarGiftUpgradeCostHint')}</p>
+      <p className={styles.headerTitle}>{lang('DiamondGiftUpgradeCostModalTitle')}</p>
+      <p className={styles.headerHint}>{lang('DiamondGiftUpgradeCostHint')}</p>
     </div>
   );
 

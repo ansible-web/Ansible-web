@@ -82,7 +82,7 @@ const DiamondsGiftingPickerModal: FC<OwnProps & StateProps> = ({
       className={styles.root}
       isOpen={isOpen}
       onClose={closeStarsGiftingPickerModal}
-      title={oldLang('GiftStarsTitle')}
+      title={oldLang('GiftDiamondsTitle')}
       hasCloseButton
       shouldAdaptToSearch
       withFixedHeight

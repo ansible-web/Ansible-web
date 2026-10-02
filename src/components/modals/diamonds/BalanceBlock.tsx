@@ -67,7 +67,7 @@ const BalanceBlock = ({ balance, className, withAddButton }: OwnProps) => {
   return (
     <div className={buildClassName(styles.balanceBlock, className)}>
       <div className={styles.balanceInfo}>
-        <span className={styles.smallerText}>{lang('StarsBalance')}</span>
+        <span className={styles.smallerText}>{lang('DiamondsBalance')}</span>
         <div className={styles.balanceBottom}>
           {balance?.currency === TON_CURRENCY_CODE ? renderTonAmount() : renderStarsAmount()}
         </div>

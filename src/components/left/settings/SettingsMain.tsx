@@ -117,7 +117,7 @@ const SettingsMain = ({
             narrow
             onClick={() => openSettingsScreen({ screen: SettingsScreens.General })}
           >
-            <span className="title">{lang('TelegramGeneralSettingsViewController')}</span>
+            <span className="title">{lang('AnsibleGeneralSettingsViewController')}</span>
             <span className="subtitle">{lang('SettingsGeneralDesc')}</span>
           </ListItem>
 
@@ -222,7 +222,7 @@ const SettingsMain = ({
               narrow
               onClick={() => openPremiumModal()}
             >
-              {lang('TelegramPremium')}
+              {lang('AnsiblePremium')}
             </ListItem>
           )}
 
@@ -231,7 +231,7 @@ const SettingsMain = ({
             narrow
             onClick={() => openStarsBalanceModal({})}
           >
-            {lang('MenuStars')}
+            {lang('MenuDiamonds')}
             {Boolean(starsBalance) && (
               <span className="settings-item__current-value">
                 {formatStarsAsIcon(lang, formatStarsAmount(lang, starsBalance), {
@@ -272,7 +272,7 @@ const SettingsMain = ({
             narrow
             onClick={() => openUrl({ url: FAQ_URL })}
           >
-            {lang('MenuTelegramFaq')}
+            {lang('MenuAnsibleFaq')}
           </ListItem>
           <ListItem
             icon="privacy-policy-filled"

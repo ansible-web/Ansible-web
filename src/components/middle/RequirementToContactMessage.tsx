@@ -86,7 +86,7 @@ function RequirementToContactMessage({
             paidMessagesStars
               ? (
                 <>
-                  {lang('ButtonBuyStars')}
+                  {lang('ButtonBuyDiamonds')}
                   <Sparkles preset="button" />
                 </>
               )

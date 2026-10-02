@@ -101,15 +101,15 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
     }
 
     if (transaction.isRefund) {
-      status = oldLang('StarsRefunded');
+      status = oldLang('DiamondsRefunded');
     }
 
     if (transaction.hasFailed) {
-      status = oldLang('StarsFailed');
+      status = oldLang('DiamondsFailed');
     }
 
     if (transaction.isPending) {
-      status = oldLang('StarsPending');
+      status = oldLang('DiamondsPending');
     }
 
     return {

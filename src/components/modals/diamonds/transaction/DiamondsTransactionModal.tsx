@@ -127,8 +127,8 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     const areAllPhotos = media?.every((m) => !m.video);
     const areAllVideos = media?.every((m) => !m.photo);
 
-    const mediaText = areAllPhotos ? oldLang('Stars.Transfer.Photos', mediaAmount)
-      : areAllVideos ? oldLang('Stars.Transfer.Videos', mediaAmount)
+    const mediaText = areAllPhotos ? oldLang('Diamonds.Transfer.Photos', mediaAmount)
+      : areAllVideos ? oldLang('Diamonds.Transfer.Videos', mediaAmount)
         : oldLang('Media', mediaAmount);
 
     const description = transaction.description
@@ -221,45 +221,45 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
 
     if (transaction && starRefCommision && !transaction.paidMessages && !isGiftResale) {
       tableData.push([
-        oldLang('StarsTransaction.StarRefReason.Title'),
-        oldLang('StarsTransaction.StarRefReason.Program'),
+        oldLang('DiamondsTransaction.DiamondRefReason.Title'),
+        oldLang('DiamondsTransaction.DiamondRefReason.Program'),
       ]);
     }
 
     if (isGiftUpgrade) {
       tableData.push([
-        oldLang('StarGiftReason'),
-        oldLang('StarGiftReasonUpgrade'),
+        oldLang('DiamondGiftReason'),
+        oldLang('DiamondGiftReasonUpgrade'),
       ]);
     }
 
     if (isDropOriginalDetails) {
       tableData.push([
-        oldLang('StarGiftReason'),
-        lang('StarGiftReasonDropOriginalDetails'),
+        oldLang('DiamondGiftReason'),
+        lang('DiamondGiftReasonDropOriginalDetails'),
       ]);
     }
 
     if (isGiftResale) {
       tableData.push([
-        oldLang('StarGiftReason'),
+        oldLang('DiamondGiftReason'),
         isNegativeAmount(transaction.amount)
-          ? lang('StarGiftSaleTransaction')
-          : lang('StarGiftPurchaseTransaction'),
+          ? lang('DiamondGiftSaleTransaction')
+          : lang('DiamondGiftPurchaseTransaction'),
       ]);
     }
 
     let peerLabel;
     if (isGiftUpgrade) {
-      peerLabel = oldLang('Stars.Transaction.GiftFrom');
+      peerLabel = oldLang('Diamonds.Transaction.GiftFrom');
     } else if (isNegativeAmount(amount) || transaction.isMyGift) {
-      peerLabel = oldLang('Stars.Transaction.To');
+      peerLabel = oldLang('Diamonds.Transaction.To');
     } else if (transaction.starRefCommision && !transaction.paidMessages && !isGiftResale) {
-      peerLabel = oldLang('StarsTransaction.StarRefReason.Miniapp');
+      peerLabel = oldLang('DiamondsTransaction.DiamondRefReason.Miniapp');
     } else if (peerId) {
-      peerLabel = oldLang('Star.Transaction.From');
+      peerLabel = oldLang('Diamond.Transaction.From');
     } else {
-      peerLabel = oldLang('Stars.Transaction.Via');
+      peerLabel = oldLang('Diamonds.Transaction.Via');
     }
 
     if (!transaction.isPostsSearch && !isDropOriginalDetails && !transaction.isStarGiftAuctionBid) {
@@ -279,17 +279,20 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     }
 
     if (messageLink) {
-      tableData.push([oldLang('Stars.Transaction.Reaction.Post'), <SafeLink url={messageLink} text={messageLink} />]);
+      tableData.push([
+        oldLang('Diamonds.Transaction.Reaction.Post'),
+        <SafeLink url={messageLink} text={messageLink} />,
+      ]);
     }
 
     if (giveawayMessageLink && transaction.amount.currency === STARS_CURRENCY_CODE) {
       tableData.push([oldLang('BoostReason'), <SafeLink url={giveawayMessageLink} text={oldLang('Giveaway')} />]);
-      tableData.push([oldLang('Gift'), oldLang('Stars', transaction.amount, 'i')]);
+      tableData.push([oldLang('Gift'), oldLang('Diamonds', transaction.amount, 'i')]);
     }
 
     if (transaction.id) {
       tableData.push([
-        oldLang('Stars.Transaction.Id'),
+        oldLang('Diamonds.Transaction.Id'),
         (
           <>
             <div
@@ -297,7 +300,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
               onClick={() => {
                 copyTextToClipboard(transaction.id!);
                 showNotification({
-                  message: oldLang('StarsTransactionIDCopied'),
+                  message: oldLang('DiamondsTransactionIDCopied'),
                 });
               }}
             >
@@ -310,7 +313,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     }
 
     tableData.push([
-      oldLang('Stars.Transaction.Date'),
+      oldLang('Diamonds.Transaction.Date'),
       formatDateTimeToString(transaction.date * 1000, oldLang.code, true),
     ]);
 
@@ -332,7 +335,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     const footer = (
       <span className={styles.footer}>
         {footerTextParts[0]}
-        <SafeLink url={oldLang('StarsTOSLink')} text={oldLang('lng_credits_summary_options_about_link')} />
+        <SafeLink url={oldLang('DiamondsTOSLink')} text={oldLang('lng_credits_summary_options_about_link')} />
         {footerTextParts[1]}
       </span>
     );

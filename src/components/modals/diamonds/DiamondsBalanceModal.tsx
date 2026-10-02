@@ -109,27 +109,27 @@ const DiamondsBalanceModal = ({
     if (originReaction) {
       const channel = selectChat(global, originReaction.chatId);
       if (!channel) return undefined;
-      return oldLang('StarsNeededTextReactions', getChatTitle(oldLang, channel));
+      return oldLang('DiamondsNeededTextReactions', getChatTitle(oldLang, channel));
     }
 
     if (originStarsPayment) {
       const bot = originStarsPayment.form?.botId ? selectUser(global, originStarsPayment.form.botId) : undefined;
       if (!bot) return undefined;
-      return oldLang('StarsNeededText', getUserFullName(bot));
+      return oldLang('DiamondsNeededText', getUserFullName(bot));
     }
 
     if (originGift) {
       const peer = selectUser(global, originGift.peerId);
       if (!peer) return undefined;
-      return oldLang('StarsNeededTextGift', getPeerTitle(lang, peer));
+      return oldLang('DiamondsNeededTextGift', getPeerTitle(lang, peer));
     }
 
     if (topup?.purpose === SUBSCRIPTION_PURPOSE) {
-      return oldLang('StarsNeededTextLink');
+      return oldLang('DiamondsNeededTextLink');
     }
 
     if (topup?.purpose === PAID_MESSAGES_PURPOSE) {
-      return lang('StarsNeededTextSendPaidMessages', undefined, {
+      return lang('DiamondsNeededTextSendPaidMessages', undefined, {
         withMarkdown: true,
         withNodes: true,
       });
@@ -186,7 +186,7 @@ const DiamondsBalanceModal = ({
     const parts = text.split('{link}');
     return [
       parts[0],
-      <SafeLink url={oldLang('StarsTOSLink')} text={oldLang('lng_credits_summary_options_about_link')} />,
+      <SafeLink url={oldLang('DiamondsTOSLink')} text={oldLang('lng_credits_summary_options_about_link')} />,
       parts[1],
     ];
   }, [isOpen, oldLang]);
@@ -197,9 +197,9 @@ const DiamondsBalanceModal = ({
         <ParticlesHeader
           model="speeding-diamond"
           color="blue"
-          title={starsNeeded ? oldLang('StarsNeededTitle', ongoingTransactionAmount) : oldLang('TelegramStars')}
+          title={starsNeeded ? oldLang('DiamondsNeededTitle', ongoingTransactionAmount) : oldLang('AnsibleDiamonds')}
           description={renderText(
-            starsNeededText || oldLang('TelegramStarsInfo'),
+            starsNeededText || oldLang('AnsibleDiamondsInfo'),
             ['simple_markdown', 'emoji'],
           )}
           isDisabled={!isOpen}
@@ -210,7 +210,7 @@ const DiamondsBalanceModal = ({
             onClick={showBuyOptions}
             fluid
           >
-            {oldLang('Star.List.BuyMoreStars')}
+            {oldLang('Diamond.List.BuyMoreDiamonds')}
           </Button>
         )}
         {canBuyPremium && !areBuyOptionsShown && shouldSuggestGifting && (
@@ -221,7 +221,7 @@ const DiamondsBalanceModal = ({
             fluid
             onClick={openStarsGiftingPickerModalHandler}
           >
-            {oldLang('TelegramStarsGift')}
+            {oldLang('AnsibleDiamondsGift')}
           </Button>
         )}
         {areBuyOptionsShown && starsBalanceState?.topupOptions && (
@@ -361,7 +361,7 @@ const DiamondsBalanceModal = ({
           )}
         >
           <h2 className={styles.starHeaderText}>
-            {oldLang('TelegramStars')}
+            {oldLang('AnsibleDiamonds')}
           </h2>
         </div>
         <div className={styles.section}>
@@ -374,7 +374,7 @@ const DiamondsBalanceModal = ({
         )}
         {shouldShowItems && Boolean(subscriptions?.list.length) && (
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>{oldLang('StarMySubscriptions')}</h3>
+            <h3 className={styles.sectionTitle}>{oldLang('DiamondMySubscriptions')}</h3>
             <div className={styles.subscriptions}>
               {subscriptions?.list.map((subscription) => (
                 <DiamondsSubscriptionItem
@@ -392,7 +392,7 @@ const DiamondsBalanceModal = ({
                   onClick={handleLoadMoreSubscriptions}
                 >
                   <Icon name="down" className={styles.loadMoreIcon} />
-                  {oldLang('StarMySubscriptionsExpand')}
+                  {oldLang('DiamondMySubscriptionsExpand')}
                 </Button>
               )}
             </div>

@@ -241,7 +241,7 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
                 </div>
                 {hasPriceDecreaseInfo && (
                   <div className={styles.priceDecreaseTimer}>
-                    {lang('StarGiftPriceDecreaseTimer', {
+                    {lang('DiamondGiftPriceDecreaseTimer', {
                       timer: <TextTimer endsAt={nextPriceDate} onEnd={handleTimerEnd} />,
                     }, { withNodes: true })}
                   </div>
@@ -254,7 +254,7 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
                 isPrimary
                 onClick={handleOpenPriceInfo}
               >
-                {lang('StarGiftPriceDecreaseInfoLink', undefined,
+                {lang('DiamondGiftPriceDecreaseInfoLink', undefined,
                   { withNodes: true, specialReplacement: NEXT_ARROW_REPLACEMENT })}
               </Link>
             )}

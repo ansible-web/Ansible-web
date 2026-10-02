@@ -123,12 +123,12 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
 
   function renderGiftTitle() {
     if (renderingModal?.isCompleted) {
-      return user ? renderText(oldLang('Notification.StarsGift.SentYou',
+      return user ? renderText(oldLang('Notification.DiamondsGift.SentYou',
         formatCurrencyAsString(selectedOption!.amount, selectedOption!.currency, oldLang.code)), ['simple_markdown'])
-        : renderText(oldLang('StarsAcquiredInfo', selectedOption?.stars), ['simple_markdown']);
+        : renderText(oldLang('DiamondsAcquiredInfo', selectedOption?.stars), ['simple_markdown']);
     }
 
-    return user ? oldLang('GiftStarsTitle') : oldLang('Star.List.GetStars');
+    return user ? oldLang('GiftDiamondsTitle') : oldLang('Diamond.List.GetDiamonds');
   }
 
   const bottomText = useMemo(() => {
@@ -137,7 +137,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
     return [
       parts[0],
       <SafeLink
-        url={oldLang('StarsTOSLink')}
+        url={oldLang('DiamondsTOSLink')}
         text={oldLang('lng_credits_summary_options_about_link')}
       />,
       parts[1],
@@ -157,7 +157,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
       <div className={buildClassName(styles.main, 'custom-scroll')} onScroll={handleScroll}>
         <div className={buildClassName(styles.header, isHeaderHidden && styles.hiddenHeader)}>
           <h2 className={styles.starHeaderText}>
-            {user ? oldLang('GiftStarsTitle') : oldLang('Star.List.GetStars')}
+            {user ? oldLang('GiftDiamondsTitle') : oldLang('Diamond.List.GetDiamonds')}
           </h2>
         </div>
         <div className={styles.headerInfo}>
@@ -182,8 +182,8 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
         </h2>
         <p className={styles.description}>
           {user ? renderText(
-            oldLang('ActionGiftStarsSubtitle', getPeerTitle(oldLang, user)), ['simple_markdown'],
-          ) : oldLang('Stars.Purchase.GetStarsInfo')}
+            oldLang('ActionGiftDiamondsSubtitle', getPeerTitle(oldLang, user)), ['simple_markdown'],
+          ) : oldLang('Diamonds.Purchase.GetDiamondsInfo')}
         </p>
         <div className={styles.section}>
           <DiamondTopupOptionList

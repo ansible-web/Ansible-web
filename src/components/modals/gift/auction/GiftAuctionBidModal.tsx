@@ -229,7 +229,7 @@ const GiftAuctionBidModal = ({
   const isWinning = Boolean(userState?.bidAmount && userPosition && userPosition <= giftsPerRound);
 
   function renderCurrentBidSectionTitle() {
-    const giftTitle = renderingAuctionState?.gift.title || lang('StarGift');
+    const giftTitle = renderingAuctionState?.gift.title || lang('DiamondGift');
     const nextGiftNum = userPosition && userPosition <= 100
       ? (activeState?.lastGiftNum || 0) + userPosition
       : undefined;

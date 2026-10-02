@@ -203,10 +203,10 @@ const ProfileRatingModal = ({
     lang, handleShowFuture, handleShowCurrent]);
 
   const listItemData = [
-    ['gift', lang('RatingGiftsFromTelegram'), (
+    ['gift', lang('RatingGiftsFromAnsible'), (
       <span>
         {renderBadge('added')}
-        {lang('RatingGiftsFromTelegramDesc')}
+        {lang('RatingGiftsFromAnsibleDesc')}
       </span>
     )],
     ['user-stars', lang('RatingGiftsAndPostsFromUsers'), (

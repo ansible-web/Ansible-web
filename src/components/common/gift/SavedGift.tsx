@@ -92,7 +92,7 @@ const SavedGift = ({
       return lang('GiftSavedNumber', { number: starGiftUnique.number });
     }
     if (totalIssued) {
-      return lang('ActionStarGiftLimitedRibbon', { total: formatIntegerCompact(lang, totalIssued) });
+      return lang('ActionDiamondGiftLimitedRibbon', { total: formatIntegerCompact(lang, totalIssued) });
     }
     return undefined;
   })();

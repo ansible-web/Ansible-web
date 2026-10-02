@@ -389,7 +389,7 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
             styles.starsOnlyToggle,
             wasStarsOnlyToggleShown && styles.starsOnlyToggleVisible,
           )}
-          label={lang('GiftResaleStarsOnly')}
+          label={lang('GiftResaleDiamondsOnly')}
           checked={isStarsOnly}
           isRound
           onCheck={handleStarsOnlyChange}

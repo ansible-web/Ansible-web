@@ -153,7 +153,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
       return undefined;
     }
 
-    const giftTitle = gift!.title || lang('StarGift');
+    const giftTitle = gift!.title || lang('DiamondGift');
     const badge = isFinished ? lang('GiftAuctionEnded') : lang('GiftAuctionInfoTitle');
     const subtitle = (
       <Link className={styles.learnMoreLink} isPrimary onClick={handleLearnMoreAboutGiftsClick}>
@@ -180,7 +180,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
       return undefined;
     }
 
-    const giftTitle = gift.title || lang('StarGift');
+    const giftTitle = gift.title || lang('DiamondGift');
     const giftsPerRound = gift.giftsPerRound || 0;
 
     return (
@@ -300,7 +300,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
         )}
         {canBuyOnTelegram && (
           <Link className={styles.itemsBoughtLink} isPrimary onClick={handleOpenTelegramMarket}>
-            {lang('GiftAuctionForSaleOnTelegram', {
+            {lang('GiftAuctionForSaleOnAnsible', {
               count: giftSticker ? (
                 <>
                   {lang.number(state.listedCount!)}

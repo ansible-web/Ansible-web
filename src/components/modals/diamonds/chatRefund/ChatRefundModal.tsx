@@ -62,7 +62,7 @@ const ChatRefundModal = ({ modal, user }: OwnProps & StateProps) => {
         Boolean(starsToRefund) && (
           <Checkbox
             className="dialog-checkbox"
-            label={lang('ConfirmDialogRemoveFeeRefundStars', {
+            label={lang('ConfirmDialogRemoveFeeRefundDiamonds', {
               amount: formatStarsAsText(lang, starsToRefund),
             }, {
               withMarkdown: true,

@@ -434,7 +434,7 @@ const ActionMessage = ({
 
       case 'starGiftUnique': {
         if (action.gift.isBurned) {
-          showNotification({ message: lang('ActionStarGiftUniqueBurnedError') });
+          showNotification({ message: lang('ActionDiamondGiftUniqueBurnedError') });
           break;
         }
         openGiftInfoModalFromMessage({

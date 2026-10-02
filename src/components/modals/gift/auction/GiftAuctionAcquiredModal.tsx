@@ -52,7 +52,7 @@ const GiftAuctionAcquiredModal = ({ modal, acquiredGifts, giftTitle, giftSticker
 
     return renderingGifts.map((gift) => {
       const header = lang('GiftAuctionBoughtGiftHeader', {
-        gift: renderingGiftTitle || lang('StarGift'),
+        gift: renderingGiftTitle || lang('DiamondGift'),
         giftNumber: gift.giftNumber ? lang.number(gift.giftNumber) : '',
         round: lang.number(gift.round),
       });

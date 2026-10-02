@@ -153,7 +153,7 @@ const LeftSideMenuItems = ({
   });
 
   const handleOpenTipsChat = useLastCallback(() => {
-    openChatByUsername({ username: lang('TelegramFeaturesUsername') });
+    openChatByUsername({ username: lang('AnsibleFeaturesUsername') });
   });
 
   const handleBugReportClick = useLastCallback(() => {
@@ -246,7 +246,7 @@ const LeftSideMenuItems = ({
               icon="help"
               onClick={handleOpenTipsChat}
             >
-              {lang('MenuTelegramFeatures')}
+              {lang('MenuAnsibleFeatures')}
             </MenuItem>
             <MenuItem
               icon="bug"

@@ -22,8 +22,8 @@ export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transactio
 
   if (transaction.isGiftResale) {
     return isNegativeAmount(transaction.amount)
-      ? lang('StarGiftSaleTransaction')
-      : lang('StarGiftPurchaseTransaction');
+      ? lang('DiamondGiftSaleTransaction')
+      : lang('DiamondGiftPurchaseTransaction');
   }
   if (transaction.isPostsSearch) {
     return lang('PostsSearchTransaction');
@@ -39,24 +39,24 @@ export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transactio
 
   if (transaction.isStarGiftAuctionBid) {
     return isNegativeAmount(transaction.amount)
-      ? lang('StarGiftAuctionBidTransaction')
-      : lang('StarGiftAuctionBidRefundedTransaction');
+      ? lang('DiamondGiftAuctionBidTransaction')
+      : lang('DiamondGiftAuctionBidRefundedTransaction');
   }
 
   if (transaction.starRefCommision) {
-    return oldLang('StarTransactionCommission', formatPercent(transaction.starRefCommision));
+    return oldLang('DiamondTransactionCommission', formatPercent(transaction.starRefCommision));
   }
   if (transaction.isGiftUpgrade) return oldLang('Gift2TransactionUpgraded');
-  if (transaction.extendedMedia) return oldLang('StarMediaPurchase');
-  if (transaction.subscriptionPeriod) return transaction.title || oldLang('StarSubscriptionPurchase');
-  if (transaction.isReaction) return oldLang('StarsReactionsSent');
-  if (transaction.giveawayPostId) return oldLang('StarsGiveawayPrizeReceived');
-  if (transaction.isMyGift) return oldLang('StarsGiftSent');
+  if (transaction.extendedMedia) return oldLang('DiamondMediaPurchase');
+  if (transaction.subscriptionPeriod) return transaction.title || oldLang('DiamondSubscriptionPurchase');
+  if (transaction.isReaction) return oldLang('DiamondsReactionsSent');
+  if (transaction.giveawayPostId) return oldLang('DiamondsGiveawayPrizeReceived');
+  if (transaction.isMyGift) return oldLang('DiamondsGiftSent');
   if (transaction.isGift) {
     if (transaction.amount.currency === TON_CURRENCY_CODE) {
       return lang('GramGiftReceived');
     }
-    return oldLang('StarsGiftReceived');
+    return oldLang('DiamondsGiftReceived');
   }
   if (transaction.starGift) {
     return isNegativeAmount(transaction.amount) ? oldLang('Gift2TransactionSent') : oldLang('Gift2ConvertedTitle');

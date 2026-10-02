@@ -133,7 +133,7 @@ const Giveaway = ({
             {message?.content?.giveaway?.stars ? (
               <>
                 {renderText(
-                  lang('Chat.Giveaway.Message.Stars.PrizeText', lang('Stars', message?.content?.giveaway?.stars)),
+                  lang('Chat.Giveaway.Message.Diamonds.PrizeText', lang('Diamonds', message?.content?.giveaway?.stars)),
                   ['simple_markdown'],
                 )}
                 <br />
@@ -233,7 +233,7 @@ const Giveaway = ({
     const isSeveral = otherChannelsCount > 0;
 
     const firstKey = isResultsInfo ? 'BoostingGiveawayHowItWorksTextEnd' : 'BoostingGiveawayHowItWorksText';
-    const giveawayDuration = isResultsInfo ? lang('Chat.Giveaway.Info.Months', months) : lang('Stars', stars, 'i');
+    const giveawayDuration = isResultsInfo ? lang('Chat.Giveaway.Info.Months', months) : lang('Diamonds', stars, 'i');
     const firstParagraph = lang(firstKey, [chatTitle, quantity, giveawayDuration], undefined, quantity);
 
     const additionalPrizes = prizeDescription

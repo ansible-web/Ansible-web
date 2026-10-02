@@ -91,7 +91,7 @@ const DiamondsSubscriptionItem = ({ subscription }: OwnProps) => {
                 {formatInteger(pricing.amount)}
               </span>
             </div>
-            <div className={styles.statusPeriod}>{lang('StarsParticipantSubscriptionPerMonth')}</div>
+            <div className={styles.statusPeriod}>{lang('DiamondsParticipantSubscriptionPerMonth')}</div>
           </>
         )}
       </div>

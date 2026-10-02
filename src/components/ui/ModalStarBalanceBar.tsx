@@ -72,14 +72,14 @@ function ModalStarBalanceBar({
     >
       <div>
         {isTonMode ? (
-          lang('ModalStarsBalanceBarDescription', {
+          lang('ModalDiamondsBalanceBarDescription', {
             stars: formatTonAsIcon(lang, convertTonFromNanos(currentBalance.amount)),
           }, {
             withNodes: true,
             withMarkdown: true,
           })
         ) : (
-          lang('ModalStarsBalanceBarDescription', {
+          lang('ModalDiamondsBalanceBarDescription', {
             stars: formatStarsAsIcon(lang, formatStarsAmount(lang, currentBalance as ApiStarsAmount)),
           }, {
             withNodes: true,
@@ -99,7 +99,7 @@ function ModalStarBalanceBar({
         )}
         {!isTonMode && (
           <Link className={styles.getMoreStarsLink} isPrimary onClick={handleGetMoreStars}>
-            {lang('GetMoreStarsLinkText', undefined, {
+            {lang('GetMoreDiamondsLinkText', undefined, {
               withNodes: true,
               specialReplacement: NEXT_ARROW_REPLACEMENT,
             })}

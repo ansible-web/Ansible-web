@@ -150,7 +150,7 @@ export const AiEditorErrorMessage = memo(({
           : lang('AiMessageEditorDailyLimitReached', {
             link: (
               <Link isPrimary onClick={handleOpenPremiumModal}>
-                {lang('TelegramPremium')}
+                {lang('AnsiblePremium')}
               </Link>
             ),
           }, { withNodes: true })
