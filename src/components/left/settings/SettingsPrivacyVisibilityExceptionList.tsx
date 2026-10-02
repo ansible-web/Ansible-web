@@ -235,6 +235,9 @@ function getCurrentPrivacySettings(global: GlobalState, screen: SettingsScreens)
     case SettingsScreens.PrivacyGiftsAllowedContacts:
     case SettingsScreens.PrivacyGiftsDeniedContacts:
       return privacy.gifts;
+    case SettingsScreens.PrivacySavedMusicAllowedContacts:
+    case SettingsScreens.PrivacySavedMusicDeniedContacts:
+      return privacy.savedMusic;
     case SettingsScreens.PrivacyPhoneCallAllowedContacts:
     case SettingsScreens.PrivacyPhoneCallDeniedContacts:
       return privacy.phoneCall;

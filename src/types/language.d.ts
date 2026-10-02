@@ -1610,6 +1610,9 @@ export interface LangPair {
   'BotDownloadFileButton': undefined;
   'PrivacyGifts': undefined;
   'PrivacyGiftsTitle': undefined;
+  'PrivacyMusic': undefined;
+  'PrivacyMusicTitle': undefined;
+  'PrivacyMusicInfo': undefined;
   'PrivacyGiftsInfo': undefined;
   'PrivacyAcceptedGiftTitle': undefined;
   'PrivacyAcceptedGiftInfo': undefined;

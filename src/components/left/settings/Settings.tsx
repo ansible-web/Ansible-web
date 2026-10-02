@@ -121,6 +121,11 @@ const PRIVACY_GIFTS_SCREENS = [
   SettingsScreens.PrivacyGiftsDeniedContacts,
 ];
 
+const PRIVACY_SAVED_MUSIC_SCREENS = [
+  SettingsScreens.PrivacySavedMusicAllowedContacts,
+  SettingsScreens.PrivacySavedMusicDeniedContacts,
+];
+
 const PRIVACY_PHONE_CALL_SCREENS = [
   SettingsScreens.PrivacyPhoneCallAllowedContacts,
   SettingsScreens.PrivacyPhoneCallDeniedContacts,
@@ -230,6 +235,7 @@ const Settings: FC<OwnProps> = ({
       [SettingsScreens.PrivacyBio]: PRIVACY_BIO_SCREENS.includes(activeScreen),
       [SettingsScreens.PrivacyBirthday]: PRIVACY_BIRTHDAY_SCREENS.includes(activeScreen),
       [SettingsScreens.PrivacyGifts]: PRIVACY_GIFTS_SCREENS.includes(activeScreen),
+      [SettingsScreens.PrivacySavedMusic]: PRIVACY_SAVED_MUSIC_SCREENS.includes(activeScreen),
       [SettingsScreens.PrivacyPhoneCall]: PRIVACY_PHONE_CALL_SCREENS.includes(activeScreen),
       [SettingsScreens.PrivacyPhoneP2P]: PRIVACY_PHONE_P2P_SCREENS.includes(activeScreen),
       [SettingsScreens.PrivacyForwarding]: PRIVACY_FORWARDING_SCREENS.includes(activeScreen),
@@ -361,6 +367,7 @@ const Settings: FC<OwnProps> = ({
       case SettingsScreens.PrivacyBio:
       case SettingsScreens.PrivacyBirthday:
       case SettingsScreens.PrivacyGifts:
+      case SettingsScreens.PrivacySavedMusic:
       case SettingsScreens.PrivacyPhoneCall:
       case SettingsScreens.PrivacyForwarding:
       case SettingsScreens.PrivacyVoiceMessages:
@@ -379,6 +386,7 @@ const Settings: FC<OwnProps> = ({
       case SettingsScreens.PrivacyBioAllowedContacts:
       case SettingsScreens.PrivacyBirthdayAllowedContacts:
       case SettingsScreens.PrivacyGiftsAllowedContacts:
+      case SettingsScreens.PrivacySavedMusicAllowedContacts:
       case SettingsScreens.PrivacyPhoneCallAllowedContacts:
       case SettingsScreens.PrivacyPhoneP2PAllowedContacts:
       case SettingsScreens.PrivacyForwardingAllowedContacts:
@@ -403,6 +411,7 @@ const Settings: FC<OwnProps> = ({
       case SettingsScreens.PrivacyBioDeniedContacts:
       case SettingsScreens.PrivacyBirthdayDeniedContacts:
       case SettingsScreens.PrivacyGiftsDeniedContacts:
+      case SettingsScreens.PrivacySavedMusicDeniedContacts:
       case SettingsScreens.PrivacyPhoneCallDeniedContacts:
       case SettingsScreens.PrivacyPhoneP2PDeniedContacts:
       case SettingsScreens.PrivacyForwardingDeniedContacts:

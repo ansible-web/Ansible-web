@@ -123,6 +123,8 @@ const SettingsHeader: FC<OwnProps> = ({
         return <h3>{oldLang('PrivacyBirthday')}</h3>;
       case SettingsScreens.PrivacyGifts:
         return <h3>{lang('PrivacyGifts')}</h3>;
+      case SettingsScreens.PrivacySavedMusic:
+        return <h3>{lang('PrivacyMusic')}</h3>;
       case SettingsScreens.PrivacyForwarding:
         return <h3>{oldLang('PrivacyForwards')}</h3>;
       case SettingsScreens.PrivacyVoiceMessages:
@@ -138,12 +140,14 @@ const SettingsHeader: FC<OwnProps> = ({
       case SettingsScreens.PrivacyProfilePhotoAllowedContacts:
       case SettingsScreens.PrivacyBioAllowedContacts:
       case SettingsScreens.PrivacyGroupChatsAllowedContacts:
+      case SettingsScreens.PrivacySavedMusicAllowedContacts:
         return <h3>{oldLang('AlwaysShareWith')}</h3>;
 
       case SettingsScreens.PrivacyLastSeenDeniedContacts:
       case SettingsScreens.PrivacyProfilePhotoDeniedContacts:
       case SettingsScreens.PrivacyBioDeniedContacts:
       case SettingsScreens.PrivacyGroupChatsDeniedContacts:
+      case SettingsScreens.PrivacySavedMusicDeniedContacts:
         return <h3>{oldLang('NeverShareWith')}</h3>;
 
       case SettingsScreens.PrivacyPhoneNumberAllowedContacts:

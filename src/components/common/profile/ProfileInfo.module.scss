@@ -529,3 +529,27 @@
     }
   }
 }
+
+/* Полоса музыки профиля: ей нужно место под именем, иначе она ляжет на статус. */
+.hasMusic .info {
+  /* stylelint-disable-next-line plugin/no-low-performance-animation-properties */
+  transition: padding-bottom 0.25s;
+}
+
+.hasMusic:not(.minimized) .info {
+  padding-bottom: 2.25rem;
+}
+
+.hasMusic.minimized,
+.hasMusic.plain {
+  padding-bottom: 2.75rem;
+}
+
+.hasMusic {
+  /* stylelint-disable-next-line plugin/no-low-performance-animation-properties */
+  transition: height 0.25s;
+}
+
+.musicOverlay {
+  bottom: 0.375rem;
+}

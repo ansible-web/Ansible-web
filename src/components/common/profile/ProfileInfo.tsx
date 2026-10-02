@@ -63,6 +63,7 @@ import Avatar from '../Avatar.tsx';
 import FullNameTitle from '../FullNameTitle.tsx';
 import Icon from '../icons/Icon.tsx';
 import TopicIcon from '../TopicIcon.tsx';
+import ProfileMusicStrip from './ProfileMusicStrip';
 import ProfilePhoto from './ProfilePhoto';
 import ProfilePinnedGifts from './ProfilePinnedGifts.tsx';
 import RadialPatternBackground from './RadialPatternBackground.tsx';
@@ -151,6 +152,9 @@ const ProfileInfo = ({
     openProfileRatingModal,
     loadPeerSavedGifts,
   } = getActions();
+
+  // Трек музыки профиля (userFull.saved_music): его показывает полоса под именем.
+  const savedMusic = userFullInfo?.savedMusic;
 
   const oldLang = useOldLang();
   const lang = useLang();
@@ -492,6 +496,7 @@ const ProfileInfo = ({
         styles.root,
         !isExpanded && styles.minimized,
         isPlain && styles.plain,
+        savedMusic && styles.hasMusic,
       )}
       style={buildStyle(
         profileColorSet && `--rating-outline-color: ${isExpanded ? 'transparent' : profileColorSet?.bgColors[0]}`,
@@ -614,6 +619,13 @@ const ProfileInfo = ({
         )}
         {renderStatus()}
       </div>
+      {Boolean(savedMusic) && (
+        <ProfileMusicStrip
+          audio={savedMusic}
+          className={isExpanded ? styles.musicOverlay : undefined}
+          style={createVtnStyle('music', true)}
+        />
+      )}
     </div>
   );
 };
