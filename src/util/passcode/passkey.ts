@@ -5,7 +5,7 @@ import { getTranslationFn } from '../localization';
 const PRF_SALT_LENGTH = 32;
 const CHALLENGE_LENGTH = 32;
 const HKDF_INFO = 'tt-passcode-unlock';
-const RP_NAME = 'Telegram Web';
+const RP_NAME = 'Ansible Web';
 
 let conditionalRequestAbortController: AbortController | undefined;
 
