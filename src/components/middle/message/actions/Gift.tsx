@@ -91,7 +91,7 @@ const GiftAction = ({
           {!message
             && (lang(action.type === 'giftTon' ? 'DescriptionAboutGram'
               : action.type === 'giftPremium'
-                ? 'ActionGiftPremiumText' : 'ActionGiftStarsText'))}
+                ? 'ActionGiftPremiumText' : 'ActionGiftDiamondsText'))}
         </div>
       </div>
       <div className={styles.actionButton}>

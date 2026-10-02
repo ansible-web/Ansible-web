@@ -98,30 +98,30 @@ const DiamondGiftAction = ({
 
     if (action.alreadyPaidUpgradeStars && !isAuction) {
       return translateWithYou(
-        lang, 'ActionStarGiftUpgradeText', !isOutgoing || isSelf, { peer: peerLink },
+        lang, 'ActionDiamondGiftUpgradeText', !isOutgoing || isSelf, { peer: peerLink },
       );
     }
 
     if (action.isConverted) {
       return translateWithYou(
-        lang, 'ActionStarGiftConvertedText', !isOutgoing || isSelf, { peer: peerLink, amount: starsAmount },
+        lang, 'ActionDiamondGiftConvertedText', !isOutgoing || isSelf, { peer: peerLink, amount: starsAmount },
       );
     }
 
     if (starGiftMaxConvertPeriod && getServerTime() < message.date + starGiftMaxConvertPeriod && starsAmount) {
       return translateWithYou(
-        lang, 'ActionStarGiftConvertText', !isOutgoing || isSelf, { peer: peerLink, amount: starsAmount },
+        lang, 'ActionDiamondGiftConvertText', !isOutgoing || isSelf, { peer: peerLink, amount: starsAmount },
       );
     }
 
     if (isChannel) {
       return lang(
-        'ActionStarGiftChannelText', { amount: starsAmount }, { withNodes: true },
+        'ActionDiamondGiftChannelText', { amount: starsAmount }, { withNodes: true },
       );
     }
 
     return translateWithYou(
-      lang, 'ActionStarGiftNoConvertText', !isOutgoing || isSelf, { peer: peerLink },
+      lang, 'ActionDiamondGiftNoConvertText', !isOutgoing || isSelf, { peer: peerLink },
     );
   }, [
     action, auctionBid, fallbackPeerTitle, isAuction, isChannel, isOutgoing, lang, message.date, peer?.id, peerTitle,
@@ -166,11 +166,11 @@ const DiamondGiftAction = ({
       <div className={styles.info}>
         <h3 className={styles.title}>
           {isAuction && recipient ? lang(
-            'ActionStarGiftAuctionFor',
+            'ActionDiamondGiftAuctionFor',
             { peer: renderPeerLink(recipient.id, auctionToTitle || fallbackPeerTitle) },
             { withNodes: true },
           ) : isSelf ? lang('ActionDiamondGiftSelf') : lang(
-            isOutgoing ? 'ActionStarGiftTo' : 'ActionStarGiftFrom',
+            isOutgoing ? 'ActionDiamondGiftTo' : 'ActionDiamondGiftFrom',
             {
               peer: renderPeerLink(peer?.id, peerTitle || fallbackPeerTitle),
             },

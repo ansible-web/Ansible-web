@@ -113,7 +113,7 @@ const GiveawayPrizeAction = ({
           )}
           {action.type === 'prizeStars' && (
             lang(
-              'ActionGiveawayResultStarsText',
+              'ActionGiveawayResultDiamondsText',
               { amount: action.stars, channel: channelLink },
               {
                 withNodes: true,

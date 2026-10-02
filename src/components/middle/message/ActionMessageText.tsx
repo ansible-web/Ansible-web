@@ -428,7 +428,7 @@ const ActionMessageText = ({
 
         if (stars) {
           return lang(
-            isChannel ? 'ActionGiveawayStarsStarted' : 'ActionGiveawayStarsStartedGroup',
+            isChannel ? 'ActionGiveawayDiamondsStarted' : 'ActionGiveawayDiamondsStartedGroup',
             { from: senderLink, amount: renderStrong(formatStarsAsText(lang, stars)) },
             { withNodes: true },
           );
@@ -445,11 +445,11 @@ const ActionMessageText = ({
         const { winnersCount, isStars, unclaimedCount } = action;
         if (!winnersCount) return lang('ActionGiveawayResultsNone');
         if (unclaimedCount) {
-          return lang(isStars ? 'ActionGiveawayResultsStarsSome' : 'ActionGiveawayResultsSome');
+          return lang(isStars ? 'ActionGiveawayResultsDiamondsSome' : 'ActionGiveawayResultsSome');
         }
 
         return lang(
-          isStars ? 'ActionGiveawayResultsStars' : 'ActionGiveawayResults',
+          isStars ? 'ActionGiveawayResultsDiamonds' : 'ActionGiveawayResults',
           { count: winnersCount },
           { pluralValue: winnersCount },
         );
@@ -604,7 +604,7 @@ const ActionMessageText = ({
           const upgradeCost = renderStrong(formatStarsAsText(lang, gift.upgradeStars));
 
           return translateWithYou(
-            lang, 'ActionStarGiftPrepaidUpgrade', isOutgoing, {
+            lang, 'ActionDiamondGiftPrepaidUpgrade', isOutgoing, {
               peer: isOutgoing ? toLink : senderLink,
               cost: upgradeCost,
             },
@@ -618,7 +618,7 @@ const ActionMessageText = ({
           const channelTitle = (channelPeer && getPeerTitle(lang, channelPeer)) || channelFallbackText;
           const channelLink = renderPeerLink(peerId, channelTitle, asPreview);
           return translateWithYou(
-            lang, 'ActionStarGiftSentChannel', isYou, { user: fromLink, channel: channelLink, cost },
+            lang, 'ActionDiamondGiftSentChannel', isYou, { user: fromLink, channel: channelLink, cost },
           );
         }
 
@@ -663,14 +663,14 @@ const ActionMessageText = ({
 
           if (isOutgoing) {
             return lang(
-              'ActionStarGiftSoldFromOffer',
+              'ActionDiamondGiftSoldFromOffer',
               { user: chatLink, gift: formattedGiftName, cost: formattedAmountText },
               { withNodes: true },
             );
           }
 
           return lang(
-            'ActionStarGiftBoughtFromOffer',
+            'ActionDiamondGiftBoughtFromOffer',
             { user: senderLink, gift: formattedGiftName, cost: formattedAmountText },
             { withNodes: true },
           );
@@ -688,8 +688,8 @@ const ActionMessageText = ({
 
           return lang(
             isOutgoing
-              ? 'ApiMessageMessageActionResaleStarGiftUniqueOutgoing'
-              : 'ApiMessageMessageActionResaleStarGiftUniqueIncoming',
+              ? 'ApiMessageMessageActionResaleDiamondGiftUniqueOutgoing'
+              : 'ApiMessageMessageActionResaleDiamondGiftUniqueIncoming',
             {
               gift: lang('GiftUnique', { title: gift.title, number: gift.number }),
               stars: renderStrong(amountText),
@@ -708,7 +708,7 @@ const ActionMessageText = ({
 
           if (isUpgrade) {
             return translateWithYou(
-              lang, 'ActionStarGiftUpgradedChannel', isYou, { user: fromLink, channel: channelLink },
+              lang, 'ActionDiamondGiftUpgradedChannel', isYou, { user: fromLink, channel: channelLink },
             );
           }
 
@@ -718,7 +718,7 @@ const ActionMessageText = ({
             }
 
             return translateWithYou(
-              lang, 'ActionStarGiftTransferredChannel', isYou, { user: fromLink, channel: channelLink },
+              lang, 'ActionDiamondGiftTransferredChannel', isYou, { user: fromLink, channel: channelLink },
             );
           }
         }
@@ -729,7 +729,7 @@ const ActionMessageText = ({
           if (resaleAmount) {
             const amountText = formatCurrencyAmountAsText(lang, resaleAmount);
             return lang(
-              'ApiMessageMessageActionResaleStarGiftUniqueOutgoing',
+              'ApiMessageMessageActionResaleDiamondGiftUniqueOutgoing',
               {
                 gift: lang('GiftUnique', { title: gift.title, number: gift.number }),
                 stars: asPreview ? amountText : renderStrong(amountText),
@@ -1201,7 +1201,7 @@ const ActionMessageText = ({
         const formattedPriceText = asPreview ? priceText : renderStrong(priceText);
 
         return lang(
-          isOutgoing ? 'ActionStarGiftOfferOutgoing' : 'ActionStarGiftOfferIncoming',
+          isOutgoing ? 'ActionDiamondGiftOfferOutgoing' : 'ActionDiamondGiftOfferIncoming',
           {
             peer: peerLink,
             cost: formattedPriceText,
@@ -1225,7 +1225,7 @@ const ActionMessageText = ({
         const formattedPriceText = asPreview ? priceText : renderStrong(priceText);
 
         return lang(
-          isOutgoing ? 'ActionStarGiftOfferDeclinedOutgoing' : 'ActionStarGiftOfferDeclinedIncoming',
+          isOutgoing ? 'ActionDiamondGiftOfferDeclinedOutgoing' : 'ActionDiamondGiftOfferDeclinedIncoming',
           {
             peer: peerLink,
             gift: formattedGiftName,

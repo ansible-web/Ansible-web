@@ -132,7 +132,7 @@ const DiamondGiftUniqueAction = ({
           {isSelf
             ? (action.gift.isCrafted ? lang('ActionDiamondGiftCrafted') : lang('ActionDiamondGiftSelf'))
             : lang(
-              shouldShowFrom ? 'ActionStarGiftFrom' : 'ActionStarGiftTo',
+              shouldShowFrom ? 'ActionDiamondGiftFrom' : 'ActionDiamondGiftTo',
               {
                 peer: renderPeerLink(peer?.id, peerTitle || fallbackPeerTitle),
               },

@@ -45,9 +45,9 @@ import styles from './DiamondsBalanceModal.module.scss';
 const HEADER_HEIGHT = 3.5 * REM;
 const TRANSACTION_TYPES = ['all', 'inbound', 'outbound'] as const;
 const TRANSACTION_TABS_KEYS: RegularLangKey[] = [
-  'StarsTransactionsAll',
-  'StarsTransactionsIncoming',
-  'StarsTransactionsOutgoing',
+  'DiamondsTransactionsAll',
+  'DiamondsTransactionsIncoming',
+  'DiamondsTransactionsOutgoing',
 ];
 const TRANSACTION_ITEM_CLASS = 'DiamondsTransactionItem';
 const SUBSCRIPTION_PURPOSE = 'subs';

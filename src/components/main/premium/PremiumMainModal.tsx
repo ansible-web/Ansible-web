@@ -325,7 +325,7 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
     return renderText(
       fromUser
         ? oldLang('AnsiblePremiumUserDialogTitle', getUserFullName(fromUser))
-        : oldLang(isPremium ? 'TelegramPremiumSubscribedTitle' : 'AnsiblePremium'),
+        : oldLang(isPremium ? 'AnsiblePremiumSubscribedTitle' : 'AnsiblePremium'),
       ['simple_markdown', 'emoji'],
     );
   }
@@ -349,7 +349,7 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
 
     return fromUser
       ? oldLang('AnsiblePremiumUserDialogSubtitle')
-      : oldLang(isPremium ? 'TelegramPremiumSubscribedSubtitle' : 'TelegramPremiumSubtitle');
+      : oldLang(isPremium ? 'AnsiblePremiumSubscribedSubtitle' : 'AnsiblePremiumSubtitle');
   }
 
   function renderHeader() {

@@ -98,7 +98,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
         if (giftModalState && inputInvoice.userIds[0] === giftModalState.forPeerId) {
           actions.showNotification({
             message: {
-              key: 'StarsGiftCompleted',
+              key: 'DiamondsGiftCompleted',
             },
             tabId,
           });
@@ -113,7 +113,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
         if (giftModalState && inputInvoice.userId === giftModalState.forPeerId) {
           actions.showNotification({
             message: {
-              key: 'StarsGiftCompleted',
+              key: 'DiamondsGiftCompleted',
             },
             tabId,
           });
@@ -148,7 +148,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
         if (starGiftModalState && inputInvoice.peerId === starGiftModalState.forPeerId) {
           actions.showNotification({
             message: {
-              key: 'StarsGiftCompleted',
+              key: 'DiamondsGiftCompleted',
             },
             tabId,
           });
@@ -168,7 +168,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
 
           actions.showNotification({
             message: {
-              key: 'StarsGiftBought',
+              key: 'DiamondsGiftBought',
             },
             tabId,
           });

@@ -368,7 +368,7 @@ const ForwardRecipientPicker = ({
                 ? (canCopyLink ? oldLang('CopyLink') : lang('SelectChats'))
                 : (singleChatStars > 0
                   ? lang(
-                    'ForwardForStars',
+                    'ForwardForDiamonds',
                     { price: formatStarsAsIcon(lang, singleChatStars, { asFont: true }) },
                     { withNodes: true },
                   )

@@ -398,7 +398,7 @@ function getStarsPeerTitleKey(peer: ApiStarsTransactionPeer) {
     case 'ads':
       return 'StarsTransactionAds';
     case 'api':
-      return 'Stars.Intro.Transaction.TelegramBotApi.Subtitle';
+      return 'Diamonds.Intro.Transaction.AnsibleBotApi.Subtitle';
     default:
       return 'Stars.Transaction.Unsupported.Title';
   }

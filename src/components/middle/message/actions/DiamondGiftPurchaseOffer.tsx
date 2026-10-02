@@ -147,7 +147,7 @@ const DiamondGiftPurchaseOffer = ({
       <div className={styles.info}>
         <p className={styles.title}>
           {lang(
-            isOutgoing ? 'ActionStarGiftOfferOutgoing' : 'ActionStarGiftOfferIncoming',
+            isOutgoing ? 'ActionDiamondGiftOfferOutgoing' : 'ActionDiamondGiftOfferIncoming',
             {
               peer: renderPeerLink(peer?.id, peerTitle || fallbackPeerTitle),
               cost: priceText,

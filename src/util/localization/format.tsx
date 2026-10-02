@@ -83,7 +83,7 @@ export function formatStarsAsIcon(lang: LangFn, amount: number | string, options
   const icon = asFont
     ? <Icon name="diamond" className={buildClassName('in-text-icon', iconClassName)} />
     : <DiamondIcon type="gold" className={iconClassName} size="adaptive" />;
-  const key = withIconLast ? 'StarsAmountIconLast' : 'StarsAmount';
+  const key = withIconLast ? 'DiamondsAmountIconLast' : 'DiamondsAmount';
 
   if (containerClassName || withWrapper) {
     return (

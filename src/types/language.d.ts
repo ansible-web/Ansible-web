@@ -301,7 +301,7 @@ export interface LangPair {
   'ChatListEmptyChatListFilterText': undefined;
   'ChatEmptyChat': undefined;
   'ChatListEmptyChatListEditFilter': undefined;
-  'UpdateTelegram': undefined;
+  'UpdateAnsible': undefined;
   'AriaLabelOpenMenu': undefined;
   'AriaLabelBackChatList': undefined;
   'SettingsTipsUsername': undefined;
@@ -313,7 +313,7 @@ export interface LangPair {
   'SettingsEnableNightTheme': undefined;
   'AnsiblePremium': undefined;
   'New': undefined;
-  'TelegramFeatures': undefined;
+  'AnsibleFeatures': undefined;
   'ShortcutsControllerOthersLockByPasscode': undefined;
   'GroupAddMembers': undefined;
   'SendMessageTo': undefined;
@@ -567,7 +567,7 @@ export interface LangPair {
   'IncreaseLimit': undefined;
   'LimitFree': undefined;
   'LimitPremium': undefined;
-  'TelegramPremiumSubscribedTitle': undefined;
+  'AnsiblePremiumSubscribedTitle': undefined;
   'AboutPremiumDescription': undefined;
   'AboutPremiumDescription2': undefined;
   'OpenUrlTitle': undefined;
@@ -1162,8 +1162,8 @@ export interface LangPair {
   'BioLimitSubtitle': undefined;
   'CaptionsLimitSubtitle': undefined;
   'AnsiblePremiumUserDialogSubtitle': undefined;
-  'TelegramPremiumSubscribedSubtitle': undefined;
-  'TelegramPremiumSubtitle': undefined;
+  'AnsiblePremiumSubscribedSubtitle': undefined;
+  'AnsiblePremiumSubtitle': undefined;
   'EditMessageAriaLabel': undefined;
   'Emoji1': undefined;
   'Emoji2': undefined;
@@ -1516,8 +1516,8 @@ export interface LangPair {
   'GiftPremiumHeader': undefined;
   'GiftPremiumDescriptionLinkCaption': undefined;
   'GiftPremiumDescriptionLink': undefined;
-  'StarsGiftHeader': undefined;
-  'StarsGiftHeaderSelf': undefined;
+  'DiamondsGiftHeader': undefined;
+  'DiamondsGiftHeaderSelf': undefined;
   'DiamondGiftDescriptionCollectibles': undefined;
   'DiamondGiftDescriptionSelf': undefined;
   'GiftLimited': undefined;
@@ -1663,12 +1663,12 @@ export interface LangPair {
   'PrivacyDisplayGift': undefined;
   'SendDisallowError': undefined;
   'PrivacySubscribeToAnsiblePremium': undefined;
-  'PrivacyDisableLimitedEditionStarGifts': undefined;
-  'PrivacyEnableLimitedEditionStarGifts': undefined;
-  'PrivacyDisableUnlimitedStarGifts': undefined;
-  'PrivacyEnableUnlimitedStarGifts': undefined;
-  'PrivacyDisableUniqueStarGifts': undefined;
-  'PrivacyEnableUniqueStarGifts': undefined;
+  'PrivacyDisableLimitedEditionDiamondGifts': undefined;
+  'PrivacyEnableLimitedEditionDiamondGifts': undefined;
+  'PrivacyDisableUnlimitedDiamondGifts': undefined;
+  'PrivacyEnableUnlimitedDiamondGifts': undefined;
+  'PrivacyDisableUniqueDiamondGifts': undefined;
+  'PrivacyEnableUniqueDiamondGifts': undefined;
   'PrivacyDisablePremiumGifts': undefined;
   'PrivacyEnablePremiumGifts': undefined;
   'DisplayGiftsButton': undefined;
@@ -1698,9 +1698,9 @@ export interface LangPair {
   'SearchResultTopics': undefined;
   'SearchResultMyChannels': undefined;
   'SearchResultRecommendedChannels': undefined;
-  'StarsTransactionsAll': undefined;
-  'StarsTransactionsIncoming': undefined;
-  'StarsTransactionsOutgoing': undefined;
+  'DiamondsTransactionsAll': undefined;
+  'DiamondsTransactionsIncoming': undefined;
+  'DiamondsTransactionsOutgoing': undefined;
   'ProfileTabSavedDialogs': undefined;
   'ProfileTabStories': undefined;
   'ProfileTabStoriesArchive': undefined;
@@ -1824,10 +1824,10 @@ export interface LangPair {
   'ActionDiamondGiftCraftedSelf': undefined;
   'ActionDiamondGiftCrafted': undefined;
   'ActionDiamondGiftTransferredUnknown': undefined;
-  'ActionStarGiftNoConvertTextYou': undefined;
-  'ActionStarGiftDisplaying': undefined;
-  'ActionStarGiftChannelDisplaying': undefined;
-  'ActionStarGiftUpgradeTextYou': undefined;
+  'ActionDiamondGiftNoConvertTextYou': undefined;
+  'ActionDiamondGiftDisplaying': undefined;
+  'ActionDiamondGiftChannelDisplaying': undefined;
+  'ActionDiamondGiftUpgradeTextYou': undefined;
   'ActionDiamondGiftUpgraded': undefined;
   'ActionDiamondGiftUnpack': undefined;
   'ActionDiamondGiftUniqueRibbon': undefined;
@@ -1857,13 +1857,13 @@ export interface LangPair {
   'ActionTopicUnhiddenInside': undefined;
   'ActionTopicPlaceholder': undefined;
   'ActionGiveawayResultsSome': undefined;
-  'ActionGiveawayResultsStarsSome': undefined;
+  'ActionGiveawayResultsDiamondsSome': undefined;
   'ActionGiveawayResultsNone': undefined;
   'ActionOpenGiftButton': undefined;
   'ActionViewButton': undefined;
   'ActionGiveawayResultTitle': undefined;
   'ActionGiftPremiumText': undefined;
-  'ActionGiftStarsText': undefined;
+  'ActionGiftDiamondsText': undefined;
   'RichEditorTableCompact': undefined;
   'BotDraftStop': undefined;
   'CommunityOpenPanel': undefined;
@@ -1892,7 +1892,7 @@ export interface LangPair {
   'WebAppCollapse': undefined;
   'GiftPremiumPayWithDiamondsAcc': undefined;
   'GetMoreDiamondsLinkText': undefined;
-  'StarsGiftCompleted': undefined;
+  'DiamondsGiftCompleted': undefined;
   'GiftSent': undefined;
   'PrivacyDescriptionMessagesContactsAndPremium': undefined;
   'PrivacyChargeForMessages': undefined;
@@ -1935,7 +1935,7 @@ export interface LangPair {
   'NotificationMessageNotSupportedInFrozenAccount': undefined;
   'NotificationMessageTextHidden': undefined;
   'GiftRibbonSale': undefined;
-  'StarsGiftBought': undefined;
+  'DiamondsGiftBought': undefined;
   'GiftSellTitle': undefined;
   'Sell': undefined;
   'InputPlaceholderGiftResalePrice': undefined;
@@ -2691,7 +2691,7 @@ export interface LangPairWithVariables<V = LangVariable> {
     'domain': V;
     'phone': V;
   };
-  'ForwardForStars': {
+  'ForwardForDiamonds': {
     'price': V;
   };
   'BlockUserTitle': {
@@ -2974,7 +2974,7 @@ export interface LangPairWithVariables<V = LangVariable> {
   'DiamondsTransactionTOS': {
     'link': V;
   };
-  'GiftStarsOutgoing': {
+  'GiftDiamondsOutgoing': {
     'user': V;
   };
   'GiftPremiumDescription': {
@@ -3151,16 +3151,16 @@ export interface LangPairWithVariables<V = LangVariable> {
   'GiftWithdrawDescription': {
     'gift': V;
   };
-  'StarsAmount': {
+  'DiamondsAmount': {
     'amount': V;
   };
-  'StarsAmountIconLast': {
+  'DiamondsAmountIconLast': {
     'amount': V;
   };
   'SendPaidReaction': {
     'amount': V;
   };
-  'StarsPay': {
+  'DiamondsPay': {
     'amount': V;
   };
   'DiamondsReactionTerms': {
@@ -3193,7 +3193,7 @@ export interface LangPairWithVariables<V = LangVariable> {
     'icon': V;
     'gift': V;
   };
-  'StarsSubscribeBotButtonMonth': {
+  'DiamondsSubscribeBotButtonMonth': {
     'amount': V;
   };
   'SearchContextCaption': {
@@ -3410,11 +3410,11 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionDiamondGiftUpgradedUser': {
     'user': V;
   };
-  'ActionStarGiftUpgradedChannel': {
+  'ActionDiamondGiftUpgradedChannel': {
     'user': V;
     'channel': V;
   };
-  'ActionStarGiftUpgradedChannelYou': {
+  'ActionDiamondGiftUpgradedChannelYou': {
     'channel': V;
   };
   'ActionDiamondGiftUpgradedMine': {
@@ -3423,11 +3423,11 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionDiamondGiftTransferred': {
     'user': V;
   };
-  'ActionStarGiftTransferredChannel': {
+  'ActionDiamondGiftTransferredChannel': {
     'user': V;
     'channel': V;
   };
-  'ActionStarGiftTransferredChannelYou': {
+  'ActionDiamondGiftTransferredChannelYou': {
     'channel': V;
   };
   'ActionDiamondGiftTransferredMine': {
@@ -3436,12 +3436,12 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionDiamondGiftTransferredUnknownChannel': {
     'channel': V;
   };
-  'ActionStarGiftSoldFromOffer': {
+  'ActionDiamondGiftSoldFromOffer': {
     'gift': V;
     'user': V;
     'cost': V;
   };
-  'ActionStarGiftBoughtFromOffer': {
+  'ActionDiamondGiftBoughtFromOffer': {
     'user': V;
     'gift': V;
     'cost': V;
@@ -3449,53 +3449,53 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionDiamondGiftReceivedAnonymous': {
     'cost': V;
   };
-  'ActionStarGiftSentChannel': {
+  'ActionDiamondGiftSentChannel': {
     'user': V;
     'channel': V;
     'cost': V;
   };
-  'ActionStarGiftSentChannelYou': {
+  'ActionDiamondGiftSentChannelYou': {
     'channel': V;
     'cost': V;
   };
-  'ActionStarGiftPrepaidUpgradeYou': {
+  'ActionDiamondGiftPrepaidUpgradeYou': {
     'cost': V;
     'peer': V;
   };
-  'ActionStarGiftPrepaidUpgrade': {
+  'ActionDiamondGiftPrepaidUpgrade': {
     'peer': V;
     'cost': V;
   };
   'ActionDiamondGiftSelfBought': {
     'cost': V;
   };
-  'ActionStarGiftTo': {
+  'ActionDiamondGiftTo': {
     'peer': V;
   };
-  'ActionStarGiftFrom': {
+  'ActionDiamondGiftFrom': {
     'peer': V;
   };
-  'ActionStarGiftConvertText': {
-    'peer': V;
-    'amount': V;
-  };
-  'ActionStarGiftConvertTextYou': {
-    'amount': V;
-  };
-  'ActionStarGiftNoConvertText': {
-    'peer': V;
-  };
-  'ActionStarGiftConvertedText': {
+  'ActionDiamondGiftConvertText': {
     'peer': V;
     'amount': V;
   };
-  'ActionStarGiftConvertedTextYou': {
+  'ActionDiamondGiftConvertTextYou': {
     'amount': V;
   };
-  'ActionStarGiftChannelText': {
+  'ActionDiamondGiftNoConvertText': {
+    'peer': V;
+  };
+  'ActionDiamondGiftConvertedText': {
+    'peer': V;
     'amount': V;
   };
-  'ActionStarGiftUpgradeText': {
+  'ActionDiamondGiftConvertedTextYou': {
+    'amount': V;
+  };
+  'ActionDiamondGiftChannelText': {
+    'amount': V;
+  };
+  'ActionDiamondGiftUpgradeText': {
     'peer': V;
   };
   'ActionDiamondGiftLimitedRibbon': {
@@ -3504,18 +3504,18 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionDiamondGiftAuctionWon': {
     'cost': V;
   };
-  'ActionStarGiftAuctionFor': {
+  'ActionDiamondGiftAuctionFor': {
     'peer': V;
   };
   'ActionDiamondGiftAuctionBought': {
     'cost': V;
   };
-  'ActionStarGiftOfferOutgoing': {
+  'ActionDiamondGiftOfferOutgoing': {
     'peer': V;
     'cost': V;
     'gift': V;
   };
-  'ActionStarGiftOfferIncoming': {
+  'ActionDiamondGiftOfferIncoming': {
     'peer': V;
     'cost': V;
     'gift': V;
@@ -3523,12 +3523,12 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionDiamondGiftOfferExpires': {
     'time': V;
   };
-  'ActionStarGiftOfferDeclinedOutgoing': {
+  'ActionDiamondGiftOfferDeclinedOutgoing': {
     'peer': V;
     'gift': V;
     'cost': V;
   };
-  'ActionStarGiftOfferDeclinedIncoming': {
+  'ActionDiamondGiftOfferDeclinedIncoming': {
     'peer': V;
     'gift': V;
     'cost': V;
@@ -3609,11 +3609,11 @@ export interface LangPairWithVariables<V = LangVariable> {
   'ActionGiveawayStarted': {
     'from': V;
   };
-  'ActionGiveawayStarsStartedGroup': {
+  'ActionGiveawayDiamondsStartedGroup': {
     'from': V;
     'amount': V;
   };
-  'ActionGiveawayStarsStarted': {
+  'ActionGiveawayDiamondsStarted': {
     'from': V;
     'amount': V;
   };
@@ -3676,7 +3676,7 @@ export interface LangPairWithVariables<V = LangVariable> {
     'stars': V;
     'link': V;
   };
-  'SectionDescriptionStarsForForMessages': {
+  'SectionDescriptionDiamondsForForMessages': {
     'percent': V;
     'amount': V;
   };
@@ -3774,11 +3774,11 @@ export interface LangPairWithVariables<V = LangVariable> {
   'DescriptionComposerGiftMinimumPrice': {
     'stars': V;
   };
-  'ApiMessageMessageActionResaleStarGiftUniqueOutgoing': {
+  'ApiMessageMessageActionResaleDiamondGiftUniqueOutgoing': {
     'stars': V;
     'gift': V;
   };
-  'ApiMessageMessageActionResaleStarGiftUniqueIncoming': {
+  'ApiMessageMessageActionResaleDiamondGiftUniqueIncoming': {
     'stars': V;
     'gift': V;
   };
@@ -4243,7 +4243,7 @@ export interface LangPairWithVariables<V = LangVariable> {
   'TonAmount': {
     'amount': V;
   };
-  'StarsBuyNotEnough': {
+  'DiamondsBuyNotEnough': {
     'count': V;
   };
 }
@@ -4586,7 +4586,7 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'ActionGiveawayResults': {
     'count': V;
   };
-  'ActionGiveawayResultsStars': {
+  'ActionGiveawayResultsDiamonds': {
     'count': V;
   };
   'ActionGiveawayResultPremiumText': {
@@ -4597,7 +4597,7 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
     'channel': V;
     'months': V;
   };
-  'ActionGiveawayResultStarsText': {
+  'ActionGiveawayResultDiamondsText': {
     'channel': V;
     'amount': V;
   };

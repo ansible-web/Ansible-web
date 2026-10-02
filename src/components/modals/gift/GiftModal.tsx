@@ -293,7 +293,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
   function renderStarGiftsHeader() {
     return (
       <h2 ref={giftHeaderRef} className={buildClassName(styles.headerText, styles.center)}>
-        {lang(isSelf ? 'StarsGiftHeaderSelf' : 'StarsGiftHeader')}
+        {lang(isSelf ? 'DiamondsGiftHeaderSelf' : 'DiamondsGiftHeader')}
       </h2>
     );
   }
@@ -573,7 +573,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     }
     return (
       <h2 className={styles.commonHeaderText}>
-        {lang(isHeaderForStarGifts ? (isSelf ? 'StarsGiftHeaderSelf' : 'StarsGiftHeader') : 'GiftPremiumHeader')}
+        {lang(isHeaderForStarGifts ? (isSelf ? 'DiamondsGiftHeaderSelf' : 'DiamondsGiftHeader') : 'GiftPremiumHeader')}
       </h2>
     );
   }

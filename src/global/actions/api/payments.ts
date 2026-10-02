@@ -1219,7 +1219,7 @@ async function payInputStarInvoice<T extends GlobalState>(
     if (!isTon) {
       actions.showNotification({
         message: {
-          key: 'StarsBuyNotEnough',
+          key: 'DiamondsBuyNotEnough',
           variables: { count: price - balance.amount },
         },
         tabId,

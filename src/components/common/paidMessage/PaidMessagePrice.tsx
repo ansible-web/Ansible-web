@@ -81,7 +81,7 @@ function PaidMessagePrice({
       )}
       {canChangeChargeForMessages && (
         <p className="settings-item-description-larger" dir={lang.isRtl ? 'rtl' : undefined}>
-          {lang(isGroupChat ? 'SetPriceGroupDescription' : 'SectionDescriptionStarsForForMessages', {
+          {lang(isGroupChat ? 'SetPriceGroupDescription' : 'SectionDescriptionDiamondsForForMessages', {
             percent: formatPercent(starsPaidMessageCommissionPermille * 100),
             amount: formatCurrencyAsString(
               chargeForMessages * starsUsdWithdrawRate * starsPaidMessageCommissionPermille,

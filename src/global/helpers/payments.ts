@@ -385,8 +385,8 @@ export function buildStarsTransactionCustomPeer(
     return {
       avatarIcon: 'bots',
       isCustomPeer: true,
-      titleKey: 'Stars.Intro.Transaction.TelegramBotApi.Title',
-      subtitleKey: 'Stars.Intro.Transaction.TelegramBotApi.Subtitle',
+      titleKey: 'Diamonds.Intro.Transaction.AnsibleBotApi.Title',
+      subtitleKey: 'Diamonds.Intro.Transaction.AnsibleBotApi.Subtitle',
       peerColorId: 4,
     };
   }

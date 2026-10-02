@@ -199,7 +199,7 @@ const DiamondsPaymentModal = ({
         {renderText(descriptionText, ['simple_markdown', 'emoji'])}
       </div>
       <Button className={styles.paymentButton} inline onClick={handlePayment} isLoading={isLoading}>
-        {lang(isBotSubscription ? 'StarsSubscribeBotButtonMonth' : 'StarsPay', {
+        {lang(isBotSubscription ? 'DiamondsSubscribeBotButtonMonth' : 'DiamondsPay', {
           amount: formatStarsAsIcon(lang, amount!, { asFont: true }),
         }, {
           withNodes: true,
