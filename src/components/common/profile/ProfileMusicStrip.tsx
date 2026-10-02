@@ -1,19 +1,15 @@
-import { memo, useState } from '../../../lib/teact/teact';
-import { getActions, getGlobal } from '../../../global';
+import type React from '../../../lib/teact/teact';
+import { memo, useEffect, useState } from '../../../lib/teact/teact';
 
 import type { ApiAudio } from '../../../api/types';
 
 import { getMediaFormat, getMediaHash } from '../../../global/helpers';
-import {
-  getPlaybackCapabilities, selectPlaybackItem, selectPlaybackSource,
-} from '../../../global/selectors/audioPlayer';
-import { ensureAudioContext } from '../../../util/audioPlayback/audioAnalyser';
-import { makeSavedMusicTrackKey } from '../../../util/audioPlayback/mediaPool';
-import * as playbackController from '../../../util/audioPlayback/playbackController';
+import { makeSavedMusicTrackId } from '../../../util/audioPlayer';
 import buildClassName from '../../../util/buildClassName';
 import renderText from '../helpers/renderText';
 
-import useAudioPlayback from '../../../hooks/useAudioPlayback';
+import useAudioPlayer from '../../../hooks/useAudioPlayer';
+import useBuffering from '../../../hooks/useBuffering';
 import useLastCallback from '../../../hooks/useLastCallback';
 import useMedia from '../../../hooks/useMedia';
 
@@ -23,61 +19,56 @@ import styles from './ProfileMusicStrip.module.scss';
 
 type OwnProps = {
   audio: ApiAudio;
-  peerId: string;
   className?: string;
   style?: string;
 };
 
-const SAVED_MUSIC_CAPABILITIES = getPlaybackCapabilities('savedMusic');
+// Полоса музыки профиля: трек из userFull.saved_music строкой под именем.
+//
+// Апстрим открывает по нажатию отдельную модалку плейлиста, которая стоит на его
+// новой подсистеме проигрывания (`util/audioPlayback/*`, `useAudioPlayback`,
+// селекторы плеера). У нас этой подсистемы нет — плеер прежний, поэтому полоса
+// играет трек нашим `useAudioPlayer` с источником `savedMusic`, тем же, что и
+// вкладка «Плейлист» (`common/ProfileMusic.tsx`). Весь список по-прежнему живёт на
+// вкладке, а полоса даёт то, за чем она и нужна: видно, какой трек в профиле, и
+// его можно послушать одним нажатием.
+const ProfileMusicStrip = ({ audio, className, style }: OwnProps) => {
+  const [isActivated, setIsActivated] = useState(false);
 
-const ProfileMusicStrip = ({
-  audio, peerId, className, style,
-}: OwnProps) => {
-  const { openAudioPlayer, openAudioPlaylistModal } = getActions();
-
-  const [activatedAudioId, setActivatedAudioId] = useState<string>();
-  const isActivated = activatedAudioId === audio.id;
-
-  const trackKey = makeSavedMusicTrackKey(peerId, audio.id);
   const mediaData = useMedia(getMediaHash(audio, 'inline'), !isActivated, getMediaFormat(audio, 'inline'));
+  const { bufferingHandlers, checkBuffering } = useBuffering();
+
+  const handleForcePlay = useLastCallback(() => {
+    setIsActivated(true);
+  });
 
   const handleTrackChange = useLastCallback(() => {
-    setActivatedAudioId(undefined);
+    setIsActivated(false);
   });
 
-  const { playPause } = useAudioPlayback({
-    trackKey,
-    mediaType: 'audio',
-    capabilities: SAVED_MUSIC_CAPABILITIES,
-    src: mediaData,
-    originalDuration: audio.duration,
-    shouldPlay: isActivated,
-    noProgressUpdates: true,
-    onTrackChange: handleTrackChange,
-  });
+  const { isPlaying, playPause } = useAudioPlayer(
+    makeSavedMusicTrackId(audio),
+    audio.duration,
+    'savedMusic',
+    mediaData,
+    bufferingHandlers,
+    undefined,
+    checkBuffering,
+    isActivated,
+    handleForcePlay,
+    handleTrackChange,
+    // Убрать трек из плейлиста при размонтировании: в плейлисте остаётся только
+    // то, что показано сейчас (так же, как во вкладке «Плейлист»).
+    true,
+  );
+
+  useEffect(() => {
+    setIsActivated(isPlaying);
+  }, [isPlaying]);
 
   const handleClick = useLastCallback(() => {
-    const global = getGlobal();
-    const source = selectPlaybackSource(global);
-    // Closing the player keeps the source, so an active playlist is only the one that still has a track
-    const isPeerPlaylistActive = source?.type === 'savedMusic' && source.peerId === peerId
-      && selectPlaybackItem(global)?.type === 'savedMusic';
-
-    if (!isPeerPlaylistActive) {
-      ensureAudioContext();
-      playbackController.prepareTrackSwitch(trackKey);
-      openAudioPlayer({
-        item: { type: 'savedMusic', peerId, audioId: audio.id },
-        source: { type: 'savedMusic', peerId },
-      });
-      if (isActivated) {
-        playPause();
-      } else {
-        setActivatedAudioId(audio.id);
-      }
-    }
-
-    openAudioPlaylistModal();
+    setIsActivated(!isActivated);
+    playPause();
   });
 
   const handleKeyDown = useLastCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -98,13 +89,13 @@ const ProfileMusicStrip = ({
         onClick={handleClick}
         onKeyDown={handleKeyDown}
       >
-        <Icon name="music-note" className={styles.icon} />
-        {audio.performer && (
+        <Icon name="profile-music" className={styles.icon} />
+        {Boolean(audio.performer) && (
           <span className={styles.performer}>{renderText(audio.performer)}</span>
         )}
-        {audio.performer && <span className={styles.separator}>-</span>}
+        {Boolean(audio.performer) && <span className={styles.separator}>-</span>}
         <span className={styles.title}>{title}</span>
-        <Icon name="next" className={styles.icon} />
+        <Icon name={isPlaying ? 'pause' : 'play'} className={styles.icon} />
       </div>
     </div>
   );

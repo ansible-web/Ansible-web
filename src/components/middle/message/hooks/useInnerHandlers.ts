@@ -188,11 +188,7 @@ export default function useInnerHandlers({
   });
 
   const handleAudioPlay = useLastCallback((): void => {
-    openAudioPlayer({
-      item: {
-        type: 'message', chatId, threadId, messageId,
-      },
-    });
+    openAudioPlayer({ chatId, threadId, messageId });
   });
 
   const handleAlbumMediaClick = useLastCallback((albumMessageId: number, albumIndex?: number): void => {

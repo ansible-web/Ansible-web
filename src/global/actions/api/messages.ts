@@ -219,23 +219,6 @@ const ttlCleanupTimersByChatId = new Map<string, { timer: number; expiresAt: num
 
 const runDebouncedForMarkRead = debounce((cb) => cb(), 500, false);
 
-addActionHandler('saveVoiceWaveform', (global, actions, payload): ActionReturnType => {
-  const { chatId, messageId, waveform } = payload;
-
-  const message = selectChatMessage(global, chatId, messageId);
-  const voice = message?.content.voice;
-  if (!voice || voice.waveform?.length) {
-    return undefined;
-  }
-
-  return updateChatMessage(global, chatId, messageId, {
-    content: {
-      ...message.content,
-      voice: { ...voice, waveform },
-    },
-  });
-});
-
 addActionHandler('loadViewportMessages', (global, actions, payload): ActionReturnType => {
   const {
     direction = LoadMoreDirection.Around,

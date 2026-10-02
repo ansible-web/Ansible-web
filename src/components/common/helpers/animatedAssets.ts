@@ -16,7 +16,6 @@ import Flame from '../../../assets/ass/general/Flame.ass';
 import Fragment from '../../../assets/ass/general/Fragment.ass';
 import Mention from '../../../assets/ass/general/Mention.ass';
 import PartyPopper from '../../../assets/ass/general/PartyPopper.ass';
-import PlayPause from '../../../assets/ass/general/PlayPause.ass';
 import Invite from '../../../assets/ass/invites/Invite.ass';
 import JoinRequest from '../../../assets/ass/invites/Requests.ass';
 import LastSeen from '../../../assets/ass/LastSeen.ass';
@@ -48,15 +47,11 @@ import BrokenGiftPreview from '../../../assets/broken-gift.svg';
 import UtyanDisappear from '../../../assets/tgs/settings/UtyanDisappear.ass';
 import DuckNothingFoundPreview from '../../../assets/tgs-previews/DuckNothingFound.svg';
 import WritingPreview from '../../../assets/tgs-previews/message/Writing.svg';
-import PausePreview from '../../../assets/tgs-previews/Pause.svg';
-import PlayPreview from '../../../assets/tgs-previews/Play.svg';
 import SearchPreview from '../../../assets/tgs-previews/Search.svg';
 import HandStopPreview from '../../../assets/tgs-previews/settings/HandStopPreview.png';
 import PasskeysPreview from '../../../assets/tgs-previews/settings/Passkeys.svg';
 
 export const LOCAL_TGS_PREVIEW_URLS = {
-  PlayPause: PlayPreview,
-  PlayPausePaused: PausePreview,
   HandStop: HandStopPreview,
   BrokenGift: BrokenGiftPreview,
   DuckNothingFound: DuckNothingFoundPreview,
@@ -66,7 +61,6 @@ export const LOCAL_TGS_PREVIEW_URLS = {
 };
 
 export const LOCAL_TGS_URLS = {
-  PlayPause,
   MonkeyIdle,
   MonkeyTracking,
   MonkeyClose,

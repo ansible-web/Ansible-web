@@ -9,7 +9,6 @@ import type {
   ApiMessage,
   ApiMessageSearchType,
   ApiPhoto,
-  ApiRichMessage,
   ApiSticker,
   ApiVideo,
   ApiVoice,
@@ -29,9 +28,7 @@ import {
   IS_SAFARI,
   MAX_BUFFER_SIZE,
 } from '../../util/browser/windowEnvironment';
-import { buildCollectionByKey } from '../../util/iteratees';
 import { getDocumentHasPreview } from '../../components/common/helpers/documentInfo';
-import { getPageBlocksAudios } from './buildPageAudioById';
 import { getAttachmentMediaType, matchLinkInMessageText } from './messages';
 
 export type MediaWithThumbs = ApiPhoto | ApiVideo | ApiDocument | ApiSticker | ApiMediaExtendedPreview;
@@ -166,19 +163,6 @@ export function getWebPageVideo(webPage?: ApiWebPage) {
 
 export function getWebPageAudio(webPage?: ApiWebPage) {
   return webPage?.webpageType === 'full' ? webPage.audio : undefined;
-}
-
-const AUDIOS_BY_RICH_MESSAGE = new WeakMap<ApiRichMessage, { byId: Record<string, ApiAudio>; ids: string[] }>();
-
-export function getRichMessageAudios(richMessage: ApiRichMessage) {
-  let memoized = AUDIOS_BY_RICH_MESSAGE.get(richMessage);
-  if (!memoized) {
-    const byId = buildCollectionByKey(getPageBlocksAudios(richMessage.blocks), 'id');
-    memoized = { byId, ids: Object.keys(byId) };
-    AUDIOS_BY_RICH_MESSAGE.set(richMessage, memoized);
-  }
-
-  return memoized;
 }
 
 export function getWebPageDocument(webPage?: ApiWebPage) {

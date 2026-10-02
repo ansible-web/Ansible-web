@@ -10,7 +10,6 @@ import type {
 } from '../../../types';
 import type {
   ApiAttachment,
-  ApiAudio,
   ApiChat,
   ApiComposedMessageWithAI,
   ApiFormattedText,
@@ -130,9 +129,7 @@ import { sendApiUpdate } from '../updates/apiUpdateEmitter';
 import { processMessageAndUpdateThreadInfo } from '../updates/entityProcessor';
 import { processAffectedHistory, updateChannelState } from '../updates/updateManager';
 import { requestChatUpdate } from './chats';
-import {
-  handleGramJsUpdate, invokeRequest, invokeRequestBeacon, uploadFile,
-} from './client';
+import { handleGramJsUpdate, invokeRequest, uploadFile } from './client';
 
 const FAST_SEND_TIMEOUT = 1000;
 const INPUT_WAVEFORM_LENGTH = 63;
@@ -3277,23 +3274,4 @@ export async function saveAiTone({
     tone: buildInputAiComposeTone(tone),
     unsave: Boolean(unsave),
   }));
-}
-
-export function reportMusicListen({ audio, listenedDuration, isPageUnload }: {
-  audio: ApiAudio; listenedDuration: number; isPageUnload?: boolean;
-}) {
-  const id = buildInputDocument(audio);
-  if (!id) return undefined;
-
-  const request = new GramJs.messages.ReportMusicListen({ id, listenedDuration });
-
-  if (isPageUnload) {
-    invokeRequestBeacon(request);
-    return undefined;
-  }
-
-  return invokeRequest(request, {
-    shouldReturnTrue: true,
-    shouldIgnoreErrors: true,
-  });
 }

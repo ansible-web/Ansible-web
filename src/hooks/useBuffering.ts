@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from '../lib/teact/teact';
+import { useMemo, useState } from '../lib/teact/teact';
 
 import { areDeepEqual } from '../util/areDeepEqual';
 import { isSafariPatchInProgress } from '../util/patchSafariProgressiveAudio';
@@ -11,21 +11,13 @@ const MIN_READY_STATE = 3;
 // Avoid flickering when re-mounting previously buffered video
 const DEBOUNCE = 200;
 const MIN_ALLOWED_MEDIA_DURATION = 0.1; // Some video emojis have weird duration of 0.04 causing extreme amount of events
-const BUFFERING_EVENTS = [
-  'play', 'loadeddata', 'playing', 'loadstart', 'pause', 'timeupdate', 'progress',
-] as const;
 
 /**
  * Time range relative to the duration [0, 1]
  */
 export type BufferedRange = { start: number; end: number };
 
-const useBuffering = (
-  noInitiallyBuffered = false,
-  onTimeUpdate?: AnyToVoidFunction,
-  onBroken?: AnyToVoidFunction,
-  mediaElement?: HTMLMediaElement,
-) => {
+const useBuffering = (noInitiallyBuffered = false, onTimeUpdate?: AnyToVoidFunction, onBroken?: AnyToVoidFunction) => {
   const [isBuffered, setIsBuffered] = useState(!noInitiallyBuffered);
   const [isReady, setIsReady] = useState(false);
   const [bufferedProgress, setBufferedProgress] = useState(0);
@@ -61,17 +53,6 @@ const useBuffering = (
       setIsReady((current) => current || media.readyState > MIN_READY_STATE);
     }
   });
-
-  useEffect(() => {
-    if (!mediaElement) return undefined;
-
-    const listener = handleBuffering as EventListener;
-    BUFFERING_EVENTS.forEach((event) => mediaElement.addEventListener(event, listener));
-
-    return () => {
-      BUFFERING_EVENTS.forEach((event) => mediaElement.removeEventListener(event, listener));
-    };
-  }, [mediaElement, handleBuffering]);
 
   const bufferingHandlers = {
     onPLay: handleBuffering,

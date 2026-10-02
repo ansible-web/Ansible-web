@@ -68,8 +68,6 @@ import type {
   ChatListType,
   ChatTranslatedMessages,
   EmojiKeywords,
-  OrderMode,
-  RepeatMode,
   ServiceNotification,
   SimilarBotsInfo,
   StarGiftCategory,
@@ -122,8 +120,6 @@ export type GlobalState = {
     volume: number;
     lastPlaybackRate: number;
     isLastPlaybackRateActive?: boolean;
-    repeatMode: RepeatMode;
-    orderMode: OrderMode;
   };
 
   mediaViewer: {

@@ -2,7 +2,6 @@ import type { TeactNode } from '../lib/teact/teact';
 
 import type {
   ApiAttachment,
-  ApiAudio,
   ApiBotInlineMediaResult,
   ApiBotInlineResult,
   ApiBotInlineSwitchPm,
@@ -44,7 +43,6 @@ import type {
   ApiTopic,
   ApiTypingStatus,
   ApiVideo,
-  ApiVoice,
   MediaContent,
   StarGiftAttributeIdModel,
 } from '../api/types';
@@ -390,46 +388,6 @@ export enum AudioOrigin {
   Search,
   OneTimeModal,
 }
-
-export type AudioVariant = 'inline' | 'sharedMedia' | 'search' | 'attachment' | 'oneTimeModal';
-
-export type PlaybackMediaType = 'audio' | 'voice';
-
-export type PlaybackSource =
-  | { type: 'chat'; chatId: string; threadId: ThreadId; mediaType: PlaybackMediaType }
-  | { type: 'globalSearch'; mediaType: PlaybackMediaType }
-  | { type: 'savedMusic'; peerId: string }
-  | { type: 'richMessage'; chatId: string; threadId: ThreadId; messageId: number }
-  | { type: 'single' };
-
-export type PlaybackContextType = 'message' | 'savedMusic' | 'instantView';
-
-export type PlaybackMedia = ApiAudio | ApiVoice | ApiVideo;
-
-export type PlaybackItemRef =
-  // `documentId` targets an audio block inside a rich message
-  | { type: 'message'; chatId: string; threadId: ThreadId; messageId: number; documentId?: string }
-  | { type: 'savedMusic'; peerId: string; audioId: string }
-  | { type: 'instantView'; webPageId: string; documentId: string };
-
-export type PlaybackCapabilities = {
-  canSeek: boolean;
-  mediaSession: 'own' | 'keep' | 'clear';
-  withAutoAdvance: boolean;
-};
-
-export type RepeatMode = 'none' | 'one' | 'all';
-export type OrderMode = 'default' | 'reverse' | 'shuffle';
-
-export type PlaylistKey = number | string;
-
-export type ShuffleState = {
-  playlist: PlaylistKey[];
-  nonPlayedKeys: PlaylistKey[];
-  playedKeys: PlaylistKey[];
-  indexInPlayed: number;
-  areAllLoaded: boolean;
-};
 
 export enum ChatCreationProgress {
   Idle,

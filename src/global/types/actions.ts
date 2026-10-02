@@ -81,6 +81,7 @@ import type { P2pMessage } from '../../lib/vibecalls';
 import type {
   AccountSettings,
   AttachmentCompression,
+  AudioOrigin,
   CallSound,
   ChatListType,
   ConfettiParams,
@@ -100,14 +101,10 @@ import type {
   MessageListType,
   MiddleSearchParams,
   NewChatMembersProgress,
-  OrderMode,
   PaymentStep,
   PerformanceType,
-  PlaybackItemRef,
-  PlaybackSource,
   Point,
   ProfileTabType,
-  RepeatMode,
   ResaleGiftsFilterOptions,
   ScrollTargetPosition,
   SendMessageParams,
@@ -368,7 +365,6 @@ export interface ActionPayloads {
     direction?: LoadMoreDirection;
     chatId?: string;
     threadId?: ThreadId;
-    mediaType?: SharedMediaType;
     limit?: number;
   } & WithTabId;
   searchMessagesByDate: {
@@ -1938,8 +1934,10 @@ export interface ActionPayloads {
     timestamp: number;
   } & WithTabId;
   openAudioPlayer: {
-    item?: PlaybackItemRef;
-    source?: PlaybackSource;
+    chatId: string;
+    threadId?: ThreadId;
+    messageId: number;
+    origin?: AudioOrigin;
     volume?: number;
     playbackRate?: number;
     isMuted?: boolean;
@@ -1956,36 +1954,11 @@ export interface ActionPayloads {
   setAudioPlayerMuted: {
     isMuted: boolean;
   } & WithTabId;
-  setAudioPlaybackSource: {
-    source: PlaybackSource;
-  } & WithTabId;
-  playNextTrack: {
-    isAuto?: boolean;
-  } & WithTabId;
-  playPreviousTrack: WithTabId | undefined;
-  setAudioPlayerRepeatMode: {
-    repeatMode: RepeatMode;
-  } & WithTabId;
-  setAudioPlayerOrderMode: {
-    orderMode: OrderMode;
-  } & WithTabId;
-  openAudioPlaylistModal: WithTabId | undefined;
-  closeAudioPlaylistModal: WithTabId | undefined;
-  loadShufflePlaylist: WithTabId | undefined;
-  settlePendingPlaylistStep: {
-    shouldContinue?: boolean;
+  setAudioPlayerOrigin: {
+    origin: AudioOrigin;
   } & WithTabId;
   loadSavedMusicIds: undefined;
   toggleMusicInProfile: { audio: ApiAudio } & WithTabId;
-  saveVoiceWaveform: {
-    chatId: string;
-    messageId: number;
-    waveform: number[];
-  };
-  reportMusicListen: { audio: ApiAudio; listenedDuration: number; isPageUnload?: boolean };
-  reorderSavedMusic: { audioId: string; afterAudioId?: string } & WithTabId;
-
-  // Downloads
 
   // Downloads
   downloadSelectedMessages: WithTabId | undefined;
@@ -2054,7 +2027,7 @@ export interface ActionPayloads {
   };
   loadSavedMusic: {
     userId: string;
-  } & WithTabId;
+  };
   reportSpam: { chatId: string } & WithTabId;
   loadFullUser: { userId: string; withPhotos?: boolean };
   openAddContactDialog: { userId?: string } & WithTabId;
@@ -2144,7 +2117,6 @@ export interface ActionPayloads {
     storyId?: number;
     groupedId?: string;
     withMyScore?: boolean;
-    audioItem?: PlaybackItemRef;
   } & WithTabId;
   openForwardMenuForSelectedMessages: WithTabId | undefined;
   setForwardChatOrTopic: {

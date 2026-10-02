@@ -119,8 +119,6 @@ export interface ApiUserSavedMusic {
   ids: string[];
   count: number;
   isFullyLoaded: boolean;
-  isLoading?: boolean;
-  isLoaded?: boolean;
 }
 
 export interface ApiSavedGifts {

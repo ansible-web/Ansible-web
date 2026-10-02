@@ -69,6 +69,7 @@ import type { ReducerAction } from '../../hooks/useReducer';
 import type {
   ActiveDownloads,
   ActiveEmojiInteraction,
+  AudioOrigin,
   ChatCreationProgress,
   ChatMediaSearchParams,
   ChatRequestedTranslations,
@@ -89,8 +90,6 @@ import type {
   MiddleSearchParams,
   NewChatMembersProgress,
   PaymentStep,
-  PlaybackItemRef,
-  PlaybackSource,
   ProfileEditProgress,
   ProfileTabType,
   ResaleGiftsFilterOptions,
@@ -98,7 +97,6 @@ import type {
   SettingsScreens,
   SharedMediaType,
   ShippingOption,
-  ShuffleState,
   StarGiftInfo,
   StoryViewerOrigin,
   TabThread,
@@ -413,20 +411,15 @@ export type TabState = {
   };
 
   audioPlayer: {
-    activeItem?: PlaybackItemRef;
-    source?: PlaybackSource;
+    chatId?: string;
+    messageId?: number;
+    threadId?: ThreadId;
+    origin?: AudioOrigin;
     playbackRate: number;
     isPlaybackRateActive?: boolean;
     timestamp?: number;
     isMuted: boolean;
-    shuffle?: ShuffleState;
-    pendingStep?: {
-      direction: 'next' | 'prev';
-      isAuto?: boolean;
-    };
   };
-
-  isAudioPlaylistModalOpen?: boolean;
 
   webPagePreviewId?: string;
 
