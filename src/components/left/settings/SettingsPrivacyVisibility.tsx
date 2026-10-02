@@ -1,4 +1,3 @@
-import type { FC } from '../../../lib/teact/teact';
 import { memo, useCallback, useMemo } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
@@ -41,7 +40,7 @@ type StateProps = {
   isCurrentUserPremium?: boolean;
 };
 
-const SettingsPrivacyVisibility: FC<OwnProps & StateProps> = ({
+const SettingsPrivacyVisibility = ({
   screen,
   isActive,
   primaryPrivacy,
@@ -53,7 +52,7 @@ const SettingsPrivacyVisibility: FC<OwnProps & StateProps> = ({
   onReset,
   shouldDisplayGiftsButton,
   isCurrentUserPremium,
-}) => {
+}: OwnProps & StateProps) => {
   const { updateGlobalPrivacySettings, showNotification } = getActions();
 
   const lang = useLang();

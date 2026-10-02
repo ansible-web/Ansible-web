@@ -447,7 +447,7 @@ const Main = ({
 
     const parsedInitialLocationHash = parseInitialLocationHash();
     if (parsedInitialLocationHash?.tgaddr) {
-      processDeepLink(decodeURIComponent(parsedInitialLocationHash.tgaddr), { type: 'inner' });
+      processDeepLink(parsedInitialLocationHash.tgaddr, { type: 'inner' });
     }
   }, [isSynced]);
 

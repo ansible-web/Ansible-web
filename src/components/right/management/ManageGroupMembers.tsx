@@ -135,7 +135,7 @@ const ManageGroupMembers: FC<OwnProps & StateProps> = ({
           return true;
         }
 
-        return (isChannel || user.canBeInvitedToGroup || !isUserBot(user))
+        return (isChannel || user.canBotBeInvitedToGroup || !isUserBot(user))
           && (!noAdmins || !adminIds.includes(contactId));
       }),
       true,
@@ -281,7 +281,6 @@ export default memo(withGlobal<OwnProps>(
 
     const canAddMembers = chat && ((getHasAdminRight(chat, 'inviteUsers')
       || (!isChannel && !isUserRightBanned(chat, 'inviteUsers')))
-    || chat.isCreator
     );
 
     return {

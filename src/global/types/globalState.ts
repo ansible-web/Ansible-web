@@ -68,6 +68,8 @@ import type {
   ChatListType,
   ChatTranslatedMessages,
   EmojiKeywords,
+  OrderMode,
+  RepeatMode,
   ServiceNotification,
   SimilarBotsInfo,
   StarGiftCategory,
@@ -120,6 +122,8 @@ export type GlobalState = {
     volume: number;
     lastPlaybackRate: number;
     isLastPlaybackRateActive?: boolean;
+    repeatMode: RepeatMode;
+    orderMode: OrderMode;
   };
 
   mediaViewer: {
@@ -152,10 +156,12 @@ export type GlobalState = {
   passcode: {
     isScreenLocked?: boolean;
     hasPasscode?: boolean;
-    error?: string;
+    hasPasskey?: boolean;
+    autolockDuration?: number;
+    isDataCorrupted?: boolean;
+    errorKey?: RegularLangFnParameters;
     timeoutUntil?: number;
     invalidAttemptsCount?: number;
-    invalidAttemptError?: string;
     isLoading?: boolean;
   };
 
@@ -262,6 +268,7 @@ export type GlobalState = {
     byChatId: Record<string, {
       byId: Record<number, ApiMessage>;
       ephemeralById: Record<number, ApiMessage>;
+      anchoredById: Record<number, ApiMessage>;
       summaryById: Record<number, TextSummary>;
       threadsById: Record<ThreadId, Thread>;
     }>;

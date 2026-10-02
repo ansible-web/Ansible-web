@@ -443,6 +443,14 @@
   }
 }
 
+.minimized.withBackground {
+  grid-template-rows: auto 1fr;
+}
+
+.plain.minimized.withBackground {
+  padding-top: 4.25rem;
+}
+
 .title {
   @include mixins.with-vt-type('profileAvatar');
 
@@ -530,7 +538,6 @@
   }
 }
 
-/* Полоса музыки профиля: ей нужно место под именем, иначе она ляжет на статус. */
 .hasMusic .info {
   /* stylelint-disable-next-line plugin/no-low-performance-animation-properties */
   transition: padding-bottom 0.25s;
@@ -540,7 +547,10 @@
   padding-bottom: 2.25rem;
 }
 
-.hasMusic.minimized,
+.hasMusic.minimized {
+  padding-bottom: 2.75rem;
+}
+
 .hasMusic.plain {
   padding-bottom: 2.75rem;
 }
@@ -548,6 +558,10 @@
 .hasMusic {
   /* stylelint-disable-next-line plugin/no-low-performance-animation-properties */
   transition: height 0.25s;
+}
+
+.hasMusic.plain.minimized:not(.withBackground) .standaloneAvatar {
+  margin-top: 2.75rem;
 }
 
 .musicOverlay {

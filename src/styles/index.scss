@@ -116,6 +116,16 @@ body.cursor-ew-resize {
   cursor: ew-resize !important;
 }
 
+[data-file-hover-open-active] {
+  animation: file-hover-open-opacity 250ms ease-in-out 250ms 2 alternate;
+}
+
+@keyframes file-hover-open-opacity {
+  to {
+    opacity: 0.65;
+  }
+}
+
 #root,
 .full-height {
   height: 100%;
@@ -556,7 +566,7 @@ body:not(.is-ios) {
   --color-code-own: rgb(255, 255, 255);
   --color-code-bg: rgb(0, 0, 0, 0.502);
   --color-code-own-bg: rgb(0, 0, 0, 0.314);
-  --color-composer-button: rgb(170, 170, 170, 0.8);
+  --color-composer-button: rgb(255, 255, 255);
   --color-message-reaction: rgb(43, 42, 53);
   --color-message-reaction-hover: rgb(52, 49, 71);
   --color-message-reaction-own: rgb(103, 92, 175);

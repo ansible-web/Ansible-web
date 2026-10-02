@@ -1,4 +1,3 @@
-import type { FC } from '../../../lib/teact/teact';
 import {
   memo, useCallback, useMemo, useState,
 } from '../../../lib/teact/teact';
@@ -23,12 +22,12 @@ type OwnProps = {
   onReset: () => void;
 };
 
-const SettingsHeader: FC<OwnProps> = ({
+const SettingsHeader = ({
   currentScreen,
   editedFolderId,
   hasProfileBackground,
   onReset,
-}) => {
+}: OwnProps) => {
   const {
     signOut,
     openDeleteChatFolderModal,
@@ -61,8 +60,8 @@ const SettingsHeader: FC<OwnProps> = ({
     signOut({ forceInitApi: true });
   }, [closeSignOutConfirmation, signOut]);
 
-  const SettingsMenuButton: FC<{ onTrigger: () => void; isOpen?: boolean }> = useMemo(() => {
-    return ({ onTrigger, isOpen }) => (
+  const SettingsMenuButton = useMemo(() => {
+    return ({ onTrigger, isOpen }: { onTrigger: () => void; isOpen?: boolean }) => (
       <Button
         round
         ripple={!isMobile}
@@ -210,6 +209,8 @@ const SettingsHeader: FC<OwnProps> = ({
       case SettingsScreens.PasscodeEnabled:
       case SettingsScreens.PasscodeNewPasscode:
       case SettingsScreens.PasscodeNewPasscodeConfirm:
+      case SettingsScreens.PasscodePasskeyAddConfirm:
+      case SettingsScreens.PasscodePasskeyRemoveConfirm:
       case SettingsScreens.PasscodeCongratulations:
         return <h3>{oldLang('Passcode')}</h3>;
 

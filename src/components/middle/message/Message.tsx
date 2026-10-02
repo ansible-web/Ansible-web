@@ -45,12 +45,13 @@ import type {
 } from '../../../types';
 import type { Signal } from '../../../util/signals';
 import { MAIN_THREAD_ID } from '../../../api/types';
-import { AudioOrigin } from '../../../types';
 
 import { EMOJI_STATUS_LOOP_LIMIT, MESSAGE_APPEARANCE_DELAY } from '../../../config';
 import {
   areReactionsEmpty,
+  extractMessageText,
   getAllowedAttachmentOptions,
+  getCanReplyToEphemeralMessage,
   getIsDownloading,
   getMainUsername,
   getMessageContent,
@@ -68,6 +69,7 @@ import {
   isChatPublic,
   isGeoLiveExpired,
   isMessageLocal,
+  isMessageLocalOnly,
   isMessageTranslatable,
   isOwnMessage,
   isReplyToMessage,
@@ -183,7 +185,6 @@ import PeerColorWrapper from '../../common/PeerColorWrapper';
 import RankBadge from '../../common/RankBadge';
 import ReactionStaticEmoji from '../../common/reactions/ReactionStaticEmoji';
 import Sparkles from '../../common/Sparkles';
-import TopicChip from '../../common/TopicChip';
 import { animateSnap } from '../../main/visualEffects/SnapEffectContainer';
 import Button from '../../ui/Button';
 import ConfirmDialog from '../../ui/ConfirmDialog';
@@ -319,7 +320,6 @@ type StateProps = {
   isPremium: boolean;
   senderChatMember?: ApiChatMember;
   messageTopic?: ApiTopic;
-  hasTopicChip?: boolean;
   chatTranslations?: ChatTranslatedMessages;
   areTranslationsEnabled?: boolean;
   shouldDetectChatLanguage?: boolean;
@@ -452,7 +452,6 @@ const Message = ({
   memoFirstUnreadIdRef,
   senderChatMember,
   messageTopic,
-  hasTopicChip,
   chatTranslations,
   areTranslationsEnabled,
   shouldDetectChatLanguage,
@@ -519,6 +518,8 @@ const Message = ({
     isTypingDraft, previousLocalId, fromRank,
   } = message;
 
+  const isLocalOnly = isMessageLocalOnly(message);
+
   const [isTranscriptionHidden, setIsTranscriptionHidden] = useState(false);
   const [isPlayingSnapAnimation, setIsPlayingSnapAnimation] = useState(false);
   const [isPlayingDeleteAnimation, setIsPlayingDeleteAnimation] = useState(false);
@@ -529,7 +530,7 @@ const Message = ({
   const [declineReason, setDeclineReason] = useState('');
   const { isMobile, isTouchScreen } = useAppLayout();
 
-  useOnIntersect(bottomMarkerRef, isTypingDraft || message.isEphemeral ? undefined : observeIntersectionForBottom);
+  useOnIntersect(bottomMarkerRef, isTypingDraft || isLocalOnly ? undefined : observeIntersectionForBottom);
 
   const {
     isContextMenuOpen,
@@ -554,7 +555,7 @@ const Message = ({
     }
   }, [isContextMenuOpen, disableContextMenuHint]);
 
-  const noAppearanceAnimation = appearanceOrder <= 0;
+  const noAppearanceAnimation = appearanceOrder <= 0 || message.shouldSkipTypingAnimation;
   const [isShown, markShown] = useFlag(noAppearanceAnimation);
   useEffect(() => {
     if (noAppearanceAnimation) {
@@ -568,7 +569,7 @@ const Message = ({
   useShowTransition({
     ref,
     isOpen: isShown || isJustAdded,
-    noMountTransition: noAppearanceAnimation && !isJustAdded,
+    noMountTransition: message.shouldSkipTypingAnimation || (noAppearanceAnimation && !isJustAdded),
     className: false,
   });
 
@@ -589,7 +590,7 @@ const Message = ({
     && threadId === MAIN_THREAD_ID
     && !isQuickPreview
     && !isLocal
-    && !message.isEphemeral
+    && !isLocalOnly
     && readMetricsMessage.viewsCount !== undefined;
   const hasMessageReply = isReplyToMessage(message) && !shouldHideReply
     && (!isEphemeralReply || Boolean(replyMessage));
@@ -657,7 +658,7 @@ const Message = ({
 
   const hasForwardedCustomShape = asForwarded && isCustomShape;
   const hasSubheader = message.isEphemeral
-    || hasTopicChip || hasMessageReply || hasStoryReply || hasForwardedCustomShape
+    || hasMessageReply || hasStoryReply || hasForwardedCustomShape
     || Boolean(isShowingSummary && summary?.text);
 
   const selectMessage = useLastCallback((e?: React.MouseEvent<HTMLDivElement, MouseEvent>, groupedId?: string) => {
@@ -732,7 +733,6 @@ const Message = ({
     handleFocus,
     handleFocusForwarded,
     handleDocumentGroupSelectAll,
-    handleTopicChipClick,
     handleStoryClick,
   } = useInnerHandlers({
     lang: oldLang,
@@ -749,7 +749,6 @@ const Message = ({
     senderPeer,
     botSender,
     guestFromSender,
-    messageTopic,
     isTranslatingChat: Boolean(requestedChatTranslationLanguage),
     story: replyStory && 'content' in replyStory ? replyStory : undefined,
     isReplyPrivate,
@@ -873,8 +872,9 @@ const Message = ({
     }
   }, [dice, memoFirstUnreadIdRef, messageId, isLocal]);
 
+  const textForLanguageDetection = useMemo(() => textMessage && extractMessageText(textMessage)?.text, [textMessage]);
   const detectedLanguage = useTextLanguage(
-    text?.text,
+    textForLanguageDetection,
     !(areTranslationsEnabled && shouldDetectChatLanguage) || isTypingDraft,
     getIsMessageListReady,
   );
@@ -888,13 +888,14 @@ const Message = ({
   const translationLanguageForHook = parsedManualTranslation?.languageCode || requestedChatTranslationLanguage;
   const translationToneForHook = parsedManualTranslation?.tone || requestedTranslationTone;
 
-  const { isPending: isTranslationPending, translatedText } = useMessageTranslation(
+  const { isPending: isTranslationPending, translatedText, translatedRichMessage } = useMessageTranslation(
     chatTranslations, chatId, shouldTranslate ? messageId : undefined, translationLanguageForHook,
     translationToneForHook,
   );
   const isSummaryPending = Boolean(summary?.isPending);
   const isNewTextPending = isTranslationPending || isSummaryPending;
   const previousTranslatedText = usePreviousDeprecated(translatedText, Boolean(shouldTranslate));
+  const previousTranslatedRichMessage = usePreviousDeprecated(translatedRichMessage, Boolean(shouldTranslate));
 
   useEffectWithPrevDeps(([prevIsShowingSummary]) => {
     if (summary?.text || (prevIsShowingSummary && !isShowingSummary)) {
@@ -902,7 +903,9 @@ const Message = ({
     }
   }, [isShowingSummary, summary?.text]);
 
-  const currentTranslatedText = translatedText || previousTranslatedText;
+  const currentTranslatedText = shouldTranslate ? translatedText || previousTranslatedText : undefined;
+  const currentTranslatedRichMessage = shouldTranslate
+    ? translatedRichMessage || (isTranslationPending !== false ? previousTranslatedRichMessage : undefined) : undefined;
 
   const phoneCall = action?.type === 'phoneCall' ? action : undefined;
 
@@ -1025,7 +1028,7 @@ const Message = ({
     || undefined;
 
   useEffect(() => {
-    if (isTypingDraft || message.isEphemeral) {
+    if (isTypingDraft || isLocalOnly) {
       return;
     }
 
@@ -1070,7 +1073,7 @@ const Message = ({
     isQuickPreview,
     isOwn,
     isTypingDraft,
-    message.isEphemeral,
+    isLocalOnly,
     markMessageListRead,
     messageId,
     memoFirstUnreadIdRef,
@@ -1112,10 +1115,12 @@ const Message = ({
       return (
         <MessageRichText
           message={textMessage}
+          forcedRichMessage={requestedTranslationLanguage ? currentTranslatedRichMessage : undefined}
           isOwn={isOwn}
           noAvatars={noAvatars}
           canAutoLoadMedia={canAutoLoadMedia}
           isProtected={isProtected}
+          noPlaylist={isScheduled}
           theme={theme}
           observeIntersectionForLoading={observeIntersectionForLoading}
           observeIntersectionForPlaying={observeIntersectionForPlaying}
@@ -1144,6 +1149,7 @@ const Message = ({
         maxTimestamp={maxTimestamp}
         threadId={threadId}
         shouldAnimateTyping={isTypingDraft}
+        noInitialTypingAnimation={message.shouldSkipTypingAnimation}
         canAnimateTextStreaming={canAnimateTextStreaming}
         onTypingAnimationEnd={handleTypingAnimationEnd}
       />
@@ -1206,7 +1212,7 @@ const Message = ({
           withQuickReactionButton && quickReactionPosition === 'in-meta' ? renderQuickReactionButton : undefined
         }
         availableReactions={availableReactions}
-        isTranslated={Boolean(requestedTranslationLanguage ? currentTranslatedText : undefined)}
+        isTranslated={Boolean(requestedTranslationLanguage && (currentTranslatedText || currentTranslatedRichMessage))}
         effectEmoji={effect?.emoticon}
         onClick={handleMetaClick}
         onEffectClick={handleEffectClick}
@@ -1251,7 +1257,7 @@ const Message = ({
     );
     const shouldReadMedia = !hasTtl || !isOwn || isChatWithSelf;
     let ephemeralBotName: string | undefined;
-    if (message.isEphemeral && message.isOutgoing) {
+    if (isLocalOnly && message.isOutgoing) {
       if (!ephemeralBot) {
         ephemeralBotName = lang('Bot');
       } else if (ephemeralBot.hasUsername) {
@@ -1270,18 +1276,11 @@ const Message = ({
               <BadgeButton className="ephemeral-header">
                 <Icon name="eye-outline" />
                 <span dir="auto">
-                  {message.isOutgoing
+                  {message.isOutgoing && isLocalOnly
                     ? lang('EphemeralOnlyVisibleToBot', { bot: ephemeralBotName! })
                     : lang('EphemeralOnlyVisible')}
                 </span>
               </BadgeButton>
-            )}
-            {hasTopicChip && (
-              <TopicChip
-                topic={messageTopic}
-                onClick={handleTopicChipClick}
-                className="message-topic"
-              />
             )}
             {hasForwardedCustomShape && (
               <div className="forward-custom-shape-subheader">
@@ -1409,7 +1408,9 @@ const Message = ({
           <Audio
             theme={theme}
             message={message}
-            origin={AudioOrigin.Inline}
+            variant="inline"
+            threadId={threadId}
+            noPlaylist={isScheduled}
             uploadProgress={uploadProgress}
             isSelectable={isInDocumentGroup}
             isSelected={isSelected}
@@ -1688,7 +1689,7 @@ const Message = ({
   function shouldRenderSenderName() {
     const media = photo || video || location || paidMedia;
     return !(isCustomShape && !hasViaSender) && (
-      (withSenderName && (!media || hasTopicChip)) || asForwarded || viaBotId
+      (withSenderName && !media) || asForwarded || viaBotId
       || (guestChatViaId && isFirstInGroup) || forceSenderName
     ) && !isInDocumentGroupNotFirst && !(hasMessageReply && isCustomShape);
   }
@@ -1718,7 +1719,7 @@ const Message = ({
   });
 
   const handleLocalInlineButtonClick = useLastCallback((button: ApiKeyboardButton) => {
-    if (button.type === 'openThread') {
+    if (button.action.type === 'openThread') {
       openThread({
         chatId,
         threadId: messageTopic!.id,
@@ -1726,8 +1727,8 @@ const Message = ({
       return;
     }
 
-    if (button.type === 'suggestedMessage') {
-      if (button.buttonType === 'approve') {
+    if (button.action.type === 'suggestedMessage') {
+      if (button.action.buttonType === 'approve') {
         openSuggestedPostApprovalModal({
           chatId,
           messageId: message.id,
@@ -1735,7 +1736,7 @@ const Message = ({
         return;
       }
 
-      if (button.buttonType === 'decline') {
+      if (button.action.buttonType === 'decline') {
         openDeclineDialog();
         return;
       }
@@ -1743,7 +1744,7 @@ const Message = ({
       clickSuggestedMessageButton({
         chatId,
         messageId: message.id,
-        button,
+        button: { ...button, action: button.action },
       });
       return;
     }
@@ -1890,21 +1891,17 @@ const Message = ({
     return [
       [
         {
-          type: 'suggestedMessage',
-          buttonType: 'decline',
+          action: { type: 'suggestedMessage', buttonType: 'decline' },
           text: lang('SuggestedPostDecline'),
         },
         {
-          type: 'suggestedMessage',
-          buttonType: 'approve',
+          action: { type: 'suggestedMessage', buttonType: 'approve', disabled: isSuggestedPostExpired },
           text: lang('SuggestedPostApprove'),
-          disabled: isSuggestedPostExpired,
         },
       ],
       [
         {
-          type: 'suggestedMessage',
-          buttonType: 'suggestChanges',
+          action: { type: 'suggestedMessage', buttonType: 'suggestChanges' },
           text: lang('SuggestedPostSuggestChanges'),
         },
       ],
@@ -1918,7 +1915,7 @@ const Message = ({
 
     return [
       [{
-        type: 'openThread',
+        action: { type: 'openThread' },
         text: lang('BotForumContinueThreadButton'),
       }],
     ];
@@ -2054,6 +2051,7 @@ const Message = ({
         {message.inlineButtons && (
           <InlineButtons
             inlineButtons={message.inlineButtons}
+            isReceipt={Boolean(invoice?.receiptMessageId)}
             isEphemeral={message.isEphemeral}
             onClick={handleInlineButtonClick}
           />
@@ -2129,7 +2127,7 @@ export default memo(withGlobal<OwnProps>(
     } = selectTabState(global);
     const {
       message, album, documentGroup, withSenderName, withAvatar, threadId, messageListType,
-      isLastInDocumentGroup, isFirstInGroup, shouldIgnoreSendFocus,
+      isLastInDocumentGroup, shouldIgnoreSendFocus,
     } = ownProps;
     const {
       id, chatId, viaBotId, guestChatViaId, isOutgoing, forwardInfo, transcriptionId, isPinned,
@@ -2244,7 +2242,6 @@ export default memo(withGlobal<OwnProps>(
     const hasUnreadReaction = readState?.unreadReactions?.includes(message.id);
     const hasUnreadPollVote = readState?.unreadPollVotes?.includes(message.id);
 
-    const hasTopicChip = threadId === MAIN_THREAD_ID && chat?.isForum && !chat.isBotForum && isFirstInGroup;
     const messageTopic = selectTopicFromMessage(global, message);
 
     const chatTranslations = selectChatTranslations(global, chatId);
@@ -2285,7 +2282,8 @@ export default memo(withGlobal<OwnProps>(
     const isMediaNsfw = selectIsMediaNsfw(global, message);
     const isReplyMediaNsfw = replyMessage && selectIsMediaNsfw(global, replyMessage);
 
-    const summary = selectMessageSummary(global, chatId, message.id, requestedTranslationLanguage);
+    const summary = !message.isEphemeral
+      ? selectMessageSummary(global, chatId, message.id, requestedTranslationLanguage) : undefined;
 
     const allowedAttachmentOptions = getAllowedAttachmentOptions(chat, chatFullInfo, isChatWithBot);
 
@@ -2320,7 +2318,7 @@ export default memo(withGlobal<OwnProps>(
       isAnonymousForwards,
       isChannel,
       isGroup,
-      canReply: message.isEphemeral ? !message.isOutgoing : canReply,
+      canReply: message.isEphemeral ? getCanReplyToEphemeralMessage(message) : canReply,
       highlight,
       animatedEmoji,
       animatedCustomEmoji,
@@ -2353,7 +2351,6 @@ export default memo(withGlobal<OwnProps>(
       isPremium,
       senderChatMember,
       messageTopic,
-      hasTopicChip,
       chatTranslations,
       areTranslationsEnabled,
       shouldDetectChatLanguage: selectShouldDetectChatLanguage(global, chatId),

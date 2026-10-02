@@ -9,6 +9,7 @@ import type {
   ApiMessage,
   ApiMessageSearchType,
   ApiPhoto,
+  ApiRichMessage,
   ApiSticker,
   ApiVideo,
   ApiVoice,
@@ -18,7 +19,7 @@ import type {
   SizeTarget,
   StatefulMediaContent,
 } from '../../api/types';
-import type { ActiveDownloads } from '../../types';
+import type { ActiveDownloads, SharedMediaType } from '../../types';
 import { ApiMediaFormat } from '../../api/types';
 
 import {
@@ -28,8 +29,11 @@ import {
   IS_SAFARI,
   MAX_BUFFER_SIZE,
 } from '../../util/browser/windowEnvironment';
+import { buildCollectionByKey } from '../../util/iteratees';
 import { getDocumentHasPreview } from '../../components/common/helpers/documentInfo';
+import { getPageBlocksAudios } from './buildPageAudioById';
 import { getAttachmentMediaType, matchLinkInMessageText } from './messages';
+import { WINDOWED_MEDIA_SEARCH_TYPES } from './middleSearch';
 
 export type MediaWithThumbs = ApiPhoto | ApiVideo | ApiDocument | ApiSticker | ApiMediaExtendedPreview;
 export type DownloadableMedia = ApiPhoto | ApiVideo | ApiDocument | ApiSticker | ApiAudio | ApiVoice | ApiWebDocument;
@@ -54,6 +58,7 @@ export function hasMessageMedia(message: MediaContainer) {
     || getMessageAction(message)
     || getMessageAudio(message)
     || getMessageVoice(message)
+    || getMessagePaidMedia(message)
   ));
 }
 
@@ -163,6 +168,19 @@ export function getWebPageVideo(webPage?: ApiWebPage) {
 
 export function getWebPageAudio(webPage?: ApiWebPage) {
   return webPage?.webpageType === 'full' ? webPage.audio : undefined;
+}
+
+const AUDIOS_BY_RICH_MESSAGE = new WeakMap<ApiRichMessage, { byId: Record<string, ApiAudio>; ids: string[] }>();
+
+export function getRichMessageAudios(richMessage: ApiRichMessage) {
+  let memoized = AUDIOS_BY_RICH_MESSAGE.get(richMessage);
+  if (!memoized) {
+    const byId = buildCollectionByKey(getPageBlocksAudios(richMessage.blocks), 'id');
+    memoized = { byId, ids: Object.keys(byId) };
+    AUDIOS_BY_RICH_MESSAGE.set(richMessage, memoized);
+  }
+
+  return memoized;
 }
 
 export function getWebPageDocument(webPage?: ApiWebPage) {
@@ -588,6 +606,10 @@ export function getMessageContentIds(
       };
       break;
 
+    case 'polls':
+      validator = getMessagePollId;
+      break;
+
     default:
       return [] as Array<number>;
   }
@@ -606,6 +628,23 @@ export function isMediaLoadableInViewer(newMessage: ApiMessage) {
   if (newMessage.content.photo) return true;
   if (newMessage.content.video && !newMessage.content.video.isRound && !newMessage.content.video.isGif) return true;
   return false;
+}
+
+export function isMessageInMediaWindow(message: ApiMessage, mediaType: SharedMediaType) {
+  switch (mediaType) {
+    case 'media':
+      return isMediaLoadableInViewer(message);
+    case 'audio':
+      return Boolean(message.content?.audio);
+    case 'voice':
+      return Boolean(message.content?.voice || message.content?.video?.isRound);
+    default:
+      return false;
+  }
+}
+
+export function hasWindowedMediaContent(message: ApiMessage) {
+  return WINDOWED_MEDIA_SEARCH_TYPES.some((mediaType) => isMessageInMediaWindow(message, mediaType));
 }
 
 export function getMediaFilename(media: DownloadableMedia) {

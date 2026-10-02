@@ -228,7 +228,7 @@ function GiftItemDiamond({
         </Button>
       )}
       {giftRibbon}
-      {isLocked && <Icon name="lock-badge" className={styles.lockIcon} />}
+      {isLocked && <Icon name="lock-filled" className={styles.lockIcon} />}
     </GiftAttributeItem>
   );
 }

@@ -10,6 +10,7 @@ import type {
 } from '../../../types';
 import type {
   ApiAttachment,
+  ApiAudio,
   ApiChat,
   ApiComposedMessageWithAI,
   ApiFormattedText,
@@ -28,6 +29,7 @@ import type {
   ApiOnProgress,
   ApiPeer,
   ApiReaction,
+  ApiRichMessage,
   ApiSearchPostsFlood,
   ApiSendMessageAction,
   ApiSticker,
@@ -55,8 +57,9 @@ import {
   SUPPORTED_PHOTO_CONTENT_TYPES,
   SUPPORTED_VIDEO_CONTENT_TYPES,
 } from '../../../config';
+import buildUploadingMedia from '../../../util/buildUploadingMedia';
 import { fetchFile } from '../../../util/files';
-import { compact, split } from '../../../util/iteratees';
+import { compact, omit, split } from '../../../util/iteratees';
 import { getMessageKey, getMtpEphemeralMessageId } from '../../../util/keys/messageKey';
 import { getServerTime } from '../../../util/serverTime';
 import { interpolateArray } from '../../../util/waveform';
@@ -68,11 +71,18 @@ import {
   buildThreadReadState,
 } from '../apiBuilders/chats';
 import {
-  buildApiAiComposeTone, buildApiAiComposeToneExample, buildApiComposedMessageWithAI, buildApiFormattedText,
+  buildApiAiComposeTone,
+  buildApiAiComposeToneExample,
+  buildApiComposedMessageWithAI,
+  buildApiFormattedText,
 } from '../apiBuilders/common';
 import { buildApiTopicWithState } from '../apiBuilders/forums';
+import { buildApiDocument } from '../apiBuilders/media';
 import {
-  buildMessageMediaContent, buildMessagePollFromMedia, buildMessageTextContent,
+  buildApiRichMessage,
+  buildMessageMediaContent,
+  buildMessagePollFromMedia,
+  buildMessageTextContent,
   buildWebPage,
   buildWebPageFromMedia,
   buildWebPagesFromMedia,
@@ -90,7 +100,6 @@ import {
   buildLocalForwardedMessage,
   buildLocalMessage,
   buildPreparedInlineMessage,
-  buildUploadingMedia,
   incrementLocalMessageCounter,
 } from '../apiBuilders/messages';
 import { getApiChatIdFromMtpPeer } from '../apiBuilders/peers';
@@ -129,7 +138,9 @@ import { sendApiUpdate } from '../updates/apiUpdateEmitter';
 import { processMessageAndUpdateThreadInfo } from '../updates/entityProcessor';
 import { processAffectedHistory, updateChannelState } from '../updates/updateManager';
 import { requestChatUpdate } from './chats';
-import { handleGramJsUpdate, invokeRequest, uploadFile } from './client';
+import {
+  handleGramJsUpdate, invokeRequest, invokeRequestBeacon, repairFileReference, uploadFile,
+} from './client';
 
 const FAST_SEND_TIMEOUT = 1000;
 const INPUT_WAVEFORM_LENGTH = 63;
@@ -139,6 +150,7 @@ type TranslateTextParams = ({
 } | {
   chat: ApiChat;
   messageIds: number[];
+  requestId: string;
 }) & {
   toLanguageCode: string;
   tone?: TranslationTone;
@@ -365,7 +377,7 @@ export function sendMessageLocal(
 ) {
   const {
     chat, lastMessageId, text, entities, richMessage, replyInfo, suggestedPostInfo,
-    attachment, sticker, story, gif, poll, todo,
+    attachment, sticker, story, gif, audio, poll, todo,
     contact, scheduledAt, scheduleRepeatPeriod, groupedId, sendAs, wasDrafted, isInvertedMedia, effectId, isPending,
     messagePriceInStars, dice,
   } = params;
@@ -386,6 +398,7 @@ export function sendMessageLocal(
     attachment,
     sticker,
     gif,
+    audio,
     poll,
     todo,
     contact,
@@ -420,7 +433,7 @@ export function sendApiMessage(
 ) {
   const {
     chat, text, entities, richMessage, replyInfo, suggestedPostInfo, suggestedMedia,
-    attachment, sticker, story, gif, poll, todo, contact, dice,
+    attachment, sticker, story, gif, audio, poll, todo, contact, dice,
 
     isSilent, scheduledAt, scheduleRepeatPeriod, groupedId, noWebPage, sendAs, shouldUpdateStickerSetOrder,
     isInvertedMedia, effectId, webPageMediaSize, webPageUrl, messagePriceInStars,
@@ -523,6 +536,8 @@ export function sendApiMessage(
       media = buildInputMediaDocument(sticker);
     } else if (gif) {
       media = buildInputMediaDocument(gif);
+    } else if (audio) {
+      media = buildInputMediaDocument(audio);
     } else if (poll) {
       try {
         const attachedMedia = poll.attachedMedia
@@ -600,16 +615,26 @@ export function sendApiMessage(
       suggestedPost: suggestedPostInfo && buildInputSuggestedPost(suggestedPostInfo),
     };
 
+    const sendMedia = (inputMedia: GramJs.TypeInputMedia) => invokeRequest(new GramJs.messages.SendMedia({
+      ...args,
+      media: inputMedia,
+    }), {
+      shouldThrow: true,
+      shouldIgnoreUpdates: true,
+    });
+
     try {
       let update;
       if (media) {
-        update = await invokeRequest(new GramJs.messages.SendMedia({
-          ...args,
-          media,
-        }), {
-          shouldThrow: true,
-          shouldIgnoreUpdates: true,
-        });
+        try {
+          update = await sendMedia(media);
+        } catch (error: any) {
+          if (!audio || !error.errorMessage?.startsWith('FILE_REFERENCE')) throw error;
+          if (!await repairFileReference({ url: `document${audio.id}` })) throw error;
+          const repairedMedia = buildInputMediaDocument(audio);
+          if (!repairedMedia) throw error;
+          update = await sendMedia(repairedMedia);
+        }
       } else {
         update = await invokeRequest(new GramJs.messages.SendMessage({
           ...args,
@@ -725,13 +750,18 @@ export async function sendEphemeralMessage({
       return undefined;
     }
 
+    const inputRichMessage = richMessage && buildInputRichMessage(richMessage);
+    if (richMessage && !inputRichMessage) {
+      markEphemeralMessageAsFailed(localMessage);
+      return undefined;
+    }
     const result = await invokeRequest(new GramJs.ephemeral.SendMessage({
       peer: buildInputPeer(chat.id, chat.accessHash),
       receiverId: buildInputUser(receiver.id, receiver.accessHash),
       message: richMessage ? DEFAULT_PRIMITIVES.STRING : text || DEFAULT_PRIMITIVES.STRING,
       entities: richMessage ? undefined : entities?.map(buildMtpMessageEntity),
       media,
-      richMessage: richMessage ? buildInputRichMessage(richMessage) : undefined,
+      richMessage: inputRichMessage,
       randomId,
       replyTo: requestReplyInfo && buildInputReplyTo(requestReplyInfo),
     }), {
@@ -1036,9 +1066,10 @@ export async function editMessage({
   }
 
   const isInvertedMedia = text && !attachment?.shouldSendAsFile ? message.isInvertedMedia : undefined;
+  const baseContent = richMessage ? omit(message.content, ['webPage']) : message.content;
 
   const newContent = {
-    ...(media || message.content),
+    ...(media || baseContent),
     text: richMessage || !text ? undefined : {
       text,
       entities,
@@ -1116,6 +1147,7 @@ function canSendRichMessage(params: SendMessageParams) {
     && !params.sticker
     && !params.story
     && !params.gif
+    && !params.audio
     && !params.poll
     && !params.todo
     && !params.contact
@@ -1250,12 +1282,37 @@ export async function rescheduleMessage({
   }));
 }
 
-async function uploadMedia(message: ApiMessage, attachment: ApiAttachment, onProgress: ApiOnProgress) {
-  const {
-    filename, blobUrl, mimeType, quick, voice, audio, previewBlobUrl, shouldSendAsFile, shouldSendAsSpoiler, ttlSeconds,
-    isRoundVideo,
-  } = attachment;
+export async function uploadRichMedia({
+  chat,
+  attachment,
+}: {
+  chat: ApiChat;
+  attachment: ApiAttachment;
+}, onProgress: ApiOnProgress) {
+  const uploadedMedia = await uploadAttachment({
+    ...attachment,
+    shouldSendAsSpoiler: undefined,
+  }, onProgress);
+  if (onProgress.isCanceled) {
+    return undefined;
+  }
 
+  const messageMedia = await invokeRequest(new GramJs.messages.UploadMedia({
+    peer: buildInputPeer(chat.id, chat.accessHash),
+    media: uploadedMedia,
+  }), { shouldThrow: true });
+  if (!messageMedia) {
+    return undefined;
+  }
+
+  const content = buildMessageMediaContent(messageMedia);
+  if (attachment.shouldSendAsFile && messageMedia instanceof GramJs.MessageMediaDocument && messageMedia.document) {
+    return buildApiDocument(messageMedia.document);
+  }
+  return content?.photo || content?.video || content?.audio || content?.document;
+}
+
+async function uploadMedia(message: ApiMessage, attachment: ApiAttachment, onProgress: ApiOnProgress) {
   const patchedOnProgress: ApiOnProgress = (progress) => {
     if (onProgress.isCanceled) {
       patchedOnProgress.isCanceled = true;
@@ -1263,6 +1320,15 @@ async function uploadMedia(message: ApiMessage, attachment: ApiAttachment, onPro
       onProgress(progress, getMessageKey(message));
     }
   };
+
+  return uploadAttachment(attachment, patchedOnProgress);
+}
+
+async function uploadAttachment(attachment: ApiAttachment, onProgress: ApiOnProgress) {
+  const {
+    filename, blobUrl, mimeType, quick, voice, audio, previewBlobUrl, shouldSendAsFile, shouldSendAsSpoiler, ttlSeconds,
+    isRoundVideo,
+  } = attachment;
 
   const fetchAndUpload = async (url: string, progressCallback?: (progress: number) => void) => {
     const file = await fetchFile(url, filename);
@@ -1273,7 +1339,7 @@ async function uploadMedia(message: ApiMessage, attachment: ApiAttachment, onPro
   const shouldUploadThumb = audio || isVideo || shouldSendAsFile;
 
   const [inputFile, thumb] = await Promise.all(compact([
-    fetchAndUpload(blobUrl, patchedOnProgress),
+    fetchAndUpload(blobUrl, onProgress),
     shouldUploadThumb && previewBlobUrl && fetchAndUpload(previewBlobUrl),
   ]));
 
@@ -1903,6 +1969,9 @@ export async function searchMessagesInChat({
     case 'gif':
       filter = new GramJs.InputMessagesFilterGif();
       break;
+    case 'polls':
+      filter = new GramJs.InputMessagesFilterPoll();
+      break;
     case 'text':
     default: {
       filter = new GramJs.InputMessagesFilterEmpty();
@@ -2331,7 +2400,7 @@ export function forwardMessagesLocal(params: ForwardMessagesParams) {
 
 export async function forwardApiMessages(params: ForwardMessagesParams) {
   const {
-    fromChat, toChat, toThreadId, isSilent,
+    fromChat, toChat, toThreadId, messages, isSilent,
     scheduledAt, scheduleRepeatPeriod, sendAs, withMyScore, noAuthors, noCaptions,
     forwardedLocalMessagesSlice, messagePriceInStars, effectId,
   } = params;
@@ -2343,6 +2412,8 @@ export async function forwardApiMessages(params: ForwardMessagesParams) {
   } = forwardedLocalMessagesSlice;
 
   const priceInStars = messagePriceInStars ? messagePriceInStars * messageIds.length : undefined;
+  const isFromEphemeral = messages[0]?.isEphemeral;
+  const apiMessageIds = isFromEphemeral ? messageIds.map(getMtpEphemeralMessageId) : messageIds;
 
   const randomIds = messageIds.map(() => generateRandomBigInt());
   try {
@@ -2350,7 +2421,8 @@ export async function forwardApiMessages(params: ForwardMessagesParams) {
       fromPeer: buildInputPeer(fromChat.id, fromChat.accessHash),
       toPeer: buildInputPeer(toChat.id, toChat.accessHash),
       randomId: randomIds,
-      id: messageIds,
+      id: apiMessageIds,
+      fromEphemeral: isFromEphemeral || undefined,
       withMyScore: withMyScore || undefined,
       silent: isSilent || undefined,
       dropAuthor: noAuthors || undefined,
@@ -2841,6 +2913,7 @@ export async function translateText(params: TranslateTextParams) {
     if (isMessageTranslation) {
       sendApiUpdate({
         '@type': 'failedMessageTranslations',
+        requestId: params.requestId,
         chatId: params.chat.id,
         messageIds: params.messageIds,
         toLanguageCode: params.toLanguageCode,
@@ -2855,15 +2928,61 @@ export async function translateText(params: TranslateTextParams) {
   if (isMessageTranslation) {
     sendApiUpdate({
       '@type': 'updateMessageTranslations',
+      requestId: params.requestId,
       chatId: params.chat.id,
       messageIds: params.messageIds,
-      translations: formattedText,
+      translations: formattedText.map((text) => ({ text })),
       toLanguageCode: params.toLanguageCode,
       tone,
     });
   }
 
   return formattedText;
+}
+
+export async function translateRichMessage({
+  chat, messageIds, requestId, toLanguageCode, tone,
+}: {
+  chat: ApiChat;
+  messageIds: number[];
+  requestId: string;
+  toLanguageCode: string;
+  tone?: TranslationTone;
+}) {
+  const result = await invokeRequest(new GramJs.messages.TranslateRichMessage({
+    peer: buildInputPeer(chat.id, chat.accessHash),
+    id: messageIds,
+    toLang: toLanguageCode,
+    tone: tone === 'neutral' ? undefined : tone,
+  }));
+
+  if (!result) {
+    sendApiUpdate({
+      '@type': 'failedMessageTranslations',
+      requestId,
+      chatId: chat.id,
+      messageIds,
+      toLanguageCode,
+      tone,
+    });
+    return undefined;
+  }
+
+  const peerId = buildPeer(chat.id);
+  const translations = result.result.map((richMessage, index) => ({
+    richMessage: buildApiRichMessage(richMessage, { peerId, id: messageIds[index] }),
+  }));
+  sendApiUpdate({
+    '@type': 'updateMessageTranslations',
+    requestId,
+    chatId: chat.id,
+    messageIds,
+    translations,
+    toLanguageCode,
+    tone,
+  });
+
+  return translations;
 }
 
 export async function fetchMessageSummary({
@@ -3150,6 +3269,45 @@ export async function composeMessageWithAI({
   }
 }
 
+export async function composeRichMessageWithAI({
+  text,
+  shouldProofread,
+  isEmojify,
+  translateToLang,
+  tone,
+}: {
+  text?: ApiInputRichMessage;
+  shouldProofread?: boolean;
+  isEmojify?: boolean;
+  translateToLang?: string;
+  tone?: ApiInputAiComposeTone;
+}): Promise<{ result?: ApiRichMessage; error?: 'floodPremium' | 'aiError' | 'generic' } | undefined> {
+  const inputText = text && buildInputRichMessage(text);
+  if (text && !inputText) return { error: 'generic' };
+
+  try {
+    const result = await invokeRequest(new GramJs.messages.ComposeRichMessageWithAI({
+      text: inputText,
+      proofread: shouldProofread || undefined,
+      emojify: isEmojify || undefined,
+      translateToLang,
+      tone: tone ? buildInputAiComposeTone(tone) : undefined,
+    }), { shouldThrow: true });
+
+    if (!result) return undefined;
+    const richMessage = buildApiRichMessage(result.result);
+    if (!richMessage) return { error: 'generic' };
+
+    return { result: richMessage };
+  } catch (err) {
+    if (err instanceof RPCError) {
+      if (err.errorMessage === 'AICOMPOSE_FLOOD_PREMIUM') return { error: 'floodPremium' };
+      if (err.errorMessage === 'AICOMPOSE_ERROR_OCCURED') return { error: 'aiError' };
+    }
+    return { error: 'generic' };
+  }
+}
+
 export async function fetchAiComposeTones({
   hash,
 }: {
@@ -3274,4 +3432,23 @@ export async function saveAiTone({
     tone: buildInputAiComposeTone(tone),
     unsave: Boolean(unsave),
   }));
+}
+
+export function reportMusicListen({ audio, listenedDuration, isPageUnload }: {
+  audio: ApiAudio; listenedDuration: number; isPageUnload?: boolean;
+}) {
+  const id = buildInputDocument(audio);
+  if (!id) return undefined;
+
+  const request = new GramJs.messages.ReportMusicListen({ id, listenedDuration });
+
+  if (isPageUnload) {
+    invokeRequestBeacon(request);
+    return undefined;
+  }
+
+  return invokeRequest(request, {
+    shouldReturnTrue: true,
+    shouldIgnoreErrors: true,
+  });
 }

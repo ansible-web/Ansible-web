@@ -16,6 +16,7 @@ import Flame from '../../../assets/ass/general/Flame.ass';
 import Fragment from '../../../assets/ass/general/Fragment.ass';
 import Mention from '../../../assets/ass/general/Mention.ass';
 import PartyPopper from '../../../assets/ass/general/PartyPopper.ass';
+import PlayPause from '../../../assets/ass/general/PlayPause.ass';
 import Invite from '../../../assets/ass/invites/Invite.ass';
 import JoinRequest from '../../../assets/ass/invites/Requests.ass';
 import LastSeen from '../../../assets/ass/LastSeen.ass';
@@ -40,19 +41,23 @@ import FoldersShare from '../../../assets/ass/settings/FoldersShare.ass';
 import HandStop from '../../../assets/ass/settings/HandStop.ass';
 import Lock from '../../../assets/ass/settings/Lock.ass';
 import Passkeys from '../../../assets/ass/settings/Passkeys.ass';
+import UtyanDisappear from '../../../assets/ass/settings/UtyanDisappear.ass';
 import StarReaction from '../../../assets/ass/stars/StarReaction.ass';
 import StarReactionEffect from '../../../assets/ass/stars/StarReactionEffect.ass';
 import Unlock from '../../../assets/ass/Unlock.ass';
 import BrokenGiftPreview from '../../../assets/broken-gift.svg';
-import UtyanDisappear from '../../../assets/tgs/settings/UtyanDisappear.ass';
 import DuckNothingFoundPreview from '../../../assets/tgs-previews/DuckNothingFound.svg';
 import WritingPreview from '../../../assets/tgs-previews/message/Writing.svg';
+import PausePreview from '../../../assets/tgs-previews/Pause.svg';
+import PlayPreview from '../../../assets/tgs-previews/Play.svg';
 import SearchPreview from '../../../assets/tgs-previews/Search.svg';
 import HandStopPreview from '../../../assets/tgs-previews/settings/HandStopPreview.png';
 import PasskeysPreview from '../../../assets/tgs-previews/settings/Passkeys.svg';
 
 export const LOCAL_TGS_PREVIEW_URLS = {
   HandStop: HandStopPreview,
+  PlayPause: PlayPreview,
+  PlayPausePaused: PausePreview,
   BrokenGift: BrokenGiftPreview,
   DuckNothingFound: DuckNothingFoundPreview,
   Search: SearchPreview,
@@ -84,6 +89,7 @@ export const LOCAL_TGS_URLS = {
   Congratulations,
   Experimental,
   PartyPopper,
+  PlayPause,
   Flame,
   ReadTime,
   Unlock,

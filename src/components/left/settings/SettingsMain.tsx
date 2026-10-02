@@ -1,4 +1,3 @@
-import type { FC } from '../../../lib/teact/teact';
 import { memo, useEffect } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
@@ -41,7 +40,7 @@ type StateProps = {
   starsBalance?: ApiStarsAmount;
 };
 
-const SettingsMain: FC<OwnProps & StateProps> = ({
+const SettingsMain = ({
   isActive,
   currentUserId,
   sessionCount,
@@ -49,7 +48,7 @@ const SettingsMain: FC<OwnProps & StateProps> = ({
   isGiveawayAvailable,
   starsBalance,
   onReset,
-}) => {
+}: OwnProps & StateProps) => {
   const {
     loadMoreProfilePhotos,
     openPremiumModal,

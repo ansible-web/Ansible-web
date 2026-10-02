@@ -1,5 +1,4 @@
 import type { ChangeEvent } from 'react';
-import type { FC } from '../../../lib/teact/teact';
 import {
   memo, useCallback, useEffect, useMemo, useState,
 } from '../../../lib/teact/teact';
@@ -61,7 +60,7 @@ type StateProps = {
   privateInviteLink?: string;
 };
 
-const ManageChatPrivacyType: FC<OwnProps & StateProps> = ({
+const ManageChatPrivacyType = ({
   chat,
   isActive,
   isChannel,
@@ -77,7 +76,7 @@ const ManageChatPrivacyType: FC<OwnProps & StateProps> = ({
   maxPublicLinks,
   privateInviteLink,
   onClose,
-}) => {
+}: OwnProps & StateProps) => {
   const {
     updatePublicLink,
     updatePrivateLink,
@@ -149,7 +148,7 @@ const ManageChatPrivacyType: FC<OwnProps & StateProps> = ({
 
   const handleOptionChange = useCallback((value: string, e: ChangeEvent<HTMLInputElement>) => {
     const myChats = Object.values(getGlobal().chats.byId)
-      .filter(({ isCreator, usernames }) => isCreator && usernames?.some((c) => c.isActive));
+      .filter(({ isOwner, usernames }) => isOwner && usernames?.some((c) => c.isActive));
 
     if (myChats.length >= maxPublicLinks && value === 'public') {
       openLimitReachedModal({ limit: 'channelsPublic' });
@@ -305,6 +304,7 @@ const ManageChatPrivacyType: FC<OwnProps & StateProps> = ({
               <div className="settings-input">
                 <UsernameInput
                   asLink
+                  chatId={chat.id}
                   currentUsername={currentUsername}
                   isLoading={isLoading}
                   isUsernameAvailable={isUsernameAvailable}

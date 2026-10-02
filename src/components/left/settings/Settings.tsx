@@ -1,4 +1,3 @@
-import type { FC } from '@teact';
 import { memo, useRef, useState } from '@teact';
 import { getActions, getGlobal } from '../../../global';
 
@@ -166,7 +165,7 @@ export type OwnProps = {
   onReset: (forceReturnToChatList?: true | Event) => void;
 };
 
-const Settings: FC<OwnProps> = ({
+const Settings = ({
   isActive,
   currentScreen,
   foldersState,
@@ -175,7 +174,7 @@ const Settings: FC<OwnProps> = ({
   animationLevel,
   shouldSkipTransition,
   hasProfileBackground,
-}) => {
+}: OwnProps) => {
   const { closeShareChatFolderModal, openSettingsScreen } = getActions();
 
   const containerRef = useRef<HTMLDivElement>();
@@ -487,6 +486,8 @@ const Settings: FC<OwnProps> = ({
       case SettingsScreens.PasscodeChangePasscodeCurrent:
       case SettingsScreens.PasscodeChangePasscodeNew:
       case SettingsScreens.PasscodeChangePasscodeConfirm:
+      case SettingsScreens.PasscodePasskeyAddConfirm:
+      case SettingsScreens.PasscodePasskeyRemoveConfirm:
       case SettingsScreens.PasscodeCongratulations:
       case SettingsScreens.PasscodeEnabled:
       case SettingsScreens.PasscodeTurnOff:

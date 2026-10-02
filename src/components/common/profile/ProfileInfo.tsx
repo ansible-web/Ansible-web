@@ -112,7 +112,6 @@ const MAX_PHOTO_DASH_COUNT = 30;
 const STATUS_UPDATE_INTERVAL = 1000 * 60; // 1 min
 
 const PATTERN_Y_SHIFT = 8 * REM;
-const PATTERN_PLAIN_Y_SHIFT = 5.25 * REM;
 
 const ProfileInfo = ({
   isExpanded,
@@ -153,7 +152,6 @@ const ProfileInfo = ({
     loadPeerSavedGifts,
   } = getActions();
 
-  // Трек музыки профиля (userFull.saved_music): его показывает полоса под именем.
   const savedMusic = userFullInfo?.savedMusic;
 
   const oldLang = useOldLang();
@@ -496,6 +494,7 @@ const ProfileInfo = ({
         styles.root,
         !isExpanded && styles.minimized,
         isPlain && styles.plain,
+        hasPatternBackground && styles.withBackground,
         savedMusic && styles.hasMusic,
       )}
       style={buildStyle(
@@ -512,7 +511,7 @@ const ProfileInfo = ({
           patternSize={16}
           withLinearGradient={!collectibleEmojiStatus}
           className={styles.radialPatternBackground}
-          yPosition={isPlain ? PATTERN_PLAIN_Y_SHIFT : PATTERN_Y_SHIFT}
+          yPosition={PATTERN_Y_SHIFT}
         />
       )}
       {Boolean(pinnedGifts?.length) && (
@@ -619,9 +618,10 @@ const ProfileInfo = ({
         )}
         {renderStatus()}
       </div>
-      {Boolean(savedMusic) && (
+      {savedMusic && (
         <ProfileMusicStrip
           audio={savedMusic}
+          peerId={peerId}
           className={isExpanded ? styles.musicOverlay : undefined}
           style={createVtnStyle('music', true)}
         />

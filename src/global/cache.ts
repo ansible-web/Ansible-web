@@ -4,18 +4,19 @@ import { addCallback, removeCallback } from '../lib/teact/teactn';
 import type {
   ApiAvailableReaction,
   ApiDocument,
+  ApiKeyboardButton,
   ApiMessage,
   ApiPhoto,
   ApiVideo,
 } from '../api/types';
 import type {
-  IThemeSettings, MessageList, ThemeKey, ThreadId, TopicsInfo,
+  IThemeSettings, MessageList, PerformanceType, ThemeKey, ThreadId, TopicsInfo,
 } from '../types';
 import type { ActionReturnType, GlobalState, SharedState } from './types';
 import { ApiMessageEntityTypes, MAIN_THREAD_ID } from '../api/types';
 
 import {
-  ALL_FOLDER_ID, ANIMATION_LEVEL_DEFAULT,
+  ALL_FOLDER_ID,
   ARCHIVED_FOLDER_ID,
   DEBUG,
   EPHEMERAL_MESSAGE_TTL_SECONDS,
@@ -24,6 +25,7 @@ import {
   GLOBAL_STATE_CACHE_CHAT_LIST_LIMIT,
   GLOBAL_STATE_CACHE_CUSTOM_EMOJI_LIMIT,
   GLOBAL_STATE_CACHE_DISABLED,
+  GLOBAL_STATE_CACHE_PREFIX,
   GLOBAL_STATE_CACHE_USER_LIST_LIMIT,
   INSTANT_VIEW_FONT_SIZE_ADJUST_DEFAULT,
   IS_SCREEN_LOCKED_CACHE_KEY,
@@ -36,21 +38,22 @@ import { getOrderedIds } from '../util/folderManager';
 import {
   compact, pick, pickTruthy, unique,
 } from '../util/iteratees';
-import { GLOBAL_STATE_CACHE_KEY } from '../util/multiaccount';
-import { encryptSession } from '../util/passcode';
+import { ACCOUNT_SLOT, getGlobalStateCacheKey, GLOBAL_STATE_CACHE_KEY } from '../util/multiaccount';
+import { getDek, writeGlobalsVaultForSlot } from '../util/passcode';
 import { onBeforeUnload, throttle } from '../util/schedulers';
 import { getServerTime } from '../util/serverTime';
 import { hasStoredSession } from '../util/sessions';
 import { getSystemTheme } from '../util/systemTheme';
 import { getDefaultPatternColor } from '../util/wallpaper';
 import { migrateLegacyWallpaperBlobs, prefetchWallpaperUrl } from '../util/wallpaperStorage';
+import { buildPageAudioById } from './helpers/buildPageAudioById';
 import { selectSharedSettings } from './selectors/sharedState';
 import { selectThreadInfo } from './selectors/threads';
 import { addActionHandler, getGlobal } from './index';
 import {
-  INITIAL_GLOBAL_STATE, INITIAL_PERFORMANCE_STATE_MED, SHARED_STATE_CACHE_VERSION,
+  INITIAL_GLOBAL_STATE, SHARED_STATE_CACHE_VERSION,
 } from './initialState';
-import { clearGlobalForLockScreen, clearSharedStateForLockScreen } from './reducers';
+import { clearGlobalForLockScreen, updatePasscodeSettings } from './reducers';
 import {
   selectChatLastMessageId,
   selectChatMessages,
@@ -79,7 +82,11 @@ let cacheUpdateSuspensionTimestamp = 0;
 let unsubscribeFromBeforeUnload: NoneToVoidFunction | undefined;
 
 export function cacheGlobal(global: GlobalState) {
-  return MAIN_IDB_STORE.set(GLOBAL_STATE_CACHE_KEY, global);
+  return cacheGlobalForSlot(ACCOUNT_SLOT, global);
+}
+
+export function cacheGlobalForSlot(slot: number | undefined, global: GlobalState) {
+  return MAIN_IDB_STORE.set(getGlobalStateCacheKey(slot), reduceGlobal(global));
 }
 
 export function cacheSharedState(state: SharedState) {
@@ -87,7 +94,11 @@ export function cacheSharedState(state: SharedState) {
 }
 
 export function loadCachedGlobal() {
-  return MAIN_IDB_STORE.get<GlobalState>(GLOBAL_STATE_CACHE_KEY);
+  return loadCachedGlobalForSlot(ACCOUNT_SLOT);
+}
+
+export function loadCachedGlobalForSlot(slot: number | undefined) {
+  return MAIN_IDB_STORE.get<GlobalState>(getGlobalStateCacheKey(slot));
 }
 
 export function loadCachedSharedState() {
@@ -98,12 +109,20 @@ export function removeGlobalFromCache() {
   return MAIN_IDB_STORE.del(GLOBAL_STATE_CACHE_KEY);
 }
 
-export function removeSharedStateFromCache() {
-  return MAIN_IDB_STORE.del(SHARED_STATE_CACHE_KEY);
+export async function removeAllGlobalCaches() {
+  Object.keys(localStorage).filter(isGlobalStateCacheKey).forEach((cacheKey) => localStorage.removeItem(cacheKey));
+  const cacheKeys = (await MAIN_IDB_STORE.keys()).filter(
+    (cacheKey): cacheKey is string => typeof cacheKey === 'string' && isGlobalStateCacheKey(cacheKey),
+  );
+  await MAIN_IDB_STORE.delMany(cacheKeys);
 }
 
-function cacheIsScreenLocked(global: GlobalState) {
-  if (global?.passcode?.isScreenLocked) localStorage.setItem(IS_SCREEN_LOCKED_CACHE_KEY, 'true');
+function isGlobalStateCacheKey(cacheKey: string) {
+  return cacheKey === GLOBAL_STATE_CACHE_PREFIX || cacheKey.startsWith(`${GLOBAL_STATE_CACHE_PREFIX}_`);
+}
+
+export function removeSharedStateFromCache() {
+  return MAIN_IDB_STORE.del(SHARED_STATE_CACHE_KEY);
 }
 
 export function initCache() {
@@ -113,7 +132,6 @@ export function initCache() {
 
   const resetCache = () => {
     isRemovingCache = true;
-    localStorage.removeItem(IS_SCREEN_LOCKED_CACHE_KEY);
     removeGlobalFromCache().finally(() => {
       isRemovingCache = false;
       if (!isCaching) {
@@ -144,7 +162,6 @@ export async function loadCache(initialState: GlobalState): Promise<GlobalState 
   const cache = await readCache(initialState);
 
   if (cache.passcode.hasPasscode || hasStoredSession()) {
-    setupCaching();
     // Start resolving the wallpaper early without delaying the initial render
     void prefetchCurrentWallpaperUrl(cache);
 
@@ -157,6 +174,8 @@ export async function loadCache(initialState: GlobalState): Promise<GlobalState 
 }
 
 export function setupCaching() {
+  if (isCaching) return;
+
   isCaching = true;
   unsubscribeFromBeforeUnload = onBeforeUnload(updateCacheForced, true);
   window.addEventListener('blur', updateCacheForced);
@@ -234,7 +253,7 @@ async function readCache(initialState: GlobalState): Promise<GlobalState> {
   return newState;
 }
 
-function migrateSharedCache(
+export function migrateSharedCache(
   cached: SharedState | undefined,
   fallbackThemes: Partial<Record<ThemeKey, IThemeSettings>> | undefined,
   initialState: SharedState,
@@ -245,11 +264,14 @@ function migrateSharedCache(
   let migrated = cached || initialState;
 
   if (cacheVersion < SHARED_STATE_CACHE_VERSION) {
+    const { messageBlur, ...performance } = settings.performance as PerformanceType & { messageBlur?: boolean };
+
     migrated = {
       ...migrated,
       cacheVersion: SHARED_STATE_CACHE_VERSION,
       settings: {
         ...settings,
+        performance,
         themes: cachedSettings?.themes
           || (fallbackThemes ? cloneThemeSettings(fallbackThemes) : initialState.settings.themes),
         // Версия 2: гасим запасной HTTP-транспорт, сохранённый версией 0.3.3.
@@ -284,7 +306,7 @@ function pruneExpiredEphemeralMessages(cached: GlobalState) {
   const serverTime = getServerTime();
   Object.values(cached.messages.byChatId).forEach(({ ephemeralById }) => {
     Object.values(ephemeralById).forEach((message) => {
-      if (message.date + EPHEMERAL_MESSAGE_TTL_SECONDS <= serverTime) {
+      if (message.anchorMsgId || message.date + EPHEMERAL_MESSAGE_TTL_SECONDS <= serverTime) {
         delete ephemeralById[message.id];
       }
     });
@@ -295,6 +317,13 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
   const untypedCached = cached as any;
   Object.values(cached.messages.byChatId).forEach((messageStore) => {
     messageStore.ephemeralById ||= {};
+    messageStore.anchoredById = {};
+  });
+
+  Object.values(cached.messages.webPageById).forEach((webPage) => {
+    if (webPage.webpageType === 'full' && webPage.cachedPage && !webPage.cachedPageAudioById) {
+      webPage.cachedPageAudioById = buildPageAudioById(webPage.cachedPage);
+    }
   });
 
   // Pre-fill settings with defaults
@@ -303,166 +332,21 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
     ...cached.settings.byKey,
   };
 
-  cached.chatFolders = {
-    ...initialState.chatFolders,
-    ...cached.chatFolders,
-  };
-
-  if (!cached.chats.similarChannelsById) {
-    cached.chats.similarChannelsById = initialState.chats.similarChannelsById;
-  }
-
-  if (!cached.chats.similarBotsById) {
-    cached.chats.similarBotsById = initialState.chats.similarBotsById;
-  }
-
-  if (!cached.chats.lastMessageIds) {
-    cached.chats.lastMessageIds = initialState.chats.lastMessageIds;
-  }
-
   if (!cached.emojiGroups) {
     cached.emojiGroups = initialState.emojiGroups;
   }
 
-  // Clear old color storage to optimize cache size
-  if (untypedCached?.appConfig.peerColors) {
-    untypedCached.appConfig.peerColors = undefined;
-    untypedCached.appConfig.darkPeerColors = undefined;
-  }
-
-  if (!cached.fileUploads.byMessageKey) {
-    cached.fileUploads.byMessageKey = {};
-  }
-
-  if (!cached.reactions) {
-    cached.reactions = initialState.reactions;
-  }
-
-  if (!cached.quickReplies) {
-    cached.quickReplies = initialState.quickReplies;
-  }
-
-  if (!cached.users.previewMediaByBotId) {
-    cached.users.previewMediaByBotId = initialState.users.previewMediaByBotId;
-  }
-  if (!cached.chats.loadingParameters) {
-    cached.chats.loadingParameters = initialState.chats.loadingParameters;
-  }
   if (!cached.topPeerCategories) {
     cached.topPeerCategories = initialState.topPeerCategories;
   }
 
-  if (!cached.reactions.defaultTags?.[0]?.type) {
-    cached.reactions = initialState.reactions;
-  }
-
-  if (!cached.users.commonChatsById) {
-    cached.users.commonChatsById = initialState.users.commonChatsById;
-  }
   if (!cached.users.savedMusicByPeerId) {
     cached.users.savedMusicByPeerId = initialState.users.savedMusicByPeerId;
-  }
-
-  if (!cached.users.botAppPermissionsById) {
-    cached.users.botAppPermissionsById = initialState.users.botAppPermissionsById;
-  }
-  if (!cached.chats.topicsInfoById) {
-    cached.chats.topicsInfoById = initialState.chats.topicsInfoById;
-  }
-
-  if (!cached.messages.pollById) {
-    cached.messages.pollById = initialState.messages.pollById;
-  }
-  if (!cached.settings.botVerificationShownPeerIds) {
-    cached.settings.botVerificationShownPeerIds = initialState.settings.botVerificationShownPeerIds;
-  }
-
-  if (!cached.peers) {
-    cached.peers = initialState.peers;
-  }
-
-  if (!cached.settings.accountDaysTtl) {
-    cached.settings.accountDaysTtl = initialState.settings.accountDaysTtl;
-  }
-
-  if (!cached.cacheVersion) {
-    // Reset because of the new action message structure (the same reset the version 3 migration
-    // below performs)
-    cached.messages = initialState.messages;
-    cached.chats.listIds = initialState.chats.listIds;
-    // Treat unversioned caches as version 3, so every later migration still runs — stamping the
-    // current version would skip them all
-    cached.cacheVersion = 3;
-  }
-
-  if (!cached.messages.playbackByChatId) {
-    cached.messages.playbackByChatId = initialState.messages.playbackByChatId;
-  }
-
-  if (cached.cacheVersion < 2) {
-    if (untypedCached.settings.themes?.dark) {
-      untypedCached.settings.themes.dark.patternColor = initialState.sharedState.settings.themes.dark!.patternColor;
-    }
-
-    if (untypedCached.settings.themes?.light) {
-      untypedCached.settings.themes.light.patternColor = initialState.sharedState.settings.themes.light!.patternColor;
-    }
-
-    cached.cacheVersion = 2;
-  }
-
-  if (!cached.chats.notifyExceptionById) {
-    cached.chats.notifyExceptionById = initialState.chats.notifyExceptionById;
-  }
-
-  if (!cached.sharedState) {
-    cached.sharedState = initialState.sharedState;
-    cached.sharedState.settings = {
-      canDisplayChatInTitle: untypedCached.settings.byKey.canDisplayChatInTitle,
-      animationLevel: untypedCached.settings.byKey.animationLevel,
-      foldersPosition: FOLDERS_POSITION_DEFAULT,
-      messageSendKeyCombo: untypedCached.settings.byKey.messageSendKeyCombo,
-      shouldReplaceTextShortcuts: true,
-      messageTextSize: untypedCached.settings.byKey.messageTextSize,
-      instantViewFontSizeAdjust: INSTANT_VIEW_FONT_SIZE_ADJUST_DEFAULT,
-      performance: untypedCached.settings.performance,
-      theme: untypedCached.settings.byKey.theme,
-      themes: untypedCached.settings.themes
-        ? cloneThemeSettings(untypedCached.settings.themes)
-        : initialState.sharedState.settings.themes,
-      timeFormat: untypedCached.settings.byKey.timeFormat,
-      wasTimeFormatSetManually: untypedCached.settings.byKey.wasTimeFormatSetManually,
-      shouldUseSystemTheme: untypedCached.settings.byKey.shouldUseSystemTheme,
-      isConnectionStatusMinimized: untypedCached.settings.byKey.isConnectionStatusMinimized,
-      shouldForceHttpTransport: untypedCached.settings.byKey.shouldForceHttpTransport,
-      language: untypedCached.settings.byKey.language,
-      languages: untypedCached.settings.languages,
-      shouldSkipBrowserCloseConfirmation: Boolean(untypedCached.settings.byKey.shouldSkipBrowserCloseConfirmation),
-      browserCachedPosition: untypedCached.settings.browserCachedPosition,
-      browserCachedSize: untypedCached.settings.browserCachedSize,
-      shouldAllowHttpTransport: untypedCached.settings.byKey.shouldAllowHttpTransport,
-      shouldCollectDebugLogs: untypedCached.settings.byKey.shouldCollectDebugLogs,
-      shouldDebugExportedSenders: untypedCached.settings.byKey.shouldDebugExportedSenders,
-      shouldWarnAboutFiles: untypedCached.settings.byKey.shouldWarnAboutFiles,
-    };
-  }
-
-  if (!cached.messages.webPageById) {
-    cached.messages.webPageById = initialState.messages.webPageById;
   }
 
   const cachedSharedSettings = cached.sharedState.settings;
   if (cachedSharedSettings.instantViewFontSizeAdjust === undefined) {
     cachedSharedSettings.instantViewFontSizeAdjust = INSTANT_VIEW_FONT_SIZE_ADJUST_DEFAULT;
-  }
-
-  if (!cachedSharedSettings.wasAnimationLevelSetManually) {
-    cachedSharedSettings.animationLevel = ANIMATION_LEVEL_DEFAULT;
-    cachedSharedSettings.performance = INITIAL_PERFORMANCE_STATE_MED;
-  }
-
-  if (cachedSharedSettings.performance.messageBlur === undefined) {
-    cachedSharedSettings.performance.messageBlur = false;
   }
 
   if (cachedSharedSettings.performance.textStreaming === undefined) {
@@ -475,10 +359,6 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
 
   if (cachedSharedSettings.shouldReplaceTextShortcuts === undefined) {
     cachedSharedSettings.shouldReplaceTextShortcuts = true;
-  }
-
-  if (!cached.appConfig) {
-    cached.appConfig = initialState.appConfig;
   }
 
   if (cached.appConfig.webAppAllowedProtocols === undefined) {
@@ -495,11 +375,6 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
     cached.appConfig.richMessageMaxDepth = initialState.appConfig.richMessageMaxDepth;
     cached.appConfig.richMessageMaxMedia = initialState.appConfig.richMessageMaxMedia;
     cached.appConfig.richMessageMaxTableColumns = initialState.appConfig.richMessageMaxTableColumns;
-  }
-
-  if (untypedCached.sharedState?.settings?.shouldWarnAboutSvg) {
-    cached.sharedState.settings.shouldWarnAboutFiles = true;
-    untypedCached.sharedState.settings.shouldWarnAboutSvg = undefined;
   }
 
   if (cached.cacheVersion < 3) {
@@ -533,15 +408,30 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
   }
 
   if (cached.cacheVersion < 6) {
+    Object.values(untypedCached.chats.byId).forEach((chat: any) => {
+      if ('isCreator' in chat) {
+        chat.isOwner = chat.isCreator;
+        delete chat.isCreator;
+      }
+    });
     cached.cacheVersion = 6;
+  }
+
+  if (cached.cacheVersion < 7) {
+    migrateButtonActions(cached);
+    cached.cacheVersion = 7;
+  }
+
+  if (cached.cacheVersion < 8) {
+    cached.cacheVersion = 8;
     // Сериализация стикеров и кастомных эмодзи на бэкенде поменялась (миниатюры/атрибуты);
     // сбрасываем кеш наборов и эмодзи, чтобы они перезапросились с сервера.
     cached.stickers = initialState.stickers;
     cached.customEmojis = initialState.customEmojis;
   }
 
-  if (cached.cacheVersion < 7) {
-    cached.cacheVersion = 7;
+  if (cached.cacheVersion < 9) {
+    cached.cacheVersion = 9;
     // Набор стикеров по умолчанию теперь отдаётся каждому через getAllStickers;
     // сбрасываем кеш, чтобы он появился в «добавленных» без ручной чистки.
     cached.stickers = initialState.stickers;
@@ -549,11 +439,23 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
 
   if (!cached.auth) {
     cached.auth = initialState.auth;
-    cached.auth.rememberMe = untypedCached.rememberMe;
+    cached.auth.rememberMe = untypedCached.authRememberMe;
+  }
+
+  if (cached.auth.rememberMe === undefined) {
+    cached.auth.rememberMe = initialState.auth.rememberMe;
   }
 
   if (cached.audioPlayer.volume === undefined) {
     cached.audioPlayer.volume = initialState.audioPlayer.volume;
+  }
+
+  if (cached.audioPlayer.repeatMode === undefined) {
+    cached.audioPlayer.repeatMode = initialState.audioPlayer.repeatMode;
+  }
+
+  if (cached.audioPlayer.orderMode === undefined) {
+    cached.audioPlayer.orderMode = initialState.audioPlayer.orderMode;
   }
 }
 
@@ -588,28 +490,35 @@ export function temporarilySuspendCacheUpdate() {
   cacheUpdateSuspensionTimestamp = Date.now() + UPDATE_THROTTLE;
 }
 
-export function forceUpdateCache(noEncrypt = false) {
+export function forceUpdateCache() {
   if (Date.now() < cacheUpdateSuspensionTimestamp) {
     return;
   }
 
   const global = getGlobal();
-  const { hasPasscode, isScreenLocked } = global.passcode;
+  const passcodeState = localStorage.getItem(IS_SCREEN_LOCKED_CACHE_KEY);
+  if (passcodeState === 'enabling' || passcodeState === 'disabling') return;
+  const hasPasscode = passcodeState === 'true' || passcodeState === 'false';
+  if (!hasPasscode && global.passcode.hasPasscode) return;
 
+  // With passcode enabled, content is never persisted in plaintext.
+  // Full snapshots are written into the encrypted vault instead.
   if (hasPasscode) {
-    if (!isScreenLocked && !noEncrypt) {
-      const serializedGlobal = serializeGlobal(global);
-      void encryptSession(undefined, serializedGlobal, serializeShared(global.sharedState));
-    }
+    const passcodeGlobal = global.passcode.hasPasscode ? global : updatePasscodeSettings(global, {
+      hasPasscode: true,
+    });
+    cacheGlobal(clearGlobalForLockScreen(passcodeGlobal, false));
+    cacheSharedState(reduceSharedState(global.sharedState));
 
-    cacheIsScreenLocked(global);
-    cacheGlobal(clearGlobalForLockScreen(global, false));
-    cacheSharedState(clearSharedStateForLockScreen(global.sharedState));
+    // Keep the vault snapshot fresh so content survives a boot-lock
+    // (e.g. all tabs reloading at once), when there is no explicit lock to write it
+    if (getDek() && !global.passcode.isScreenLocked) {
+      void writeGlobalsVaultForSlot(ACCOUNT_SLOT, serializeGlobal(global));
+    }
     return;
   }
 
-  cacheIsScreenLocked(global);
-  cacheGlobal(reduceGlobal(global));
+  cacheGlobal(global);
   cacheSharedState(reduceSharedState(global.sharedState));
 }
 
@@ -665,6 +574,8 @@ function reduceGlobal<T extends GlobalState>(global: T) {
     passcode: pick(global.passcode, [
       'isScreenLocked',
       'hasPasscode',
+      'hasPasskey',
+      'autolockDuration',
       'invalidAttemptsCount',
       'timeoutUntil',
     ]),
@@ -960,6 +871,7 @@ function reduceMessages<T extends GlobalState>(global: T): GlobalState['messages
     const ephemeralById = Object.values(current.ephemeralById).reduce((acc, message) => {
       if (
         message.sendingState
+        || message.anchorMsgId
         || message.date + EPHEMERAL_MESSAGE_TTL_SECONDS <= serverTime
       ) {
         return acc;
@@ -977,6 +889,7 @@ function reduceMessages<T extends GlobalState>(global: T): GlobalState['messages
     byChatId[chatId] = {
       byId: cleanedById,
       ephemeralById,
+      anchoredById: {},
       threadsById,
       summaryById: {},
     };
@@ -1078,7 +991,32 @@ function reduceGroupCalls<T extends GlobalState>(global: T): GlobalState['groupC
   };
 }
 
-function reduceAvailableReactions(availableReactions?: ApiAvailableReaction[]): ApiAvailableReaction[] | undefined {
+function reduceAvailableReactions(
+  availableReactions?: ApiAvailableReaction[],
+): ApiAvailableReaction[] | undefined {
   return availableReactions
     ?.map((r) => ({ ...pick(r, ['reaction', 'staticIcon', 'title', 'isInactive']), isLocalCache: true }));
+}
+
+function migrateButtonActions(cached: GlobalState) {
+  Object.values(cached.messages.byChatId).forEach(({ byId, ephemeralById }) => {
+    [...Object.values(byId), ...Object.values(ephemeralById)].forEach((message) => {
+      [message.inlineButtons, message.keyboardButtons].forEach((rows) => {
+        rows?.forEach((row) => row.forEach((button, index) => {
+          if ('action' in button) return;
+          const legacyButton = button as { type: string; text?: string; receiptMessageId?: number };
+          const { text, type, receiptMessageId, ...fields } = legacyButton;
+          if (type === 'receipt' && message.content.invoice) {
+            message.content.invoice.receiptMessageId ||= receiptMessageId;
+          }
+          const { style, ...actionFields } = fields as { style?: ApiKeyboardButton['style'] };
+          row[index] = {
+            text: text || '',
+            style,
+            action: { ...actionFields, type: type === 'receipt' ? 'buy' : type } as ApiKeyboardButton['action'],
+          };
+        }));
+      });
+    });
+  });
 }

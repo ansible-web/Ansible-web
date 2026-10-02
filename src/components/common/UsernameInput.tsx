@@ -1,4 +1,3 @@
-import type { FC } from '../../lib/teact/teact';
 import {
   memo, useCallback, useEffect, useMemo, useState,
 } from '../../lib/teact/teact';
@@ -16,6 +15,8 @@ import usePreviousDeprecated from '../../hooks/usePreviousDeprecated';
 import InputText from '../ui/InputText';
 
 type OwnProps = {
+  // Checks the public link of the chat instead of the current user's username
+  chatId?: string;
   currentUsername?: string;
   asLink?: boolean;
   isLoading?: boolean;
@@ -34,14 +35,15 @@ const LINK_PREFIX_REGEX = new RegExp(
 
 const runDebouncedForCheckUsername = debounce((cb) => cb(), 250, false);
 
-const UsernameInput: FC<OwnProps> = ({
+const UsernameInput = ({
+  chatId,
   currentUsername,
   asLink,
   isLoading,
   isUsernameAvailable,
   checkedUsername,
   onChange,
-}) => {
+}: OwnProps) => {
   const { checkUsername, checkPublicLink } = getActions();
   const [username, setUsername] = useState(currentUsername || '');
 
@@ -104,12 +106,15 @@ const UsernameInput: FC<OwnProps> = ({
     onChange?.(newUsername);
 
     runDebouncedForCheckUsername(() => {
-      if (newUsername !== currentUsername) {
-        const check = asLink ? checkPublicLink : checkUsername;
-        check({ username: newUsername });
+      if (newUsername === currentUsername) return;
+
+      if (chatId) {
+        checkPublicLink({ chatId, username: newUsername });
+      } else {
+        checkUsername({ username: newUsername });
       }
     });
-  }, [asLink, checkPublicLink, checkUsername, currentUsername, onChange]);
+  }, [asLink, chatId, checkPublicLink, checkUsername, currentUsername, onChange]);
 
   return (
     <InputText
