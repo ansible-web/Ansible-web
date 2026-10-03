@@ -75,19 +75,7 @@ export async function initGlobal(force: boolean = false, prevGlobal?: GlobalStat
   const currentGlobal = getGlobal();
   if (!force && 'byTabId' in currentGlobal) {
     await ensureDekForUnlockedSession(currentGlobal);
-    if (cache) {
-      // 🚨 Эта ветка срабатывает, когда состояние пришло от другой вкладки, и
-      // прочитанный кеш выбрасывается — а запись кеша при этом включается. Если у
-      // пришедшего состояния общие настройки ещё начальные, страница записывает их
-      // поверх сохранённых: выбрал русский, обновил страницу — снова английский.
-      // Замер 03.10 (Opera GX, свежий профиль, 3 прогона из 3): страница читала
-      // tt-shared-state -> lang=ru и через пару секунд писала lang=en; в Chrome
-      // та же сборка держала язык, потому что до этой ветки дело не доходило.
-      // Общие настройки (язык, формат времени, тема) у всех вкладок ОДНИ, поэтому
-      // взять их из кеша безопасно — остальное состояние не трогаем.
-      setGlobal({ ...currentGlobal, sharedState: global.sharedState });
-      setupCaching();
-    }
+    if (cache) setupCaching();
     return;
   }
 
