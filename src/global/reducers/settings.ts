@@ -27,6 +27,18 @@ export function updateSharedSettings<T extends GlobalState>(
 ): T {
   const settings = selectSharedSettings(global);
   return updateSharedState(global, {
+    // Человек поменял настройку — состояние больше НЕ «начальное».
+    //
+    // 🚨 Без этого sharedStateConnector.onGlobalChange молча не отдаёт изменение
+    // SharedWorker'у (там стоит `if (global.sharedState.isInitial) return`), а
+    // воркер — хозяин общих настроек: он живёт дольше страницы и на перезагрузке
+    // отвечает своей старой копией. Замер 03.10 (Opera GX, свежий профиль):
+    //   первая загрузка -> reqGetFullState localState.lang=en isInitial=true
+    //                   <- fullState lang=en
+    //   после F5        -> reqGetFullState localState.lang=ru isInitial=undefined
+    //                   <- fullState lang=en   -- и выбор человека затирался.
+    // В Chrome воркер между загрузками умирал, поэтому там язык держался.
+    isInitial: undefined,
     settings: {
       ...settings,
       ...newSettings,
