@@ -65,7 +65,7 @@ const ManageBot: FC<OwnProps & StateProps> = ({
     setBotInfo,
     uploadProfilePhoto,
     uploadContactProfilePhoto,
-    startBotFatherConversation,
+    startBotManagerConversation,
   } = getActions();
 
   const [isFieldTouched, markFieldTouched, unmarkProfileTouched] = useFlag(false);
@@ -156,15 +156,15 @@ const ManageBot: FC<OwnProps & StateProps> = ({
   });
 
   const handleChangeEditIntro = useLastCallback(() => {
-    startBotFatherConversation({ param: `${username}-intro` });
+    startBotManagerConversation({ param: `${username}-intro` });
   });
 
   const handleChangeEditCommands = useLastCallback(() => {
-    startBotFatherConversation({ param: `${username}-commands` });
+    startBotManagerConversation({ param: `${username}-commands` });
   });
 
   const handleChangeSettings = useLastCallback(() => {
-    startBotFatherConversation({ param: username! });
+    startBotManagerConversation({ param: username! });
   });
 
   const inputRef = useRef<HTMLInputElement>();

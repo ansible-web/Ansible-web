@@ -12,7 +12,7 @@ import {
 } from '../../../api/types';
 import { ManagementProgress } from '../../../types';
 
-import { BOT_FATHER_USERNAME, GENERAL_REFETCH_INTERVAL } from '../../../config';
+import { BOT_MANAGER_USERNAME, GENERAL_REFETCH_INTERVAL } from '../../../config';
 import { copyTextToClipboard } from '../../../util/clipboard';
 import { getUsernameFromDeepLink } from '../../../util/deepLinkParser';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
@@ -1696,14 +1696,14 @@ addActionHandler('toggleUserLocationPermission', (global, actions, payload): Act
   setGlobal(global);
 });
 
-addActionHandler('startBotFatherConversation', async (global, actions, payload): Promise<void> => {
+addActionHandler('startBotManagerConversation', async (global, actions, payload): Promise<void> => {
   const {
     param,
     tabId = getCurrentTabId(),
   } = payload;
 
   if (!botFatherId) {
-    const chat = await fetchChatByUsername(global, BOT_FATHER_USERNAME);
+    const chat = await fetchChatByUsername(global, BOT_MANAGER_USERNAME);
     if (!chat) {
       return;
     }

@@ -352,7 +352,7 @@ export const TME_LINK_PREFIX = 'https://asme.su/';
 // Управляющий бот МЕССЕНДЖЕРА: у нас это @BotManager (uid 15), имени
 // botfather на стенде нет вовсе — поэтому три кнопки экрана «Изменить»
 // (приветствие/команды/настройки) молчали: имя не резолвилось.
-export const BOT_FATHER_USERNAME = 'botmanager';
+export const BOT_MANAGER_USERNAME = 'botmanager';
 export const USERNAME_PURCHASE_ERROR = 'USERNAME_PURCHASE_AVAILABLE';
 export const MESSAGE_ID_REQUIRED_ERROR = 'MESSAGE_ID_REQUIRED';
 export const PURCHASE_USERNAME = 'auction';

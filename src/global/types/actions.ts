@@ -2037,7 +2037,7 @@ export interface ActionPayloads {
     about?: string | undefined;
     description?: string | undefined;
   } & WithTabId;
-  startBotFatherConversation: {
+  startBotManagerConversation: {
     param: string;
   } & WithTabId;
   loadBotFreezeAppeal: undefined;
