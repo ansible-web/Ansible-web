@@ -349,7 +349,10 @@ export const RE_TG_LINK = /^as:(\/\/)?/i;
 export const RE_TME_LINK = /^(https?:\/\/)?([-a-zA-Z0-9@:%_+~#=]{1,32}\.)?(asme\.su)(?=[:/?#]|$)/i;
 export const RE_TELEGRAM_LINK = /^(https?:\/\/)?telegram\.org\//i;
 export const TME_LINK_PREFIX = 'https://asme.su/';
-export const BOT_FATHER_USERNAME = 'botfather';
+// Управляющий бот МЕССЕНДЖЕРА: у нас это @BotManager (uid 15), имени
+// botfather на стенде нет вовсе — поэтому три кнопки экрана «Изменить»
+// (приветствие/команды/настройки) молчали: имя не резолвилось.
+export const BOT_FATHER_USERNAME = 'botmanager';
 export const USERNAME_PURCHASE_ERROR = 'USERNAME_PURCHASE_AVAILABLE';
 export const MESSAGE_ID_REQUIRED_ERROR = 'MESSAGE_ID_REQUIRED';
 export const PURCHASE_USERNAME = 'auction';
