@@ -12,7 +12,7 @@ import {
 import {
   selectIsCurrentUserPremium,
   selectNewNoncontactPeersRequirePremium,
-  selectNonContactPeersPaidStars,
+  selectNonContactPeersPaidDiamonds,
 } from '../../../global/selectors';
 
 import useDebouncedCallback from '../../../hooks/useDebouncedCallback';
@@ -40,7 +40,7 @@ type StateProps = {
   canLimitNewMessagesWithoutPremium?: boolean;
   canChargeForMessages?: boolean;
   isCurrentUserPremium?: boolean;
-  nonContactPeersPaidStars: number;
+  nonContactPeersPaidDiamonds: number;
   noPaidReactionsForUsersCount: number;
   privacy: GlobalState['settings']['privacy'];
 };
@@ -51,7 +51,7 @@ function PrivacyMessages({
   canChargeForMessages,
   shouldNewNonContactPeersRequirePremium,
   shouldChargeForMessages,
-  nonContactPeersPaidStars,
+  nonContactPeersPaidDiamonds,
   isCurrentUserPremium,
   noPaidReactionsForUsersCount,
   onReset,
@@ -63,7 +63,7 @@ function PrivacyMessages({
 
   const canChangeForContactsAndPremium = isCurrentUserPremium || canLimitNewMessagesWithoutPremium;
   const canChangeChargeForMessages = isCurrentUserPremium && canChargeForMessages;
-  const [chargeForMessages, setChargeForMessages] = useState<number>(nonContactPeersPaidStars);
+  const [chargeForMessages, setChargeForMessages] = useState<number>(nonContactPeersPaidDiamonds);
   const [hasShownNotification, setHasShownNotification] = useState(false);
 
   const selectedValue = useMemo(() => {
@@ -140,13 +140,13 @@ function PrivacyMessages({
     updateGlobalPrivacySettings({
       shouldNewNonContactPeersRequirePremium: privacyValue === 'contacts_and_premium',
       // eslint-disable-next-line no-null/no-null
-      nonContactPeersPaidStars: privacyValue === 'charge_for_messages' ? chargeForMessages : null,
+      nonContactPeersPaidDiamonds: privacyValue === 'charge_for_messages' ? chargeForMessages : null,
     });
   });
 
   const updateGlobalPrivacySettingsWithDebounced = useDebouncedCallback((value: number) => {
     updateGlobalPrivacySettings({
-      nonContactPeersPaidStars: value,
+      nonContactPeersPaidDiamonds: value,
     });
   }, [updateGlobalPrivacySettings], 300, true);
 
@@ -232,14 +232,14 @@ export default memo(withGlobal<OwnProps>((global): Complete<StateProps> => {
       privacy,
     },
   } = global;
-  const nonContactPeersPaidStars = selectNonContactPeersPaidStars(global);
+  const nonContactPeersPaidDiamonds = selectNonContactPeersPaidDiamonds(global);
 
   const noPaidReactionsForUsersCount = global.settings.privacy.noPaidMessages?.allowUserIds.length || 0;
 
   return {
     shouldNewNonContactPeersRequirePremium: selectNewNoncontactPeersRequirePremium(global),
-    shouldChargeForMessages: Boolean(nonContactPeersPaidStars),
-    nonContactPeersPaidStars: nonContactPeersPaidStars || DEFAULT_CHARGE_FOR_MESSAGES,
+    shouldChargeForMessages: Boolean(nonContactPeersPaidDiamonds),
+    nonContactPeersPaidDiamonds: nonContactPeersPaidDiamonds || DEFAULT_CHARGE_FOR_MESSAGES,
     isCurrentUserPremium: selectIsCurrentUserPremium(global),
     canLimitNewMessagesWithoutPremium: global.appConfig.canLimitNewMessagesWithoutPremium,
     canChargeForMessages: global.appConfig.starsPaidMessagesAvailable,

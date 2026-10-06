@@ -11,7 +11,7 @@ import { isDeepLink, tryParseDeepLink } from '../../../util/deepLinkParser';
 import { toChannelId } from '../../../util/entities/ids';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { getTranslationFn } from '../../../util/localization';
-import { formatStarsAsText } from '../../../util/localization/format';
+import { formatDiamondsAsText } from '../../../util/localization/format';
 import { throttle } from '../../../util/schedulers';
 import { callApi } from '../../../api/gramjs';
 import { addActionHandler, getActions, getGlobal, setGlobal } from '../..';
@@ -356,7 +356,7 @@ async function searchMessagesGlobal<T extends GlobalState>(global: T, params: {
       message: {
         key: 'NotificationPaidExtraSearch',
         variables: {
-          stars: formatStarsAsText(lang, searchFlood.starsAmount),
+          stars: formatDiamondsAsText(lang, searchFlood.starsAmount),
         },
       },
     });

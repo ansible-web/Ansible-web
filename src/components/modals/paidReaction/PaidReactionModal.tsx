@@ -5,10 +5,10 @@ import {
 import { getActions, getGlobal, withGlobal } from '../../../global';
 
 import type {
-  ApiChat, ApiMessage, ApiPaidReactionPrivacyType,
+  ApiChat, ApiDiamondsAmount, ApiMessage, ApiPaidReactionPrivacyType,
   ApiPeer,
   ApiSendAsPeerId,
-  ApiStarsAmount, ApiUser,
+  ApiUser,
 } from '../../../api/types';
 import type { TabState } from '../../../global/types';
 import type { CustomPeer } from '../../../types';
@@ -40,7 +40,7 @@ import MenuItem from '../../ui/MenuItem';
 import Modal from '../../ui/Modal';
 import Separator from '../../ui/Separator';
 import BalanceBlock from '../diamonds/BalanceBlock';
-import StarSlider from './StarSlider';
+import DiamondSlider from './StarSlider';
 
 import styles from './PaidReactionModal.module.scss';
 
@@ -52,7 +52,7 @@ type StateProps = {
   message?: ApiMessage;
   chat?: ApiChat;
   maxAmount: number;
-  starBalance?: ApiStarsAmount;
+  starBalance?: ApiDiamondsAmount;
   defaultPrivacy?: ApiPaidReactionPrivacyType;
   sendPaidReactionsAsPeerIds?: ApiSendAsPeerId[];
   currentUserId: string;
@@ -307,7 +307,7 @@ const PaidReactionModal = ({
         <BalanceBlock balance={starBalance} className={styles.modalBalance} withAddButton />
       </div>
 
-      <StarSlider
+      <DiamondSlider
         className={styles.slider}
         defaultValue={DEFAULT_STARS_AMOUNT}
         maxValue={maxAmount}

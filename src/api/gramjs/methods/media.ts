@@ -1,6 +1,6 @@
 import { Api as GramJs } from '../../../lib/gramjs';
 
-import type { SizeType, TelegramClient } from '../../../lib/gramjs';
+import type { AnsibleClient, SizeType } from '../../../lib/gramjs';
 import type { ApiOnProgress, ApiParsedMedia } from '../../types';
 import {
   ApiMediaFormat,
@@ -32,7 +32,7 @@ export default async function downloadMedia(
   }: {
     url: string; mediaFormat: ApiMediaFormat; start?: number; end?: number; isHtmlAllowed?: boolean;
   },
-  client: TelegramClient,
+  client: AnsibleClient,
   onProgress?: ApiOnProgress,
 ) {
   const {
@@ -75,7 +75,7 @@ export type EntityType = (
 
 async function download(
   url: string,
-  client: TelegramClient,
+  client: AnsibleClient,
   onProgress?: ApiOnProgress,
   start?: number,
   end?: number,

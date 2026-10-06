@@ -2,7 +2,7 @@ import { memo, useMemo, useRef } from '@teact';
 import { withGlobal } from '../../../../global';
 
 import type { ApiMessage, ApiPeer } from '../../../../api/types';
-import type { ApiMessageActionStarGift } from '../../../../api/types/messageActions';
+import type { ApiMessageActionDiamondGift } from '../../../../api/types/messageActions';
 
 import { isChatChannel } from '../../../../global/helpers';
 import { getPeerTitle, isApiPeerChat } from '../../../../global/helpers/peers';
@@ -14,7 +14,7 @@ import {
 } from '../../../../global/selectors';
 import { IS_TOUCH_ENV } from '../../../../util/browser/windowEnvironment.ts';
 import buildClassName from '../../../../util/buildClassName';
-import { formatStarsAsText } from '../../../../util/localization/format';
+import { formatDiamondsAsText } from '../../../../util/localization/format';
 import { getServerTime } from '../../../../util/serverTime';
 import { formatIntegerCompact } from '../../../../util/textFormat';
 import { getStickerFromGift } from '../../../common/helpers/gifts';
@@ -34,7 +34,7 @@ import styles from '../ActionMessage.module.scss';
 
 type OwnProps = {
   message: ApiMessage;
-  action: ApiMessageActionStarGift;
+  action: ApiMessageActionDiamondGift;
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;
   onClick?: NoneToVoidFunction;
@@ -86,17 +86,17 @@ const DiamondGiftAction = ({
   const giftDescription = useMemo(() => {
     const peerLink = renderPeerLink(peer?.id, peerTitle || fallbackPeerTitle);
     const starsAmount = action.starsToConvert !== undefined
-      ? formatStarsAsText(lang, action.starsToConvert) : undefined;
+      ? formatDiamondsAsText(lang, action.starsToConvert) : undefined;
 
     if (isAuction && auctionBid !== undefined) {
-      return lang('ActionDiamondGiftAuctionBought', { cost: formatStarsAsText(lang, auctionBid) });
+      return lang('ActionDiamondGiftAuctionBought', { cost: formatDiamondsAsText(lang, auctionBid) });
     }
 
     if (action.isUpgraded) {
       return lang('ActionDiamondGiftUpgraded');
     }
 
-    if (action.alreadyPaidUpgradeStars && !isAuction) {
+    if (action.alreadyPaidUpgradeDiamonds && !isAuction) {
       return translateWithYou(
         lang, 'ActionDiamondGiftUpgradeText', !isOutgoing || isSelf, { peer: peerLink },
       );
@@ -186,7 +186,7 @@ const DiamondGiftAction = ({
       </div>
       <div className={styles.actionButton}>
         <Sparkles preset="button" />
-        {action.alreadyPaidUpgradeStars && !action.isUpgraded && !isOutgoing
+        {action.alreadyPaidUpgradeDiamonds && !action.isUpgraded && !isOutgoing
           ? lang('ActionDiamondGiftUnpack') : lang('ActionViewButton')}
       </div>
     </div>

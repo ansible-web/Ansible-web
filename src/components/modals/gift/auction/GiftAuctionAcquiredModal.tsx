@@ -1,12 +1,12 @@
 import { memo, useMemo, useRef } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
-import type { ApiStarGiftAuctionAcquiredGift, ApiSticker } from '../../../../api/types';
+import type { ApiDiamondGiftAuctionAcquiredGift, ApiSticker } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
 import { selectTabState } from '../../../../global/selectors';
 import { formatDateTimeToString } from '../../../../util/dates/oldDateFormat';
-import { formatStarsAsIcon } from '../../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../../util/localization/format';
 
 import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
 import useLang from '../../../../hooks/useLang';
@@ -26,7 +26,7 @@ export type OwnProps = {
 };
 
 type StateProps = {
-  acquiredGifts?: ApiStarGiftAuctionAcquiredGift[];
+  acquiredGifts?: ApiDiamondGiftAuctionAcquiredGift[];
   giftTitle?: string;
   giftSticker?: ApiSticker;
 };
@@ -75,7 +75,7 @@ const GiftAuctionAcquiredModal = ({ modal, acquiredGifts, giftTitle, giftSticker
         [lang('GiftAuctionDate'), formatDateTimeToString(gift.date * 1000, lang.code, true)],
         [lang('GiftAuctionAcceptedBid'), (
           <span className={styles.bidValue}>
-            {formatStarsAsIcon(lang, gift.bidAmount, { className: styles.starIcon })}
+            {formatDiamondsAsIcon(lang, gift.bidAmount, { className: styles.starIcon })}
             <BadgeButton className={styles.badge}>
               {lang('GiftAuctionTopPosition', { position: gift.position })}
             </BadgeButton>

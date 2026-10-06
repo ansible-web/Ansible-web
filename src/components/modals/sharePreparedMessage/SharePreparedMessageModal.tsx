@@ -31,7 +31,7 @@ export type OwnProps = {
 type StateProps = {
   paymentMessageConfirmDialogKey?: string;
   starsBalance: number;
-  isStarsBalanceModalOpen: boolean;
+  isDiamondsBalanceModalOpen: boolean;
 };
 
 export type SendParams = {
@@ -42,7 +42,7 @@ export type SendParams = {
 const PAYMENT_DIALOG_KEY = 'sharePreparedMessage';
 
 const SharePreparedMessageModal = ({
-  modal, paymentMessageConfirmDialogKey, isStarsBalanceModalOpen, starsBalance,
+  modal, paymentMessageConfirmDialogKey, isDiamondsBalanceModalOpen, starsBalance,
 }: OwnProps & StateProps) => {
   const {
     closeSharePreparedMessageModal,
@@ -76,7 +76,9 @@ const SharePreparedMessageModal = ({
     shouldAutoApprove: shouldPaidMessageAutoApprove,
     setAutoApprove: setShouldPaidMessageAutoApprove,
     handleWithConfirmation: handleActionWithPaymentConfirmation,
-  } = usePaidMessageConfirmation(PAYMENT_DIALOG_KEY, starsForSendMessage || 0, isStarsBalanceModalOpen, starsBalance);
+  } = usePaidMessageConfirmation(
+    PAYMENT_DIALOG_KEY, starsForSendMessage || 0, isDiamondsBalanceModalOpen, starsBalance,
+  );
 
   const handleClose = useLastCallback(() => {
     closeSharePreparedMessageModal();
@@ -162,7 +164,7 @@ const SharePreparedMessageModal = ({
         isOpen={paymentMessageConfirmDialogKey === PAYMENT_DIALOG_KEY}
         onClose={handleClosePaymentMessageConfirmDialog}
         userName={peerName}
-        messagePriceInStars={starsForSendMessage || 0}
+        messagePriceInDiamonds={starsForSendMessage || 0}
         messagesCount={1}
         shouldAutoApprove={shouldPaidMessageAutoApprove}
         setAutoApprove={setShouldPaidMessageAutoApprove}
@@ -177,11 +179,11 @@ export default memo(withGlobal(
     const tabState = selectTabState(global);
     const { paymentMessageConfirmDialogKey } = tabState;
     const starsBalance = global.stars?.balance.amount || 0;
-    const isStarsBalanceModalOpen = Boolean(tabState.starsBalanceModal);
+    const isDiamondsBalanceModalOpen = Boolean(tabState.starsBalanceModal);
     return {
       paymentMessageConfirmDialogKey,
       starsBalance,
-      isStarsBalanceModalOpen,
+      isDiamondsBalanceModalOpen,
     };
   },
 )(SharePreparedMessageModal));

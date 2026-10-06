@@ -46,7 +46,7 @@ import type {
 import type { ApiEmojiStatusType, ApiPeerSettings } from './peers';
 import type { ApiRichMessage } from './richMessage';
 import type { ApiPrivacyKey, LangPackStringValue, PrivacyVisibility } from './settings';
-import type { ApiStarGiftAuctionUserState, ApiTypeCurrencyAmount, ApiTypeStarGiftAuctionState } from './stars';
+import type { ApiDiamondGiftAuctionUserState, ApiTypeCurrencyAmount, ApiTypeDiamondGiftAuctionState } from './stars';
 import type { ApiStealthMode, ApiStory, ApiStorySkipped } from './stories';
 import type {
   ApiUser, ApiUserFullInfo, ApiUserStatus,
@@ -670,7 +670,7 @@ export type ApiUpdatePaymentStateCompleted = {
   tabId: number;
 };
 
-export type ApiUpdateStarPaymentStateCompleted = {
+export type ApiUpdateDiamondPaymentStateCompleted = {
   '@type': 'updateStarPaymentStateCompleted';
   paymentState: TabState['starsPayment'];
   tabId: number;
@@ -926,24 +926,24 @@ export type ApiUpdatePremiumFloodWait = {
   isUpload?: boolean;
 };
 
-export type ApiUpdateStarsBalance = {
+export type ApiUpdateDiamondsBalance = {
   '@type': 'updateStarsBalance';
   balance: ApiTypeCurrencyAmount;
 };
 
-export type ApiUpdateStarGiftAuctionState = {
+export type ApiUpdateDiamondGiftAuctionState = {
   '@type': 'updateStarGiftAuctionState';
   giftId: string;
-  state: ApiTypeStarGiftAuctionState;
+  state: ApiTypeDiamondGiftAuctionState;
 };
 
-export type ApiUpdateStarGiftAuctionUserState = {
+export type ApiUpdateDiamondGiftAuctionUserState = {
   '@type': 'updateStarGiftAuctionUserState';
   giftId: string;
-  userState: ApiStarGiftAuctionUserState;
+  userState: ApiDiamondGiftAuctionUserState;
 };
 
-export type ApiUpdateStarGiftCraftFail = {
+export type ApiUpdateDiamondGiftCraftFail = {
   '@type': 'updateStarGiftCraftFail';
 };
 
@@ -1016,7 +1016,7 @@ export type ApiUpdate = (
   ApiUpdateError | ApiUpdateResetContacts | ApiUpdateStartEmojiInteraction | ApiUpdateThreadReadState |
   ApiUpdateFavoriteStickers | ApiUpdateStickerSet | ApiUpdateStickerSets | ApiUpdateStickerSetsOrder |
   ApiUpdateRecentStickers | ApiUpdateSavedGifs | ApiUpdateNewScheduledMessage | ApiUpdateMoveStickerSetToTop |
-  ApiUpdateScheduledMessageSendSucceeded | ApiUpdateScheduledMessage | ApiUpdateStarPaymentStateCompleted |
+  ApiUpdateScheduledMessageSendSucceeded | ApiUpdateScheduledMessage | ApiUpdateDiamondPaymentStateCompleted |
   ApiUpdateDeleteScheduledMessages | ApiUpdateResetMessages | ApiUpdateMessageTranslations |
   ApiUpdateFailedMessageTranslations | ApiUpdateWebPage | ApiUpdateChatTypingDraft | ApiUpdateChatTypingDraftStopped
   | ApiUpdateDiscussion |
@@ -1035,8 +1035,8 @@ export type ApiUpdate = (
   ApiRequestReconnectApi | ApiRequestSync | ApiUpdateFetchingDifference | ApiUpdateChannelMessages |
   ApiUpdateStealthMode | ApiUpdateAttachMenuBots | ApiUpdateNewAuthorization | ApiUpdateGroupInvitePrivacyForbidden |
   ApiUpdateViewForumAsMessages | ApiUpdateSavedDialogPinned | ApiUpdatePinnedSavedDialogIds | ApiUpdateChatLastMessage |
-  ApiUpdateDeleteSavedHistory | ApiUpdatePremiumFloodWait | ApiUpdateStarsBalance | ApiUpdateStarGiftAuctionState
-  | ApiUpdateStarGiftAuctionUserState | ApiUpdateStarGiftCraftFail | ApiUpdateBotCommands
+  ApiUpdateDeleteSavedHistory | ApiUpdatePremiumFloodWait | ApiUpdateDiamondsBalance | ApiUpdateDiamondGiftAuctionState
+  | ApiUpdateDiamondGiftAuctionUserState | ApiUpdateDiamondGiftCraftFail | ApiUpdateBotCommands
   | ApiUpdateQuickReplyMessage | ApiUpdateQuickReplies
   | ApiDeleteQuickReply | ApiUpdateDeleteQuickReplyMessages | ApiUpdateDeleteProfilePhoto | ApiUpdateNewProfilePhoto
   | ApiUpdateEntities | ApiUpdatePaidReactionPrivacy | ApiUpdateLangPackTooLong | ApiUpdateLangPack

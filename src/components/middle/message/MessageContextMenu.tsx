@@ -276,10 +276,10 @@ const MessageContextMenu = ({
   const seenByDates = message.seenByDates;
   const isPremiumGift = message.content.action?.type === 'giftPremium';
   const isGiftCode = message.content.action?.type === 'giftCode';
-  const isStarGift = message.content.action?.type === 'starGift';
-  const isStarGiftUnique = message.content.action?.type === 'starGiftUnique';
+  const isDiamondGift = message.content.action?.type === 'starGift';
+  const isDiamondGiftUnique = message.content.action?.type === 'starGiftUnique';
   const shouldShowGiftButton = isUserId(message.chatId)
-    && canGift && (isPremiumGift || isGiftCode || isStarGift || isStarGiftUnique);
+    && canGift && (isPremiumGift || isGiftCode || isDiamondGift || isDiamondGiftUnique);
   const pollCountryRestrictionMessage = useMemo(
     () => getPollCountryRestrictionMessage(lang, poll?.summary.allowedCountryCodes),
     [lang, poll?.summary.allowedCountryCodes],

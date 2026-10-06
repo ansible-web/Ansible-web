@@ -6,13 +6,13 @@ import { getActions, withGlobal } from '../../../../global';
 import type { TabState } from '../../../../global/types';
 
 import {
-  selectStarsGiftResaleCommission,
+  selectDiamondsGiftResaleCommission,
   selectTonGiftResaleCommission,
 } from '../../../../global/selectors';
 import {
   convertTonFromNanos, convertTonToNanos, convertTonToUsd, formatCurrencyAsString,
 } from '../../../../util/formatCurrency';
-import { formatStarsAsIcon, formatStarsAsText, formatTonAsIcon,
+import { formatDiamondsAsIcon, formatDiamondsAsText, formatTonAsIcon,
   formatTonAsText } from '../../../../util/localization/format';
 
 import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
@@ -128,7 +128,7 @@ const GiftResalePriceComposerModal = ({
       <div className={styles.inputPriceDescription}>
         <span>
           {!isPriceCorrect && Boolean(commission) && lang('DescriptionComposerGiftMinimumPrice', {
-            stars: isPriceInTon ? formatTonAsText(lang, minAmount) : formatStarsAsText(lang, minAmount),
+            stars: isPriceInTon ? formatTonAsText(lang, minAmount) : formatDiamondsAsText(lang, minAmount),
           }, {
             withMarkdown: true,
             withNodes: true,
@@ -139,7 +139,7 @@ const GiftResalePriceComposerModal = ({
               {
                 stars: isPriceInTon
                   ? formatTonAsText(lang, priceWithCommission)
-                  : formatStarsAsText(lang, priceWithCommission),
+                  : formatDiamondsAsText(lang, priceWithCommission),
               },
               {
                 withMarkdown: true,
@@ -169,7 +169,7 @@ const GiftResalePriceComposerModal = ({
       <Button inline noForcedUpperCase disabled={!isPriceCorrect} onClick={handleSellGift}>
         {isPriceCorrect && lang('ButtonSellGift', {
           stars: isPriceInTon ? formatTonAsIcon(lang, price)
-            : formatStarsAsIcon(lang, price),
+            : formatDiamondsAsIcon(lang, price),
         }, { withNodes: true })}
         {!isPriceCorrect && lang('Sell')}
       </Button>
@@ -179,7 +179,7 @@ const GiftResalePriceComposerModal = ({
 
 export default memo(withGlobal<OwnProps>(
   (global): Complete<StateProps> => {
-    const starsCommission = selectStarsGiftResaleCommission(global);
+    const starsCommission = selectDiamondsGiftResaleCommission(global);
     const starsResaleAmountMin = global.appConfig.starsStargiftResaleAmountMin || 0;
     const starsResaleAmountMax = global.appConfig.starsStargiftResaleAmountMax;
 

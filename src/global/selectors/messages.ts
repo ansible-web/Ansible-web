@@ -83,7 +83,7 @@ import {
 } from './chats';
 import { selectCurrentLimit } from './limits';
 import { selectMessageDownloadableMedia } from './media';
-import { selectPeer, selectPeerPaidMessagesStars } from './peers';
+import { selectPeer, selectPeerPaidMessagesDiamonds } from './peers';
 import { selectPeerStory } from './stories';
 import { selectCustomEmoji, selectIsStickerFavorite } from './symbols';
 import { selectTabState } from './tabs';
@@ -1385,15 +1385,15 @@ export function selectCanSchedule<T extends GlobalState>(
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ) {
   const chatId = selectCurrentMessageList(global, tabId)?.chatId;
-  const paidMessagesStars = chatId ? selectPeerPaidMessagesStars(global, chatId) : undefined;
-  return !paidMessagesStars;
+  const paidMessagesDiamonds = chatId ? selectPeerPaidMessagesDiamonds(global, chatId) : undefined;
+  return !paidMessagesDiamonds;
 }
 
 export function selectCanScheduleUntilOnline<T extends GlobalState>(global: T, id: string) {
   const isChatWithSelf = selectIsChatWithSelf(global, id);
   const chatBot = selectBot(global, id);
-  const paidMessagesStars = selectPeerPaidMessagesStars(global, id);
-  return Boolean(!paidMessagesStars
+  const paidMessagesDiamonds = selectPeerPaidMessagesDiamonds(global, id);
+  return Boolean(!paidMessagesDiamonds
     && !isChatWithSelf && !chatBot && isUserId(id) && selectUserStatus(global, id)?.wasOnline);
 }
 

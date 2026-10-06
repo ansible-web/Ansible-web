@@ -7,13 +7,13 @@ import type { TabState } from '../../../../global/types';
 import { TON_CURRENCY_CODE } from '../../../../config';
 import { getPeerTitle } from '../../../../global/helpers/peers';
 import {
+  selectDiamondsGiftResaleCommission,
   selectPeer,
-  selectStarsGiftResaleCommission,
   selectTonGiftResaleCommission,
 } from '../../../../global/selectors';
 import { convertTonToUsd, formatCurrencyAsString } from '../../../../util/formatCurrency';
 import {
-  formatCurrencyAmountAsText, formatStarsAsIcon, formatStarsAsText, formatTonAsIcon, formatTonAsText,
+  formatCurrencyAmountAsText, formatDiamondsAsIcon, formatDiamondsAsText, formatTonAsIcon, formatTonAsText,
 } from '../../../../util/localization/format';
 import { round } from '../../../../util/math';
 import { formatPercent } from '../../../../util/textFormat';
@@ -48,7 +48,7 @@ const GiftOfferAcceptModal = ({
   modal, recipientPeer, starsCommission, tonCommission, starsUsdRate, tonUsdRate,
 }: OwnProps & StateProps) => {
   const {
-    closeGiftOfferAcceptModal, acceptStarGiftOffer,
+    closeGiftOfferAcceptModal, acceptDiamondGiftOffer,
   } = getActions();
   const lang = useLang();
 
@@ -59,7 +59,7 @@ const GiftOfferAcceptModal = ({
   const handleConfirm = useLastCallback(() => {
     if (!renderingModal) return;
 
-    acceptStarGiftOffer({ messageId: renderingModal.messageId });
+    acceptDiamondGiftOffer({ messageId: renderingModal.messageId });
     closeGiftOfferAcceptModal();
   });
 
@@ -159,10 +159,10 @@ const GiftOfferAcceptModal = ({
   const formattedPrice = formatCurrencyAmountAsText(lang, price);
   const formattedReceiveAmountAsText = isPriceInTon
     ? formatTonAsText(lang, receiveAmount, true)
-    : formatStarsAsText(lang, receiveAmount);
+    : formatDiamondsAsText(lang, receiveAmount);
   const formattedReceiveAmountAsIcon = isPriceInTon
     ? formatTonAsIcon(lang, receiveAmount, { shouldConvertFromNanos: true })
-    : formatStarsAsIcon(lang, receiveAmount);
+    : formatDiamondsAsIcon(lang, receiveAmount);
 
   return (
     <ConfirmDialog
@@ -208,7 +208,7 @@ const GiftOfferAcceptModal = ({
 export default memo(
   withGlobal<OwnProps>((global, { modal }): Complete<StateProps> => {
     const recipientPeer = modal?.peerId ? selectPeer(global, modal.peerId) : undefined;
-    const starsCommission = selectStarsGiftResaleCommission(global);
+    const starsCommission = selectDiamondsGiftResaleCommission(global);
     const tonCommission = selectTonGiftResaleCommission(global);
 
     const starsUsdSellRateX1000 = global.appConfig?.starsUsdSellRateX1000;

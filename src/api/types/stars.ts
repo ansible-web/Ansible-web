@@ -4,7 +4,7 @@ import type { ApiChat } from './chats';
 import type { ApiFormattedText, ApiSticker, BoughtPaidMedia } from './messages';
 import type { ApiUser } from './users';
 
-export interface ApiStarGiftRegular {
+export interface ApiDiamondGiftRegular {
   type: 'starGift';
   isLimited?: true;
   id: string;
@@ -30,16 +30,16 @@ export interface ApiStarGiftRegular {
   isAuction?: true;
   auctionSlug?: string;
   giftsPerRound?: number;
-  background?: ApiStarGiftBackground;
+  background?: ApiDiamondGiftBackground;
 }
 
-export interface ApiStarGiftBackground {
+export interface ApiDiamondGiftBackground {
   centerColor: string;
   edgeColor: string;
   textColor: string;
 }
 
-export interface ApiStarGiftUnique {
+export interface ApiDiamondGiftUnique {
   type: 'starGiftUnique';
   id: string;
   regularGiftId: string;
@@ -50,7 +50,7 @@ export interface ApiStarGiftUnique {
   ownerAddress?: string;
   issuedCount: number;
   totalCount: number;
-  attributes: ApiStarGiftAttribute[];
+  attributes: ApiDiamondGiftAttribute[];
   slug: string;
   giftAddress?: string;
   resellPrice?: ApiTypeCurrencyAmount[];
@@ -66,34 +66,35 @@ export interface ApiStarGiftUnique {
   craftChancePermille?: number;
 }
 
-export type ApiStarGift = ApiStarGiftRegular | ApiStarGiftUnique;
+export type ApiDiamondGift = ApiDiamondGiftRegular | ApiDiamondGiftUnique;
 
-interface ApiStarGiftAttributeRarityUncommon {
+interface ApiDiamondGiftAttributeRarityUncommon {
   type: 'uncommon' | 'rare' | 'epic' | 'legendary';
 }
 
-interface ApiStarGiftAttributeRarityRegular {
+interface ApiDiamondGiftAttributeRarityRegular {
   type: 'regular';
   rarityPercent: number;
 }
 
-export type ApiStarGiftAttributeRarity = ApiStarGiftAttributeRarityRegular | ApiStarGiftAttributeRarityUncommon;
+export type ApiDiamondGiftAttributeRarity =
+  ApiDiamondGiftAttributeRarityRegular | ApiDiamondGiftAttributeRarityUncommon;
 
-export interface ApiStarGiftAttributeModel {
+export interface ApiDiamondGiftAttributeModel {
   type: 'model';
   name: string;
   sticker: ApiSticker;
-  rarity: ApiStarGiftAttributeRarity;
+  rarity: ApiDiamondGiftAttributeRarity;
 }
 
-export interface ApiStarGiftAttributePattern {
+export interface ApiDiamondGiftAttributePattern {
   type: 'pattern';
   name: string;
   sticker: ApiSticker;
-  rarity: ApiStarGiftAttributeRarity;
+  rarity: ApiDiamondGiftAttributeRarity;
 }
 
-export interface ApiStarGiftAttributeBackdrop {
+export interface ApiDiamondGiftAttributeBackdrop {
   type: 'backdrop';
   backdropId: number;
   name: string;
@@ -101,10 +102,10 @@ export interface ApiStarGiftAttributeBackdrop {
   edgeColor: string;
   patternColor: string;
   textColor: string;
-  rarity: ApiStarGiftAttributeRarity;
+  rarity: ApiDiamondGiftAttributeRarity;
 }
 
-export interface ApiStarGiftAttributeOriginalDetails {
+export interface ApiDiamondGiftAttributeOriginalDetails {
   type: 'originalDetails';
   senderId?: string;
   recipientId: string;
@@ -112,34 +113,34 @@ export interface ApiStarGiftAttributeOriginalDetails {
   message?: ApiFormattedText;
 }
 
-export type ApiStarGiftAttribute = ApiStarGiftAttributeModel | ApiStarGiftAttributePattern
-  | ApiStarGiftAttributeBackdrop | ApiStarGiftAttributeOriginalDetails;
+export type ApiDiamondGiftAttribute = ApiDiamondGiftAttributeModel | ApiDiamondGiftAttributePattern
+  | ApiDiamondGiftAttributeBackdrop | ApiDiamondGiftAttributeOriginalDetails;
 
-export interface ApiStarGiftUpgradePrice {
+export interface ApiDiamondGiftUpgradePrice {
   date: number;
   upgradeStars: number;
 }
 
-export interface ApiStarGiftUpgradePreview {
-  sampleAttributes: ApiStarGiftAttribute[];
-  prices: ApiStarGiftUpgradePrice[];
-  nextPrices: ApiStarGiftUpgradePrice[];
+export interface ApiDiamondGiftUpgradePreview {
+  sampleAttributes: ApiDiamondGiftAttribute[];
+  prices: ApiDiamondGiftUpgradePrice[];
+  nextPrices: ApiDiamondGiftUpgradePrice[];
 }
 
-export interface ApiSavedStarGift {
+export interface ApiSavedDiamondGift {
   isNameHidden?: boolean;
   isUnsaved?: boolean;
   isRefunded?: boolean;
   fromId?: string;
   date: number;
-  gift: ApiStarGift;
-  inputGift?: ApiInputSavedStarGift;
+  gift: ApiDiamondGift;
+  inputGift?: ApiInputSavedDiamondGift;
   savedId?: string;
   message?: ApiFormattedText;
   messageId?: number;
   starsToConvert?: number;
   canUpgrade?: true;
-  alreadyPaidUpgradeStars?: number;
+  alreadyPaidUpgradeDiamonds?: number;
   transferStars?: number;
   canExportAt?: number;
   canTransferAt?: number;
@@ -157,57 +158,57 @@ export type StarGiftAttributeIdModel = {
   type: 'model';
   documentId: string;
 };
-export type ApiStarGiftAttributeIdPattern = {
+export type ApiDiamondGiftAttributeIdPattern = {
   type: 'pattern';
   documentId: string;
 };
-export type ApiStarGiftAttributeIdBackdrop = {
+export type ApiDiamondGiftAttributeIdBackdrop = {
   type: 'backdrop';
   backdropId: number;
 };
-export type ApiStarGiftAttributeId = StarGiftAttributeIdModel |
-  ApiStarGiftAttributeIdPattern | ApiStarGiftAttributeIdBackdrop;
+export type ApiDiamondGiftAttributeId = StarGiftAttributeIdModel |
+  ApiDiamondGiftAttributeIdPattern | ApiDiamondGiftAttributeIdBackdrop;
 
-export interface ApiStarGiftAttributeCounter<T extends ApiStarGiftAttributeId = ApiStarGiftAttributeId> {
+export interface ApiDiamondGiftAttributeCounter<T extends ApiDiamondGiftAttributeId = ApiDiamondGiftAttributeId> {
   attribute: T;
   count: number;
 }
 
-export interface ApiTypeResaleStarGifts {
+export interface ApiTypeResaleDiamondGifts {
   count: number;
-  gifts: ApiStarGift[];
+  gifts: ApiDiamondGift[];
   nextOffset?: string;
-  attributes?: ApiStarGiftAttribute[];
+  attributes?: ApiDiamondGiftAttribute[];
   attributesHash?: string;
   chats: ApiChat[];
-  counters?: ApiStarGiftAttributeCounter[];
+  counters?: ApiDiamondGiftAttributeCounter[];
   users: ApiUser[];
 }
 
-export interface ApiInputSavedStarGiftUser {
+export interface ApiInputSavedDiamondGiftUser {
   type: 'user';
   messageId: number;
 }
 
-export interface ApiInputSavedStarGiftChat {
+export interface ApiInputSavedDiamondGiftChat {
   type: 'chat';
   chatId: string;
   savedId: string;
 }
 
-export type ApiInputSavedStarGift = ApiInputSavedStarGiftUser | ApiInputSavedStarGiftChat;
+export type ApiInputSavedDiamondGift = ApiInputSavedDiamondGiftUser | ApiInputSavedDiamondGiftChat;
 
-export type ApiRequestInputSavedStarGiftUser = ApiInputSavedStarGiftUser;
-export type ApiRequestInputSavedStarGiftChat = {
+export type ApiRequestInputSavedDiamondGiftUser = ApiInputSavedDiamondGiftUser;
+export type ApiRequestInputSavedDiamondGiftChat = {
   type: 'chat';
   chat: ApiChat;
   savedId: string;
 };
-export type ApiRequestInputSavedStarGift = ApiRequestInputSavedStarGiftUser | ApiRequestInputSavedStarGiftChat;
+export type ApiRequestInputSavedDiamondGift = ApiRequestInputSavedDiamondGiftUser | ApiRequestInputSavedDiamondGiftChat;
 
-export type ApiTypeCurrencyAmount = ApiStarsAmount | ApiTonAmount;
+export type ApiTypeCurrencyAmount = ApiDiamondsAmount | ApiTonAmount;
 
-export interface ApiStarsAmount {
+export interface ApiDiamondsAmount {
   currency: typeof STARS_CURRENCY_CODE;
   amount: number;
   nanos: number;
@@ -218,57 +219,57 @@ export interface ApiTonAmount {
   amount: number;
 }
 
-export interface ApiStarsTransactionPeerUnsupported {
+export interface ApiDiamondsTransactionPeerUnsupported {
   type: 'unsupported';
 }
 
-export interface ApiStarsTransactionPeerAppStore {
+export interface ApiDiamondsTransactionPeerAppStore {
   type: 'appStore';
 }
 
-export interface ApiStarsTransactionPeerPlayMarket {
+export interface ApiDiamondsTransactionPeerPlayMarket {
   type: 'playMarket';
 }
 
-export interface ApiStarsTransactionPeerPremiumBot {
+export interface ApiDiamondsTransactionPeerPremiumBot {
   type: 'premiumBot';
 }
 
-export interface ApiStarsTransactionPeerFragment {
+export interface ApiDiamondsTransactionPeerFragment {
   type: 'fragment';
 }
 
-export interface ApiStarsTransactionPeerAds {
+export interface ApiDiamondsTransactionPeerAds {
   type: 'ads';
 }
 
-export interface ApiStarsTransactionApi {
+export interface ApiDiamondsTransactionApi {
   type: 'api';
 }
 
-export interface ApiStarsTransactionPeerPeer {
+export interface ApiDiamondsTransactionPeerPeer {
   type: 'peer';
   id: string;
 }
 
-export type ApiStarsTransactionPeer =
-  | ApiStarsTransactionPeerUnsupported
-  | ApiStarsTransactionPeerAppStore
-  | ApiStarsTransactionPeerPlayMarket
-  | ApiStarsTransactionPeerPremiumBot
-  | ApiStarsTransactionPeerFragment
-  | ApiStarsTransactionPeerAds
-  | ApiStarsTransactionApi
-  | ApiStarsTransactionPeerPeer;
+export type ApiDiamondsTransactionPeer =
+  | ApiDiamondsTransactionPeerUnsupported
+  | ApiDiamondsTransactionPeerAppStore
+  | ApiDiamondsTransactionPeerPlayMarket
+  | ApiDiamondsTransactionPeerPremiumBot
+  | ApiDiamondsTransactionPeerFragment
+  | ApiDiamondsTransactionPeerAds
+  | ApiDiamondsTransactionApi
+  | ApiDiamondsTransactionPeerPeer;
 
-export interface ApiStarsTransaction {
+export interface ApiDiamondsTransaction {
   id?: string;
-  peer: ApiStarsTransactionPeer;
+  peer: ApiDiamondsTransactionPeer;
   messageId?: number;
   amount: ApiTypeCurrencyAmount;
   isRefund?: true;
   isGift?: true;
-  starGift?: ApiStarGift;
+  starGift?: ApiDiamondGift;
   giveawayPostId?: number;
   isMyGift?: true; // Used only for outgoing star gift messages
   isReaction?: true;
@@ -287,14 +288,14 @@ export interface ApiStarsTransaction {
   isPostsSearch?: true;
   isDropOriginalDetails?: true;
   isPrepaidUpgrade?: true;
-  isStarGiftAuctionBid?: true;
+  isDiamondGiftAuctionBid?: true;
 }
 
-export interface ApiStarsSubscription {
+export interface ApiDiamondsSubscription {
   id: string;
   peerId: string;
   until: number;
-  pricing: ApiStarsSubscriptionPricing;
+  pricing: ApiDiamondsSubscriptionPricing;
   isCancelled?: true;
   canRefulfill?: true;
   hasMissingBalance?: true;
@@ -305,32 +306,32 @@ export interface ApiStarsSubscription {
   invoiceSlug?: string;
 }
 
-export type ApiStarsSubscriptionPricing = {
+export type ApiDiamondsSubscriptionPricing = {
   period: number;
   amount: number;
 };
 
-export interface ApiStarTopupOption {
+export interface ApiDiamondTopupOption {
   isExtended?: true;
   stars: number;
   currency: string;
   amount: number;
 }
 
-export interface ApiStarsGiveawayWinnerOption {
+export interface ApiDiamondsGiveawayWinnerOption {
   isDefault?: true;
   users: number;
   perUserStars: number;
 }
 
 export interface ApiDisallowedGiftsSettings {
-  shouldDisallowUnlimitedStarGifts?: true;
-  shouldDisallowLimitedStarGifts?: true;
-  shouldDisallowUniqueStarGifts?: true;
+  shouldDisallowUnlimitedDiamondGifts?: true;
+  shouldDisallowLimitedDiamondGifts?: true;
+  shouldDisallowUniqueDiamondGifts?: true;
   shouldDisallowPremiumGifts?: true;
 }
 
-export interface ApiStarGiftCollection {
+export interface ApiDiamondGiftCollection {
   collectionId: number;
   title: string;
   icon?: ApiSticker;
@@ -338,7 +339,7 @@ export interface ApiStarGiftCollection {
   hash: string;
 }
 
-export interface ApiStarsRating {
+export interface ApiDiamondsRating {
   level: number;
   currentLevelStars: number;
   stars: number;
@@ -351,7 +352,7 @@ export interface ApiAuctionBidLevel {
   date: number;
 }
 
-export interface ApiStarGiftAuctionStateActive {
+export interface ApiDiamondGiftAuctionStateActive {
   type: 'active';
   version: number;
   startDate: number;
@@ -366,7 +367,7 @@ export interface ApiStarGiftAuctionStateActive {
   totalRounds: number;
 }
 
-export interface ApiStarGiftAuctionStateFinished {
+export interface ApiDiamondGiftAuctionStateFinished {
   type: 'finished';
   startDate: number;
   endDate: number;
@@ -376,7 +377,7 @@ export interface ApiStarGiftAuctionStateFinished {
   fragmentListedUrl?: string;
 }
 
-export interface ApiStarGiftAuctionUserState {
+export interface ApiDiamondGiftAuctionUserState {
   isReturned?: true;
   bidAmount?: number;
   bidDate?: number;
@@ -385,16 +386,16 @@ export interface ApiStarGiftAuctionUserState {
   acquiredCount: number;
 }
 
-export type ApiTypeStarGiftAuctionState = ApiStarGiftAuctionStateActive | ApiStarGiftAuctionStateFinished;
+export type ApiTypeDiamondGiftAuctionState = ApiDiamondGiftAuctionStateActive | ApiDiamondGiftAuctionStateFinished;
 
-export interface ApiStarGiftAuctionState {
-  gift: ApiStarGiftRegular;
-  state: ApiTypeStarGiftAuctionState;
-  userState: ApiStarGiftAuctionUserState;
+export interface ApiDiamondGiftAuctionState {
+  gift: ApiDiamondGiftRegular;
+  state: ApiTypeDiamondGiftAuctionState;
+  userState: ApiDiamondGiftAuctionUserState;
   timeout?: number;
 }
 
-export interface ApiStarGiftAuctionAcquiredGift {
+export interface ApiDiamondGiftAuctionAcquiredGift {
   peerId: string;
   date: number;
   bidAmount: number;

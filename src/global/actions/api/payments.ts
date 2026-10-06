@@ -1,7 +1,7 @@
 import type {
-  ApiInputInvoice, ApiInputInvoicePremiumGiftStars, ApiInputInvoiceStarGift,
-  ApiInputInvoiceStarGiftAuctionBid, ApiInputInvoiceStarGiftResale,
-  ApiRequestInputInvoice,
+  ApiInputInvoice, ApiInputInvoiceDiamondGift,
+  ApiInputInvoiceDiamondGiftAuctionBid, ApiInputInvoiceDiamondGiftResale,
+  ApiInputInvoicePremiumGiftDiamonds, ApiRequestInputInvoice,
 } from '../../../api/types';
 import type { ApiCredentials } from '../../../components/payment/PaymentModal';
 import type { RegularLangFnParameters } from '../../../util/localization';
@@ -20,35 +20,35 @@ import { callApi } from '../../../api/gramjs';
 import { isChatChannel, isChatSuperGroup } from '../../helpers';
 import {
   getRequestInputInvoice,
-  getRequestInputSavedStarGift,
+  getRequestInputSavedDiamondGift,
 } from '../../helpers/payments';
 import {
   addActionHandler, getActions, getGlobal, setGlobal,
 } from '../../index';
 import {
   closeInvoice,
-  openStarsTransactionFromReceipt,
+  openDiamondsTransactionFromReceipt,
   setPaymentStep,
   setReceipt,
   setRequestInfoId,
   setSmartGlocalCardInfo,
   setStripeCardInfo,
   updateChatFullInfo,
+  updateDiamondsPayment,
   updatePayment,
   updateShippingOptions,
-  updateStarsPayment,
 } from '../../reducers';
 import { updateTabState } from '../../reducers/tabs';
 import {
   selectChat,
   selectChatFullInfo,
+  selectDiamondsPayment,
   selectIsCurrentUserFrozen,
   selectPaymentInputInvoice,
   selectPaymentRequestId,
   selectProviderPublicToken,
   selectProviderPublishableKey,
   selectSmartGlocalCredentials,
-  selectStarsPayment,
   selectStripeCredentials,
   selectTabState,
 } from '../../selectors';
@@ -154,12 +154,12 @@ addActionHandler('openInvoice', async (global, actions, payload): Promise<void> 
   setGlobal(global);
 });
 
-addActionHandler('sendStarGift', (global, actions, payload): ActionReturnType => {
+addActionHandler('sendDiamondGift', (global, actions, payload): ActionReturnType => {
   const {
     gift, peerId, message, shouldHideName, shouldUpgrade, tabId = getCurrentTabId(),
   } = payload;
 
-  const inputInvoice: ApiInputInvoiceStarGift = {
+  const inputInvoice: ApiInputInvoiceDiamondGift = {
     type: 'stargift',
     peerId,
     giftId: gift.id,
@@ -168,15 +168,15 @@ addActionHandler('sendStarGift', (global, actions, payload): ActionReturnType =>
     shouldUpgrade: shouldUpgrade || undefined,
   };
 
-  payInputStarInvoice(global, inputInvoice, gift.stars, tabId);
+  payInputDiamondInvoice(global, inputInvoice, gift.stars, tabId);
 });
 
-addActionHandler('buyStarGift', (global, actions, payload): ActionReturnType => {
+addActionHandler('buyDiamondGift', (global, actions, payload): ActionReturnType => {
   const {
     slug, peerId, price, message, shouldShowName, tabId = getCurrentTabId(),
   } = payload;
 
-  const inputInvoice: ApiInputInvoiceStarGiftResale = {
+  const inputInvoice: ApiInputInvoiceDiamondGiftResale = {
     type: 'stargiftResale',
     slug,
     peerId,
@@ -185,22 +185,22 @@ addActionHandler('buyStarGift', (global, actions, payload): ActionReturnType => 
     shouldShowName,
   };
 
-  payInputStarInvoice(global, inputInvoice, price.amount, tabId);
+  payInputDiamondInvoice(global, inputInvoice, price.amount, tabId);
 });
 
-addActionHandler('sendPremiumGiftByStars', (global, actions, payload): ActionReturnType => {
+addActionHandler('sendPremiumGiftByDiamonds', (global, actions, payload): ActionReturnType => {
   const {
     userId, months, amount, message, tabId = getCurrentTabId(),
   } = payload;
 
-  const inputInvoice: ApiInputInvoicePremiumGiftStars = {
+  const inputInvoice: ApiInputInvoicePremiumGiftDiamonds = {
     type: 'premiumGiftStars',
     userId,
     months,
     message,
   };
 
-  payInputStarInvoice(global, inputInvoice, amount, tabId);
+  payInputDiamondInvoice(global, inputInvoice, amount, tabId);
 });
 
 addActionHandler('getReceipt', async (global, actions, payload): Promise<void> => {
@@ -219,7 +219,7 @@ addActionHandler('getReceipt', async (global, actions, payload): Promise<void> =
 
   global = getGlobal();
   if (result.receipt.type === 'stars') {
-    global = openStarsTransactionFromReceipt(global, result.receipt, tabId);
+    global = openDiamondsTransactionFromReceipt(global, result.receipt, tabId);
   } else {
     global = setReceipt(global, result.receipt, tabId);
   }
@@ -336,9 +336,9 @@ addActionHandler('sendPaymentForm', async (global, actions, payload): Promise<vo
   });
 });
 
-addActionHandler('sendStarPaymentForm', async (global, actions, payload): Promise<void> => {
+addActionHandler('sendDiamondPaymentForm', async (global, actions, payload): Promise<void> => {
   const { directInfo, tabId = getCurrentTabId() } = payload;
-  const starPayment = selectStarsPayment(global, tabId);
+  const starPayment = selectDiamondsPayment(global, tabId);
   const inputInvoice = starPayment?.inputInvoice || directInfo?.inputInvoice;
   if (!inputInvoice) return;
 
@@ -349,27 +349,27 @@ addActionHandler('sendStarPaymentForm', async (global, actions, payload): Promis
 
   const formId = (starPayment.form?.formId || starPayment.subscriptionInfo?.subscriptionFormId || directInfo?.formId)!;
 
-  global = updateStarsPayment(global, { status: 'pending' }, tabId);
+  global = updateDiamondsPayment(global, { status: 'pending' }, tabId);
   setGlobal(global);
 
-  const result = await callApi('sendStarPaymentForm', {
+  const result = await callApi('sendDiamondPaymentForm', {
     inputInvoice: requestInputInvoice,
     formId,
   });
 
   if (!result) {
     global = getGlobal();
-    global = updateStarsPayment(global, { status: 'failed' }, tabId);
+    global = updateDiamondsPayment(global, { status: 'failed' }, tabId);
     setGlobal(global);
-    actions.closeStarsPaymentModal({ tabId });
+    actions.closeDiamondsPaymentModal({ tabId });
     actions.closeGiftModal({ tabId });
     return;
   }
 
   global = getGlobal();
-  global = updateStarsPayment(global, { status: 'paid' }, tabId);
+  global = updateDiamondsPayment(global, { status: 'paid' }, tabId);
   setGlobal(global);
-  actions.closeStarsPaymentModal({ tabId });
+  actions.closeDiamondsPaymentModal({ tabId });
 
   if ('channelId' in result) {
     actions.openChat({ id: result.channelId, tabId });
@@ -380,7 +380,7 @@ addActionHandler('sendStarPaymentForm', async (global, actions, payload): Promis
     paymentState: directInfo ? { inputInvoice } : starPayment,
     tabId,
   });
-  actions.loadStarStatus();
+  actions.loadDiamondStatus();
 });
 
 async function sendStripeCredentials<T extends GlobalState>(
@@ -568,7 +568,7 @@ addActionHandler('openGiveawayModal', async (global, actions, payload): Promise<
     chat,
   });
 
-  const starOptions = await callApi('fetchStarsGiveawayOptions');
+  const starOptions = await callApi('fetchDiamondsGiveawayOptions');
 
   if (!result || !starOptions) {
     return;
@@ -640,7 +640,7 @@ addActionHandler('openGiftModal', async (global, actions, payload): Promise<void
   setGlobal(global);
 });
 
-addActionHandler('openStarsGiftModal', async (global, actions, payload): Promise<void> => {
+addActionHandler('openDiamondsGiftModal', async (global, actions, payload): Promise<void> => {
   const {
     forUserId,
     tabId = getCurrentTabId(),
@@ -654,7 +654,7 @@ addActionHandler('openStarsGiftModal', async (global, actions, payload): Promise
   const chat = forUserId ? selectChat(global, forUserId) : undefined;
   if (forUserId && !chat) return;
 
-  const starsGiftOptions = await callApi('fetchStarsGiftOptions', {
+  const starsGiftOptions = await callApi('fetchDiamondsGiftOptions', {
     chat,
   });
 
@@ -1005,7 +1005,7 @@ addActionHandler('applyGiftCode', async (global, actions, payload): Promise<void
   if (!result) {
     return;
   }
-  actions.requestConfetti({ withStars: true, tabId });
+  actions.requestConfetti({ withDiamonds: true, tabId });
   actions.closeGiftCodeModal({ tabId });
 });
 
@@ -1042,7 +1042,7 @@ addActionHandler('launchPrepaidGiveaway', async (global, actions, payload): Prom
   actions.openBoostStatistics({ chatId, tabId });
 });
 
-addActionHandler('launchPrepaidStarsGiveaway', async (global, actions, payload): Promise<void> => {
+addActionHandler('launchPrepaidDiamondsGiveaway', async (global, actions, payload): Promise<void> => {
   const {
     chatId, giveawayId, paymentPurpose, tabId = getCurrentTabId(),
   } = payload;
@@ -1082,13 +1082,13 @@ addActionHandler('upgradeGift', async (global, actions, payload): Promise<void> 
     gift, shouldKeepOriginalDetails, upgradeStars, tabId = getCurrentTabId(),
   } = payload;
 
-  const requestSavedGift = getRequestInputSavedStarGift(global, gift);
+  const requestSavedGift = getRequestInputSavedDiamondGift(global, gift);
   if (!requestSavedGift) {
     return;
   }
 
   global = updateTabState(global, {
-    isWaitingForStarGiftUpgrade: true,
+    isWaitingForDiamondGiftUpgrade: true,
   }, tabId);
 
   setGlobal(global);
@@ -1117,7 +1117,7 @@ addActionHandler('upgradeGift', async (global, actions, payload): Promise<void> 
     shouldKeepOriginalDetails: shouldKeepOriginalDetails || undefined,
   };
 
-  payInputStarInvoice(global, invoice, upgradeStars, tabId);
+  payInputDiamondInvoice(global, invoice, upgradeStars, tabId);
 });
 
 addActionHandler('transferGift', (global, actions, payload): ActionReturnType => {
@@ -1127,13 +1127,13 @@ addActionHandler('transferGift', (global, actions, payload): ActionReturnType =>
 
   const peer = selectChat(global, recipientId);
 
-  const requestSavedGift = getRequestInputSavedStarGift(global, gift);
+  const requestSavedGift = getRequestInputSavedDiamondGift(global, gift);
   if (!peer || !requestSavedGift) {
     return;
   }
 
   global = updateTabState(global, {
-    isWaitingForStarGiftTransfer: true,
+    isWaitingForDiamondGiftTransfer: true,
   }, tabId);
 
   setGlobal(global);
@@ -1157,7 +1157,7 @@ addActionHandler('transferGift', (global, actions, payload): ActionReturnType =>
     recipientId,
   };
 
-  payInputStarInvoice(global, invoice, transferStars, tabId);
+  payInputDiamondInvoice(global, invoice, transferStars, tabId);
 });
 
 addActionHandler('removeGiftDescription', (global, actions, payload): ActionReturnType => {
@@ -1168,7 +1168,7 @@ addActionHandler('removeGiftDescription', (global, actions, payload): ActionRetu
     inputSavedGift: gift,
   };
 
-  payInputStarInvoice(global, invoice, price, tabId);
+  payInputDiamondInvoice(global, invoice, price, tabId);
 });
 
 addActionHandler('upgradePrepaidGift', (global, actions, payload): ActionReturnType => {
@@ -1180,15 +1180,15 @@ addActionHandler('upgradePrepaidGift', (global, actions, payload): ActionReturnT
     hash,
   };
 
-  payInputStarInvoice(global, invoice, stars, tabId);
+  payInputDiamondInvoice(global, invoice, stars, tabId);
 });
 
-addActionHandler('sendStarGiftAuctionBid', (global, actions, payload): ActionReturnType => {
+addActionHandler('sendDiamondGiftAuctionBid', (global, actions, payload): ActionReturnType => {
   const {
     giftId, bidAmount, peerId, message, shouldHideName, isUpdateBid, tabId = getCurrentTabId(),
   } = payload;
 
-  const invoice: ApiInputInvoiceStarGiftAuctionBid = {
+  const invoice: ApiInputInvoiceDiamondGiftAuctionBid = {
     type: 'stargiftAuctionBid',
     giftId,
     bidAmount,
@@ -1198,10 +1198,10 @@ addActionHandler('sendStarGiftAuctionBid', (global, actions, payload): ActionRet
     isUpdateBid,
   };
 
-  payInputStarInvoice(global, invoice, bidAmount, tabId);
+  payInputDiamondInvoice(global, invoice, bidAmount, tabId);
 });
 
-async function payInputStarInvoice<T extends GlobalState>(
+async function payInputDiamondInvoice<T extends GlobalState>(
   global: T, inputInvoice: ApiInputInvoice, price: number,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ) {
@@ -1225,7 +1225,7 @@ async function payInputStarInvoice<T extends GlobalState>(
         tabId,
       });
     }
-    actions.openStarsBalanceModal({ currency, tabId });
+    actions.openDiamondsBalanceModal({ currency, tabId });
     return;
   }
 
@@ -1273,7 +1273,7 @@ async function payInputStarInvoice<T extends GlobalState>(
     return;
   }
 
-  actions.sendStarPaymentForm({
+  actions.sendDiamondPaymentForm({
     directInfo: {
       inputInvoice,
       formId: form.formId,
@@ -1287,7 +1287,7 @@ addActionHandler('openUniqueGiftBySlug', async (global, actions, payload): Promi
     slug, tabId = getCurrentTabId(),
   } = payload;
 
-  const result = await callApi('fetchUniqueStarGift', { slug });
+  const result = await callApi('fetchUniqueDiamondGift', { slug });
 
   if (!result || 'error' in result) {
     const isBurned = result && 'error' in result && result.errorMessage === 'STARGIFT_ALREADY_BURNED';
@@ -1308,7 +1308,7 @@ addActionHandler('openGiftAuctionBySlug', async (global, actions, payload): Prom
     slug, tabId = getCurrentTabId(),
   } = payload;
 
-  const auctionState = await callApi('fetchStarGiftAuctionState', { slug });
+  const auctionState = await callApi('fetchDiamondGiftAuctionState', { slug });
 
   if (!auctionState) {
     actions.showNotification({
@@ -1323,7 +1323,7 @@ addActionHandler('openGiftAuctionBySlug', async (global, actions, payload): Prom
   actions.openGiftAuctionModal({ gift: auctionState.gift, tabId });
 });
 
-addActionHandler('processStarGiftWithdrawal', async (global, actions, payload): Promise<void> => {
+addActionHandler('processDiamondGiftWithdrawal', async (global, actions, payload): Promise<void> => {
   const {
     gift, password, tabId = getCurrentTabId(),
   } = payload;
@@ -1340,12 +1340,12 @@ addActionHandler('processStarGiftWithdrawal', async (global, actions, payload): 
   }, tabId);
   setGlobal(global);
 
-  const inputGift = getRequestInputSavedStarGift(global, gift);
+  const inputGift = getRequestInputSavedDiamondGift(global, gift);
   if (!inputGift) {
     return;
   }
 
-  const result = await callApi('fetchStarGiftWithdrawalUrl', { inputGift, password });
+  const result = await callApi('fetchDiamondGiftWithdrawalUrl', { inputGift, password });
 
   if (!result) {
     return;

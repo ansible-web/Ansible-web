@@ -120,7 +120,7 @@ type OwnProps = {
   withBottomShift?: boolean;
   withDefaultBg: boolean;
   isContactRequirePremium?: boolean;
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
   isQuickPreview?: boolean;
   onScrollDownToggle?: BooleanToVoidFunction;
   onIntersectPinnedMessage?: OnIntersectPinnedMessage;
@@ -274,7 +274,7 @@ const MessageList = ({
   isServiceNotificationsChat,
   currentUserId,
   isContactRequirePremium,
-  paidMessagesStars,
+  paidMessagesDiamonds,
   areAdsEnabled,
   channelJoinInfo,
   isChatProtected,
@@ -1321,7 +1321,7 @@ const MessageList = ({
 
   const activeKey = isRestricted ? (
     Content.Restricted
-  ) : paidMessagesStars && !hasMessages && !hasCustomGreeting ? (
+  ) : paidMessagesDiamonds && !hasMessages && !hasCustomGreeting ? (
     Content.StarsRequired
   ) : isContactRequirePremium && !hasMessages ? (
     Content.PremiumRequired
@@ -1348,7 +1348,7 @@ const MessageList = ({
         </span>
       </div>
     ) : activeKey === Content.StarsRequired ? (
-      <RequirementToContactMessage paidMessagesStars={paidMessagesStars} peerId={monoforumChannelId || chatId} />
+      <RequirementToContactMessage paidMessagesDiamonds={paidMessagesDiamonds} peerId={monoforumChannelId || chatId} />
     ) : activeKey === Content.PremiumRequired ? (
       <RequirementToContactMessage peerId={chatId} />
     ) : activeKey === Content.AccountInfo ? (

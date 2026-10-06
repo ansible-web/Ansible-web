@@ -33,7 +33,7 @@ import {
   formatCountdown, formatDateTimeToString, formatScheduledDateTime, formatShortDuration,
 } from '../../../util/dates/oldDateFormat';
 import { convertTonFromNanos, formatCurrency } from '../../../util/formatCurrency';
-import { formatCurrencyAmountAsText, formatStarsAsText, formatTonAsText } from '../../../util/localization/format';
+import { formatCurrencyAmountAsText, formatDiamondsAsText, formatTonAsText } from '../../../util/localization/format';
 import { conjuctionWithNodes } from '../../../util/localization/utils';
 import { getServerTime } from '../../../util/serverTime';
 import renderText from '../../common/helpers/renderText';
@@ -429,7 +429,7 @@ const ActionMessageText = ({
         if (stars) {
           return lang(
             isChannel ? 'ActionGiveawayDiamondsStarted' : 'ActionGiveawayDiamondsStartedGroup',
-            { from: senderLink, amount: renderStrong(formatStarsAsText(lang, stars)) },
+            { from: senderLink, amount: renderStrong(formatDiamondsAsText(lang, stars)) },
             { withNodes: true },
           );
         }
@@ -442,14 +442,14 @@ const ActionMessageText = ({
       }
 
       case 'giveawayResults': {
-        const { winnersCount, isStars, unclaimedCount } = action;
+        const { winnersCount, isDiamonds, unclaimedCount } = action;
         if (!winnersCount) return lang('ActionGiveawayResultsNone');
         if (unclaimedCount) {
-          return lang(isStars ? 'ActionGiveawayResultsDiamondsSome' : 'ActionGiveawayResultsSome');
+          return lang(isDiamonds ? 'ActionGiveawayResultsDiamondsSome' : 'ActionGiveawayResultsSome');
         }
 
         return lang(
-          isStars ? 'ActionGiveawayResultsDiamonds' : 'ActionGiveawayResults',
+          isDiamonds ? 'ActionGiveawayResultsDiamonds' : 'ActionGiveawayResults',
           { count: winnersCount },
           { pluralValue: winnersCount },
         );
@@ -580,7 +580,7 @@ const ActionMessageText = ({
 
       case 'starGift': {
         const {
-          gift, alreadyPaidUpgradeStars, peerId, savedId, fromId, isPrepaidUpgrade, isAuctionAcquired,
+          gift, alreadyPaidUpgradeDiamonds, peerId, savedId, fromId, isPrepaidUpgrade, isAuctionAcquired,
         } = action;
         const isToChannel = Boolean(peerId && savedId);
 
@@ -593,15 +593,15 @@ const ActionMessageText = ({
           || (isToChannel ? channelFallbackText : userFallbackText);
         const toLink = renderPeerLink(toPeer?.id, toTitle, asPreview);
 
-        const starsAmount = gift.stars + (alreadyPaidUpgradeStars || 0);
-        const cost = renderStrong(formatStarsAsText(lang, starsAmount));
+        const starsAmount = gift.stars + (alreadyPaidUpgradeDiamonds || 0);
+        const cost = renderStrong(formatDiamondsAsText(lang, starsAmount));
 
         if (isAuctionAcquired) {
           return lang('ActionDiamondGiftAuctionWon', { cost }, { withNodes: true });
         }
 
         if (isPrepaidUpgrade && gift.upgradeStars) {
-          const upgradeCost = renderStrong(formatStarsAsText(lang, gift.upgradeStars));
+          const upgradeCost = renderStrong(formatDiamondsAsText(lang, gift.upgradeStars));
 
           return translateWithYou(
             lang, 'ActionDiamondGiftPrepaidUpgrade', isOutgoing, {
@@ -869,7 +869,7 @@ const ActionMessageText = ({
         }
         return translateWithYou(lang, 'ActionPaidMessagePrice', isOutgoing, {
           peer: senderLink,
-          amount: formatStarsAsText(lang, stars),
+          amount: formatDiamondsAsText(lang, stars),
         }, { withMarkdown: true });
       }
 
@@ -883,7 +883,7 @@ const ActionMessageText = ({
           : 'ApiMessageActionPaidMessagesRefundedIncoming';
 
         return lang(key, {
-          stars: formatStarsAsText(lang, stars),
+          stars: formatDiamondsAsText(lang, stars),
           user: renderPeerLink(user?.id, userTitle),
         }, { withNodes: true, withMarkdown: true });
       }
@@ -899,7 +899,7 @@ const ActionMessageText = ({
 
         const formattedAmount = currency === TON_CURRENCY_CODE
           ? formatTonAsText(lang, convertTonFromNanos(amount))
-          : formatStarsAsText(lang, amount);
+          : formatDiamondsAsText(lang, amount);
 
         return lang('ActionSuggestedPostSuccess', {
           channel: channelLink,
@@ -923,7 +923,7 @@ const ActionMessageText = ({
 
         const formattedAmount = currency === TON_CURRENCY_CODE
           ? formatTonAsText(lang, convertTonFromNanos(amount))
-          : formatStarsAsText(lang, amount);
+          : formatDiamondsAsText(lang, amount);
 
         if (payerInitiated) {
           return lang('SuggestedPostRefundedByUser', {

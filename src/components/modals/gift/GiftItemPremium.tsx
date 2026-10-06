@@ -11,7 +11,7 @@ import {
   selectGiftStickerForDuration,
 } from '../../../global/selectors';
 import { formatCurrencyAsString } from '../../../util/formatCurrency';
-import { formatStarsAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../util/localization/format';
 
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
@@ -24,7 +24,7 @@ import styles from './GiftItem.module.scss';
 
 export type OwnProps = {
   option: ApiPremiumGiftCodeOption;
-  optionByStars?: ApiPremiumGiftCodeOption;
+  optionByDiamonds?: ApiPremiumGiftCodeOption;
   baseMonthAmount?: number;
   onClick: (gift: ApiPremiumGiftCodeOption) => void;
 };
@@ -37,7 +37,7 @@ export type StateProps = {
 const GIFT_STICKER_SIZE = 86;
 
 function GiftItemPremium({
-  sticker, canPlayAnimatedEmojis, baseMonthAmount, option, optionByStars, onClick,
+  sticker, canPlayAnimatedEmojis, baseMonthAmount, option, optionByDiamonds, onClick,
 }: OwnProps & StateProps) {
   const {
     months, amount, currency,
@@ -86,10 +86,10 @@ function GiftItemPremium({
       <Button className={styles.buy} color="adaptive" nonInteractive size="tiny" pill fluid>
         {formatCurrencyAsString(amount, currency)}
       </Button>
-      {optionByStars && (
+      {optionByDiamonds && (
         <div className={styles.starsPriceBlock}>
           {lang('GiftPremiumDiamondsPrice', {
-            stars: (formatStarsAsIcon(lang, optionByStars.amount)),
+            stars: (formatDiamondsAsIcon(lang, optionByDiamonds.amount)),
           }, { withNodes: true, withMarkdown: true })}
         </div>
       )}

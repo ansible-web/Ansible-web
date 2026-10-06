@@ -4,7 +4,7 @@ import { getActions } from '../../../global';
 import type { ApiTypeCurrencyAmount } from '../../../api/types';
 
 import { NNBSP, STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../config';
-import { formatStarsAmount } from '../../../global/helpers/payments';
+import { formatDiamondsAmount } from '../../../global/helpers/payments';
 import buildClassName from '../../../util/buildClassName';
 import { convertCurrencyFromBaseUnit } from '../../../util/formatCurrency';
 
@@ -27,25 +27,25 @@ const BalanceBlock = ({ balance, className, withAddButton }: OwnProps) => {
   const lang = useLang();
 
   const {
-    openStarsBalanceModal,
+    openDiamondsBalanceModal,
   } = getActions();
 
-  const renderStarsAmount = () => {
+  const renderDiamondsAmount = () => {
     return (
       <>
         <span>
           <DiamondIcon type="gold" size="adaptive" />
           {NNBSP}
           {balance !== undefined && balance.currency === STARS_CURRENCY_CODE
-            ? formatStarsAmount(lang, balance) : '…'}
+            ? formatDiamondsAmount(lang, balance) : '…'}
         </span>
         {withAddButton && (
           <BadgeButton
-            className={styles.addStarsButton}
-            onClick={() => openStarsBalanceModal({})}
+            className={styles.addDiamondsButton}
+            onClick={() => openDiamondsBalanceModal({})}
           >
             <Icon
-              className={styles.addStarsIcon}
+              className={styles.addDiamondsIcon}
               name="add"
             />
           </BadgeButton>
@@ -69,7 +69,7 @@ const BalanceBlock = ({ balance, className, withAddButton }: OwnProps) => {
       <div className={styles.balanceInfo}>
         <span className={styles.smallerText}>{lang('DiamondsBalance')}</span>
         <div className={styles.balanceBottom}>
-          {balance?.currency === TON_CURRENCY_CODE ? renderTonAmount() : renderStarsAmount()}
+          {balance?.currency === TON_CURRENCY_CODE ? renderTonAmount() : renderDiamondsAmount()}
         </div>
       </div>
     </div>

@@ -42,8 +42,8 @@ import HandStop from '../../../assets/ass/settings/HandStop.ass';
 import Lock from '../../../assets/ass/settings/Lock.ass';
 import Passkeys from '../../../assets/ass/settings/Passkeys.ass';
 import UtyanDisappear from '../../../assets/ass/settings/UtyanDisappear.ass';
-import StarReaction from '../../../assets/ass/stars/StarReaction.ass';
-import StarReactionEffect from '../../../assets/ass/stars/StarReactionEffect.ass';
+import DiamondReaction from '../../../assets/ass/stars/StarReaction.ass';
+import DiamondReactionEffect from '../../../assets/ass/stars/StarReactionEffect.ass';
 import Unlock from '../../../assets/ass/Unlock.ass';
 import BrokenGiftPreview from '../../../assets/broken-gift.svg';
 import DuckNothingFoundPreview from '../../../assets/tgs-previews/DuckNothingFound.svg';
@@ -96,8 +96,8 @@ export const LOCAL_TGS_URLS = {
   LastSeen,
   Mention,
   Fragment,
-  StarReactionEffect,
-  StarReaction,
+  DiamondReactionEffect,
+  DiamondReaction,
   Report,
   SearchingDuck,
   BannedDuck,

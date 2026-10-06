@@ -1,7 +1,7 @@
 import { memo, useMemo } from '@teact';
 import { getActions, withGlobal } from '../../../../global';
 
-import type { ApiStarGiftAuctionState, ApiStarGiftAuctionStateActive } from '../../../../api/types';
+import type { ApiDiamondGiftAuctionState, ApiDiamondGiftAuctionStateActive } from '../../../../api/types';
 import type { GlobalState } from '../../../../global/types';
 
 import buildClassName from '../../../../util/buildClassName';
@@ -44,13 +44,13 @@ const GiftAuctionPane = ({
 
   const [activeAuctions, winningCount, outbidCount] = useMemo(() => {
     const auctions = activeGiftAuctionIds?.map((id) => giftAuctionByGiftId?.[id])
-      .filter((auc): auc is ApiStarGiftAuctionState => (
+      .filter((auc): auc is ApiDiamondGiftAuctionState => (
         auc?.state.type === 'active' && Boolean(auc.userState.bidAmount)),
       );
 
     if (!auctions) return [undefined, 0, 0];
     const [winning, outbid] = partition(auctions, (auction) => {
-      const state = auction.state as ApiStarGiftAuctionStateActive;
+      const state = auction.state as ApiDiamondGiftAuctionStateActive;
       const position = getBidAuctionPosition(
         auction.userState.bidAmount!, auction.userState.bidDate!, state.bidLevels,
       );
@@ -117,7 +117,7 @@ const GiftAuctionPane = ({
       >
         {singleActiveAuction ? (
           <TextTimer
-            endsAt={(singleActiveAuction.state as ApiStarGiftAuctionStateActive).nextRoundAt}
+            endsAt={(singleActiveAuction.state as ApiDiamondGiftAuctionStateActive).nextRoundAt}
             shouldShowZeroOnEnd
           />
         ) : lang('ChatListAuctionView')}

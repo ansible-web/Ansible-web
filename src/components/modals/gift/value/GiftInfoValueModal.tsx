@@ -7,7 +7,7 @@ import type { TabState } from '../../../../global/types';
 import { STARS_CURRENCY_CODE } from '../../../../config';
 import { formatDateToString } from '../../../../util/dates/oldDateFormat';
 import { formatCurrencyAsString } from '../../../../util/formatCurrency';
-import { formatStarsAsIcon } from '../../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../../util/localization/format';
 import { getGiftAttributes } from '../../../common/helpers/gifts';
 
 import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
@@ -60,7 +60,7 @@ const GiftInfoValueModal: FC<OwnProps> = ({
     // Crystals (XTR) render as the diamond icon, not the "XTR" currency code.
     const isCrystals = valueInfo.currency === STARS_CURRENCY_CODE;
     const fmtValue = (amount: number) => (isCrystals
-      ? formatStarsAsIcon(lang, amount)
+      ? formatDiamondsAsIcon(lang, amount)
       : formatCurrencyAsString(amount, valueInfo.currency, lang.code));
 
     const header = (
@@ -97,7 +97,7 @@ const GiftInfoValueModal: FC<OwnProps> = ({
     tableData.push([
       lang('GiftValueTitleInitialPrice'),
       <span className={styles.initialPrice}>
-        {formatStarsAsIcon(lang, valueInfo.initialSaleStars, { className: styles.starIcon })}
+        {formatDiamondsAsIcon(lang, valueInfo.initialSaleStars, { className: styles.starIcon })}
         {!isCrystals && (
           <>
             {' (~ '}

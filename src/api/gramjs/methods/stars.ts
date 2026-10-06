@@ -4,10 +4,10 @@ import { RPCError } from '../../../lib/gramjs/errors';
 import type { GiftProfileFilterOptions, ResaleGiftsFilterOptions } from '../../../types';
 import type {
   ApiChat,
+  ApiDiamondGiftAttributeId,
+  ApiDiamondGiftRegular,
   ApiPeer,
-  ApiRequestInputSavedStarGift,
-  ApiStarGiftAttributeId,
-  ApiStarGiftRegular,
+  ApiRequestInputSavedDiamondGift,
   ApiTypeCurrencyAmount,
 } from '../../types';
 
@@ -16,30 +16,30 @@ import {
   buildApiFormattedText,
 } from '../apiBuilders/common';
 import {
+  buildApiDiamondGift,
+  buildApiDiamondGiftAttribute,
+  buildApiDiamondGiftAuctionAcquiredGift,
+  buildApiDiamondGiftAuctionState,
+  buildApiDiamondGiftCollection,
+  buildApiDiamondGiftUpgradePreview,
   buildApiResaleGifts,
-  buildApiSavedStarGift,
-  buildApiStarGift,
-  buildApiStarGiftAttribute,
-  buildApiStarGiftAuctionAcquiredGift,
-  buildApiStarGiftAuctionState,
-  buildApiStarGiftCollection,
-  buildApiStarGiftUpgradePreview,
+  buildApiSavedDiamondGift,
   buildInputResaleGiftsAttributes,
 } from '../apiBuilders/gifts';
 import {
   buildApiCurrencyAmount,
-  buildApiStarsGiftOptions,
-  buildApiStarsGiveawayOptions,
-  buildApiStarsSubscription,
-  buildApiStarsTransaction,
-  buildApiStarTopupOption,
-  buildApiUniqueStarGiftValueInfo,
+  buildApiDiamondsGiftOptions,
+  buildApiDiamondsGiveawayOptions,
+  buildApiDiamondsSubscription,
+  buildApiDiamondsTransaction,
+  buildApiDiamondTopupOption,
+  buildApiUniqueDiamondGiftValueInfo,
 } from '../apiBuilders/payments';
 import { buildApiUser } from '../apiBuilders/users';
 import {
+  buildInputDiamondsAmount,
   buildInputPeer,
-  buildInputSavedStarGift,
-  buildInputStarsAmount,
+  buildInputSavedDiamondGift,
   buildInputUser,
   DEFAULT_PRIMITIVES } from '../gramjsBuilders';
 import { checkErrorType, wrapError } from '../helpers/misc';
@@ -66,17 +66,17 @@ export async function fetchCheckCanSendGift({ giftId }: { giftId: string }) {
   return undefined;
 }
 
-export async function fetchStarsGiveawayOptions() {
+export async function fetchDiamondsGiveawayOptions() {
   const result = await invokeRequest(new GramJs.payments.GetStarsGiveawayOptions());
 
   if (!result) {
     return undefined;
   }
 
-  return result.map(buildApiStarsGiveawayOptions);
+  return result.map(buildApiDiamondsGiveawayOptions);
 }
 
-export async function fetchStarGifts() {
+export async function fetchDiamondGifts() {
   const result = await invokeRequest(new GramJs.payments.GetStarGifts({
     hash: DEFAULT_PRIMITIVES.INT,
   }));
@@ -90,7 +90,7 @@ export async function fetchStarGifts() {
 
   // Right now, only regular star gifts can be bought, but API are not specific
   const gifts
-    = result.gifts.map(buildApiStarGift).filter((gift): gift is ApiStarGiftRegular => gift.type === 'starGift');
+    = result.gifts.map(buildApiDiamondGift).filter((gift): gift is ApiDiamondGiftRegular => gift.type === 'starGift');
 
   return {
     gifts,
@@ -116,7 +116,7 @@ export async function fetchResaleGifts({
 }) {
   type GetResaleStarGifts = ConstructorParameters<typeof GramJs.payments.GetResaleStarGifts>[0];
 
-  const attributes: ApiStarGiftAttributeId[] = [
+  const attributes: ApiDiamondGiftAttributeId[] = [
     ...(filter?.backdropAttributes ?? []),
     ...(filter?.modelAttributes ?? []),
     ...(filter?.patternAttributes ?? []),
@@ -143,7 +143,7 @@ export async function fetchResaleGifts({
   return buildApiResaleGifts(result);
 }
 
-export async function fetchSavedStarGifts({
+export async function fetchSavedDiamondGifts({
   peer,
   offset = DEFAULT_PRIMITIVES.STRING,
   limit = DEFAULT_PRIMITIVES.INT,
@@ -180,7 +180,7 @@ export async function fetchSavedStarGifts({
     return undefined;
   }
 
-  const gifts = result.gifts.map((g) => buildApiSavedStarGift(g, peer.id));
+  const gifts = result.gifts.map((g) => buildApiSavedDiamondGift(g, peer.id));
 
   return {
     gifts,
@@ -192,11 +192,11 @@ export function saveStarGift({
   inputGift,
   shouldUnsave,
 }: {
-  inputGift: ApiRequestInputSavedStarGift;
+  inputGift: ApiRequestInputSavedDiamondGift;
   shouldUnsave?: boolean;
 }) {
   return invokeRequest(new GramJs.payments.SaveStarGift({
-    stargift: buildInputSavedStarGift(inputGift),
+    stargift: buildInputSavedDiamondGift(inputGift),
     unsave: shouldUnsave || undefined,
   }));
 }
@@ -204,14 +204,14 @@ export function saveStarGift({
 export function convertStarGift({
   inputSavedGift,
 }: {
-  inputSavedGift: ApiRequestInputSavedStarGift;
+  inputSavedGift: ApiRequestInputSavedDiamondGift;
 }) {
   return invokeRequest(new GramJs.payments.ConvertStarGift({
-    stargift: buildInputSavedStarGift(inputSavedGift),
+    stargift: buildInputSavedDiamondGift(inputSavedGift),
   }));
 }
 
-export async function fetchStarsGiftOptions({
+export async function fetchDiamondsGiftOptions({
   chat,
 }: {
   chat?: ApiChat;
@@ -224,10 +224,10 @@ export async function fetchStarsGiftOptions({
     return undefined;
   }
 
-  return result.map(buildApiStarsGiftOptions);
+  return result.map(buildApiDiamondsGiftOptions);
 }
 
-export async function fetchStarsStatus({
+export async function fetchDiamondsStatus({
   isTon,
 }: {
   isTon?: boolean;
@@ -248,14 +248,14 @@ export async function fetchStarsStatus({
 
   return {
     nextHistoryOffset: result.nextOffset,
-    history: result.history?.map(buildApiStarsTransaction).filter(Boolean),
+    history: result.history?.map(buildApiDiamondsTransaction).filter(Boolean),
     nextSubscriptionOffset: result.subscriptionsNextOffset,
-    subscriptions: result.subscriptions?.map(buildApiStarsSubscription),
+    subscriptions: result.subscriptions?.map(buildApiDiamondsSubscription),
     balance,
   };
 }
 
-export async function fetchStarsTransactions({
+export async function fetchDiamondsTransactions({
   peer,
   offset = DEFAULT_PRIMITIVES.STRING,
   limit = DEFAULT_PRIMITIVES.INT,
@@ -291,12 +291,12 @@ export async function fetchStarsTransactions({
 
   return {
     nextOffset: result.nextOffset,
-    history: result.history?.map(buildApiStarsTransaction).filter(Boolean),
+    history: result.history?.map(buildApiDiamondsTransaction).filter(Boolean),
     balance,
   };
 }
 
-export async function fetchStarsTransactionById({
+export async function fetchDiamondsTransactionById({
   id, peer, ton,
 }: {
   id: string;
@@ -317,11 +317,11 @@ export async function fetchStarsTransactionById({
   }
 
   return {
-    transaction: buildApiStarsTransaction(result?.history[0]),
+    transaction: buildApiDiamondsTransaction(result?.history[0]),
   };
 }
 
-export async function fetchStarsSubscriptions({
+export async function fetchDiamondsSubscriptions({
   offset = DEFAULT_PRIMITIVES.STRING,
   peer,
 }: {
@@ -345,7 +345,7 @@ export async function fetchStarsSubscriptions({
 
   return {
     nextOffset: result.subscriptionsNextOffset,
-    subscriptions: result.subscriptions.map(buildApiStarsSubscription),
+    subscriptions: result.subscriptions.map(buildApiDiamondsSubscription),
     balance,
   };
 }
@@ -380,17 +380,17 @@ export async function fulfillStarsSubscription({
   return result;
 }
 
-export async function fetchStarsTopupOptions() {
+export async function fetchDiamondsTopupOptions() {
   const result = await invokeRequest(new GramJs.payments.GetStarsTopupOptions());
 
   if (!result) {
     return undefined;
   }
 
-  return result.map(buildApiStarTopupOption);
+  return result.map(buildApiDiamondTopupOption);
 }
 
-export async function fetchUniqueStarGift({ slug }: {
+export async function fetchUniqueDiamondGift({ slug }: {
   slug: string;
 }) {
   try {
@@ -400,7 +400,7 @@ export async function fetchUniqueStarGift({ slug }: {
 
     if (!result) return undefined;
 
-    const gift = buildApiStarGift(result.gift);
+    const gift = buildApiDiamondGift(result.gift);
     if (gift.type !== 'starGiftUnique') return undefined;
     return gift;
   } catch (err) {
@@ -411,7 +411,7 @@ export async function fetchUniqueStarGift({ slug }: {
   }
 }
 
-export async function fetchStarGiftUpgradePreview({
+export async function fetchDiamondGiftUpgradePreview({
   giftId,
 }: {
   giftId: string;
@@ -424,10 +424,10 @@ export async function fetchStarGiftUpgradePreview({
     return undefined;
   }
 
-  return buildApiStarGiftUpgradePreview(result);
+  return buildApiDiamondGiftUpgradePreview(result);
 }
 
-export async function fetchStarGiftAuctionState({
+export async function fetchDiamondGiftAuctionState({
   giftId,
   slug,
   version = 0,
@@ -451,10 +451,10 @@ export async function fetchStarGiftAuctionState({
     return undefined;
   }
 
-  return buildApiStarGiftAuctionState(result);
+  return buildApiDiamondGiftAuctionState(result);
 }
 
-export async function fetchStarGiftAuctionAcquiredGifts({
+export async function fetchDiamondGiftAuctionAcquiredGifts({
   giftId,
 }: {
   giftId: string;
@@ -468,11 +468,11 @@ export async function fetchStarGiftAuctionAcquiredGifts({
   }
 
   return {
-    gifts: result.gifts.map(buildApiStarGiftAuctionAcquiredGift),
+    gifts: result.gifts.map(buildApiDiamondGiftAuctionAcquiredGift),
   };
 }
 
-export async function fetchStarGiftActiveAuctions() {
+export async function fetchDiamondGiftActiveAuctions() {
   const result = await invokeRequest(new GramJs.payments.GetStarGiftActiveAuctions({
     hash: DEFAULT_PRIMITIVES.BIGINT,
   }));
@@ -482,7 +482,7 @@ export async function fetchStarGiftActiveAuctions() {
   }
 
   return {
-    auctions: result.auctions.map(buildApiStarGiftAuctionState).filter(Boolean),
+    auctions: result.auctions.map(buildApiDiamondGiftAuctionState).filter(Boolean),
   };
 }
 
@@ -490,11 +490,11 @@ export function upgradeStarGift({
   inputSavedGift,
   shouldKeepOriginalDetails,
 }: {
-  inputSavedGift: ApiRequestInputSavedStarGift;
+  inputSavedGift: ApiRequestInputSavedDiamondGift;
   shouldKeepOriginalDetails?: true;
 }) {
   return invokeRequest(new GramJs.payments.UpgradeStarGift({
-    stargift: buildInputSavedStarGift(inputSavedGift),
+    stargift: buildInputSavedDiamondGift(inputSavedGift),
     keepOriginalDetails: shouldKeepOriginalDetails,
   }), {
     shouldReturnTrue: true,
@@ -505,11 +505,11 @@ export function transferStarGift({
   inputSavedGift,
   toPeer,
 }: {
-  inputSavedGift: ApiRequestInputSavedStarGift;
+  inputSavedGift: ApiRequestInputSavedDiamondGift;
   toPeer: ApiPeer;
 }) {
   return invokeRequest(new GramJs.payments.TransferStarGift({
-    stargift: buildInputSavedStarGift(inputSavedGift),
+    stargift: buildInputSavedDiamondGift(inputSavedGift),
     toId: buildInputPeer(toPeer.id, toPeer.accessHash),
   }), {
     shouldReturnTrue: true,
@@ -520,11 +520,11 @@ export function toggleSavedGiftPinned({
   inputSavedGifts,
   peer,
 }: {
-  inputSavedGifts: ApiRequestInputSavedStarGift[];
+  inputSavedGifts: ApiRequestInputSavedDiamondGift[];
   peer: ApiPeer;
 }) {
   return invokeRequest(new GramJs.payments.ToggleStarGiftsPinnedToTop({
-    stargift: inputSavedGifts.map(buildInputSavedStarGift),
+    stargift: inputSavedGifts.map(buildInputSavedDiamondGift),
     peer: buildInputPeer(peer.id, peer.accessHash),
   }), {
     shouldReturnTrue: true,
@@ -535,18 +535,18 @@ export function updateStarGiftPrice({
   inputSavedGift,
   price,
 }: {
-  inputSavedGift: ApiRequestInputSavedStarGift;
+  inputSavedGift: ApiRequestInputSavedDiamondGift;
   price: ApiTypeCurrencyAmount;
 }) {
   return invokeRequest(new GramJs.payments.UpdateStarGiftPrice({
-    stargift: buildInputSavedStarGift(inputSavedGift),
-    resellAmount: buildInputStarsAmount(price),
+    stargift: buildInputSavedDiamondGift(inputSavedGift),
+    resellAmount: buildInputDiamondsAmount(price),
   }), {
     shouldReturnTrue: true,
   });
 }
 
-export async function fetchUniqueStarGiftValueInfo({ slug }: { slug: string }) {
+export async function fetchUniqueDiamondGiftValueInfo({ slug }: { slug: string }) {
   const result = await invokeRequest(new GramJs.payments.GetUniqueStarGiftValueInfo({
     slug,
   }));
@@ -555,14 +555,14 @@ export async function fetchUniqueStarGiftValueInfo({ slug }: { slug: string }) {
     return undefined;
   }
 
-  return buildApiUniqueStarGiftValueInfo(result);
+  return buildApiUniqueDiamondGiftValueInfo(result);
 }
 
-export async function fetchStarGiftWithdrawalUrl({
+export async function fetchDiamondGiftWithdrawalUrl({
   inputGift,
   password,
 }: {
-  inputGift: ApiRequestInputSavedStarGift;
+  inputGift: ApiRequestInputSavedDiamondGift;
   password: string;
 }) {
   try {
@@ -577,7 +577,7 @@ export async function fetchStarGiftWithdrawalUrl({
     }
 
     const result = await invokeRequest(new GramJs.payments.GetStarGiftWithdrawalUrl({
-      stargift: buildInputSavedStarGift(inputGift),
+      stargift: buildInputSavedDiamondGift(inputGift),
       password: passwordCheck,
     }), {
       shouldThrow: true,
@@ -597,7 +597,7 @@ export async function fetchStarGiftWithdrawalUrl({
   return undefined;
 }
 
-export async function fetchStarGiftCollections({
+export async function fetchDiamondGiftCollections({
   peer,
   hash,
 }: {
@@ -614,7 +614,7 @@ export async function fetchStarGiftCollections({
   }
 
   return {
-    collections: result.collections.map(buildApiStarGiftCollection).filter(Boolean),
+    collections: result.collections.map(buildApiDiamondGiftCollection).filter(Boolean),
   };
 }
 
@@ -633,7 +633,7 @@ export function resolveStarGiftOffer({
   });
 }
 
-export async function fetchCraftStarGifts({
+export async function fetchCraftDiamondGifts({
   giftId,
   peerId,
   offset = DEFAULT_PRIMITIVES.STRING,
@@ -655,7 +655,7 @@ export async function fetchCraftStarGifts({
   }
 
   return {
-    gifts: result.gifts.map((g) => buildApiSavedStarGift(g, peerId)),
+    gifts: result.gifts.map((g) => buildApiSavedDiamondGift(g, peerId)),
     nextOffset: result.nextOffset,
     count: result.count,
   };
@@ -664,11 +664,11 @@ export async function fetchCraftStarGifts({
 export async function craftStarGift({
   inputSavedGifts,
 }: {
-  inputSavedGifts: ApiRequestInputSavedStarGift[];
+  inputSavedGifts: ApiRequestInputSavedDiamondGift[];
 }) {
   try {
     await invokeRequest(new GramJs.payments.CraftStarGift({
-      stargift: inputSavedGifts.map(buildInputSavedStarGift),
+      stargift: inputSavedGifts.map(buildInputSavedDiamondGift),
     }), {
       shouldThrow: true,
     });
@@ -681,7 +681,7 @@ export async function craftStarGift({
   }
 }
 
-export async function fetchStarGiftUpgradeAttributes({
+export async function fetchDiamondGiftUpgradeAttributes({
   giftId,
 }: {
   giftId: string;
@@ -695,6 +695,6 @@ export async function fetchStarGiftUpgradeAttributes({
   }
 
   return {
-    attributes: result.attributes.map(buildApiStarGiftAttribute).filter(Boolean),
+    attributes: result.attributes.map(buildApiDiamondGiftAttribute).filter(Boolean),
   };
 }

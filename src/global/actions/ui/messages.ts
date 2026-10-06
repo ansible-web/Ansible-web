@@ -62,7 +62,7 @@ import {
 import { makeMessageTrackKeyFrom, selectCurrentPlaylistKey } from '../../selectors/audioPlayer';
 import { selectMessageDownloadableMedia } from '../../selectors/media';
 import { selectDraft, selectReplyStack, selectThreadInfo } from '../../selectors/threads';
-import { getPeerStarsForMessage } from '../api/messages';
+import { getPeerDiamondsForMessage } from '../api/messages';
 
 import { getIsMobile } from '../../../hooks/useAppLayout';
 
@@ -1235,7 +1235,7 @@ addActionHandler('updateSharePreparedMessageModalSendArgs', async (global, actio
     return;
   }
 
-  const starsForSendMessage = await getPeerStarsForMessage(global, args.peerId);
+  const starsForSendMessage = await getPeerDiamondsForMessage(global, args.peerId);
 
   global = getGlobal();
   global = updateTabState(global, {

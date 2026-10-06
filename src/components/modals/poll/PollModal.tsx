@@ -22,7 +22,7 @@ import {
   selectChat,
   selectNotifyDefaults,
   selectNotifyException,
-  selectPeerPaidMessagesStars,
+  selectPeerPaidMessagesDiamonds,
   selectTabState,
 } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
@@ -112,10 +112,10 @@ type StateProps = {
   pollCountriesMax: number;
   phoneCountryIso2?: string;
   countryList: ApiCountry[];
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
   paymentMessageConfirmDialogKey?: string;
   starsBalance: number;
-  isStarsBalanceModalOpen: boolean;
+  isDiamondsBalanceModalOpen: boolean;
   isSilentPosting?: boolean;
 };
 
@@ -153,10 +153,10 @@ const PollModal = ({
   pollCountriesMax,
   phoneCountryIso2,
   countryList,
-  paidMessagesStars,
+  paidMessagesDiamonds,
   paymentMessageConfirmDialogKey,
   starsBalance,
-  isStarsBalanceModalOpen,
+  isDiamondsBalanceModalOpen,
   isSilentPosting,
 }: OwnProps & StateProps) => {
   const {
@@ -216,8 +216,8 @@ const PollModal = ({
     handleWithConfirmation,
   } = usePaidMessageConfirmation(
     PAYMENT_DIALOG_KEY,
-    paidMessagesStars || 0,
-    isStarsBalanceModalOpen,
+    paidMessagesDiamonds || 0,
+    isDiamondsBalanceModalOpen,
     starsBalance,
     true,
   );
@@ -278,7 +278,7 @@ const PollModal = ({
 
   const trimmedQuestion = useMemo(() => question.trim().substring(0, MAX_QUESTION_LENGTH), [question]);
   const isInScheduledList = modal.messageListType === 'scheduled';
-  const canSchedule = Boolean(!paidMessagesStars && !chat?.isMonoforum);
+  const canSchedule = Boolean(!paidMessagesDiamonds && !chat?.isMonoforum);
   const isCorrectAnswerInvalid = hasSubmitted && isQuizMode && !correctAnswerPositions.length;
   const isAddAnswersDisabled = isQuizMode || !isPublic;
   const minOptionsCount = isQuizMode ? MIN_QUIZ_OPTIONS_COUNT : MIN_OPTIONS_COUNT;
@@ -934,7 +934,7 @@ const PollModal = ({
         isOpen={paymentMessageConfirmDialogKey === PAYMENT_DIALOG_KEY}
         onClose={closeConfirmDialog}
         userName={chat ? getPeerTitle(lang, chat) : undefined}
-        messagePriceInStars={paidMessagesStars || 0}
+        messagePriceInDiamonds={paidMessagesDiamonds || 0}
         messagesCount={1}
         shouldAutoApprove={shouldAutoApprove}
         setAutoApprove={setAutoApprove}
@@ -1031,10 +1031,10 @@ export default memo(withGlobal<OwnProps>(
       pollCountriesMax: global.appConfig.pollCountriesMax,
       phoneCountryIso2: global.appConfig.phoneCountryIso2,
       countryList: global.countryList.general,
-      paidMessagesStars: selectPeerPaidMessagesStars(global, chatId),
+      paidMessagesDiamonds: selectPeerPaidMessagesDiamonds(global, chatId),
       paymentMessageConfirmDialogKey: tabState.paymentMessageConfirmDialogKey,
       starsBalance: global.stars?.balance.amount || 0,
-      isStarsBalanceModalOpen: Boolean(tabState.starsBalanceModal),
+      isDiamondsBalanceModalOpen: Boolean(tabState.starsBalanceModal),
       isSilentPosting: chat ? getChatNotifySettings(
         chat,
         selectNotifyDefaults(global),

@@ -135,7 +135,7 @@ export async function fetchSavedMusic({ user, offset, limit }: {
   return { audios, count: result.count };
 }
 
-export async function fetchPaidMessagesStarsAmount(user: ApiUser) {
+export async function fetchPaidMessagesDiamondsAmount(user: ApiUser) {
   const result = await invokeRequest(new GramJs.users.GetRequirementsToContact({
     id: [buildInputUser(user.id, user.accessHash)],
   }));

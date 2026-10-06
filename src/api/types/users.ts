@@ -10,7 +10,7 @@ import type {
   ApiProfileTab,
   ApiTypePeerColor,
 } from './peers';
-import type { ApiSavedStarGift, ApiStarsRating } from './stars';
+import type { ApiDiamondsRating, ApiSavedDiamondGift } from './stars';
 
 export interface ApiUser {
   id: string;
@@ -46,7 +46,7 @@ export interface ApiUser {
   hasMainMiniApp?: boolean;
   botActiveUsers?: number;
   botVerificationIconId?: string;
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
   isBotForum?: boolean;
   canManageBotForumTopics?: boolean;
   isGuestChatBot?: boolean;
@@ -78,14 +78,14 @@ export interface ApiUserFullInfo {
   businessWorkHours?: ApiBusinessWorkHours;
   businessIntro?: ApiBusinessIntro;
   starGiftCount?: number;
-  starsRating?: ApiStarsRating;
-  starsMyPendingRating?: ApiStarsRating;
+  starsRating?: ApiDiamondsRating;
+  starsMyPendingRating?: ApiDiamondsRating;
   starsMyPendingRatingDate?: number;
   isBotCanManageEmojiStatus?: boolean;
   isBotAccessEmojiGranted?: boolean;
   hasScheduledMessages?: boolean;
   botVerification?: ApiBotVerification;
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
   settings?: ApiPeerSettings;
   mainTab?: ApiProfileTab;
   savedMusic?: ApiAudio;
@@ -124,7 +124,7 @@ export interface ApiUserSavedMusic {
 }
 
 export interface ApiSavedGifts {
-  gifts: ApiSavedStarGift[];
+  gifts: ApiSavedDiamondGift[];
   nextOffset?: string;
 }
 
@@ -168,8 +168,8 @@ export interface ApiBirthday {
 }
 
 export interface ApiDisallowedGifts {
-  shouldDisallowUnlimitedStarGifts?: boolean;
-  shouldDisallowLimitedStarGifts?: boolean;
-  shouldDisallowUniqueStarGifts?: boolean;
+  shouldDisallowUnlimitedDiamondGifts?: boolean;
+  shouldDisallowLimitedDiamondGifts?: boolean;
+  shouldDisallowUniqueDiamondGifts?: boolean;
   shouldDisallowPremiumGifts?: boolean;
 }

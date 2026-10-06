@@ -36,13 +36,13 @@ const SuggestedPostBalanceTooLow = ({
   replyMessageSender,
   replyMessage,
 }: OwnProps & StateProps) => {
-  const { openStarsBalanceModal } = getActions();
+  const { openDiamondsBalanceModal } = getActions();
   const lang = useLang();
 
-  const handleGetMoreStars = useLastCallback((e: React.MouseEvent) => {
+  const handleGetMoreDiamonds = useLastCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    openStarsBalanceModal({});
+    openDiamondsBalanceModal({});
   });
 
   const targetPeer = replyMessageSender || sender;
@@ -66,7 +66,7 @@ const SuggestedPostBalanceTooLow = ({
       </div>
 
       {!message.isOutgoing && (
-        <div className={styles.actionButton} onClick={handleGetMoreStars}>
+        <div className={styles.actionButton} onClick={handleGetMoreDiamonds}>
           <Sparkles preset="button" />
           {buyButtonText}
         </div>

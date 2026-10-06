@@ -220,7 +220,7 @@ export function selectGiftStickerForDuration<T extends GlobalState>(global: T, d
   return stickers.find((sticker) => sticker.emoji === emoji) || stickers[0];
 }
 
-export function selectGiftStickerForStars<T extends GlobalState>(global: T, starCount?: number) {
+export function selectGiftStickerForDiamonds<T extends GlobalState>(global: T, starCount?: number) {
   const stickers = global.premiumGifts?.stickers;
 
   if (!stickers || !starCount) return undefined;

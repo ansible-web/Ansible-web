@@ -2,14 +2,14 @@ import { memo, useMemo, useRef } from '../../../../lib/teact/teact';
 import { withGlobal } from '../../../../global';
 
 import type { ApiChat, ApiPeer, ApiSticker } from '../../../../api/types';
-import type { ApiMessageActionGiftCode, ApiMessageActionPrizeStars } from '../../../../api/types/messageActions';
+import type { ApiMessageActionGiftCode, ApiMessageActionPrizeDiamonds } from '../../../../api/types/messageActions';
 
 import { getPeerTitle } from '../../../../global/helpers/peers';
 import {
   selectCanPlayAnimatedEmojis,
   selectChat,
+  selectGiftStickerForDiamonds,
   selectGiftStickerForDuration,
-  selectGiftStickerForStars,
 } from '../../../../global/selectors';
 import { formatCountdownDays } from '../../../../util/dates/oldDateFormat';
 import { renderPeerLink } from '../helpers/messageActions';
@@ -23,7 +23,7 @@ import StickerView from '../../../common/StickerView';
 import styles from '../ActionMessage.module.scss';
 
 type OwnProps = {
-  action: ApiMessageActionGiftCode | ApiMessageActionPrizeStars;
+  action: ApiMessageActionGiftCode | ApiMessageActionPrizeDiamonds;
   sender?: ApiPeer;
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;
@@ -138,7 +138,7 @@ export default memo(withGlobal<OwnProps>(
     const currentUserId = global.currentUserId!;
     const sticker = action.type === 'giftCode'
       ? selectGiftStickerForDuration(global, action.days)
-      : selectGiftStickerForStars(global, action.stars);
+      : selectGiftStickerForDiamonds(global, action.stars);
     const canPlayAnimatedEmojis = selectCanPlayAnimatedEmojis(global);
 
     const channel = action.boostPeerId ? selectChat(global, action.boostPeerId) : undefined;

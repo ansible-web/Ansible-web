@@ -109,7 +109,7 @@ export interface ApiChat {
   // Locally determined field
   detectedLanguage?: string;
 
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
   ttlPeriod?: number;
 }
 
@@ -180,7 +180,7 @@ export interface ApiChatFullInfo {
   isPaidReactionAvailable?: boolean;
   hasScheduledMessages?: boolean;
   starGiftCount?: number;
-  areStarGiftsAvailable?: boolean;
+  areDiamondGiftsAvailable?: boolean;
   arePaidMessagesAvailable?: true;
 
   boostsApplied?: number;

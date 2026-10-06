@@ -43,11 +43,11 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
   modal, peer,
 }) => {
   const {
-    closeStarsSubscriptionModal,
+    closeDiamondsSubscriptionModal,
     fulfillStarsSubscription,
     changeStarsSubscription,
     checkChatInvite,
-    loadStarStatus,
+    loadDiamondStatus,
     openInvoice,
   } = getActions();
   const oldLang = useOldLang();
@@ -108,7 +108,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
             slug: subscription.invoiceSlug,
           });
         }
-        loadStarStatus();
+        loadDiamondStatus();
         break;
       }
       case 'renew': {
@@ -120,7 +120,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
         break;
       }
     }
-    closeStarsSubscriptionModal();
+    closeDiamondsSubscriptionModal();
   });
 
   const starModalData = useMemo(() => {
@@ -143,7 +143,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
             size="giant"
             onMouseMove={handleAvatarMouseMove}
           />
-          <DiamondIcon className={styles.subscriptionStar} type="gold" size="adaptive" />
+          <DiamondIcon className={styles.subscriptionDiamond} type="gold" size="adaptive" />
         </div>
         <InteractiveSparkles
           className={buildClassName(styles.starsBackground)}
@@ -249,7 +249,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
       header={renderingModalData?.header}
       tableData={renderingModalData?.tableData}
       footer={renderingModalData?.footer}
-      onClose={closeStarsSubscriptionModal}
+      onClose={closeDiamondsSubscriptionModal}
     />
   );
 };

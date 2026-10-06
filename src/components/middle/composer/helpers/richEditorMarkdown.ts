@@ -16,7 +16,7 @@ const RE_RICH_MARKDOWN_BLOCK = /^(?:#{1,6}\s|>\s?|```|\$\$|---\s*$)/m;
 const RE_RICH_MARKDOWN_INLINE = /(?:\*\*|__|~~|==|\|\|)[^\n]+|`[^`\n]+`|\*[^*\n]+\*|_[^_\n]+_|\$[^$\n]+\$/;
 const RE_MARKDOWN_FOOTNOTE = /\[\^[^\]\n]+\](?::[^\n]*)?/g;
 const RE_HTML_TAG = /<\/?[a-z][^>\n]*>/gi;
-const RE_RICH_MEDIA_HTML = /<(?:figure|tg-collage|tg-slideshow|tg-document|img|video|audio)\b/i;
+const RE_RICH_MEDIA_HTML = /<(?:figure|as-collage|as-slideshow|as-document|img|video|audio)\b/i;
 const RE_NORMALIZED_MEDIA_HTML = /<div\s+data-rich-editor-media(?:="")?[^>]*>[\s\S]*?<\/div>/gi;
 const RE_MARKDOWN_MEDIA = /!\[([^\]\n]*)\]\(([^)\s]+)(?:\s+"((?:\\.|[^"\\])*)")?\)/g;
 const RE_MARKDOWN_ESCAPE = /\\([\x20-\x7E])/g;
@@ -102,7 +102,7 @@ function buildMarkdownMediaHtml(_value: string, rawAlt: string, source: string, 
 
   const figure = document.createElement('figure');
   const figcaption = document.createElement('figcaption');
-  figcaption.dataset.tgSharedCaption = '';
+  figcaption.dataset.asSharedCaption = '';
   figcaption.textContent = caption;
   figure.append(element, figcaption);
   return figure.outerHTML;

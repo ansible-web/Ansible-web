@@ -14,13 +14,13 @@ import {
   type ApiChatlistInvite,
   type ApiChatMember,
   type ApiChatReactions,
+  type ApiDiamondsSubscriptionPricing,
   type ApiExportedInvite,
   type ApiMissingInvitedUser,
   type ApiRestrictionReason,
   type ApiSendAsPeerId,
   type ApiSponsoredMessageReportResult,
   type ApiSponsoredPeer,
-  type ApiStarsSubscriptionPricing,
   type ApiThreadInfo,
   type ApiTypingStatus,
   MAIN_THREAD_ID,
@@ -93,7 +93,7 @@ function buildApiChatFieldsFromPeerEntity(
   const color = userOrChannel?.color ? buildApiPeerColor(userOrChannel.color) : undefined;
   const profileColor = userOrChannel?.profileColor ? buildApiPeerColor(userOrChannel.profileColor) : undefined;
   const emojiStatus = userOrChannel?.emojiStatus ? buildApiEmojiStatus(userOrChannel.emojiStatus) : undefined;
-  const paidMessagesStars = userOrChannel?.sendPaidMessagesStars;
+  const paidMessagesDiamonds = userOrChannel?.sendPaidMessagesStars;
   const linkedCommunityId = userOrChannel?.linkedCommunityId;
   const isVerified = userOrChannel?.verified;
   const isForum = channel?.forum || user?.botForumView;
@@ -138,7 +138,7 @@ function buildApiChatFieldsFromPeerEntity(
     botVerificationIconId,
     hasGeo: channel?.hasGeo,
     subscriptionUntil: channel?.subscriptionUntilDate,
-    paidMessagesStars: toJSNumber(paidMessagesStars),
+    paidMessagesDiamonds: toJSNumber(paidMessagesDiamonds),
     level: channel?.level,
     hasAutoTranslation: channel?.autotranslation,
     withForumTabs: channel?.forumTabs,
@@ -706,16 +706,16 @@ export function buildApiChatInviteInfo(invite: GramJs.ChatInvite): ApiChatInvite
     isRequestNeeded: requestNeeded,
     photo: apiPhoto,
     subscriptionFormId: subscriptionFormId?.toString(),
-    subscriptionPricing: subscriptionPricing && buildApiStarsSubscriptionPricing(subscriptionPricing),
+    subscriptionPricing: subscriptionPricing && buildApiDiamondsSubscriptionPricing(subscriptionPricing),
     canRefulfillSubscription,
     participantIds: participants?.map((participant) => buildApiPeerId(participant.id, 'user')).filter(Boolean),
     botVerification: botVerification && buildApiBotVerification(botVerification),
   };
 }
 
-export function buildApiStarsSubscriptionPricing(
+export function buildApiDiamondsSubscriptionPricing(
   pricing: GramJs.StarsSubscriptionPricing,
-): ApiStarsSubscriptionPricing {
+): ApiDiamondsSubscriptionPricing {
   return {
     period: pricing.period,
     amount: toJSNumber(pricing.amount),

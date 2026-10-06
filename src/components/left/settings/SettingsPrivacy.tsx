@@ -532,7 +532,7 @@ export default memo(withGlobal<OwnProps>(
       settings: {
         byKey: {
           hasPassword, isSensitiveEnabled, canChangeSensitive, shouldArchiveAndMuteNewNonContact,
-          shouldNewNonContactPeersRequirePremium, nonContactPeersPaidStars, defaultHistoryTtl,
+          shouldNewNonContactPeersRequirePremium, nonContactPeersPaidDiamonds, defaultHistoryTtl,
         },
         privacy,
         accountDaysTtl,
@@ -546,7 +546,7 @@ export default memo(withGlobal<OwnProps>(
     } = global;
 
     const { canDisplayChatInTitle } = selectSharedSettings(global);
-    const shouldChargeForMessages = Boolean(nonContactPeersPaidStars);
+    const shouldChargeForMessages = Boolean(nonContactPeersPaidDiamonds);
     const isCurrentUserFrozen = selectIsCurrentUserFrozen(global);
     const isCurrentUserPremium = selectIsCurrentUserPremium(global);
 

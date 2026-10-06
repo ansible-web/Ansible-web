@@ -48,7 +48,7 @@ type StateProps = {
   removedUsersCount: number;
   members?: ApiChatMember[];
   arePaidMessagesAvailable?: boolean;
-  groupPeersPaidStars: number;
+  groupPeersPaidDiamonds: number;
   canChargeForMessages?: boolean;
 };
 
@@ -106,7 +106,7 @@ const ManageGroupPermissions: FC<OwnProps & StateProps> = ({
   isActive,
   arePaidMessagesAvailable,
   canChargeForMessages,
-  groupPeersPaidStars,
+  groupPeersPaidDiamonds,
 }) => {
   const { updateChatDefaultBannedRights, updatePaidMessagesPrice } = getActions();
 
@@ -138,7 +138,7 @@ const ManageGroupPermissions: FC<OwnProps & StateProps> = ({
 
   const [isPriceForMessagesChanged, markPriceForMessagesChanged, unmarkPriceForMessagesChanged] = useFlag();
   const [isPriceForMessagesOpen, setIsPriceForMessagesOpen] = useState(canChargeForMessages);
-  const [chargeForMessages, setChargeForMessages] = useState<number>(groupPeersPaidStars);
+  const [chargeForMessages, setChargeForMessages] = useState<number>(groupPeersPaidDiamonds);
 
   useEffect(() => {
     if (progress === ManagementProgress.Complete) {
@@ -159,7 +159,7 @@ const ManageGroupPermissions: FC<OwnProps & StateProps> = ({
     if (!chat) return;
     updatePaidMessagesPrice({
       chatId: chat?.id,
-      paidMessagesStars: isPriceForMessagesOpen ? chargeForMessages : 0,
+      paidMessagesDiamonds: isPriceForMessagesOpen ? chargeForMessages : 0,
     });
   });
 
@@ -210,7 +210,7 @@ const ManageGroupPermissions: FC<OwnProps & StateProps> = ({
     }, '');
   }, [chat, oldLang]);
 
-  const handleChargeStarsForMessages = useLastCallback(() => {
+  const handleChargeDiamondsForMessages = useLastCallback(() => {
     setIsPriceForMessagesOpen(!isPriceForMessagesOpen);
     markPriceForMessagesChanged();
   });
@@ -248,7 +248,7 @@ const ManageGroupPermissions: FC<OwnProps & StateProps> = ({
 
         {arePaidMessagesAvailable && (
           <Island>
-            <ListItem onClick={handleChargeStarsForMessages}>
+            <ListItem onClick={handleChargeDiamondsForMessages}>
               <span>{lang('GroupMessagesChargePrice')}</span>
               <Switch
                 id="charge_for_messages"
@@ -330,8 +330,8 @@ export default memo(withGlobal<OwnProps>(
     const fullInfo = selectChatFullInfo(global, chatId);
     const { progress } = selectTabState(global).management;
 
-    const paidMessagesStars = chat?.paidMessagesStars;
-    const configStarsPaidMessageCommissionPermille = global.appConfig.starsPaidMessageCommissionPermille;
+    const paidMessagesDiamonds = chat?.paidMessagesDiamonds;
+    const configDiamondsPaidMessageCommissionPermille = global.appConfig.starsPaidMessageCommissionPermille;
 
     return {
       chat,
@@ -339,9 +339,11 @@ export default memo(withGlobal<OwnProps>(
       currentUserId: global.currentUserId,
       removedUsersCount: fullInfo?.kickedMembers?.length || 0,
       members: fullInfo?.members,
-      arePaidMessagesAvailable: Boolean(fullInfo?.arePaidMessagesAvailable && configStarsPaidMessageCommissionPermille),
-      canChargeForMessages: Boolean(paidMessagesStars && configStarsPaidMessageCommissionPermille),
-      groupPeersPaidStars: paidMessagesStars || DEFAULT_CHARGE_FOR_MESSAGES,
+      arePaidMessagesAvailable: Boolean(
+        fullInfo?.arePaidMessagesAvailable && configDiamondsPaidMessageCommissionPermille,
+      ),
+      canChargeForMessages: Boolean(paidMessagesDiamonds && configDiamondsPaidMessageCommissionPermille),
+      groupPeersPaidDiamonds: paidMessagesDiamonds || DEFAULT_CHARGE_FOR_MESSAGES,
     };
   },
 )(ManageGroupPermissions));

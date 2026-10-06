@@ -4,7 +4,7 @@ import { getActions } from '../../../global';
 import type { ApiPaidMedia } from '../../../api/types';
 
 import { STARS_ICON_PLACEHOLDER } from '../../../config';
-import { formatStarsAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../util/localization/format';
 import { replaceWithTeact } from '../../../util/replaceWithTeact';
 import stopEvent from '../../../util/stopEvent';
 
@@ -43,7 +43,7 @@ const PaidMediaOverlay = ({
     const value = oldLang('UnlockPaidContent', paidMedia.starsAmount);
 
     return replaceWithTeact(
-      value, STARS_ICON_PLACEHOLDER, <DiamondIcon className={styles.star} type="gold" size="adaptive" />,
+      value, STARS_ICON_PLACEHOLDER, <DiamondIcon className={styles.diamond} type="gold" size="adaptive" />,
     );
   }, [oldLang, paidMedia]);
 
@@ -76,7 +76,7 @@ const PaidMediaOverlay = ({
       {paidMedia.isBought && (
         <MediaBadge className="message-paid-media-status" position="right">
           {isOutgoing
-            ? formatStarsAsIcon(lang, paidMedia.starsAmount)
+            ? formatDiamondsAsIcon(lang, paidMedia.starsAmount)
             : oldLang('Chat.PaidMedia.Purchased')}
         </MediaBadge>
       )}

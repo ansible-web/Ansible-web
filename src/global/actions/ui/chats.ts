@@ -61,8 +61,8 @@ addActionHandler('processOpenChatOrThread', (global, actions, payload): ActionRe
   actions.hideEffectInComposer({ tabId });
 
   actions.closeStoryViewer({ tabId });
-  actions.closeStarsBalanceModal({ tabId });
-  actions.closeStarsTransactionModal({ tabId });
+  actions.closeDiamondsBalanceModal({ tabId });
+  actions.closeDiamondsTransactionModal({ tabId });
   actions.closeGiftInfoModal({ tabId });
   actions.closeGiftAuctionModal({ tabId });
 

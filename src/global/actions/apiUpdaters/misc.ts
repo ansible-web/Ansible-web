@@ -319,20 +319,20 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             tabId,
           });
 
-          actions.requestConfetti({ withStars: true, tabId });
+          actions.requestConfetti({ withDiamonds: true, tabId });
         });
         return undefined;
       }
 
       if (!update.message.isOutgoing && update.message.chatId !== SERVICE_NOTIFICATIONS_USER_ID) return undefined;
       if (action?.type !== 'starGiftUnique') return undefined;
-      const actionStarGift = action.gift;
+      const actionDiamondGift = action.gift;
 
       Object.values(global.byTabId).forEach(({ id: tabId }) => {
         const tabState = selectTabState(global, tabId);
-        if (tabState.isWaitingForStarGiftUpgrade) {
+        if (tabState.isWaitingForDiamondGiftUpgrade) {
           actions.openUniqueGiftBySlug({
-            slug: actionStarGift.slug,
+            slug: actionDiamondGift.slug,
             tabId,
           });
 
@@ -342,14 +342,14 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             tabId,
           });
 
-          actions.requestConfetti({ withStars: true, tabId });
+          actions.requestConfetti({ withDiamonds: true, tabId });
 
           global = updateTabState(global, {
-            isWaitingForStarGiftUpgrade: undefined,
+            isWaitingForDiamondGiftUpgrade: undefined,
           }, tabId);
         }
 
-        if (tabState.isWaitingForStarGiftTransfer) {
+        if (tabState.isWaitingForDiamondGiftTransfer) {
           const chatId = update.message.chatId;
           const receiver = chatId ? selectPeer(global, chatId) : undefined;
           if (receiver) {
@@ -366,8 +366,8 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
                   gift: {
                     key: 'GiftUnique',
                     variables: {
-                      title: actionStarGift.title,
-                      number: actionStarGift.number,
+                      title: actionDiamondGift.title,
+                      number: actionDiamondGift.number,
                     },
                   },
                   peer: getPeerTitle(getTranslationFn(), receiver),
@@ -377,20 +377,20 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             });
           }
 
-          actions.requestConfetti({ withStars: true, tabId });
+          actions.requestConfetti({ withDiamonds: true, tabId });
 
           global = updateTabState(global, {
-            isWaitingForStarGiftTransfer: undefined,
+            isWaitingForDiamondGiftTransfer: undefined,
           }, tabId);
 
           actions.reloadPeerSavedGifts({ peerId: global.currentUserId! });
         }
 
-        if (tabState.giftCraftModal && actionStarGift.isCrafted) {
+        if (tabState.giftCraftModal && actionDiamondGift.isCrafted) {
           global = updateTabState(global, {
             giftCraftModal: {
               ...tabState.giftCraftModal,
-              craftResult: { success: true, gift: actionStarGift },
+              craftResult: { success: true, gift: actionDiamondGift },
             },
           }, tabId);
         }

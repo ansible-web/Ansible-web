@@ -1,9 +1,9 @@
 import type {
-  ApiInputSavedStarGift,
-  ApiRequestInputSavedStarGift,
-  ApiSavedStarGift,
-  ApiStarGiftAttribute,
-  ApiStarGiftUnique,
+  ApiDiamondGiftAttribute,
+  ApiDiamondGiftUnique,
+  ApiInputSavedDiamondGift,
+  ApiRequestInputSavedDiamondGift,
+  ApiSavedDiamondGift,
 } from '../../../api/types';
 import type { ActionReturnType } from '../../types';
 
@@ -18,17 +18,17 @@ import { getServerTime } from '../../../util/serverTime';
 import { callApi } from '../../../api/gramjs';
 import { preloadGiftAttributeStickers } from '../../../components/common/helpers/gifts';
 import { RESALE_GIFTS_LIMIT } from '../../../limits';
-import { areInputSavedGiftsEqual, getRequestInputSavedStarGift } from '../../helpers/payments';
+import { areInputSavedGiftsEqual, getRequestInputSavedDiamondGift } from '../../helpers/payments';
 import { addActionHandler, getGlobal, getPromiseActions, setGlobal } from '../../index';
 import {
-  appendStarsSubscriptions,
-  appendStarsTransactions,
+  appendDiamondsSubscriptions,
+  appendDiamondsTransactions,
   replaceGiftAuction,
   replacePeerSavedGifts,
   updateChats,
-  updatePeerStarGiftCollections,
+  updateDiamondsSubscriptionLoading,
+  updatePeerDiamondGiftCollections,
   updateStarsBalance,
-  updateStarsSubscriptionLoading,
   updateUsers,
 } from '../../reducers';
 import { updateTabState } from '../../reducers/tabs';
@@ -43,14 +43,14 @@ import {
   selectTabState,
 } from '../../selectors';
 
-addActionHandler('loadStarStatus', async (global): Promise<void> => {
-  const currentStarsStatus = global.stars;
-  const needsTopupOptions = !currentStarsStatus?.topupOptions;
+addActionHandler('loadDiamondStatus', async (global): Promise<void> => {
+  const currentDiamondsStatus = global.stars;
+  const needsTopupOptions = !currentDiamondsStatus?.topupOptions;
 
   const [starsStatus, tonStatus, topupOptions] = await Promise.all([
-    callApi('fetchStarsStatus'),
-    callApi('fetchStarsStatus', { isTon: true }),
-    needsTopupOptions ? callApi('fetchStarsTopupOptions') : undefined,
+    callApi('fetchDiamondsStatus'),
+    callApi('fetchDiamondsStatus', { isTon: true }),
+    needsTopupOptions ? callApi('fetchDiamondsTopupOptions') : undefined,
   ]);
 
   if (!(starsStatus || tonStatus) || (needsTopupOptions && !topupOptions)) {
@@ -63,9 +63,9 @@ addActionHandler('loadStarStatus', async (global): Promise<void> => {
     global = {
       ...global,
       stars: {
-        ...currentStarsStatus,
+        ...currentDiamondsStatus,
         balance: starsStatus.balance,
-        topupOptions: topupOptions || currentStarsStatus!.topupOptions,
+        topupOptions: topupOptions || currentDiamondsStatus!.topupOptions,
         history: {
           all: undefined,
           inbound: undefined,
@@ -76,11 +76,11 @@ addActionHandler('loadStarStatus', async (global): Promise<void> => {
     };
 
     if (starsStatus.history) {
-      global = appendStarsTransactions(global, 'all', starsStatus.history, starsStatus.nextHistoryOffset);
+      global = appendDiamondsTransactions(global, 'all', starsStatus.history, starsStatus.nextHistoryOffset);
     }
 
     if (starsStatus.subscriptions) {
-      global = appendStarsSubscriptions(global, starsStatus.subscriptions, starsStatus.nextSubscriptionOffset);
+      global = appendDiamondsSubscriptions(global, starsStatus.subscriptions, starsStatus.nextSubscriptionOffset);
     }
   }
 
@@ -101,21 +101,21 @@ addActionHandler('loadStarStatus', async (global): Promise<void> => {
     global = updateStarsBalance(global, tonStatus.balance);
 
     if (tonStatus.history) {
-      global = appendStarsTransactions(global, 'all', tonStatus.history, tonStatus.nextHistoryOffset, true);
+      global = appendDiamondsTransactions(global, 'all', tonStatus.history, tonStatus.nextHistoryOffset, true);
     }
   }
 
   setGlobal(global);
 });
 
-addActionHandler('loadStarsTransactions', async (global, actions, payload): Promise<void> => {
+addActionHandler('loadDiamondsTransactions', async (global, actions, payload): Promise<void> => {
   const { type, isTon } = payload;
 
   const history = isTon ? global.ton?.history[type] : global.stars?.history[type];
   const offset = history?.nextOffset;
   if (history && !offset) return; // Already loaded all
 
-  const result = await callApi('fetchStarsTransactions', {
+  const result = await callApi('fetchDiamondsTransactions', {
     isInbound: type === 'inbound',
     isOutbound: type === 'outbound',
     offset: offset || '',
@@ -130,13 +130,13 @@ addActionHandler('loadStarsTransactions', async (global, actions, payload): Prom
 
   global = updateStarsBalance(global, result.balance);
   if (result.history) {
-    global = appendStarsTransactions(global, type, result.history, result.nextOffset, isTon);
+    global = appendDiamondsTransactions(global, type, result.history, result.nextOffset, isTon);
   }
   setGlobal(global);
 });
 
-addActionHandler('loadStarGifts', async (global): Promise<void> => {
-  const result = await callApi('fetchStarGifts');
+addActionHandler('loadDiamondGifts', async (global): Promise<void> => {
+  const result = await callApi('fetchDiamondGifts');
 
   if (!result) {
     return;
@@ -146,10 +146,10 @@ addActionHandler('loadStarGifts', async (global): Promise<void> => {
 
   const byId = buildCollectionByKey(result.gifts, 'id');
 
-  const allStarGiftIds = Object.keys(byId);
-  const allStarGifts = Object.values(byId);
+  const allDiamondGiftIds = Object.keys(byId);
+  const allDiamondGifts = Object.values(byId);
 
-  const collectibleStarGiftIds = allStarGifts.map((gift) => (
+  const collectibleDiamondGiftIds = allDiamondGifts.map((gift) => (
     (gift.availabilityResale || (gift.isLimited && !gift.isSoldOut)) ? gift.id : undefined))
     .filter(Boolean);
 
@@ -158,8 +158,8 @@ addActionHandler('loadStarGifts', async (global): Promise<void> => {
     starGifts: {
       byId,
       idsByCategory: {
-        all: allStarGiftIds,
-        collectible: collectibleStarGiftIds,
+        all: allDiamondGiftIds,
+        collectible: collectibleDiamondGiftIds,
         myUnique: [],
       },
     },
@@ -180,7 +180,7 @@ addActionHandler('loadMyUniqueGifts', async (global, actions, payload): Promise<
   const peer = selectPeer(global, currentUserId);
   if (!peer) return;
 
-  const result = await callApi('fetchSavedStarGifts', {
+  const result = await callApi('fetchSavedDiamondGifts', {
     peer,
     offset: !shouldRefresh ? localNextOffset : undefined,
     filter: {
@@ -351,7 +351,7 @@ addActionHandler('loadPeerSavedGifts', async (global, actions, payload): Promise
 
   const fetchingFilter = selectGiftProfileFilter(global, peerId, tabId);
 
-  const result = await callApi('fetchSavedStarGifts', {
+  const result = await callApi('fetchSavedDiamondGifts', {
     peer,
     offset: !shouldRefresh ? localNextOffset : '',
     filter: fetchingFilter,
@@ -388,15 +388,15 @@ addActionHandler('reloadPeerSavedGifts', (global, actions, payload): ActionRetur
   }
 });
 
-addActionHandler('loadStarsSubscriptions', async (global): Promise<void> => {
+addActionHandler('loadDiamondsSubscriptions', async (global): Promise<void> => {
   const subscriptions = global.stars?.subscriptions;
   const offset = subscriptions?.nextOffset;
   if (subscriptions && !offset) return; // Already loaded all
 
-  global = updateStarsSubscriptionLoading(global, true);
+  global = updateDiamondsSubscriptionLoading(global, true);
   setGlobal(global);
 
-  const result = await callApi('fetchStarsSubscriptions', {
+  const result = await callApi('fetchDiamondsSubscriptions', {
     offset: offset || '',
   });
 
@@ -407,7 +407,7 @@ addActionHandler('loadStarsSubscriptions', async (global): Promise<void> => {
   global = getGlobal();
 
   global = updateStarsBalance(global, result.balance);
-  global = appendStarsSubscriptions(global, result.subscriptions, result.nextOffset);
+  global = appendDiamondsSubscriptions(global, result.subscriptions, result.nextOffset);
   setGlobal(global);
 });
 
@@ -424,7 +424,7 @@ addActionHandler('changeStarsSubscription', async (global, actions, payload): Pr
     isCancelled,
   });
 
-  actions.loadStarStatus();
+  actions.loadDiamondStatus();
 });
 
 addActionHandler('fulfillStarsSubscription', async (global, actions, payload): Promise<void> => {
@@ -439,7 +439,7 @@ addActionHandler('fulfillStarsSubscription', async (global, actions, payload): P
     subscriptionId: id,
   });
 
-  actions.loadStarStatus();
+  actions.loadDiamondStatus();
 });
 
 addActionHandler('changeGiftVisibility', async (global, actions, payload): Promise<void> => {
@@ -447,7 +447,7 @@ addActionHandler('changeGiftVisibility', async (global, actions, payload): Promi
 
   const peerId = gift.type === 'user' ? global.currentUserId! : gift.chatId;
 
-  const requestInputGift = getRequestInputSavedStarGift(global, gift);
+  const requestInputGift = getRequestInputSavedDiamondGift(global, gift);
   if (!requestInputGift) return;
 
   const activeCollectionId = selectActiveGiftsCollectionId(global, peerId, tabId);
@@ -458,7 +458,7 @@ addActionHandler('changeGiftVisibility', async (global, actions, payload): Promi
         return {
           ...g,
           isUnsaved: shouldUnsave,
-        } satisfies ApiSavedStarGift;
+        } satisfies ApiSavedDiamondGift;
       }
       return g;
     });
@@ -481,10 +481,10 @@ addActionHandler('changeGiftVisibility', async (global, actions, payload): Promi
   actions.reloadPeerSavedGifts({ peerId });
 });
 
-addActionHandler('convertGiftToStars', async (global, actions, payload): Promise<void> => {
+addActionHandler('convertGiftToDiamonds', async (global, actions, payload): Promise<void> => {
   const { gift, tabId = getCurrentTabId() } = payload;
 
-  const requestInputGift = getRequestInputSavedStarGift(global, gift);
+  const requestInputGift = getRequestInputSavedDiamondGift(global, gift);
   if (!requestInputGift) return;
 
   const result = await callApi('convertStarGift', {
@@ -497,7 +497,7 @@ addActionHandler('convertGiftToStars', async (global, actions, payload): Promise
 
   const peerId = gift.type === 'user' ? global.currentUserId! : gift.chatId;
   actions.reloadPeerSavedGifts({ peerId });
-  actions.openStarsBalanceModal({ tabId });
+  actions.openDiamondsBalanceModal({ tabId });
 });
 
 addActionHandler('openGiftUpgradeModal', async (global, actions, payload): Promise<void> => {
@@ -505,7 +505,7 @@ addActionHandler('openGiftUpgradeModal', async (global, actions, payload): Promi
     giftId, gift, peerId, tabId = getCurrentTabId(),
   } = payload;
 
-  const preview = await callApi('fetchStarGiftUpgradePreview', {
+  const preview = await callApi('fetchDiamondGiftUpgradePreview', {
     giftId,
   });
 
@@ -517,7 +517,7 @@ addActionHandler('openGiftUpgradeModal', async (global, actions, payload): Promi
 
   const passedPrices = preview.nextPrices.filter((price) => price.date <= serverTime);
   const regularGift = gift?.gift.type === 'starGift' ? gift.gift : undefined;
-  const currentUpgradeStars = passedPrices.length
+  const currentUpgradeDiamonds = passedPrices.length
     ? passedPrices[passedPrices.length - 1].upgradeStars
     : regularGift?.upgradeStars;
 
@@ -533,7 +533,7 @@ addActionHandler('openGiftUpgradeModal', async (global, actions, payload): Promi
       sampleAttributes: preview.sampleAttributes,
       prices: filteredPrices,
       nextPrices: filteredNextPrices,
-      currentUpgradeStars,
+      currentUpgradeDiamonds,
       minPrice,
       maxPrice,
     },
@@ -548,7 +548,7 @@ addActionHandler('shiftGiftUpgradeNextPrice', async (global, _actions, payload):
   const giftUpgradeModal = tabState?.giftUpgradeModal;
   if (!giftUpgradeModal?.nextPrices?.length) return;
 
-  const currentUpgradeStars = giftUpgradeModal.nextPrices[0].upgradeStars;
+  const currentUpgradeDiamonds = giftUpgradeModal.nextPrices[0].upgradeStars;
   const newNextPrices = giftUpgradeModal.nextPrices.slice(1);
 
   if (newNextPrices.length) {
@@ -556,7 +556,7 @@ addActionHandler('shiftGiftUpgradeNextPrice', async (global, _actions, payload):
       giftUpgradeModal: {
         ...giftUpgradeModal,
         nextPrices: newNextPrices,
-        currentUpgradeStars,
+        currentUpgradeDiamonds,
       },
     }, tabId);
     setGlobal(global);
@@ -568,7 +568,7 @@ addActionHandler('shiftGiftUpgradeNextPrice', async (global, _actions, payload):
   const giftId = gift?.type === 'starGift' ? gift.id : undefined;
   if (!giftId) return;
 
-  const preview = await callApi('fetchStarGiftUpgradePreview', { giftId });
+  const preview = await callApi('fetchDiamondGiftUpgradePreview', { giftId });
   if (!preview) return;
 
   const serverTime = getServerTime();
@@ -583,7 +583,7 @@ addActionHandler('shiftGiftUpgradeNextPrice', async (global, _actions, payload):
     giftUpgradeModal: {
       ...currentModal,
       nextPrices: filteredNextPrices,
-      currentUpgradeStars,
+      currentUpgradeDiamonds,
     },
   }, tabId);
   setGlobal(global);
@@ -594,7 +594,7 @@ addActionHandler('openGiftAuctionModal', async (global, _actions, payload): Prom
 
   const [, preview] = await Promise.all([
     getPromiseActions().loadGiftAuction({ giftId: gift.id }),
-    callApi('fetchStarGiftUpgradePreview', { giftId: gift.id }),
+    callApi('fetchDiamondGiftUpgradePreview', { giftId: gift.id }),
   ]);
 
   global = getGlobal();
@@ -613,7 +613,7 @@ addActionHandler('loadGiftAuction', async (global, _actions, payload): Promise<v
   const currentAuction = global.giftAuctionByGiftId?.[giftId];
   const currentVersion = currentAuction?.state.type === 'active' ? currentAuction.state.version : 0;
 
-  const auctionState = await callApi('fetchStarGiftAuctionState', {
+  const auctionState = await callApi('fetchDiamondGiftAuctionState', {
     giftId,
     version: currentVersion,
   });
@@ -636,12 +636,14 @@ addActionHandler('toggleSavedGiftPinned', async (global, actions, payload): Prom
   const pinLimit = global.appConfig.savedGiftPinLimit;
   const currentPinnedGifts = savedGifts.gifts.filter((g) => g.isPinned);
   const newPinnedGifts = gift.isPinned
-    ? currentPinnedGifts.filter((g) => (g.gift as ApiStarGiftUnique).slug !== (gift.gift as ApiStarGiftUnique).slug)
+    ? currentPinnedGifts.filter((g) => (
+      (g.gift as ApiDiamondGiftUnique).slug !== (gift.gift as ApiDiamondGiftUnique).slug
+    ))
     : [...currentPinnedGifts, gift];
 
   const trimmedPinnedGifts = pinLimit ? newPinnedGifts.slice(-pinLimit) : newPinnedGifts;
 
-  const inputSavedGifts = trimmedPinnedGifts.map((g) => getRequestInputSavedStarGift(global, g.inputGift!))
+  const inputSavedGifts = trimmedPinnedGifts.map((g) => getRequestInputSavedDiamondGift(global, g.inputGift!))
     .filter(Boolean);
 
   const result = await callApi('toggleSavedGiftPinned', {
@@ -659,7 +661,7 @@ addActionHandler('updateStarGiftPrice', async (global, actions, payload): Promis
     gift, price,
   } = payload;
 
-  const requestSavedGift = getRequestInputSavedStarGift(global, gift);
+  const requestSavedGift = getRequestInputSavedDiamondGift(global, gift);
 
   if (!requestSavedGift) {
     return;
@@ -675,7 +677,7 @@ addActionHandler('updateStarGiftPrice', async (global, actions, payload): Promis
   actions.reloadPeerSavedGifts({ peerId: global.currentUserId! });
 });
 
-addActionHandler('loadStarGiftCollections', async (global, actions, payload): Promise<void> => {
+addActionHandler('loadDiamondGiftCollections', async (global, actions, payload): Promise<void> => {
   const {
     peerId,
     hash,
@@ -684,7 +686,7 @@ addActionHandler('loadStarGiftCollections', async (global, actions, payload): Pr
   const peer = selectPeer(global, peerId);
   if (!peer) return;
 
-  const result = await callApi('fetchStarGiftCollections', {
+  const result = await callApi('fetchDiamondGiftCollections', {
     peer,
     hash,
   });
@@ -693,7 +695,7 @@ addActionHandler('loadStarGiftCollections', async (global, actions, payload): Pr
 
   global = getGlobal();
 
-  global = updatePeerStarGiftCollections(global, peerId, result.collections);
+  global = updatePeerDiamondGiftCollections(global, peerId, result.collections);
   setGlobal(global);
 });
 
@@ -702,7 +704,7 @@ addActionHandler('openGiftAuctionAcquiredModal', async (global, actions, payload
     giftId, giftTitle, giftSticker, tabId = getCurrentTabId(),
   } = payload;
 
-  const result = await callApi('fetchStarGiftAuctionAcquiredGifts', { giftId });
+  const result = await callApi('fetchDiamondGiftAuctionAcquiredGifts', { giftId });
 
   if (!result) return;
 
@@ -720,7 +722,7 @@ addActionHandler('openGiftAuctionAcquiredModal', async (global, actions, payload
   setGlobal(global);
 });
 
-addActionHandler('acceptStarGiftOffer', async (global, actions, payload): Promise<void> => {
+addActionHandler('acceptDiamondGiftOffer', async (global, actions, payload): Promise<void> => {
   const { messageId } = payload;
 
   const result = await callApi('resolveStarGiftOffer', {
@@ -731,13 +733,13 @@ addActionHandler('acceptStarGiftOffer', async (global, actions, payload): Promis
     return;
   }
 
-  actions.loadStarStatus();
+  actions.loadDiamondStatus();
   if (global.currentUserId) {
     actions.reloadPeerSavedGifts({ peerId: global.currentUserId });
   }
 });
 
-addActionHandler('declineStarGiftOffer', async (global, actions, payload): Promise<void> => {
+addActionHandler('declineDiamondGiftOffer', async (global, actions, payload): Promise<void> => {
   const { messageId } = payload;
 
   await callApi('resolveStarGiftOffer', {
@@ -747,7 +749,7 @@ addActionHandler('declineStarGiftOffer', async (global, actions, payload): Promi
 });
 
 addActionHandler('loadActiveGiftAuctions', async (global, actions, payload): Promise<void> => {
-  const result = await callApi('fetchStarGiftActiveAuctions');
+  const result = await callApi('fetchDiamondGiftActiveAuctions');
 
   if (!result) return;
 
@@ -786,7 +788,7 @@ addActionHandler('openGiftInfoModalFromMessage', async (global, actions, payload
 
   const giftReceiverId = action.peerId || (message.isOutgoing ? message.chatId : global.currentUserId!);
 
-  const inputGift: ApiInputSavedStarGift = (() => {
+  const inputGift: ApiInputSavedDiamondGift = (() => {
     if (giftMsgId) {
       return { type: 'user', messageId: giftMsgId };
     }
@@ -799,7 +801,7 @@ addActionHandler('openGiftInfoModalFromMessage', async (global, actions, payload
   const fallbackFromId = message.isOutgoing ? global.currentUserId! : message.chatId;
   const fromId = action.fromId || (action.isNameHidden ? undefined : fallbackFromId);
 
-  const gift: ApiSavedStarGift = {
+  const gift: ApiSavedDiamondGift = {
     date: message.date,
     gift: action.gift,
     message: action.message,
@@ -811,7 +813,7 @@ addActionHandler('openGiftInfoModalFromMessage', async (global, actions, payload
     isConverted: starGift?.isConverted,
     upgradeMsgId: starGift?.upgradeMsgId,
     canUpgrade: starGift?.canUpgrade,
-    alreadyPaidUpgradeStars: starGift?.alreadyPaidUpgradeStars,
+    alreadyPaidUpgradeDiamonds: starGift?.alreadyPaidUpgradeDiamonds,
     inputGift,
     canExportAt: uniqueGift?.canExportAt,
     savedId: action.savedId,
@@ -827,7 +829,7 @@ addActionHandler('openGiftInfoModalFromMessage', async (global, actions, payload
 addActionHandler('openGiftInfoValueModal', async (global, actions, payload): Promise<void> => {
   const { gift, tabId = getCurrentTabId() } = payload;
 
-  const result = await callApi('fetchUniqueStarGiftValueInfo', { slug: gift.slug });
+  const result = await callApi('fetchUniqueDiamondGiftValueInfo', { slug: gift.slug });
   if (!result) return;
 
   global = getGlobal();
@@ -846,10 +848,10 @@ addActionHandler('openGiftCraftModal', async (global, _actions, payload): Promis
   const uniqueGift = gift?.gift.type === 'starGiftUnique' ? gift.gift : undefined;
   const regularGiftId = uniqueGift?.regularGiftId;
 
-  let previewAttributes: ApiStarGiftAttribute[] | undefined;
+  let previewAttributes: ApiDiamondGiftAttribute[] | undefined;
 
   if (regularGiftId) {
-    const result = await callApi('fetchStarGiftUpgradeAttributes', { giftId: regularGiftId });
+    const result = await callApi('fetchDiamondGiftUpgradeAttributes', { giftId: regularGiftId });
     if (result) {
       const craftableModels = result.attributes.filter(
         (attr) => attr.type === 'model' && attr.rarity.type !== 'regular',
@@ -898,7 +900,7 @@ addActionHandler('openGiftCraftSelectModal', async (global, actions, payload): P
 
   const [myGiftsResult, marketGiftsResult] = await Promise.all([
     shouldLoadMyGifts
-      ? callApi('fetchCraftStarGifts', { giftId: craftModal.regularGiftId, peerId: global.currentUserId! })
+      ? callApi('fetchCraftDiamondGifts', { giftId: craftModal.regularGiftId, peerId: global.currentUserId! })
       : undefined,
     shouldLoadMarketGifts
       ? callApi('fetchResaleGifts', {
@@ -917,7 +919,7 @@ addActionHandler('openGiftCraftSelectModal', async (global, actions, payload): P
   // Filter to only unique gifts
   const savedGifts = myGiftsResult?.gifts.filter((g) => g.gift.type === 'starGiftUnique');
   const marketGifts = marketGiftsResult?.gifts.filter(
-    (g): g is ApiStarGiftUnique => g.type === 'starGiftUnique',
+    (g): g is ApiDiamondGiftUnique => g.type === 'starGiftUnique',
   );
 
   const didLoadMyGifts = shouldLoadMyGifts && myGiftsResult;
@@ -959,7 +961,7 @@ addActionHandler('loadMoreCraftableGifts', async (global, actions, payload): Pro
   const gift1Unique = craftModal.gift1?.gift.type === 'starGiftUnique' ? craftModal.gift1.gift : undefined;
   if (!gift1Unique?.regularGiftId) return;
 
-  const result = await callApi('fetchCraftStarGifts', {
+  const result = await callApi('fetchCraftDiamondGifts', {
     giftId: gift1Unique.regularGiftId,
     peerId: global.currentUserId!,
     offset: craftModal.myCraftableGiftsNextOffset,
@@ -1021,7 +1023,7 @@ addActionHandler('loadMoreMarketCraftableGifts', async (global, actions, payload
     return;
   }
 
-  const newGifts = result.gifts.filter((g): g is ApiStarGiftUnique => g.type === 'starGiftUnique');
+  const newGifts = result.gifts.filter((g): g is ApiDiamondGiftUnique => g.type === 'starGiftUnique');
 
   global = updateTabState(global, {
     giftCraftModal: {
@@ -1068,7 +1070,7 @@ addActionHandler('updateCraftGiftsFilter', async (global, actions, payload): Pro
     return;
   }
 
-  const newGifts = result.gifts.filter((g): g is ApiStarGiftUnique => g.type === 'starGiftUnique');
+  const newGifts = result.gifts.filter((g): g is ApiDiamondGiftUnique => g.type === 'starGiftUnique');
 
   global = updateTabState(global, {
     giftCraftModal: {
@@ -1093,13 +1095,13 @@ addActionHandler('craftStarGift', async (global, _actions, payload): Promise<voi
   if (!modal?.regularGiftId) return;
 
   const savedGifts = [modal.gift1, modal.gift2, modal.gift3, modal.gift4].filter(
-    (g): g is ApiSavedStarGift => Boolean(g),
+    (g): g is ApiSavedDiamondGift => Boolean(g),
   );
   if (savedGifts.length === 0) return;
 
   const inputSavedGifts = savedGifts
-    .map((g) => g.inputGift && getRequestInputSavedStarGift(global, g.inputGift))
-    .filter((g): g is ApiRequestInputSavedStarGift => Boolean(g));
+    .map((g) => g.inputGift && getRequestInputSavedDiamondGift(global, g.inputGift))
+    .filter((g): g is ApiRequestInputSavedDiamondGift => Boolean(g));
 
   if (inputSavedGifts.length === 0) return;
 
@@ -1120,7 +1122,7 @@ addActionHandler('craftStarGift', async (global, _actions, payload): Promise<voi
   }
 });
 
-addActionHandler('openAboutStarGiftModal', async (global, actions, payload): Promise<void> => {
+addActionHandler('openAboutDiamondGiftModal', async (global, actions, payload): Promise<void> => {
   const { tabId = getCurrentTabId() } = payload || {};
 
   const result = await callApi('fetchPremiumPromo');
@@ -1139,7 +1141,7 @@ addActionHandler('openAboutStarGiftModal', async (global, actions, payload): Pro
 
   global = getGlobal();
   global = updateTabState(global, {
-    aboutStarGiftModal: { videoId, videoThumbnail },
+    aboutDiamondGiftModal: { videoId, videoThumbnail },
   }, tabId);
   setGlobal(global);
 });
@@ -1148,7 +1150,7 @@ addActionHandler('openGiftPreviewModal', async (global, _actions, payload): Prom
   const { originGift, shouldShowCraftableOnStart, tabId = getCurrentTabId() } = payload;
 
   const giftId = originGift.type === 'starGiftUnique' ? originGift.regularGiftId : originGift.id;
-  const result = await callApi('fetchStarGiftUpgradeAttributes', { giftId });
+  const result = await callApi('fetchDiamondGiftUpgradeAttributes', { giftId });
   if (!result) return;
 
   global = getGlobal();

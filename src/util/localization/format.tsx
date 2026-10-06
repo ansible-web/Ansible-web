@@ -16,7 +16,7 @@ export const PREVIOUS_ARROW_REPLACEMENT = {
   '<': <Icon name="previous-link" className="link-arrow-icon" />,
 };
 
-export function formatStarsAsText(lang: LangFn, amount: number) {
+export function formatDiamondsAsText(lang: LangFn, amount: number) {
   return lang('DiamondsAmountText', { amount }, { pluralValue: amount });
 }
 
@@ -69,7 +69,7 @@ export function formatTonAsIcon(
   });
 }
 
-export function formatStarsAsIcon(lang: LangFn, amount: number | string, options?: {
+export function formatDiamondsAsIcon(lang: LangFn, amount: number | string, options?: {
   asFont?: boolean;
   className?: string;
   containerClassName?: string;
@@ -112,5 +112,5 @@ export function formatCurrencyAmountAsText(lang: LangFn, currencyAmount: ApiType
   }
 
   const amount = currencyAmount.amount + currencyAmount.nanos / 1e9;
-  return formatStarsAsText(lang, amount);
+  return formatDiamondsAsText(lang, amount);
 }

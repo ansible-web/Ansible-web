@@ -5,7 +5,7 @@ import {
   type Update,
 } from '../../../lib/gramjs';
 import type { TwoFaParams } from '../../../lib/gramjs/client/2fa';
-import TelegramClient from '../../../lib/gramjs/client/TelegramClient';
+import AnsibleClient from '../../../lib/gramjs/client/TelegramClient';
 import { RPCError } from '../../../lib/gramjs/errors';
 import { Logger as GramJsLogger } from '../../../lib/gramjs/extensions/index';
 
@@ -18,8 +18,8 @@ import type {
 } from '../../types';
 
 import {
-  APP_CODE_NAME,
-  DEBUG, DEBUG_GRAMJS, IS_TEST, LANG_PACK, TELEGRAM_API_HASH, TELEGRAM_API_ID, UPLOAD_WORKERS,
+  ANSIBLE_API_HASH, ANSIBLE_API_ID, APP_CODE_NAME,
+  DEBUG, DEBUG_GRAMJS, IS_TEST, LANG_PACK, UPLOAD_WORKERS,
 } from '../../../config';
 import { pause } from '../../../util/schedulers';
 import { buildWebPage } from '../apiBuilders/messageContent';
@@ -85,7 +85,7 @@ const gramJsUpdateEventBuilder = { build: (update: Update) => update };
 const CHAT_ABORT_CONTROLLERS = new Map<string, ChatAbortController>();
 const ABORT_CONTROLLERS = new Map<string, AbortController>();
 
-let client: TelegramClient;
+let client: AnsibleClient;
 let currentUserId: string | undefined;
 
 export async function init(initialArgs: ApiInitialArgs, onConnected?: NoneToVoidFunction) {
@@ -107,10 +107,10 @@ export async function init(initialArgs: ApiInitialArgs, onConnected?: NoneToVoid
 
   (self as any).maxBufferSize = maxBufferSize;
 
-  client = new TelegramClient(
+  client = new AnsibleClient(
     session,
-    TELEGRAM_API_ID,
-    TELEGRAM_API_HASH,
+    ANSIBLE_API_ID,
+    ANSIBLE_API_HASH,
     {
       deviceModel: navigator.userAgent || userAgent || DEFAULT_USER_AGENT,
       systemVersion: platform || DEFAULT_PLATFORM,

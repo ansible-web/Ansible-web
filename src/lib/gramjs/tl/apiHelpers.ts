@@ -151,19 +151,19 @@ function getArgFromReader(
             case 'double':
                 return reader.readDouble();
             case 'string':
-                return reader.tgReadString();
+                return reader.asReadString();
             case 'Bool':
-                return reader.tgReadBool();
+                return reader.asReadBool();
             case 'true':
                 return true;
             case 'bytes':
-                return reader.tgReadBytes();
+                return reader.asReadBytes();
             case 'date':
-                return reader.tgReadDate();
+                return reader.asReadDate();
             default:
                 return arg.isBareType
                     ? classes[arg.type].fromReader(reader)
-                    : reader.tgReadObject();
+                    : reader.asReadObject();
         }
     }
 }
@@ -307,7 +307,7 @@ function createClasses(classesType: 'constructor' | 'request', params: Generatio
                     }
                     return temp;
                 } else {
-                    return reader.tgReadObject();
+                    return reader.asReadObject();
                 }
             }
         }

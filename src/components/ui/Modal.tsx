@@ -20,7 +20,7 @@ import useShowTransition from '../../hooks/useShowTransition';
 
 import Button, { type OwnProps as ButtonProps } from './Button';
 import Menu from './Menu';
-import ModalStarBalanceBar from './ModalStarBalanceBar';
+import ModalDiamondBalanceBar from './ModalStarBalanceBar';
 import Portal from './Portal';
 
 import './Modal.scss';
@@ -277,7 +277,7 @@ const Modal = (props: OwnProps) => {
         <div className="modal-container">
           <div className="modal-backdrop" onClick={!noBackdropClose ? onClose : undefined} />
           {withBalanceBar && (
-            <ModalStarBalanceBar
+            <ModalDiamondBalanceBar
               isModalOpen={isOpen}
               currency={currencyInBalanceBar}
             />

@@ -7,10 +7,10 @@ import type {
   ApiChat,
   ApiChatFullInfo,
   ApiChatMember,
+  ApiDiamondGiftCollection,
   ApiMessage,
   ApiProfileTab,
-  ApiSavedStarGift,
-  ApiStarGiftCollection,
+  ApiSavedDiamondGift,
   ApiStoryAlbum,
   ApiTypeStory,
   ApiUser,
@@ -159,9 +159,9 @@ type StateProps = {
   hasMembersTab?: boolean;
   hasPreviewMediaTab?: boolean;
   hasGiftsTab?: boolean;
-  gifts?: ApiSavedStarGift[];
+  gifts?: ApiSavedDiamondGift[];
   storyAlbums?: ApiStoryAlbum[];
-  giftCollections?: ApiStarGiftCollection[];
+  giftCollections?: ApiDiamondGiftCollection[];
   areMembersHidden?: boolean;
   canAddMembers?: boolean;
   canDeleteMembers?: boolean;
@@ -342,7 +342,7 @@ const Profile = ({
     loadPreviewMedias,
     loadPeerSavedGifts,
     resetGiftProfileFilter,
-    loadStarGiftCollections,
+    loadDiamondGiftCollections,
     loadStoryAlbums,
     resetSelectedStoryAlbum,
     changeProfileTab,
@@ -540,7 +540,7 @@ const Profile = ({
 
   useEffect(() => {
     if (hasGiftsTab && isSynced) {
-      loadStarGiftCollections({ peerId: chatId });
+      loadDiamondGiftCollections({ peerId: chatId });
       loadStoryAlbums({ peerId: chatId });
     }
   }, [chatId, hasGiftsTab, isSynced]);

@@ -30,8 +30,8 @@ export function selectNewNoncontactPeersRequirePremium<T extends GlobalState>(gl
   return global.settings.byKey.shouldNewNonContactPeersRequirePremium;
 }
 
-export function selectNonContactPeersPaidStars<T extends GlobalState>(global: T) {
-  return global.settings.byKey.nonContactPeersPaidStars;
+export function selectNonContactPeersPaidDiamonds<T extends GlobalState>(global: T) {
+  return global.settings.byKey.nonContactPeersPaidDiamonds;
 }
 
 export function selectShouldHideReadMarks<T extends GlobalState>(global: T) {

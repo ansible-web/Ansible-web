@@ -6,18 +6,18 @@ import { getActions, withGlobal } from '../../../global';
 
 import type { GiftOption } from './GiftModal';
 import {
-  type ApiMessage, type ApiPeer, type ApiStarGiftAuctionState, type ApiStarsAmount, MAIN_THREAD_ID,
+  type ApiDiamondGiftAuctionState, type ApiDiamondsAmount, type ApiMessage, type ApiPeer, MAIN_THREAD_ID,
 } from '../../../api/types';
 
 import { getPeerTitle, isApiPeerUser } from '../../../global/helpers/peers';
 import {
-  selectPeer, selectPeerPaidMessagesStars, selectTabState, selectUserFullInfo,
+  selectPeer, selectPeerPaidMessagesDiamonds, selectTabState, selectUserFullInfo,
 } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
 import { formatCountdown } from '../../../util/dates/oldDateFormat';
 import { HOUR } from '../../../util/dates/units';
 import { formatCurrency } from '../../../util/formatCurrency';
-import { formatStarsAsIcon, NEXT_ARROW_REPLACEMENT } from '../../../util/localization/format';
+import { formatDiamondsAsIcon, NEXT_ARROW_REPLACEMENT } from '../../../util/localization/format';
 import { getServerTime } from '../../../util/serverTime';
 
 import useLang from '../../../hooks/useLang';
@@ -37,7 +37,7 @@ import styles from './GiftComposer.module.scss';
 
 export type OwnProps = {
   gift: GiftOption;
-  giftByStars?: GiftOption;
+  giftByDiamonds?: GiftOption;
   peerId: string;
 };
 
@@ -46,11 +46,11 @@ export type StateProps = {
   peer?: ApiPeer;
   currentUserId?: string;
   isPaymentFormLoading?: boolean;
-  starBalance?: ApiStarsAmount;
-  paidMessagesStars?: number;
-  areUniqueStarGiftsDisallowed?: boolean;
-  shouldDisallowLimitedStarGifts?: boolean;
-  giftAuction?: ApiStarGiftAuctionState;
+  starBalance?: ApiDiamondsAmount;
+  paidMessagesDiamonds?: number;
+  areUniqueDiamondGiftsDisallowed?: boolean;
+  shouldDisallowLimitedDiamondGifts?: boolean;
+  giftAuction?: ApiDiamondGiftAuctionState;
 };
 
 const LIMIT_DISPLAY_THRESHOLD = 50;
@@ -58,20 +58,20 @@ const TEXT_TIMER_THRESHOLD = 48 * HOUR;
 
 function GiftComposer({
   gift,
-  giftByStars,
+  giftByDiamonds,
   peerId,
   peer,
   captionLimit,
   currentUserId,
   isPaymentFormLoading,
   starBalance,
-  paidMessagesStars,
-  areUniqueStarGiftsDisallowed,
-  shouldDisallowLimitedStarGifts,
+  paidMessagesDiamonds,
+  areUniqueDiamondGiftsDisallowed,
+  shouldDisallowLimitedDiamondGifts,
   giftAuction,
 }: OwnProps & StateProps) {
   const {
-    sendStarGift, sendPremiumGiftByStars, openInvoice, openGiftUpgradeModal, openStarsBalanceModal,
+    sendDiamondGift, sendPremiumGiftByDiamonds, openInvoice, openGiftUpgradeModal, openDiamondsBalanceModal,
     openGiftAuctionBidModal, openGiftAuctionInfoModal, openGiftAuctionChangeRecipientModal,
   } = getActions();
 
@@ -80,23 +80,23 @@ function GiftComposer({
   const [giftMessage, setGiftMessage] = useState<string>('');
   const [shouldHideName, setShouldHideName] = useState<boolean>(false);
   const [shouldPayForUpgrade, setShouldPayForUpgrade] = useState<boolean>(false);
-  const [shouldPayByStars, setShouldPayByStars] = useState<boolean>(false);
+  const [shouldPayByDiamonds, setShouldPayByDiamonds] = useState<boolean>(false);
 
   useEffect(() => {
-    if (shouldDisallowLimitedStarGifts) {
+    if (shouldDisallowLimitedDiamondGifts) {
       setShouldPayForUpgrade(true);
     }
-  }, [shouldDisallowLimitedStarGifts, shouldPayForUpgrade]);
+  }, [shouldDisallowLimitedDiamondGifts, shouldPayForUpgrade]);
 
-  const isStarGift = 'id' in gift && gift.type === 'starGift';
+  const isDiamondGift = 'id' in gift && gift.type === 'starGift';
   const isPremiumGift = 'months' in gift;
-  const hasPremiumByStars = giftByStars && 'amount' in giftByStars;
+  const hasPremiumByDiamonds = giftByDiamonds && 'amount' in giftByDiamonds;
   const isPeerUser = peer && isApiPeerUser(peer);
   const isSelf = peerId === currentUserId;
 
   const localMessage = useMemo(() => {
     if (isPremiumGift) {
-      const currentGift = shouldPayByStars && hasPremiumByStars ? giftByStars : gift;
+      const currentGift = shouldPayByDiamonds && hasPremiumByDiamonds ? giftByDiamonds : gift;
       return {
         id: -1,
         chatId: '0',
@@ -116,7 +116,7 @@ function GiftComposer({
       } satisfies ApiMessage;
     }
 
-    if (isStarGift) {
+    if (isDiamondGift) {
       return {
         id: -1,
         chatId: '0',
@@ -133,7 +133,7 @@ function GiftComposer({
             isNameHidden: shouldHideName || undefined,
             starsToConvert: gift.starsToConvert,
             canUpgrade: shouldPayForUpgrade || undefined,
-            alreadyPaidUpgradeStars: shouldPayForUpgrade ? gift.upgradeStars : undefined,
+            alreadyPaidUpgradeDiamonds: shouldPayForUpgrade ? gift.upgradeStars : undefined,
             gift,
             peerId,
             fromId: currentUserId,
@@ -142,9 +142,9 @@ function GiftComposer({
       } satisfies ApiMessage;
     }
     return undefined;
-  }, [currentUserId, gift, giftMessage, isStarGift,
+  }, [currentUserId, gift, giftMessage, isDiamondGift,
     shouldHideName, shouldPayForUpgrade, peerId,
-    shouldPayByStars, hasPremiumByStars, giftByStars, isPremiumGift]);
+    shouldPayByDiamonds, hasPremiumByDiamonds, giftByDiamonds, isPremiumGift]);
 
   const handleGiftMessageChange = useLastCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
     setGiftMessage(e.target.value);
@@ -158,20 +158,20 @@ function GiftComposer({
     setShouldPayForUpgrade(!shouldPayForUpgrade);
   });
 
-  const toggleShouldPayByStars = useLastCallback(() => {
-    if (hasPremiumByStars) setShouldPayByStars(!shouldPayByStars);
+  const toggleShouldPayByDiamonds = useLastCallback(() => {
+    if (hasPremiumByDiamonds) setShouldPayByDiamonds(!shouldPayByDiamonds);
   });
 
   const handleOpenUpgradePreview = useLastCallback(() => {
-    if (!isStarGift) return;
+    if (!isDiamondGift) return;
     openGiftUpgradeModal({
       giftId: gift.id,
       peerId,
     });
   });
 
-  const handleGetMoreStars = useLastCallback(() => {
-    openStarsBalanceModal({});
+  const handleGetMoreDiamonds = useLastCallback(() => {
+    openDiamondsBalanceModal({});
   });
 
   const handleLearnMoreClick = useLastCallback(() => {
@@ -202,8 +202,8 @@ function GiftComposer({
       return;
     }
 
-    if (isStarGift) {
-      sendStarGift({
+    if (isDiamondGift) {
+      sendDiamondGift({
         peerId,
         shouldHideName,
         gift,
@@ -213,11 +213,11 @@ function GiftComposer({
       return;
     }
 
-    if (shouldPayByStars && hasPremiumByStars) {
-      sendPremiumGiftByStars({
+    if (shouldPayByDiamonds && hasPremiumByDiamonds) {
+      sendPremiumGiftByDiamonds({
         userId: peerId,
-        months: giftByStars.months,
-        amount: giftByStars.amount,
+        months: giftByDiamonds.months,
+        amount: giftByDiamonds.amount,
         message: giftMessage ? { text: giftMessage } : undefined,
       });
       return;
@@ -235,7 +235,7 @@ function GiftComposer({
     }
   });
 
-  const canUseStarsPayment = hasPremiumByStars && starBalance && (starBalance.amount > giftByStars.amount);
+  const canUseDiamondsPayment = hasPremiumByDiamonds && starBalance && (starBalance.amount > giftByDiamonds.amount);
   function renderOptionsSection() {
     const symbolsLeft = captionLimit ? captionLimit - giftMessage.length : undefined;
 
@@ -243,7 +243,7 @@ function GiftComposer({
     return (
       <div className={styles.optionsSection}>
 
-        {!paidMessagesStars && (
+        {!paidMessagesDiamonds && (
           <TextArea
             className={styles.messageInput}
             onChange={handleGiftMessageChange}
@@ -256,27 +256,27 @@ function GiftComposer({
           />
         )}
 
-        {canUseStarsPayment && (
-          <ListItem className={styles.switcher} narrow ripple onClick={toggleShouldPayByStars}>
+        {canUseDiamondsPayment && (
+          <ListItem className={styles.switcher} narrow ripple onClick={toggleShouldPayByDiamonds}>
             <span>
               {lang('GiftPremiumPayWithDiamonds', {
-                stars: formatStarsAsIcon(lang, giftByStars.amount, { className: styles.switcherStarIcon }),
+                stars: formatDiamondsAsIcon(lang, giftByDiamonds.amount, { className: styles.switcherDiamondIcon }),
               }, { withNodes: true })}
             </span>
             <Switcher
-              checked={shouldPayByStars}
+              checked={shouldPayByDiamonds}
               inactive
               label={lang('GiftPremiumPayWithDiamondsAcc')}
             />
           </ListItem>
         )}
 
-        {hasPremiumByStars && starBalance && (
+        {hasPremiumByDiamonds && starBalance && (
           <div className={styles.description}>
             {lang('GiftPremiumDescriptionYourBalance', {
-              stars: formatStarsAsIcon(lang, starBalance.amount, { className: styles.switcherStarIcon }),
+              stars: formatDiamondsAsIcon(lang, starBalance.amount, { className: styles.switcherDiamondIcon }),
               link: (
-                <Link isPrimary onClick={handleGetMoreStars}>
+                <Link isPrimary onClick={handleGetMoreDiamonds}>
                   {lang('GetMoreDiamondsLinkText', undefined, {
                     withNodes: true,
                     specialReplacement: NEXT_ARROW_REPLACEMENT,
@@ -290,17 +290,17 @@ function GiftComposer({
           </div>
         )}
 
-        {isStarGift && Boolean(gift.upgradeStars) && !areUniqueStarGiftsDisallowed && (
+        {isDiamondGift && Boolean(gift.upgradeStars) && !areUniqueDiamondGiftsDisallowed && (
           <ListItem
             className={styles.switcher}
             narrow
             ripple
             onClick={handleShouldPayForUpgradeChange}
-            disabled={shouldDisallowLimitedStarGifts}
+            disabled={shouldDisallowLimitedDiamondGifts}
           >
             <span>
               {lang('GiftMakeUnique', {
-                stars: formatStarsAsIcon(lang, gift.upgradeStars, { className: styles.switcherStarIcon }),
+                stars: formatDiamondsAsIcon(lang, gift.upgradeStars, { className: styles.switcherDiamondIcon }),
               }, { withNodes: true })}
             </span>
             <Switcher
@@ -310,7 +310,7 @@ function GiftComposer({
             />
           </ListItem>
         )}
-        {isStarGift && Boolean(gift.upgradeStars) && !areUniqueStarGiftsDisallowed && (
+        {isDiamondGift && Boolean(gift.upgradeStars) && !areUniqueDiamondGiftsDisallowed && (
           <div className={styles.description}>
             {isPeerUser
               ? lang('GiftMakeUniqueDescription', {
@@ -339,7 +339,7 @@ function GiftComposer({
           </div>
         )}
 
-        {isStarGift && (
+        {isDiamondGift && (
           <ListItem className={styles.switcher} narrow ripple onClick={handleShouldHideNameChange}>
             <span>{lang('GiftHideMyName')}</span>
             <Switcher
@@ -349,7 +349,7 @@ function GiftComposer({
             />
           </ListItem>
         )}
-        {isStarGift && (
+        {isDiamondGift && (
           <div className={styles.description}>
             {isSelf ? lang('GiftHideNameDescriptionSelf')
               : isPeerUser ? lang('GiftHideNameDescription', { receiver: title })
@@ -361,10 +361,10 @@ function GiftComposer({
   }
 
   function renderFooter() {
-    const amount = shouldPayByStars && hasPremiumByStars
-      ? formatStarsAsIcon(lang, giftByStars.amount)
-      : isStarGift
-        ? formatStarsAsIcon(lang, gift.stars + (shouldPayForUpgrade ? gift.upgradeStars! : 0))
+    const amount = shouldPayByDiamonds && hasPremiumByDiamonds
+      ? formatDiamondsAsIcon(lang, giftByDiamonds.amount)
+      : isDiamondGift
+        ? formatDiamondsAsIcon(lang, gift.stars + (shouldPayForUpgrade ? gift.upgradeStars! : 0))
         : isPremiumGift ? formatCurrency(lang, gift.amount, gift.currency) : undefined;
 
     const giftsPerRound = giftAuction?.gift.giftsPerRound;
@@ -375,7 +375,7 @@ function GiftComposer({
 
     return (
       <div className={styles.footer}>
-        {isStarGift && Boolean(gift.availabilityRemains) && (
+        {isDiamondGift && Boolean(gift.availabilityRemains) && (
           <PremiumProgress
             isPrimary
             progress={gift.availabilityRemains / gift.availabilityTotal!}
@@ -426,13 +426,13 @@ function GiftComposer({
     );
   }
 
-  if ((!isStarGift && !isPremiumGift) || !localMessage) return;
+  if ((!isDiamondGift && !isPremiumGift) || !localMessage) return;
 
   return (
     <div className={buildClassName(styles.root, 'custom-scroll')}>
       <Wallpaper className={buildClassName(styles.actionMessageView, 'MessageList')} inert isStatic>
         <ActionMessage
-          key={isStarGift ? gift.id : isPremiumGift ? gift.months : undefined}
+          key={isDiamondGift ? gift.id : isPremiumGift ? gift.months : undefined}
           message={localMessage}
           threadId={MAIN_THREAD_ID}
           appearanceOrder={0}
@@ -451,14 +451,14 @@ export default memo(withGlobal<OwnProps>(
       stars,
     } = global;
     const peer = selectPeer(global, peerId);
-    const paidMessagesStars = selectPeerPaidMessagesStars(global, peerId);
+    const paidMessagesDiamonds = selectPeerPaidMessagesDiamonds(global, peerId);
     const userFullInfo = selectUserFullInfo(global, peerId);
     const currentUserId = global.currentUserId;
     const isGiftForSelf = currentUserId === peerId;
-    const areUniqueStarGiftsDisallowed = !isGiftForSelf
-      && userFullInfo?.disallowedGifts?.shouldDisallowUniqueStarGifts;
-    const shouldDisallowLimitedStarGifts = !isGiftForSelf
-      && userFullInfo?.disallowedGifts?.shouldDisallowLimitedStarGifts;
+    const areUniqueDiamondGiftsDisallowed = !isGiftForSelf
+      && userFullInfo?.disallowedGifts?.shouldDisallowUniqueDiamondGifts;
+    const shouldDisallowLimitedDiamondGifts = !isGiftForSelf
+      && userFullInfo?.disallowedGifts?.shouldDisallowLimitedDiamondGifts;
 
     const tabState = selectTabState(global);
     const auctionGiftId = 'id' in gift && gift.type === 'starGift' && gift.isAuction ? gift.id : undefined;
@@ -471,9 +471,9 @@ export default memo(withGlobal<OwnProps>(
       captionLimit: global.appConfig.starGiftMaxMessageLength,
       currentUserId: global.currentUserId,
       isPaymentFormLoading: tabState.isPaymentFormLoading,
-      paidMessagesStars,
-      areUniqueStarGiftsDisallowed,
-      shouldDisallowLimitedStarGifts,
+      paidMessagesDiamonds,
+      areUniqueDiamondGiftsDisallowed,
+      shouldDisallowLimitedDiamondGifts,
       giftAuction,
     };
   },

@@ -39,7 +39,7 @@ const DiamondsGiftingPickerModal: FC<OwnProps & StateProps> = ({
   archivedListIds,
   userIds,
 }) => {
-  const { closeStarsGiftingPickerModal, openStarsGiftModal } = getActions();
+  const { closeDiamondsGiftingPickerModal, openDiamondsGiftModal } = getActions();
 
   const oldLang = useOldLang();
 
@@ -72,8 +72,8 @@ const DiamondsGiftingPickerModal: FC<OwnProps & StateProps> = ({
 
   const handleSelectedUserIdsChange = useLastCallback((newSelectedId?: string) => {
     if (newSelectedId?.length) {
-      openStarsGiftModal({ forUserId: newSelectedId });
-      closeStarsGiftingPickerModal();
+      openDiamondsGiftModal({ forUserId: newSelectedId });
+      closeDiamondsGiftingPickerModal();
     }
   });
 
@@ -81,13 +81,13 @@ const DiamondsGiftingPickerModal: FC<OwnProps & StateProps> = ({
     <PickerModal
       className={styles.root}
       isOpen={isOpen}
-      onClose={closeStarsGiftingPickerModal}
+      onClose={closeDiamondsGiftingPickerModal}
       title={oldLang('GiftDiamondsTitle')}
       hasCloseButton
       shouldAdaptToSearch
       withFixedHeight
       confirmButtonText={oldLang('Continue')}
-      onEnter={closeStarsGiftingPickerModal}
+      onEnter={closeDiamondsGiftingPickerModal}
     >
       <PeerPicker
         className={styles.picker}

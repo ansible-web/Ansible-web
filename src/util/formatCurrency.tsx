@@ -3,7 +3,7 @@ import { type TeactNode } from '../lib/teact/teact';
 import type { LangFn } from './localization';
 
 import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../config';
-import { formatStarsAsIcon, formatTonAsIcon } from './localization/format';
+import { formatDiamondsAsIcon, formatTonAsIcon } from './localization/format';
 
 const FALLBACK_LANG_CODE = 'en';
 
@@ -36,7 +36,7 @@ export function formatCurrency(
   const price = convertCurrencyFromBaseUnit(totalPrice, currency);
 
   if (currency === STARS_CURRENCY_CODE) {
-    return formatStarsAsIcon(lang, price, { asFont: options?.asFontIcon, className: options?.iconClassName });
+    return formatDiamondsAsIcon(lang, price, { asFont: options?.asFontIcon, className: options?.iconClassName });
   }
 
   if (currency === TON_CURRENCY_CODE) {

@@ -4,7 +4,7 @@ import { getActions, getGlobal, withGlobal } from '../../../global';
 import type {
   ApiEmojiStatusCollectible,
   ApiEmojiStatusType,
-  ApiSavedStarGift,
+  ApiSavedDiamondGift,
 } from '../../../api/types';
 
 import { DEFAULT_STATUS_ICON_ID, STARS_CURRENCY_CODE } from '../../../config';
@@ -21,7 +21,7 @@ import Button from '../../ui/Button';
 import styles from './UniqueGiftManageButtons.module.scss';
 
 type OwnProps = {
-  savedGift?: ApiSavedStarGift;
+  savedGift?: ApiSavedDiamondGift;
 };
 
 type StateProps = {

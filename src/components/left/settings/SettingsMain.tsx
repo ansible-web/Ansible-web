@@ -1,17 +1,17 @@
 import { memo, useEffect } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
-import type { ApiStarsAmount } from '../../../api/types';
+import type { ApiDiamondsAmount } from '../../../api/types';
 import { SettingsScreens } from '../../../types';
 
 import { FAQ_URL, PRIVACY_URL } from '../../../config';
-import { formatStarsAmount } from '../../../global/helpers/payments';
+import { formatDiamondsAmount } from '../../../global/helpers/payments';
 import {
   selectIsGiveawayGiftsPurchaseAvailable,
   selectIsPremiumPurchaseBlocked,
 } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
-import { formatStarsAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../util/localization/format';
 
 import useFlag from '../../../hooks/useFlag';
 import useHistoryBack from '../../../hooks/useHistoryBack';
@@ -37,7 +37,7 @@ type StateProps = {
   currentUserId?: string;
   canBuyPremium?: boolean;
   isGiveawayAvailable?: boolean;
-  starsBalance?: ApiStarsAmount;
+  starsBalance?: ApiDiamondsAmount;
 };
 
 const SettingsMain = ({
@@ -55,7 +55,7 @@ const SettingsMain = ({
     openSupportChat,
     openUrl,
     openGiftRecipientPicker,
-    openStarsBalanceModal,
+    openDiamondsBalanceModal,
     openSettingsScreen,
   } = getActions();
 
@@ -229,15 +229,15 @@ const SettingsMain = ({
           <ListItem
             leftElement={<DiamondIcon className="icon ListItem-main-icon" type="gold" size="big" />}
             narrow
-            onClick={() => openStarsBalanceModal({})}
+            onClick={() => openDiamondsBalanceModal({})}
           >
             {lang('MenuDiamonds')}
             {Boolean(starsBalance) && (
               <span className="settings-item__current-value">
-                {formatStarsAsIcon(lang, formatStarsAmount(lang, starsBalance), {
+                {formatDiamondsAsIcon(lang, formatDiamondsAmount(lang, starsBalance), {
                   asFont: true,
                   withIconLast: true,
-                  className: styles.balanceStar,
+                  className: styles.balanceDiamond,
                 })}
               </span>
             )}

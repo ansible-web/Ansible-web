@@ -1,5 +1,5 @@
 import type { ApiPasskeyOption } from '../../../api/types';
-import type TelegramClient from './TelegramClient';
+import type AnsibleClient from './TelegramClient';
 import type { Update } from './TelegramClient';
 
 import { DEBUG } from '../../../config';
@@ -50,7 +50,7 @@ const DEFAULT_INITIAL_METHOD: AuthMethod = 'phoneNumber';
 let lastUsedMethod: AuthMethod = DEFAULT_INITIAL_METHOD;
 
 export async function authFlow(
-  client: TelegramClient,
+  client: AnsibleClient,
   apiCredentials: ApiCredentials,
   authParams: UserAuthParams | BotAuthParams,
 ) {
@@ -68,7 +68,7 @@ export async function authFlow(
 }
 
 export function signInUserWithPreferredMethod(
-  client: TelegramClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
+  client: AnsibleClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
 ): Promise<Api.TypeUser> {
   const { initialMethod = DEFAULT_INITIAL_METHOD } = authParams;
 
@@ -82,7 +82,7 @@ export function signInUserWithPreferredMethod(
 }
 
 function refreshPasskeyLoginOption(
-  client: TelegramClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
+  client: AnsibleClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
 ) {
   if (!authParams.hasPasskeySupport) return;
   obtainPasskeyLoginOption(client, apiCredentials).then((passkeyOption) => {
@@ -97,7 +97,7 @@ function refreshPasskeyLoginOption(
   });
 }
 
-export async function checkAuthorization(client: TelegramClient, shouldThrow = false) {
+export async function checkAuthorization(client: AnsibleClient, shouldThrow = false) {
   try {
     await client.invoke(new Api.updates.GetState());
     return true;
@@ -108,7 +108,7 @@ export async function checkAuthorization(client: TelegramClient, shouldThrow = f
 }
 
 async function signInUserWithWebToken(
-  client: TelegramClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
+  client: AnsibleClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
 ): Promise<Api.TypeUser> {
   let hasUnsafeAuthorization = false;
   try {
@@ -143,7 +143,7 @@ async function signInUserWithWebToken(
 }
 
 async function signInUser(
-  client: TelegramClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
+  client: AnsibleClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
 ): Promise<Api.TypeUser> {
   let phoneNumber;
   let phoneCodeHash;
@@ -267,7 +267,7 @@ async function signInUser(
 }
 
 async function signInUserWithQrCode(
-  client: TelegramClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
+  client: AnsibleClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
 ): Promise<Api.TypeUser> {
   let isScanningComplete = false;
 
@@ -365,7 +365,7 @@ async function signInUserWithQrCode(
 }
 
 export async function obtainPasskeyLoginOption(
-  client: TelegramClient, apiCredentials: ApiCredentials,
+  client: AnsibleClient, apiCredentials: ApiCredentials,
 ): Promise<ApiPasskeyOption | undefined> {
   const { apiId, apiHash } = apiCredentials;
   const passkeyLoginOptions = await client.invoke(new Api.auth.InitPasskeyLogin({
@@ -387,7 +387,7 @@ export async function obtainPasskeyLoginOption(
 }
 
 export async function signInUserWithPasskey(
-  client: TelegramClient,
+  client: AnsibleClient,
   apiCredentials: ApiCredentials,
   authParams: UserAuthParams,
   credentialJson: AuthenticationResponseJSON,
@@ -461,7 +461,7 @@ export async function signInUserWithPasskey(
 }
 
 async function sendCode(
-  client: TelegramClient, apiCredentials: ApiCredentials, phoneNumber: string, forceSMS = false,
+  client: AnsibleClient, apiCredentials: ApiCredentials, phoneNumber: string, forceSMS = false,
 ): Promise<{
   phoneCodeHash: string;
   isCodeViaApp: boolean;
@@ -510,7 +510,7 @@ async function sendCode(
 }
 
 async function signInWithPassword(
-  client: TelegramClient, apiCredentials: ApiCredentials, authParams: UserAuthParams, noReset = false,
+  client: AnsibleClient, apiCredentials: ApiCredentials, authParams: UserAuthParams, noReset = false,
 ): Promise<Api.TypeUser> {
   // eslint-disable-next-line no-constant-condition
   while (1) {
@@ -535,7 +535,7 @@ async function signInWithPassword(
   return undefined!; // Never reached (TypeScript fix)
 }
 
-async function signInBot(client: TelegramClient, apiCredentials: ApiCredentials, authParams: BotAuthParams) {
+async function signInBot(client: AnsibleClient, apiCredentials: ApiCredentials, authParams: BotAuthParams) {
   const { apiId, apiHash } = apiCredentials;
   const { botAuthToken } = authParams;
 

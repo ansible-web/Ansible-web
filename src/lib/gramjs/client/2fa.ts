@@ -1,5 +1,5 @@
 import type { WrappedError } from '../../../api/gramjs/helpers/misc';
-import type TelegramClient from './TelegramClient';
+import type AnsibleClient from './TelegramClient';
 
 import { concat } from '../../../util/encoding/buffer';
 import { EmailUnconfirmedError } from '../errors';
@@ -58,7 +58,7 @@ export type PasswordResult = Api.TypeInputCheckPasswordSRP | WrappedError | unde
  "EMAIL_HASH_EXPIRED" if the user took too long to verify their email
  */
 export async function updateTwoFaSettings(
-  client: TelegramClient,
+  client: AnsibleClient,
   {
     isCheckPassword,
     currentPassword,
@@ -131,7 +131,7 @@ export async function updateTwoFaSettings(
   }
 }
 
-export async function getTmpPassword(client: TelegramClient, currentPassword: string, ttl = 60) {
+export async function getTmpPassword(client: AnsibleClient, currentPassword: string, ttl = 60) {
   const pwd = await client.invoke(new Api.account.GetPassword());
 
   if (!pwd) {
@@ -148,7 +148,7 @@ export async function getTmpPassword(client: TelegramClient, currentPassword: st
 }
 
 export async function getCurrentPassword(
-  client: TelegramClient,
+  client: AnsibleClient,
   currentPassword?: string,
 ): Promise<PasswordResult> {
   const pwd = await client.invoke(new Api.account.GetPassword());

@@ -5,7 +5,7 @@ import type { TabState } from '../../../global/types';
 
 import buildClassName from '../../../util/buildClassName';
 import { formatDateTimeToString } from '../../../util/dates/oldDateFormat';
-import { formatStarsAsIcon, formatStarsAsText } from '../../../util/localization/format';
+import { formatDiamondsAsIcon, formatDiamondsAsText } from '../../../util/localization/format';
 
 import useCurrentOrPrev from '../../../hooks/useCurrentOrPrev';
 import useLang from '../../../hooks/useLang';
@@ -22,7 +22,7 @@ export type OwnProps = {
 };
 
 const DiamondGiftPriceDecreaseInfoModal = ({ modal }: OwnProps) => {
-  const { closeStarGiftPriceDecreaseInfoModal } = getActions();
+  const { closeDiamondGiftPriceDecreaseInfoModal } = getActions();
 
   const lang = useLang();
 
@@ -30,7 +30,7 @@ const DiamondGiftPriceDecreaseInfoModal = ({ modal }: OwnProps) => {
   const renderingModal = useCurrentOrPrev(modal);
 
   const handleClose = useLastCallback(() => {
-    closeStarGiftPriceDecreaseInfoModal();
+    closeDiamondGiftPriceDecreaseInfoModal();
   });
 
   const tableData = useMemo(() => {
@@ -38,7 +38,7 @@ const DiamondGiftPriceDecreaseInfoModal = ({ modal }: OwnProps) => {
     const { prices } = renderingModal;
     return prices.map((price): TableData[number] => [
       formatDateTimeToString(price.date * 1000, lang.code, true, undefined, true),
-      formatStarsAsIcon(lang, price.upgradeStars, { containerClassName: styles.starIconContainer }),
+      formatDiamondsAsIcon(lang, price.upgradeStars, { containerClassName: styles.starIconContainer }),
     ]);
   }, [lang, renderingModal]);
 
@@ -66,9 +66,9 @@ const DiamondGiftPriceDecreaseInfoModal = ({ modal }: OwnProps) => {
   const header = (
     <div className={styles.header}>
       <PremiumProgress
-        leftText={formatStarsAsText(lang, maxPrice)}
-        rightText={formatStarsAsText(lang, minPrice)}
-        floatingBadgeText={formatStarsAsText(lang, currentPrice)}
+        leftText={formatDiamondsAsText(lang, maxPrice)}
+        rightText={formatDiamondsAsText(lang, minPrice)}
+        floatingBadgeText={formatDiamondsAsText(lang, currentPrice)}
         floatingBadgeIcon="star"
         progress={progress}
         isInverted

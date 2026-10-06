@@ -106,7 +106,7 @@ import {
   selectNotifyDefaults,
   selectNotifyException,
   selectPeer,
-  selectPeerPaidMessagesStars,
+  selectPeerPaidMessagesDiamonds,
   selectPeerStory,
   selectPerformanceSettingsValue,
   selectRequestedDraft,
@@ -139,7 +139,7 @@ import calcTextLineHeightAndCount from '../../util/element/calcTextLineHeightAnd
 import { isUserId } from '../../util/entities/ids';
 import { fetchBlob } from '../../util/files';
 import focusEditableElement from '../../util/focusEditableElement';
-import { formatStarsAsIcon } from '../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../util/localization/format';
 import { fetch } from '../../util/mediaLoader';
 import { MEMO_EMPTY_ARRAY } from '../../util/memo';
 import { getServerTime } from '../../util/serverTime';
@@ -323,7 +323,7 @@ type StateProps = {
   webPagePreview?: ApiWebPage;
   noWebPage?: boolean;
   isContactRequirePremium?: boolean;
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
   effect?: ApiAvailableEffect;
   effectReactions?: ApiReaction[];
   areEffectsSupported?: boolean;
@@ -339,7 +339,7 @@ type StateProps = {
   isSilentPosting?: boolean;
   paymentMessageConfirmDialogKey?: string;
   starsBalance: number;
-  isStarsBalanceModalOpen: boolean;
+  isDiamondsBalanceModalOpen: boolean;
   disallowedGifts?: ApiDisallowedGifts;
   isAccountFrozen?: boolean;
   isAppConfigLoaded?: boolean;
@@ -467,7 +467,7 @@ const Composer = ({
   webPagePreview,
   noWebPage,
   isContactRequirePremium,
-  paidMessagesStars,
+  paidMessagesDiamonds,
   effect,
   effectReactions,
   areEffectsSupported,
@@ -482,7 +482,7 @@ const Composer = ({
   isSilentPosting,
   paymentMessageConfirmDialogKey,
   starsBalance,
-  isStarsBalanceModalOpen,
+  isDiamondsBalanceModalOpen,
   disallowedGifts,
   isAccountFrozen,
   isAppConfigLoaded,
@@ -573,7 +573,7 @@ const Composer = ({
   const chatEmojiSetId = emojiSet?.id;
 
   const isEphemeralReply = draft?.replyInfo?.type === 'ephemeral';
-  const canSchedule = !paidMessagesStars && !isMonoforum && !isEphemeralReply;
+  const canSchedule = !paidMessagesDiamonds && !isMonoforum && !isEphemeralReply;
 
   const {
     canSendStickers, canSendGifs, canAttachMedia, canAttachPolls, canAttachEmbedLinks, canAttachToDoLists,
@@ -585,12 +585,12 @@ const Composer = ({
       isChatWithBot,
       isChatWithSelf,
       isInStoryViewer,
-      paidMessagesStars,
+      paidMessagesDiamonds,
       isInScheduledList,
       isEphemeralReply,
     ),
     [
-      chat, chatFullInfo, isChatWithBot, isChatWithSelf, isInStoryViewer, paidMessagesStars, isInScheduledList,
+      chat, chatFullInfo, isChatWithBot, isChatWithSelf, isInStoryViewer, paidMessagesDiamonds, isInScheduledList,
       isEphemeralReply,
     ],
   );
@@ -807,7 +807,7 @@ const Composer = ({
     return forwardedMessagesCount + messagesInInput;
   }, [hasInputContent, hasAttachments, attachments, isForwarding, forwardedMessagesCount]);
   const paymentDialogKey = `composer-${type}-${messageListType}-${chatId}-${threadId}-${storyId}`;
-  const starsForAllMessages = paidMessagesStars ? messagesCount * paidMessagesStars : 0;
+  const starsForAllMessages = paidMessagesDiamonds ? messagesCount * paidMessagesDiamonds : 0;
 
   const {
     closeConfirmDialog: closeConfirmModalPayForMessage,
@@ -815,7 +815,7 @@ const Composer = ({
     shouldAutoApprove: shouldPaidMessageAutoApprove,
     setAutoApprove: setShouldPaidMessageAutoApprove,
     handleWithConfirmation: handleActionWithPaymentConfirmation,
-  } = usePaidMessageConfirmation(paymentDialogKey, starsForAllMessages, isStarsBalanceModalOpen, starsBalance);
+  } = usePaidMessageConfirmation(paymentDialogKey, starsForAllMessages, isDiamondsBalanceModalOpen, starsBalance);
 
   const isPaidSendDeferred = starsForAllMessages > 0 && !shouldPaidMessageAutoApprove;
 
@@ -2358,9 +2358,11 @@ const Composer = ({
       if (slowModePlaceholder) return slowModePlaceholder;
       if (botKeyboardPlaceholder) return botKeyboardPlaceholder;
       if (inputPlaceholder) return inputPlaceholder;
-      if (paidMessagesStars) {
+      if (paidMessagesDiamonds) {
         return lang('ComposerPlaceholderPaidMessage', {
-          amount: formatStarsAsIcon(lang, paidMessagesStars, { asFont: true, className: 'placeholder-star-icon' }),
+          amount: formatDiamondsAsIcon(lang, paidMessagesDiamonds, {
+            asFont: true, className: 'placeholder-star-icon',
+          }),
         }, {
           withNodes: true,
         });
@@ -2400,7 +2402,7 @@ const Composer = ({
     return lang('ComposerPlaceholderNoText');
   }, [
     activeRecording, botKeyboardPlaceholder, chat, inputPlaceholder, isChannel, isComposerBlocked,
-    isInStoryViewer, isSilentPosting, lang, replyToTopic, isReplying, threadId, windowWidth, paidMessagesStars,
+    isInStoryViewer, isSilentPosting, lang, replyToTopic, isReplying, threadId, windowWidth, paidMessagesDiamonds,
     hasSuggestedPost, slowModePlaceholder, stealthMode?.activeUntil, user?.canManageBotForumTopics,
   ]);
 
@@ -2700,8 +2702,8 @@ const Composer = ({
   const renderedVideoRecording = useCurrentOrPrev(activeVideoRecording);
   const renderedPreviewStream = useCurrentOrPrev(previewStream);
 
-  const isPaidSend = Boolean(paidMessagesStars && mainButtonState === MainButtonState.Send);
-  const { ref: paidStarsRef, shouldRender: shouldRenderPaidStars } = useShowTransition({
+  const isPaidSend = Boolean(paidMessagesDiamonds && mainButtonState === MainButtonState.Send);
+  const { ref: paidDiamondsRef, shouldRender: shouldRenderPaidDiamonds } = useShowTransition({
     isOpen: isPaidSend,
     withShouldRender: true,
     className: 'slow',
@@ -2709,7 +2711,7 @@ const Composer = ({
   });
 
   useEffect(() => {
-    const starsEl = paidStarsRef.current;
+    const starsEl = paidDiamondsRef.current;
     const buttonEl = mainButtonRef.current;
     if (!starsEl || !buttonEl) return;
 
@@ -2719,7 +2721,7 @@ const Composer = ({
         buttonEl.style.setProperty('--paid-stars-width', `${width}px`);
       });
     });
-  }, [shouldRenderPaidStars, starsForAllMessages, paidStarsRef, mainButtonRef]);
+  }, [shouldRenderPaidDiamonds, starsForAllMessages, paidDiamondsRef, mainButtonRef]);
 
   return (
     <div ref={composerRef} className={fullClassName}>
@@ -2771,7 +2773,7 @@ const Composer = ({
         editingMessage={editingMessage}
         onSendWhenOnline={sendWhenOnline}
         canScheduleUntilOnline={canSchedule && canScheduleUntilOnline && !isViewOnceEnabled}
-        paidMessagesStars={paidMessagesStars}
+        paidMessagesDiamonds={paidMessagesDiamonds}
       />
       <MediaEditor
         isOpen={Boolean(editingRichMediaAttachment)}
@@ -2903,7 +2905,7 @@ const Composer = ({
               onMenuOpen={onAttachMenuOpen}
               onMenuClose={onAttachMenuClose}
               messageListType={messageListType}
-              paidMessagesStars={paidMessagesStars}
+              paidMessagesDiamonds={paidMessagesDiamonds}
               canExpandRichInput={canExpandRichInput}
               menuPositionX={isInMessageList ? 'left' : 'right'}
               onRichInputExpand={handleOpenRichInput}
@@ -3208,7 +3210,7 @@ const Composer = ({
           !isReady && 'not-ready',
           activeRecording && 'recording',
           isRecordingVideoMode && 'record-video',
-          Boolean(paidMessagesStars) && 'has-paid-stars',
+          Boolean(paidMessagesDiamonds) && 'has-paid-stars',
           isPaidSend && 'paid',
         )}
         disabled={areRecordingsNotAllowed || hasRichMediaBlocking}
@@ -3228,8 +3230,8 @@ const Composer = ({
         {onForward && <Icon name="forward" className="main-button-state-icon" />}
         {isInMessageList && <Icon name="schedule" className="main-button-state-icon" />}
         {isInMessageList && <Icon name="check" className="main-button-state-icon" />}
-        {shouldRenderPaidStars && (
-          <div ref={paidStarsRef} className="paidStars">
+        {shouldRenderPaidDiamonds && (
+          <div ref={paidDiamondsRef} className="paidDiamonds">
             <Icon name="diamond" />
             <AnimatedCounter
               ref={counterRef}
@@ -3284,10 +3286,10 @@ const Composer = ({
       )}
       {calendar}
       <PaymentMessageConfirmDialog
-        isOpen={paymentMessageConfirmDialogKey === paymentDialogKey && Boolean(paidMessagesStars)}
+        isOpen={paymentMessageConfirmDialogKey === paymentDialogKey && Boolean(paidMessagesDiamonds)}
         onClose={closeConfirmModalPayForMessage}
         userName={chat ? getPeerTitle(lang, chat) : undefined}
-        messagePriceInStars={paidMessagesStars || 0}
+        messagePriceInDiamonds={paidMessagesDiamonds || 0}
         messagesCount={messagesCount}
         shouldAutoApprove={shouldPaidMessageAutoApprove}
         setAutoApprove={setShouldPaidMessageAutoApprove}
@@ -3316,7 +3318,7 @@ export default memo(withGlobal<OwnProps>(
     const isChatWithSelf = selectIsChatWithSelf(global, chatId);
     const isChatWithUser = isUserId(chatId);
     const userFullInfo = isChatWithUser ? selectUserFullInfo(global, chatId) : undefined;
-    const paidMessagesStars = selectPeerPaidMessagesStars(global, chatId);
+    const paidMessagesDiamonds = selectPeerPaidMessagesDiamonds(global, chatId);
 
     const chatFullInfo = !isChatWithUser ? selectChatFullInfo(global, chatId) : undefined;
     const messageWithActualBotKeyboard = (isChatWithBot || !isChatWithUser)
@@ -3397,7 +3399,7 @@ export default memo(withGlobal<OwnProps>(
     const isReplying = Boolean(draft?.replyInfo);
     const hasSuggestedPost = Boolean(draft?.suggestedPostInfo);
     const starsBalance = global.stars?.balance.amount || 0;
-    const isStarsBalanceModalOpen = Boolean(tabState.starsBalanceModal);
+    const isDiamondsBalanceModalOpen = Boolean(tabState.starsBalanceModal);
     const isAccountFrozen = selectIsCurrentUserFrozen(global);
     const isAppConfigLoaded = global.isAppConfigLoaded;
     const insertingPeerIdMention = tabState.insertingPeerIdMention;
@@ -3494,12 +3496,12 @@ export default memo(withGlobal<OwnProps>(
       richMessageMaxDepth: global.appConfig.richMessageMaxDepth,
       richMessageMaxMedia: global.appConfig.richMessageMaxMedia,
       richMessageMaxTableColumns: global.appConfig.richMessageMaxTableColumns,
-      paidMessagesStars,
+      paidMessagesDiamonds,
       shouldPaidMessageAutoApprove,
       isSilentPosting,
       paymentMessageConfirmDialogKey: tabState.paymentMessageConfirmDialogKey,
       starsBalance,
-      isStarsBalanceModalOpen,
+      isDiamondsBalanceModalOpen,
       shouldDisplayGiftsButton: userFullInfo?.shouldDisplayGiftsButton,
       disallowedGifts: userFullInfo?.disallowedGifts,
       isAccountFrozen,

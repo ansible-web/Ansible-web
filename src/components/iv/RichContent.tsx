@@ -425,7 +425,7 @@ const RichContent = ({
         );
       case 'document':
         return (
-          <figure className={styles.figure} data-tg-rich-media={buildRichMediaCopyData(block)}>
+          <figure className={styles.figure} data-as-rich-media={buildRichMediaCopyData(block)}>
             <div data-rich-copy-ignore>
               <Document
                 document={block.document}
@@ -441,7 +441,7 @@ const RichContent = ({
         const item = audioItemsById.get(block.audio.id);
         if (!item) return renderUnsupportedBlock(unsupportedText, block.type);
         return (
-          <figure className={styles.figure} data-tg-rich-media={buildRichMediaCopyData(block)}>
+          <figure className={styles.figure} data-as-rich-media={buildRichMediaCopyData(block)}>
             <div data-rich-copy-ignore>
               <PlayableAudio
                 audio={block.audio}
@@ -600,7 +600,7 @@ function renderVideoBlock(
   const sourceId = getPageMediaSourceId(context.richTextContext.containerId, sourceKey, block);
 
   return (
-    <figure className={styles.figure} data-tg-rich-media={buildRichMediaCopyData(block)}>
+    <figure className={styles.figure} data-as-rich-media={buildRichMediaCopyData(block)}>
       <Video
         id={sourceId}
         video={getPageMediaBlockMedia(block)}
@@ -635,7 +635,7 @@ function renderPhotoBlock(
   const sourceId = getPageMediaSourceId(context.richTextContext.containerId, sourceKey, block);
 
   return (
-    <figure className={styles.figure} data-tg-rich-media={buildRichMediaCopyData(block)}>
+    <figure className={styles.figure} data-as-rich-media={buildRichMediaCopyData(block)}>
       <Photo
         id={sourceId}
         photo={getPageMediaBlockMedia(block)}
@@ -673,7 +673,7 @@ function renderSlideshowBlock(
   const sourceIds = getPageMediaSourceIds(context.richTextContext.containerId, sourceKey, items);
 
   return (
-    <figure className={styles.figure} data-tg-rich-media={buildRichMediaCopyData(block)}>
+    <figure className={styles.figure} data-as-rich-media={buildRichMediaCopyData(block)}>
       <Slideshow
         items={items}
         sourceIds={sourceIds}
@@ -706,7 +706,7 @@ function renderCollageBlock(
   const sourceIds = getPageMediaSourceIds(context.richTextContext.containerId, sourceKey, items);
 
   return (
-    <figure className={styles.figure} data-tg-rich-media={buildRichMediaCopyData(block)}>
+    <figure className={styles.figure} data-as-rich-media={buildRichMediaCopyData(block)}>
       <Collage
         items={items}
         sourceIds={sourceIds}

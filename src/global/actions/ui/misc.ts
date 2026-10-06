@@ -36,7 +36,7 @@ import {
   selectIsChatWithSelf,
   selectIsCurrentUserPremium,
   selectIsTrustedBot,
-  selectPeerPaidMessagesStars,
+  selectPeerPaidMessagesDiamonds,
   selectSender,
   selectTabState,
   selectTopic,
@@ -337,9 +337,9 @@ addActionHandler('reorderStickerSets', (global, actions, payload): ActionReturnT
 addActionHandler('showAllowedMessageTypesNotification', (global, actions, payload): ActionReturnType => {
   const { chatId, messageListType, tabId = getCurrentTabId() } = payload;
 
-  const paidMessagesStars = selectPeerPaidMessagesStars(global, chatId);
+  const paidMessagesDiamonds = selectPeerPaidMessagesDiamonds(global, chatId);
 
-  if (paidMessagesStars && messageListType === 'scheduled') {
+  if (paidMessagesDiamonds && messageListType === 'scheduled') {
     actions.showNotification({
       message: {
         key: 'DescriptionScheduledPaidMessagesNotAllowed',

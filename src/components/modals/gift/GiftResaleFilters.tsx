@@ -9,13 +9,13 @@ import {
 import { getActions, withGlobal } from '../../../global';
 
 import type {
-  ApiStarGiftAttribute,
-  ApiStarGiftAttributeBackdrop,
-  ApiStarGiftAttributeCounter,
-  ApiStarGiftAttributeIdBackdrop,
-  ApiStarGiftAttributeIdPattern,
-  ApiStarGiftAttributeModel,
-  ApiStarGiftAttributePattern,
+  ApiDiamondGiftAttribute,
+  ApiDiamondGiftAttributeBackdrop,
+  ApiDiamondGiftAttributeCounter,
+  ApiDiamondGiftAttributeIdBackdrop,
+  ApiDiamondGiftAttributeIdPattern,
+  ApiDiamondGiftAttributeModel,
+  ApiDiamondGiftAttributePattern,
   StarGiftAttributeIdModel,
 } from '../../../api/types';
 import type { ResaleGiftsFilterOptions, ResaleGiftsSortType } from '../../../types';
@@ -47,8 +47,8 @@ type OwnProps = {
 };
 type StateProps = {
   filter: ResaleGiftsFilterOptions;
-  attributes?: ApiStarGiftAttribute[];
-  counters?: ApiStarGiftAttributeCounter[];
+  attributes?: ApiDiamondGiftAttribute[];
+  counters?: ApiDiamondGiftAttributeCounter[];
 };
 
 const DEFAULT_CRAFT_FILTER: ResaleGiftsFilterOptions = { sortType: 'byPrice' };
@@ -72,9 +72,9 @@ const GiftResaleFilters = ({
   const [searchPatternQuery, setSearchPatternQuery] = useState('');
   const filteredAttributes = useMemo(() => {
     const map: {
-      model: ApiStarGiftAttributeModel[];
-      pattern: ApiStarGiftAttributePattern[];
-      backdrop: ApiStarGiftAttributeBackdrop[];
+      model: ApiDiamondGiftAttributeModel[];
+      pattern: ApiDiamondGiftAttributePattern[];
+      backdrop: ApiDiamondGiftAttributeBackdrop[];
     } = {
       model: [],
       pattern: [],
@@ -311,11 +311,11 @@ const GiftResaleFilters = ({
     });
   });
 
-  const handleModelMenuItemClick = useLastCallback((attribute: ApiStarGiftAttributeModel) => {
+  const handleModelMenuItemClick = useLastCallback((attribute: ApiDiamondGiftAttributeModel) => {
     if (!counters) return;
     const modelAttributes = filter.modelAttributes || [];
     const modelAttribute
-      = counters.find((counter): counter is ApiStarGiftAttributeCounter<StarGiftAttributeIdModel> =>
+      = counters.find((counter): counter is ApiDiamondGiftAttributeCounter<StarGiftAttributeIdModel> =>
         counter.attribute.type === 'model' && counter.attribute.documentId === attribute.sticker.id,
       )?.attribute;
 
@@ -331,11 +331,11 @@ const GiftResaleFilters = ({
     });
   });
 
-  const handlePatternMenuItemClick = useLastCallback((attribute: ApiStarGiftAttributePattern) => {
+  const handlePatternMenuItemClick = useLastCallback((attribute: ApiDiamondGiftAttributePattern) => {
     if (!counters) return;
     const patternAttributes = filter.patternAttributes || [];
     const patternAttribute = counters.find(
-      (counter): counter is ApiStarGiftAttributeCounter<ApiStarGiftAttributeIdPattern> =>
+      (counter): counter is ApiDiamondGiftAttributeCounter<ApiDiamondGiftAttributeIdPattern> =>
         counter.attribute.type === 'pattern' && counter.attribute.documentId === attribute.sticker.id,
     )?.attribute;
 
@@ -351,11 +351,11 @@ const GiftResaleFilters = ({
     });
   });
 
-  const handleBackdropMenuItemClick = useLastCallback((attribute: ApiStarGiftAttributeBackdrop) => {
+  const handleBackdropMenuItemClick = useLastCallback((attribute: ApiDiamondGiftAttributeBackdrop) => {
     if (!counters) return;
     const backdropAttributes = filter.backdropAttributes || [];
     const backdropAttribute = counters.find(
-      (counter): counter is ApiStarGiftAttributeCounter<ApiStarGiftAttributeIdBackdrop> =>
+      (counter): counter is ApiDiamondGiftAttributeCounter<ApiDiamondGiftAttributeIdBackdrop> =>
         counter.attribute.type === 'backdrop' && counter.attribute.backdropId === attribute.backdropId,
     )?.attribute;
 

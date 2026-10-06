@@ -1,9 +1,9 @@
-import type TelegramClient from '../MockClient';
+import type AnsibleClient from '../MockClient';
 
 import Api from '../../tl/api';
 import createMockedMessage from '../mockUtils/createMockedMessage';
 
-export default function<A, R>(mockClient: TelegramClient, request: Api.Request<A, R>) {
+export default function<A, R>(mockClient: AnsibleClient, request: Api.Request<A, R>) {
   if (request instanceof Api.messages.GetUnreadMentions) {
     return new Api.messages.Messages({
       messages: [

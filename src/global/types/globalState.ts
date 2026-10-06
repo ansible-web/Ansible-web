@@ -12,6 +12,11 @@ import type {
   ApiConfig,
   ApiCountry,
   ApiCountryCode,
+  ApiDiamondGiftAuctionState,
+  ApiDiamondGiftCollection,
+  ApiDiamondGiftRegular,
+  ApiDiamondsAmount,
+  ApiDiamondTopupOption,
   ApiEmojiGroup,
   ApiEmojiStatusType,
   ApiGroupCall,
@@ -32,15 +37,10 @@ import type {
   ApiQuickReply,
   ApiReaction,
   ApiReactionKey,
+  ApiSavedDiamondGift,
   ApiSavedReactionTag,
-  ApiSavedStarGift,
   ApiSession,
   ApiSponsoredMessage,
-  ApiStarGiftAuctionState,
-  ApiStarGiftCollection,
-  ApiStarGiftRegular,
-  ApiStarsAmount,
-  ApiStarTopupOption,
   ApiStealthMode,
   ApiSticker,
   ApiStickerSet,
@@ -343,19 +343,19 @@ export type GlobalState = {
   };
   availableEffectById: Record<string, ApiAvailableEffect>;
   starGifts?: {
-    byId: Record<string, ApiStarGiftRegular>;
+    byId: Record<string, ApiDiamondGiftRegular>;
     idsByCategory: Record<StarGiftCategory, string[]>;
   };
   myUniqueGifts?: {
-    byId: Record<string, ApiSavedStarGift>;
+    byId: Record<string, ApiSavedDiamondGift>;
     ids: string[];
     nextOffset?: string;
   };
   starGiftCollections?: {
-    byPeerId: Record<string, ApiStarGiftCollection[]>;
+    byPeerId: Record<string, ApiDiamondGiftCollection[]>;
   };
   activeGiftAuctionIds?: string[];
-  giftAuctionByGiftId?: Record<string, ApiStarGiftAuctionState>;
+  giftAuctionByGiftId?: Record<string, ApiDiamondGiftAuctionState>;
 
   stickers: {
     setsById: Record<string, ApiStickerSet>;
@@ -503,8 +503,8 @@ export type GlobalState = {
   };
 
   stars?: {
-    topupOptions: ApiStarTopupOption[];
-    balance: ApiStarsAmount;
+    topupOptions: ApiDiamondTopupOption[];
+    balance: ApiDiamondsAmount;
     history: StarsTransactionHistory;
     subscriptions?: StarsSubscriptions;
   };

@@ -38,8 +38,8 @@ export const DEBUG_GRAMJS = false;
 export const PAGE_TITLE = import.meta.env.TG_APP_TITLE;
 export const PAGE_TITLE_TAURI = 'Ansible';
 export const INACTIVE_MARKER = '[Inactive]';
-export const TELEGRAM_API_ID = Number(import.meta.env.TG_TELEGRAM_API_ID);
-export const TELEGRAM_API_HASH = import.meta.env.TG_TELEGRAM_API_HASH;
+export const ANSIBLE_API_ID = Number(import.meta.env.TG_TELEGRAM_API_ID);
+export const ANSIBLE_API_HASH = import.meta.env.TG_TELEGRAM_API_HASH;
 export const TEST_SESSION = import.meta.env.TG_TEST_SESSION;
 
 export const DEBUG_PAYMENT_SMART_GLOCAL = false;
@@ -347,7 +347,7 @@ export const RE_LINK_TEMPLATE = '((ftp|https?):\\/\\/)?((www\\.)?[-a-zA-Z0-9@:%.
 export const RE_MENTION_TEMPLATE = '(@[\\w\\d_-]+)';
 export const RE_TG_LINK = /^as:(\/\/)?/i;
 export const RE_TME_LINK = /^(https?:\/\/)?([-a-zA-Z0-9@:%_+~#=]{1,32}\.)?(asme\.su)(?=[:/?#]|$)/i;
-export const RE_TELEGRAM_LINK = /^(https?:\/\/)?telegram\.org\//i;
+export const RE_TELEGRAM_LINK = /^(https?:\/\/)?ansible\.org\//i;
 export const TME_LINK_PREFIX = 'https://asme.su/';
 // Управляющий бот МЕССЕНДЖЕРА: у нас это @BotManager (uid 15), имени
 // botfather на стенде нет вовсе — поэтому три кнопки экрана «Изменить»

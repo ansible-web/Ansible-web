@@ -2,15 +2,15 @@ import { memo, useCallback, useMemo } from '../../../../lib/teact/teact';
 import { getActions } from '../../../../global';
 
 import type {
+  ApiDiamondsTransaction,
   ApiPeer,
-  ApiStarsTransaction,
 } from '../../../../api/types';
 import type { GlobalState } from '../../../../global/types';
 import type { CustomPeer } from '../../../../types';
 
 import { NNBSP, STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../../config';
-import { buildStarsTransactionCustomPeer,
-  formatStarsTransactionAmount,
+import { buildDiamondsTransactionCustomPeer,
+  formatDiamondsTransactionAmount,
   shouldUseCustomPeer } from '../../../../global/helpers/payments';
 import { getPeerTitle } from '../../../../global/helpers/peers';
 import { selectPeer } from '../../../../global/selectors';
@@ -36,7 +36,7 @@ import PaidMediaThumb from './PaidMediaThumb';
 import styles from './DiamondsTransactionItem.module.scss';
 
 type OwnProps = {
-  transaction: ApiStarsTransaction;
+  transaction: ApiDiamondsTransaction;
   className?: string;
 };
 
@@ -44,7 +44,7 @@ const GIFT_STICKER_SIZE = 36;
 const AVATAR_SIZE = 42;
 
 const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
-  const { openStarsTransactionModal } = getActions();
+  const { openDiamondsTransactionModal } = getActions();
   const {
     date,
     amount,
@@ -76,7 +76,7 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
       description = peer && getPeerTitle(oldLang, peer);
       avatarPeer = peer || CUSTOM_PEER_PREMIUM;
     } else {
-      const customPeer = buildStarsTransactionCustomPeer(transaction);
+      const customPeer = buildDiamondsTransactionCustomPeer(transaction);
       title = customPeer.title || oldLang(customPeer.titleKey!);
       description = oldLang(customPeer.subtitleKey!);
       avatarPeer = customPeer;
@@ -160,14 +160,14 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
       <>
         <Avatar size={AVATAR_SIZE} webPhoto={photo} peer={data.avatarPeer} />
         {Boolean(subscriptionPeriod) && (
-          <DiamondIcon className={styles.subscriptionStar} type="gold" size="small" />
+          <DiamondIcon className={styles.subscriptionDiamond} type="gold" size="small" />
         )}
       </>
     );
   }, [isUniqueGift, extendedMedia, photo, data.avatarPeer, subscriptionPeriod, starGift, giftSticker]);
 
   const handleClick = useLastCallback(() => {
-    openStarsTransactionModal({ transaction });
+    openDiamondsTransactionModal({ transaction });
   });
 
   const amountColorClass = isNegativeAmount(amount) ? styles.negative : styles.positive;
@@ -191,7 +191,7 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
         <span
           className={buildClassName(styles.amount, amountColorClass)}
         >
-          {formatStarsTransactionAmount(lang, amount)}
+          {formatDiamondsTransactionAmount(lang, amount)}
         </span>
         {NNBSP}
         {amount.currency === STARS_CURRENCY_CODE && <DiamondIcon type="gold" size="adaptive" />}

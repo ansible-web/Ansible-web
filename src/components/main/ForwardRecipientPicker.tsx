@@ -12,14 +12,14 @@ import {
   selectCanCopyMessageLink,
   selectChat,
   selectChatMessages,
-  selectPeerPaidMessagesStars,
+  selectPeerPaidMessagesDiamonds,
   selectTabState,
   selectUser,
 } from '../../global/selectors';
 import buildClassName from '../../util/buildClassName';
 import captureKeyboardListeners from '../../util/captureKeyboardListeners';
 import { isUserId } from '../../util/entities/ids';
-import { formatStarsAsIcon, formatStarsAsText } from '../../util/localization/format';
+import { formatDiamondsAsIcon, formatDiamondsAsText } from '../../util/localization/format';
 
 import useFlag from '../../hooks/useFlag';
 import useFrozenProps from '../../hooks/useFrozenProps';
@@ -74,7 +74,7 @@ const ForwardRecipientPicker = ({
     forwardAudio,
     showNotification,
     copyMessageLink,
-    openStarsBalanceModal,
+    openDiamondsBalanceModal,
     setPaidMessageAutoApprove,
     clearAudioPendingSend,
   } = getActions();
@@ -105,10 +105,10 @@ const ForwardRecipientPicker = ({
     const totalMessages = messageCount + (hasCaption ? 1 : 0);
 
     for (const { peerId: chatId } of selectedIds) {
-      const paidStars = selectPeerPaidMessagesStars(global, chatId);
-      if (paidStars) {
+      const paidDiamonds = selectPeerPaidMessagesDiamonds(global, chatId);
+      if (paidDiamonds) {
         paidChatIds.add(chatId);
-        totalStars += paidStars * totalMessages;
+        totalStars += paidDiamonds * totalMessages;
       }
     }
 
@@ -154,8 +154,8 @@ const ForwardRecipientPicker = ({
     });
   });
 
-  const sendAudio = useLastCallback((recipientId: string, threadId?: ThreadId, confirmedStars?: number) => {
-    forwardAudio({ toChatId: recipientId, toThreadId: threadId, confirmedStars });
+  const sendAudio = useLastCallback((recipientId: string, threadId?: ThreadId, confirmedDiamonds?: number) => {
+    forwardAudio({ toChatId: recipientId, toThreadId: threadId, confirmedDiamonds });
   });
 
   useEffect(() => {
@@ -252,7 +252,7 @@ const ForwardRecipientPicker = ({
     if (paidChatsInfo.totalStars > 0) {
       const starsBalance = getGlobal().stars?.balance?.amount || 0;
       if (paidChatsInfo.totalStars > starsBalance) {
-        openStarsBalanceModal({
+        openDiamondsBalanceModal({
           topup: {
             balanceNeeded: paidChatsInfo.totalStars,
           },
@@ -308,7 +308,7 @@ const ForwardRecipientPicker = ({
     const starsBalance = getGlobal().stars?.balance?.amount || 0;
 
     if (totalStars > starsBalance) {
-      openStarsBalanceModal({
+      openDiamondsBalanceModal({
         topup: {
           balanceNeeded: totalStars,
         },
@@ -343,7 +343,7 @@ const ForwardRecipientPicker = ({
 
   const selectedCount = selectedIds.length;
   const showComposer = selectedCount >= 2;
-  const { totalStars: displayedTotalStars } = useFrozenProps(
+  const { totalStars: displayedTotalDiamonds } = useFrozenProps(
     { totalStars: paidChatsInfo.totalStars },
     !showComposer,
   );
@@ -353,7 +353,7 @@ const ForwardRecipientPicker = ({
 
     const renderButton = () => {
       const isInitial = selectedCount === 0;
-      const singleChatStars = selectedCount === 1 ? paidChatsInfo.totalStars : 0;
+      const singleChatDiamonds = selectedCount === 1 ? paidChatsInfo.totalStars : 0;
 
       return (
         <Button
@@ -366,10 +366,10 @@ const ForwardRecipientPicker = ({
             <span>
               {isInitial
                 ? (canCopyLink ? oldLang('CopyLink') : lang('SelectChats'))
-                : (singleChatStars > 0
+                : (singleChatDiamonds > 0
                   ? lang(
                     'ForwardForDiamonds',
-                    { price: formatStarsAsIcon(lang, singleChatStars, { asFont: true }) },
+                    { price: formatDiamondsAsIcon(lang, singleChatDiamonds, { asFont: true }) },
                     { withNodes: true },
                   )
                   : lang('Forward'))}
@@ -395,10 +395,10 @@ const ForwardRecipientPicker = ({
             onClick={handleForwardToMultiple}
             ariaLabel={lang('Forward')}
           >
-            {displayedTotalStars > 0 ? (
+            {displayedTotalDiamonds > 0 ? (
               <>
                 <Icon name="diamond" className="star-icon" />
-                <AnimatedCounter text={String(displayedTotalStars)} />
+                <AnimatedCounter text={String(displayedTotalDiamonds)} />
               </>
             ) : <i className="icon icon-new-send" />}
           </Button>
@@ -416,18 +416,18 @@ const ForwardRecipientPicker = ({
         </div>
       </div>
     );
-  }, [isForwarding, isStory, selectedCount, showComposer, caption, canCopyLink, displayedTotalStars,
+  }, [isForwarding, isStory, selectedCount, showComposer, caption, canCopyLink, displayedTotalDiamonds,
     paidChatsInfo, handleForwardToMultiple, handleCopyLink, lang, oldLang]);
 
   if (!isOpen && !isShown) {
     return undefined;
   }
 
-  const confirmTotalStars = pendingMusicTarget?.stars ?? paidChatsInfo.totalStars;
+  const confirmTotalDiamonds = pendingMusicTarget?.stars ?? paidChatsInfo.totalStars;
   const confirmChatsCount = pendingMusicTarget ? 1 : paidChatsInfo.paidChatsCount;
   const confirmMessagesCount = pendingMusicTarget ? 1 : paidChatsInfo.totalMessages;
 
-  const confirmPaymentMessage = confirmTotalStars > 0 ? lang(
+  const confirmPaymentMessage = confirmTotalDiamonds > 0 ? lang(
     'ForwardPaidChatsConfirmation',
     {
       chatsSelected: lang(
@@ -438,7 +438,7 @@ const ForwardRecipientPicker = ({
       payConfirmation: lang(
         'ForwardPaidChatsPayConfirmation',
         {
-          totalAmount: formatStarsAsText(lang, confirmTotalStars),
+          totalAmount: formatDiamondsAsText(lang, confirmTotalDiamonds),
           count: confirmMessagesCount,
         },
         { withNodes: true, withMarkdown: true, pluralValue: confirmMessagesCount },

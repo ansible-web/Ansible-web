@@ -11,7 +11,7 @@ import {
   selectChat, selectChatMessage, selectUser,
 } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
-import { formatStarsAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../util/localization/format';
 import { formatInteger } from '../../../util/textFormat';
 import renderText from '../../common/helpers/renderText';
 
@@ -53,7 +53,7 @@ const DiamondsPaymentModal = ({
   paidMediaMessage,
   paidMediaChat,
 }: OwnProps & StateProps) => {
-  const { closeStarsPaymentModal, openStarsBalanceModal, sendStarPaymentForm } = getActions();
+  const { closeDiamondsPaymentModal, openDiamondsBalanceModal, sendDiamondPaymentForm } = getActions();
   const [isLoading, markLoading, unmarkLoading] = useFlag();
   const isOpen = Boolean(modal?.inputInvoice && starsBalanceState);
 
@@ -151,13 +151,13 @@ const DiamondsPaymentModal = ({
     }
 
     if (amount > balance.amount) {
-      openStarsBalanceModal({
-        originStarsPayment: modal,
+      openDiamondsBalanceModal({
+        originDiamondsPayment: modal,
       });
       return;
     }
 
-    sendStarPaymentForm({});
+    sendDiamondPaymentForm({});
     markLoading();
   });
 
@@ -167,7 +167,7 @@ const DiamondsPaymentModal = ({
       isOpen={isOpen}
       hasAbsoluteCloseButton
       isSlim
-      onClose={closeStarsPaymentModal}
+      onClose={closeDiamondsPaymentModal}
     >
       <BalanceBlock balance={starsBalanceState?.balance} className={styles.modalBalance} />
       <div className={styles.paymentImages} dir={lang.isRtl ? 'ltr' : 'rtl'}>
@@ -176,7 +176,7 @@ const DiamondsPaymentModal = ({
         ) : inviteCustomPeer ? (
           <>
             <Avatar className={styles.paymentPhoto} peer={inviteCustomPeer} size="giant" />
-            <DiamondIcon type="gold" size="adaptive" className={styles.avatarStar} />
+            <DiamondIcon type="gold" size="adaptive" className={styles.avatarDiamond} />
           </>
         ) : (
           <PeerBadge
@@ -200,7 +200,7 @@ const DiamondsPaymentModal = ({
       </div>
       <Button className={styles.paymentButton} inline onClick={handlePayment} isLoading={isLoading}>
         {lang(isBotSubscription ? 'DiamondsSubscribeBotButtonMonth' : 'DiamondsPay', {
-          amount: formatStarsAsIcon(lang, amount!, { asFont: true }),
+          amount: formatDiamondsAsIcon(lang, amount!, { asFont: true }),
         }, {
           withNodes: true,
         })}

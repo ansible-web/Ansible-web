@@ -15,20 +15,20 @@ import TableAboutModal, { type TableAboutData } from '../common/TableAboutModal'
 import styles from './AboutDiamondGiftModal.module.scss';
 
 export type OwnProps = {
-  modal: TabState['aboutStarGiftModal'];
+  modal: TabState['aboutDiamondGiftModal'];
 };
 
 const AboutDiamondGiftModal = ({
   modal,
 }: OwnProps) => {
-  const { closeAboutStarGiftModal } = getActions();
+  const { closeAboutDiamondGiftModal } = getActions();
   const lang = useLang();
 
   const isOpen = Boolean(modal);
   const renderingModal = useCurrentOrPrev(modal);
 
   const handleClose = useLastCallback(() => {
-    closeAboutStarGiftModal();
+    closeAboutDiamondGiftModal();
   });
 
   const header = useMemo(() => {

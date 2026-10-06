@@ -3,14 +3,14 @@ import { withGlobal } from '../../../../global';
 
 import type { ApiSticker } from '../../../../api/types';
 import type {
+  ApiMessageActionGiftDiamonds,
   ApiMessageActionGiftPremium,
-  ApiMessageActionGiftStars,
   ApiMessageActionGiftTon } from '../../../../api/types/messageActions';
 
 import {
   selectCanPlayAnimatedEmojis,
+  selectGiftStickerForDiamonds,
   selectGiftStickerForDuration,
-  selectGiftStickerForStars,
   selectGiftStickerForTon,
 } from '../../../../global/selectors';
 import { formatCountdownDays } from '../../../../util/dates/oldDateFormat';
@@ -26,7 +26,7 @@ import StickerView from '../../../common/StickerView';
 import styles from '../ActionMessage.module.scss';
 
 type OwnProps = {
-  action: ApiMessageActionGiftPremium | ApiMessageActionGiftStars | ApiMessageActionGiftTon;
+  action: ApiMessageActionGiftPremium | ApiMessageActionGiftDiamonds | ApiMessageActionGiftTon;
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;
   onClick?: NoneToVoidFunction;
@@ -107,7 +107,7 @@ export default memo(withGlobal<OwnProps>(
     const sticker = action.type === 'giftPremium'
       ? selectGiftStickerForDuration(global, action.days)
       : action.type === 'giftStars'
-        ? selectGiftStickerForStars(global, action.stars)
+        ? selectGiftStickerForDiamonds(global, action.stars)
         : selectGiftStickerForTon(global, action.cryptoAmount);
     const canPlayAnimatedEmojis = selectCanPlayAnimatedEmojis(global);
 

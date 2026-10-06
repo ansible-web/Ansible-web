@@ -328,7 +328,7 @@ export const INITIAL_GLOBAL_STATE: GlobalState = {
       shouldArchiveAndMuteNewNonContact: false,
       shouldNewNonContactPeersRequirePremium: false,
       disallowedGifts: undefined,
-      nonContactPeersPaidStars: 0,
+      nonContactPeersPaidDiamonds: 0,
       shouldHideReadMarks: false,
       canTranslate: false,
       canTranslateChats: true,

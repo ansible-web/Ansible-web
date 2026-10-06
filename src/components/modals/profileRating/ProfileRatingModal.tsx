@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useState } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
-import type { ApiStarsRating, ApiUser } from '../../../api/types';
+import type { ApiDiamondsRating, ApiUser } from '../../../api/types';
 import type { TabState } from '../../../global/types';
 
 import { getPeerTitle } from '../../../global/helpers/peers';
@@ -29,8 +29,8 @@ export type OwnProps = {
 type StateProps = {
   user?: ApiUser;
   currentUserId?: string;
-  starsRating?: ApiStarsRating;
-  pendingRating?: ApiStarsRating;
+  starsRating?: ApiDiamondsRating;
+  pendingRating?: ApiDiamondsRating;
   pendingRatingDate?: number;
 };
 
@@ -48,7 +48,7 @@ const ProfileRatingModal = ({
   const lang = useLang();
   const isOpen = Boolean(modal);
   const renderingUser = useCurrentOrPrev(user);
-  const renderingStarsRating = useCurrentOrPrev(starsRating);
+  const renderingDiamondsRating = useCurrentOrPrev(starsRating);
   const renderingPendingRating = useCurrentOrPrev(pendingRating);
   const renderingPendingRatingDate = useCurrentOrPrev(pendingRatingDate);
   const [showFutureRating, setShowFutureRating] = useState(false);
@@ -84,25 +84,25 @@ const ProfileRatingModal = ({
   };
 
   const header = useMemo(() => {
-    if (!renderingUser || !renderingStarsRating) return undefined;
+    if (!renderingUser || !renderingDiamondsRating) return undefined;
 
     const rating = showFutureRating && renderingPendingRating
-      ? renderingPendingRating : renderingStarsRating;
-    const currentStars = rating.stars;
+      ? renderingPendingRating : renderingDiamondsRating;
+    const currentDiamonds = rating.stars;
     const currentLevelStars = rating.currentLevelStars;
     const nextLevelStars = rating.nextLevelStars;
     const currentLevel = rating.level;
     const nextLevel = currentLevel + 1;
     const isNegative = currentLevel < 0;
     const pendingLevel = !showFutureRating && renderingPendingRating
-      ? renderingPendingRating.level : renderingStarsRating.level;
+      ? renderingPendingRating.level : renderingDiamondsRating.level;
 
     let levelProgress;
 
     if (!nextLevelStars) {
       levelProgress = 1;
     } else if (nextLevelStars > currentLevelStars) {
-      levelProgress = Math.max(0.03, (currentStars - currentLevelStars) / (nextLevelStars - currentLevelStars));
+      levelProgress = Math.max(0.03, (currentDiamonds - currentLevelStars) / (nextLevelStars - currentLevelStars));
     } else {
       levelProgress = 1;
     }
@@ -110,7 +110,7 @@ const ProfileRatingModal = ({
     const progress = isNegative ? 0.5 : Math.max(0, Math.min(1, levelProgress));
 
     const waitTime = renderingPendingRatingDate ? renderingPendingRatingDate - getServerTime() : 0;
-    const pendingPoints = renderingPendingRating ? renderingPendingRating.stars - renderingStarsRating.stars : 0;
+    const pendingPoints = renderingPendingRating ? renderingPendingRating.stars - renderingDiamondsRating.stars : 0;
     const shouldShowPreview = renderingPendingRating && renderingPendingRatingDate;
 
     const renderPreviewDescription = () => {
@@ -179,7 +179,7 @@ const ProfileRatingModal = ({
           rightText={isNegative ? lang('RatingNegativeLevel') : lang('RatingLevel', { level: nextLevel })}
           floatingBadgeIcon={isNegative ? 'warning' : 'crown-wear'}
           floatingBadgeText={isNegative ? currentLevel.toString()
-            : `${lang.number(currentStars)} / ${lang.number(nextLevelStars || currentStars)}`}
+            : `${lang.number(currentDiamonds)} / ${lang.number(nextLevelStars || currentDiamonds)}`}
           progress={progress}
           isPrimary={currentLevel >= 0}
           isNegative={currentLevel < 0}
@@ -198,7 +198,7 @@ const ProfileRatingModal = ({
         </p>
       </div>
     );
-  }, [renderingUser, currentUserId, renderingStarsRating,
+  }, [renderingUser, currentUserId, renderingDiamondsRating,
     renderingPendingRating, renderingPendingRatingDate, showFutureRating,
     lang, handleShowFuture, handleShowCurrent]);
 

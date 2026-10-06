@@ -1,7 +1,7 @@
 import { memo, useMemo } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
-import type { ApiStarGiftAuctionState } from '../../../../api/types';
+import type { ApiDiamondGiftAuctionState } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
 import { selectTabState } from '../../../../global/selectors';
@@ -20,7 +20,7 @@ export type OwnProps = {
 };
 
 type StateProps = {
-  giftAuction?: ApiStarGiftAuctionState;
+  giftAuction?: ApiDiamondGiftAuctionState;
 };
 
 const GiftAuctionInfoModal = ({

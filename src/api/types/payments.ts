@@ -9,8 +9,8 @@ import type {
   ApiPaymentCredentials,
 } from './messages';
 import type {
-  ApiInputSavedStarGift, ApiRequestInputSavedStarGift, ApiStarsGiveawayWinnerOption,
-} from './stars';
+  ApiDiamondsGiveawayWinnerOption,
+  ApiInputSavedDiamondGift, ApiRequestInputSavedDiamondGift } from './stars';
 import type { StatisticsOverviewPercentage } from './statistics';
 import type { ApiUser } from './users';
 
@@ -48,7 +48,7 @@ export interface ApiPaymentFormRegular {
   photo?: ApiWebDocument;
 }
 
-export interface ApiPaymentFormStars {
+export interface ApiPaymentFormDiamonds {
   type: 'stars';
   formId: string;
   botId: string;
@@ -58,13 +58,13 @@ export interface ApiPaymentFormStars {
   invoice: ApiInvoice;
 }
 
-export interface ApiPaymentFormStarGift {
+export interface ApiPaymentFormDiamondGift {
   type: 'stargift';
   formId: string;
   invoice: ApiInvoice;
 }
 
-export type ApiPaymentForm = ApiPaymentFormRegular | ApiPaymentFormStars | ApiPaymentFormStarGift;
+export type ApiPaymentForm = ApiPaymentFormRegular | ApiPaymentFormDiamonds | ApiPaymentFormDiamondGift;
 
 export interface ApiPaymentFormNativeParams {
   needCardholderName?: boolean;
@@ -80,7 +80,7 @@ export interface ApiLabeledPrice {
   amount: number;
 }
 
-export interface ApiReceiptStars {
+export interface ApiReceiptDiamonds {
   type: 'stars';
   date: number;
   botId: string;
@@ -115,7 +115,7 @@ export interface ApiReceiptRegular {
   shippingMethod?: string;
 }
 
-export type ApiReceipt = ApiReceiptRegular | ApiReceiptStars;
+export type ApiReceipt = ApiReceiptRegular | ApiReceiptDiamonds;
 
 export type ApiPremiumSection = typeof PREMIUM_FEATURE_SECTIONS[number];
 
@@ -161,7 +161,7 @@ export type ApiInputStorePaymentGiftcode = {
   message?: ApiFormattedText;
 };
 
-export type ApiInputStorePaymentStarsTopup = {
+export type ApiInputStorePaymentDiamondsTopup = {
   type: 'stars';
   stars: number;
   currency: string;
@@ -169,7 +169,7 @@ export type ApiInputStorePaymentStarsTopup = {
   spendPurposePeer?: ApiPeer;
 };
 
-export type ApiInputStorePaymentStarsGift = {
+export type ApiInputStorePaymentDiamondsGift = {
   type: 'starsgift';
   user: ApiUser;
   stars: number;
@@ -177,7 +177,7 @@ export type ApiInputStorePaymentStarsGift = {
   amount: number;
 };
 
-export type ApiInputStorePaymentStarsGiveaway = {
+export type ApiInputStorePaymentDiamondsGiveaway = {
   type: 'starsgiveaway';
   isOnlyForNewSubscribers?: boolean;
   areWinnersVisible?: boolean;
@@ -193,7 +193,7 @@ export type ApiInputStorePaymentStarsGiveaway = {
 };
 
 export type ApiInputStorePaymentPurpose = ApiInputStorePaymentGiveaway | ApiInputStorePaymentGiftcode |
-  ApiInputStorePaymentStarsTopup | ApiInputStorePaymentStarsGift | ApiInputStorePaymentStarsGiveaway;
+  ApiInputStorePaymentDiamondsTopup | ApiInputStorePaymentDiamondsGift | ApiInputStorePaymentDiamondsGiveaway;
 
 export interface ApiPremiumGiftCodeOption {
   users: number;
@@ -210,7 +210,7 @@ export interface ApiPrepaidGiveaway {
   date: number;
 }
 
-export type ApiPrepaidStarsGiveaway = {
+export type ApiPrepaidDiamondsGiveaway = {
   type: 'starsGiveaway';
   id: string;
   stars: number;
@@ -219,7 +219,7 @@ export type ApiPrepaidStarsGiveaway = {
   date: number;
 };
 
-export type ApiTypePrepaidGiveaway = ApiPrepaidGiveaway | ApiPrepaidStarsGiveaway;
+export type ApiTypePrepaidGiveaway = ApiPrepaidGiveaway | ApiPrepaidDiamondsGiveaway;
 
 export type ApiBoostsStatus = {
   level: number;
@@ -284,14 +284,14 @@ export type ApiCheckedGiftCode = {
   usedAt?: number;
 };
 
-export interface ApiStarGiveawayOption {
+export interface ApiDiamondGiveawayOption {
   isExtended?: true;
   isDefault?: true;
   stars: number;
   yearlyBoosts: number;
   currency: string;
   amount: number;
-  winners: ApiStarsGiveawayWinnerOption[];
+  winners: ApiDiamondsGiveawayWinnerOption[];
 }
 
 export type ApiPaymentStatus = 'paid' | 'failed' | 'pending' | 'cancelled';
@@ -323,7 +323,7 @@ export type ApiInputInvoiceGiveaway = {
   option: ApiPremiumGiftCodeOption;
 };
 
-export type ApiInputInvoicePremiumGiftStars = {
+export type ApiInputInvoicePremiumGiftDiamonds = {
   type: 'premiumGiftStars';
   userId: string;
   months: number;
@@ -340,7 +340,7 @@ export type ApiInputInvoiceGiftCode = {
   message?: ApiFormattedText;
 };
 
-export type ApiInputInvoiceStars = {
+export type ApiInputInvoiceDiamonds = {
   type: 'stars';
   stars: number;
   currency: string;
@@ -348,7 +348,7 @@ export type ApiInputInvoiceStars = {
   spendPurposePeerId?: string;
 };
 
-export type ApiInputInvoiceStarsGift = {
+export type ApiInputInvoiceDiamondsGift = {
   type: 'starsgift';
   userId: string;
   stars: number;
@@ -356,7 +356,7 @@ export type ApiInputInvoiceStarsGift = {
   amount: number;
 };
 
-export type ApiInputInvoiceStarGift = {
+export type ApiInputInvoiceDiamondGift = {
   type: 'stargift';
   shouldHideName?: boolean;
   peerId: string;
@@ -365,7 +365,7 @@ export type ApiInputInvoiceStarGift = {
   shouldUpgrade?: true;
 };
 
-export type ApiInputInvoiceStarGiftResale = {
+export type ApiInputInvoiceDiamondGiftResale = {
   type: 'stargiftResale';
   slug: string;
   peerId: string;
@@ -374,7 +374,7 @@ export type ApiInputInvoiceStarGiftResale = {
   message?: ApiFormattedText;
 };
 
-export type ApiInputInvoiceStarsGiveaway = {
+export type ApiInputInvoiceDiamondsGiveaway = {
   type: 'starsgiveaway';
   chatId: string;
   additionalChannelIds?: string[];
@@ -394,30 +394,30 @@ export type ApiInputInvoiceChatInviteSubscription = {
   hash: string;
 };
 
-export type ApiInputInvoiceStarGiftUpgrade = {
+export type ApiInputInvoiceDiamondGiftUpgrade = {
   type: 'stargiftUpgrade';
-  inputSavedGift: ApiInputSavedStarGift;
+  inputSavedGift: ApiInputSavedDiamondGift;
   shouldKeepOriginalDetails?: true;
 };
 
-export type ApiInputInvoiceStarGiftTransfer = {
+export type ApiInputInvoiceDiamondGiftTransfer = {
   type: 'stargiftTransfer';
-  inputSavedGift: ApiInputSavedStarGift;
+  inputSavedGift: ApiInputSavedDiamondGift;
   recipientId: string;
 };
 
-export type ApiInputInvoiceStarGiftDropOriginalDetails = {
+export type ApiInputInvoiceDiamondGiftDropOriginalDetails = {
   type: 'stargiftDropOriginalDetails';
-  inputSavedGift: ApiInputSavedStarGift;
+  inputSavedGift: ApiInputSavedDiamondGift;
 };
 
-export type ApiInputInvoiceStarGiftPrepaidUpgrade = {
+export type ApiInputInvoiceDiamondGiftPrepaidUpgrade = {
   type: 'stargiftPrepaidUpgrade';
   peerId: string;
   hash: string;
 };
 
-export type ApiInputInvoiceStarGiftAuctionBid = {
+export type ApiInputInvoiceDiamondGiftAuctionBid = {
   type: 'stargiftAuctionBid';
   giftId: string;
   bidAmount: number;
@@ -428,11 +428,11 @@ export type ApiInputInvoiceStarGiftAuctionBid = {
 };
 
 export type ApiInputInvoice = ApiInputInvoiceMessage | ApiInputInvoiceSlug | ApiInputInvoiceGiveaway
-  | ApiInputInvoiceGiftCode | ApiInputInvoicePremiumGiftStars | ApiInputInvoiceStars | ApiInputInvoiceStarsGift
-  | ApiInputInvoiceStarsGiveaway | ApiInputInvoiceStarGift | ApiInputInvoiceChatInviteSubscription
-  | ApiInputInvoiceStarGiftUpgrade | ApiInputInvoiceStarGiftTransfer | ApiInputInvoiceStarGiftResale
-  | ApiInputInvoiceStarGiftDropOriginalDetails | ApiInputInvoiceStarGiftPrepaidUpgrade
-  | ApiInputInvoiceStarGiftAuctionBid;
+  | ApiInputInvoiceGiftCode | ApiInputInvoicePremiumGiftDiamonds | ApiInputInvoiceDiamonds | ApiInputInvoiceDiamondsGift
+  | ApiInputInvoiceDiamondsGiveaway | ApiInputInvoiceDiamondGift | ApiInputInvoiceChatInviteSubscription
+  | ApiInputInvoiceDiamondGiftUpgrade | ApiInputInvoiceDiamondGiftTransfer | ApiInputInvoiceDiamondGiftResale
+  | ApiInputInvoiceDiamondGiftDropOriginalDetails | ApiInputInvoiceDiamondGiftPrepaidUpgrade
+  | ApiInputInvoiceDiamondGiftAuctionBid;
 
 /* Used for Invoice request */
 export type ApiRequestInputInvoiceMessage = {
@@ -452,24 +452,24 @@ export type ApiRequestInputInvoiceGiveaway = {
   option: ApiPremiumGiftCodeOption;
 };
 
-export type ApiRequestInputInvoiceStars = {
+export type ApiRequestInputInvoiceDiamonds = {
   type: 'stars';
   purpose: ApiInputStorePaymentPurpose;
 };
 
-export type ApiRequestInputInvoicePremiumGiftStars = {
+export type ApiRequestInputInvoicePremiumGiftDiamonds = {
   type: 'premiumGiftStars';
   user: ApiUser;
   months: number;
   message?: ApiFormattedText;
 };
 
-export type ApiRequestInputInvoiceStarsGiveaway = {
+export type ApiRequestInputInvoiceDiamondsGiveaway = {
   type: 'starsgiveaway';
   purpose: ApiInputStorePaymentPurpose;
 };
 
-export type ApiRequestInputInvoiceStarGift = {
+export type ApiRequestInputInvoiceDiamondGift = {
   type: 'stargift';
   shouldHideName?: boolean;
   peer: ApiPeer;
@@ -478,7 +478,7 @@ export type ApiRequestInputInvoiceStarGift = {
   shouldUpgrade?: true;
 };
 
-export type ApiRequestInputInvoiceStarGiftResale = {
+export type ApiRequestInputInvoiceDiamondGiftResale = {
   type: 'stargiftResale';
   slug: string;
   peer: ApiPeer;
@@ -492,30 +492,30 @@ export type ApiRequestInputInvoiceChatInviteSubscription = {
   hash: string;
 };
 
-export type ApiRequestInputInvoiceStarGiftUpgrade = {
+export type ApiRequestInputInvoiceDiamondGiftUpgrade = {
   type: 'stargiftUpgrade';
-  inputSavedGift: ApiRequestInputSavedStarGift;
+  inputSavedGift: ApiRequestInputSavedDiamondGift;
   shouldKeepOriginalDetails?: true;
 };
 
-export type ApiRequestInputInvoiceStarGiftTransfer = {
+export type ApiRequestInputInvoiceDiamondGiftTransfer = {
   type: 'stargiftTransfer';
-  inputSavedGift: ApiRequestInputSavedStarGift;
+  inputSavedGift: ApiRequestInputSavedDiamondGift;
   recipient: ApiPeer;
 };
 
-export type ApiRequestInputInvoiceStarGiftDropOriginalDetails = {
+export type ApiRequestInputInvoiceDiamondGiftDropOriginalDetails = {
   type: 'stargiftDropOriginalDetails';
-  inputSavedGift: ApiRequestInputSavedStarGift;
+  inputSavedGift: ApiRequestInputSavedDiamondGift;
 };
 
-export type ApiRequestInputInvoiceStarGiftPrepaidUpgrade = {
+export type ApiRequestInputInvoiceDiamondGiftPrepaidUpgrade = {
   type: 'stargiftPrepaidUpgrade';
   peer: ApiPeer;
   hash: string;
 };
 
-export type ApiRequestInputInvoiceStarGiftAuctionBid = {
+export type ApiRequestInputInvoiceDiamondGiftAuctionBid = {
   type: 'stargiftAuctionBid';
   giftId: string;
   bidAmount: number;
@@ -526,14 +526,14 @@ export type ApiRequestInputInvoiceStarGiftAuctionBid = {
 };
 
 export type ApiRequestInputInvoice = ApiRequestInputInvoiceMessage | ApiRequestInputInvoiceSlug
-  | ApiRequestInputInvoiceGiveaway | ApiRequestInputInvoiceStars | ApiRequestInputInvoiceStarsGiveaway
-  | ApiRequestInputInvoiceChatInviteSubscription | ApiRequestInputInvoiceStarGift
-  | ApiRequestInputInvoiceStarGiftUpgrade | ApiRequestInputInvoiceStarGiftTransfer
-  | ApiRequestInputInvoicePremiumGiftStars | ApiRequestInputInvoiceStarGiftResale
-  | ApiRequestInputInvoiceStarGiftDropOriginalDetails | ApiRequestInputInvoiceStarGiftPrepaidUpgrade
-  | ApiRequestInputInvoiceStarGiftAuctionBid;
+  | ApiRequestInputInvoiceGiveaway | ApiRequestInputInvoiceDiamonds | ApiRequestInputInvoiceDiamondsGiveaway
+  | ApiRequestInputInvoiceChatInviteSubscription | ApiRequestInputInvoiceDiamondGift
+  | ApiRequestInputInvoiceDiamondGiftUpgrade | ApiRequestInputInvoiceDiamondGiftTransfer
+  | ApiRequestInputInvoicePremiumGiftDiamonds | ApiRequestInputInvoiceDiamondGiftResale
+  | ApiRequestInputInvoiceDiamondGiftDropOriginalDetails | ApiRequestInputInvoiceDiamondGiftPrepaidUpgrade
+  | ApiRequestInputInvoiceDiamondGiftAuctionBid;
 
-export interface ApiUniqueStarGiftValueInfo {
+export interface ApiUniqueDiamondGiftValueInfo {
   isLastSaleOnFragment?: true;
   isValueAverage?: true;
   currency: string;

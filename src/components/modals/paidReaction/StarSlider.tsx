@@ -77,7 +77,7 @@ function getColorForProgress(progress: number): string {
   return SLIDER_COLORS[Math.min(index, SLIDER_COLORS.length - 1)];
 }
 
-const StarSlider = ({
+const DiamondSlider = ({
   maxValue,
   defaultValue,
   minValue: minValueProp,
@@ -433,4 +433,4 @@ function generateBeakPath(beakWidth: number, tipOffset: number): string {
   return `M 0 0 L ${beakWidth} 0 L ${tipX + r} ${y} Q ${tipX} ${BEAK_HEIGHT} ${tipX - r} ${y} Z`;
 }
 
-export default memo(StarSlider);
+export default memo(DiamondSlider);

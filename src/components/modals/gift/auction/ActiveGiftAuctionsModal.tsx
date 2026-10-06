@@ -1,10 +1,10 @@
 import { memo, useMemo } from '@teact';
 import { getActions, withGlobal } from '../../../../global';
 
-import type { ApiStarGiftAuctionState, ApiStarGiftAuctionStateActive } from '../../../../api/types';
+import type { ApiDiamondGiftAuctionState, ApiDiamondGiftAuctionStateActive } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
-import { formatStarsAsIcon } from '../../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../../util/localization/format';
 import { getBidAuctionPosition } from '../../../common/helpers/gifts';
 import { REM } from '../../../common/helpers/mediaDimensions';
 
@@ -25,7 +25,7 @@ export type OwnProps = {
 
 type StateProps = {
   activeGiftAuctionIds?: string[];
-  giftAuctionByGiftId?: Record<string, ApiStarGiftAuctionState>;
+  giftAuctionByGiftId?: Record<string, ApiDiamondGiftAuctionState>;
 };
 
 const ICON_SIZE = 2 * REM;
@@ -38,7 +38,7 @@ const ActiveGiftAuctionsModal = ({
 
   const activeAuctions = useMemo(() => {
     return activeGiftAuctionIds?.map((id) => giftAuctionByGiftId?.[id])
-      .filter((auc): auc is ApiStarGiftAuctionState => (
+      .filter((auc): auc is ApiDiamondGiftAuctionState => (
         auc?.state.type === 'active' && Boolean(auc.userState.bidAmount)
       ));
   }, [activeGiftAuctionIds, giftAuctionByGiftId]);
@@ -60,12 +60,12 @@ const ActiveGiftAuctionsModal = ({
   );
 };
 
-function ActiveAuctionItem({ auction }: { auction: ApiStarGiftAuctionState }) {
+function ActiveAuctionItem({ auction }: { auction: ApiDiamondGiftAuctionState }) {
   const lang = useLang();
   const { openGiftAuctionBidModal, closeActiveGiftAuctionsModal } = getActions();
 
   const { userState, gift } = auction;
-  const state = auction.state as ApiStarGiftAuctionStateActive;
+  const state = auction.state as ApiDiamondGiftAuctionStateActive;
 
   const bidPosition = useMemo(() => {
     return getBidAuctionPosition(userState.bidAmount!, userState.bidDate!, state.bidLevels);
@@ -102,7 +102,7 @@ function ActiveAuctionItem({ auction }: { auction: ApiStarGiftAuctionState }) {
       </div>
       <div className="subtitle">
         {lang('GiftAuctionBidPosition', {
-          amount: formatStarsAsIcon(lang, userState.bidAmount!),
+          amount: formatDiamondsAsIcon(lang, userState.bidAmount!),
           position: lang.number(bidPosition),
         }, {
           withNodes: true,

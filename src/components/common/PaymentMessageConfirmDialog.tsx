@@ -1,7 +1,7 @@
 import type { FC, StateHookSetter } from '../../lib/teact/teact';
 import { memo } from '../../lib/teact/teact';
 
-import { formatStarsAsText } from '../../util/localization/format';
+import { formatDiamondsAsText } from '../../util/localization/format';
 
 import useLang from '../../hooks/useLang';
 
@@ -14,7 +14,7 @@ type OwnProps = {
   isOpen: boolean;
   onClose: NoneToVoidFunction;
   userName?: string;
-  messagePriceInStars: number;
+  messagePriceInDiamonds: number;
   messagesCount: number;
   shouldAutoApprove: boolean;
   setAutoApprove: StateHookSetter<boolean>;
@@ -25,7 +25,7 @@ const PaymentMessageConfirmDialog: FC<OwnProps> = ({
   isOpen,
   onClose,
   userName,
-  messagePriceInStars,
+  messagePriceInDiamonds,
   messagesCount,
   shouldAutoApprove: shouldPaidMessageAutoApprove,
   setAutoApprove: setShouldPaidMessageAutoApprove,
@@ -35,8 +35,8 @@ const PaymentMessageConfirmDialog: FC<OwnProps> = ({
 
   const confirmPaymentMessage = lang('ConfirmationModalPaymentForMessage', {
     user: userName,
-    amount: formatStarsAsText(lang, messagePriceInStars),
-    totalAmount: formatStarsAsText(lang, messagePriceInStars * messagesCount),
+    amount: formatDiamondsAsText(lang, messagePriceInDiamonds),
+    totalAmount: formatDiamondsAsText(lang, messagePriceInDiamonds * messagesCount),
     count: messagesCount,
   }, {
     withMarkdown: true,

@@ -3,8 +3,8 @@ import { memo, useMemo, useRef } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
 import type {
-  ApiPeer,
-  ApiStarsTransactionPeer, ApiSticker,
+  ApiDiamondsTransactionPeer, ApiPeer,
+  ApiSticker,
 } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 import { MediaViewerOrigin } from '../../../../types';
@@ -12,20 +12,20 @@ import { MediaViewerOrigin } from '../../../../types';
 import { NNBSP, STARS_CURRENCY_CODE } from '../../../../config';
 import { getMessageLink } from '../../../../global/helpers';
 import {
-  buildStarsTransactionCustomPeer,
-  formatStarsTransactionAmount,
+  buildDiamondsTransactionCustomPeer,
+  formatDiamondsTransactionAmount,
   shouldUseCustomPeer,
 } from '../../../../global/helpers/payments';
 import {
   selectCanPlayAnimatedEmojis,
-  selectGiftStickerForStars,
+  selectGiftStickerForDiamonds,
   selectGiftStickerForTon,
   selectPeer,
 } from '../../../../global/selectors';
 import buildClassName from '../../../../util/buildClassName';
 import { copyTextToClipboard } from '../../../../util/clipboard';
 import { formatDateTimeToString } from '../../../../util/dates/oldDateFormat';
-import { formatStarsAsIcon } from '../../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../../util/localization/format';
 import { formatPercent } from '../../../../util/textFormat';
 import { getGiftAttributes, getStickerFromGift } from '../../../common/helpers/gifts';
 import { getTransactionTitle, isNegativeAmount } from '../helpers/transaction';
@@ -68,7 +68,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
   topSticker,
   paidMessageCommission,
 }) => {
-  const { showNotification, openMediaViewer, closeStarsTransactionModal } = getActions();
+  const { showNotification, openMediaViewer, closeDiamondsTransactionModal } = getActions();
 
   const lang = useLang();
   const oldLang = useOldLang();
@@ -110,10 +110,10 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     const giftAttributes = isUniqueGift ? getGiftAttributes(gift) : undefined;
 
     const customPeer = (transaction.peer && shouldUseCustomPeer(transaction)
-      && buildStarsTransactionCustomPeer(transaction)) || undefined;
+      && buildDiamondsTransactionCustomPeer(transaction)) || undefined;
 
     const peerId = transaction.peer?.type === 'peer' ? transaction.peer.id : undefined;
-    const toName = transaction.peer && oldLang(getStarsPeerTitleKey(transaction.peer));
+    const toName = transaction.peer && oldLang(getDiamondsPeerTitleKey(transaction.peer));
 
     const title = getTransactionTitle(oldLang, lang, transaction);
 
@@ -191,7 +191,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
         <p className={styles.description}>{description}</p>
         <span className={styles.amount}>
           <span className={amountColorClass}>
-            {formatStarsTransactionAmount(lang, amount)}
+            {formatDiamondsTransactionAmount(lang, amount)}
           </span>
           {NNBSP}
           {amount.currency === STARS_CURRENCY_CODE && <DiamondIcon type="gold" size="adaptive" />}
@@ -262,7 +262,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       peerLabel = oldLang('Diamonds.Transaction.Via');
     }
 
-    if (!transaction.isPostsSearch && !isDropOriginalDetails && !transaction.isStarGiftAuctionBid) {
+    if (!transaction.isPostsSearch && !isDropOriginalDetails && !transaction.isDiamondGiftAuctionBid) {
       tableData.push([
         peerLabel,
         peerId ? { chatId: peerId } : toName || '',
@@ -272,7 +272,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     if (transaction.starRefCommision && transaction.paidMessages) {
       tableData.push([
         lang('PaidMessageTransactionTotal'),
-        formatStarsAsIcon(lang,
+        formatDiamondsAsIcon(lang,
           transaction.amount.amount / ((100 - transaction.starRefCommision) / 100),
           { asFont: false, className: styles.starIcon, withWrapper: true }),
       ]);
@@ -317,7 +317,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       formatDateTimeToString(transaction.date * 1000, oldLang.code, true),
     ]);
 
-    if (transaction.isStarGiftAuctionBid && gift?.type === 'starGift' && gift.availabilityTotal) {
+    if (transaction.isDiamondGiftAuctionBid && gift?.type === 'starGift' && gift.availabilityTotal) {
       tableData.push([
         lang('GiftInfoAvailability'),
         lang('GiftInfoAvailabilityValue', {
@@ -360,7 +360,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       tableData={renderingModalData?.tableData}
       footer={renderingModalData?.footer}
       buttonText={oldLang('OK')}
-      onClose={closeStarsTransactionModal}
+      onClose={closeDiamondsTransactionModal}
     />
   );
 };
@@ -373,7 +373,7 @@ export default memo(withGlobal<OwnProps>(
 
     const currencyAmount = modal?.transaction.amount;
     const starsGiftSticker = modal?.transaction.isGift
-      ? (currencyAmount?.currency === STARS_CURRENCY_CODE ? selectGiftStickerForStars(global, currencyAmount?.amount)
+      ? (currencyAmount?.currency === STARS_CURRENCY_CODE ? selectGiftStickerForDiamonds(global, currencyAmount?.amount)
         : selectGiftStickerForTon(global, currencyAmount?.amount)) : undefined;
 
     return {
@@ -385,7 +385,7 @@ export default memo(withGlobal<OwnProps>(
   },
 )(DiamondsTransactionModal));
 
-function getStarsPeerTitleKey(peer: ApiStarsTransactionPeer) {
+function getDiamondsPeerTitleKey(peer: ApiDiamondsTransactionPeer) {
   switch (peer.type) {
     case 'appStore':
       return 'AppStore';

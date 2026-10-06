@@ -13,7 +13,7 @@ import { selectIsMonoforumAdmin, selectMonoforumChannel,
 import buildClassName from '../../../../util/buildClassName';
 import { formatScheduledDateTime, formatShortDuration } from '../../../../util/dates/oldDateFormat';
 import { convertTonFromNanos } from '../../../../util/formatCurrency';
-import { formatStarsAsText, formatTonAsText } from '../../../../util/localization/format';
+import { formatDiamondsAsText, formatTonAsText } from '../../../../util/localization/format';
 import { getServerTime } from '../../../../util/serverTime';
 import renderText from '../../../common/helpers/renderText';
 import { renderPeerLink, translateWithYou } from '../helpers/messageActions';
@@ -69,7 +69,7 @@ const SuggestedPostApproval = ({
   const formattedAmount = amountValue > 0
     ? (currency === TON_CURRENCY_CODE
       ? formatTonAsText(lang, convertTonFromNanos(amountValue))
-      : formatStarsAsText(lang, amountValue))
+      : formatDiamondsAsText(lang, amountValue))
     : undefined;
 
   const duration = formatShortDuration(lang, ageMinSeconds, true);

@@ -5,7 +5,7 @@ import type { ApiPeer } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
 import { selectPeer } from '../../../../global/selectors';
-import { formatStarsAsIcon } from '../../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../../util/localization/format';
 import { renderGiftOriginalInfo } from '../../../common/helpers/giftOriginalInfo';
 
 import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
@@ -67,7 +67,7 @@ const GiftDescriptionRemoveModal = ({
       title={lang('RemoveGiftDescriptionTitle')}
       onClose={closeGiftDescriptionRemoveModal}
       confirmLabel={lang('RemoveGiftDescriptionButton', {
-        amount: formatStarsAsIcon(lang, price),
+        amount: formatDiamondsAsIcon(lang, price),
       }, { withNodes: true })}
       confirmHandler={handleConfirm}
     >

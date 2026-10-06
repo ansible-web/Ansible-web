@@ -422,7 +422,7 @@ type RenderedRichMediaCopyData = Omit<RichEditorMediaAttrs, 'items'> & {
 };
 
 function normalizeRenderedRichMedia(element: HTMLElement) {
-  const data = parseRenderedRichMediaCopyData(element.dataset.tgRichMedia);
+  const data = parseRenderedRichMediaCopyData(element.dataset.asRichMedia);
   if (!data) return;
 
   const isGroup = data.items.length > 1;
@@ -437,7 +437,7 @@ function normalizeRenderedRichMedia(element: HTMLElement) {
   if (caption) {
     caption.removeAttribute('data-rich-block-type');
     caption.querySelector<HTMLElement>(':scope > [data-rich-block-type="mediaCredit"]')?.remove();
-    caption.dataset.tgSharedCaption = '';
+    caption.dataset.asSharedCaption = '';
     appendStoredCredit(caption, data.credit);
     replacement.append(caption);
   }
@@ -534,12 +534,12 @@ function buildMediaElement(item: RichEditorMediaItem, ref: string) {
   element.setAttribute('src', ref);
   element.setAttribute('alt', '');
   if (item.isSpoiler) element.setAttribute('tg-spoiler', '');
-  if (item.url) element.dataset.tgUrl = item.url;
-  if (item.webPageId) element.dataset.tgWebPageId = item.webPageId;
+  if (item.url) element.dataset.asUrl = item.url;
+  if (item.webPageId) element.dataset.asWebPageId = item.webPageId;
   if (item.isAutoplay) element.setAttribute('autoplay', '');
   if (item.isLoop) element.setAttribute('loop', '');
-  element.dataset.tgCaption = JSON.stringify(item.caption.text);
-  element.dataset.tgCredit = JSON.stringify(item.caption.credit);
+  element.dataset.asCaption = JSON.stringify(item.caption.text);
+  element.dataset.asCredit = JSON.stringify(item.caption.credit);
   return element;
 }
 
@@ -585,8 +585,8 @@ function normalizeMediaContainer(element: HTMLElement) {
       media: resolved.media,
       caption: itemCaption,
       isSpoiler: mediaElement.hasAttribute('tg-spoiler') || mediaElement.hasAttribute('spoiler') ? true : undefined,
-      url: mediaElement.dataset.tgUrl,
-      webPageId: parseWebPageId(mediaElement.dataset.tgWebPageId),
+      url: mediaElement.dataset.asUrl,
+      webPageId: parseWebPageId(mediaElement.dataset.asWebPageId),
       isAutoplay: mediaElement.hasAttribute('autoplay') ? true : undefined,
       isLoop: mediaElement.hasAttribute('loop') ? true : undefined,
     });
@@ -627,11 +627,11 @@ function parseMediaItemCaption(mediaElement: HTMLElement, container: HTMLElement
     ? itemFigure.querySelector<HTMLElement>(':scope > figcaption') || undefined
     : undefined;
   return {
-    text: parseStoredRichText(mediaElement.dataset.tgCaption)
-      || parseStoredRichText(caption?.dataset.tgRichText)
+    text: parseStoredRichText(mediaElement.dataset.asCaption)
+      || parseStoredRichText(caption?.dataset.asRichText)
       || parseCaptionPlainText(caption)
       || EMPTY_RICH_MEDIA_CAPTION.text,
-    credit: parseStoredRichText(mediaElement.dataset.tgCredit)
+    credit: parseStoredRichText(mediaElement.dataset.asCredit)
       || parseStoredCredit(caption)
       || EMPTY_RICH_MEDIA_CAPTION.credit,
   };
@@ -639,7 +639,7 @@ function parseMediaItemCaption(mediaElement: HTMLElement, container: HTMLElement
 
 function parseStoredCredit(caption?: HTMLElement) {
   const cite = caption?.querySelector<HTMLElement>(':scope > cite') || undefined;
-  return parseStoredRichText(cite?.dataset.tgRichText)
+  return parseStoredRichText(cite?.dataset.asRichText)
     || (cite?.textContent ? { type: 'plain', text: cite.textContent } : undefined);
 }
 

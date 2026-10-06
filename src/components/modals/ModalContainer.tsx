@@ -138,7 +138,7 @@ type ModalKey = keyof Pick<TabState,
   'giftAuctionAcquiredModal' |
   'activeGiftAuctionsModal' |
   'starGiftPriceDecreaseInfoModal' |
-  'aboutStarGiftModal' |
+  'aboutDiamondGiftModal' |
   'monetizationVerificationModal' |
   'giftWithdrawModal' |
   'preparedMessageModal' |
@@ -280,7 +280,7 @@ const LEGACY_MODALS: LegacyModalRegistry = {
   giftAuctionAcquiredModal: GiftAuctionAcquiredModal,
   activeGiftAuctionsModal: ActiveGiftAuctionsModal,
   starGiftPriceDecreaseInfoModal: DiamondGiftPriceDecreaseInfoModal,
-  aboutStarGiftModal: AboutDiamondGiftModal,
+  aboutDiamondGiftModal: AboutDiamondGiftModal,
   monetizationVerificationModal: VerificationMonetizationModal,
   giftWithdrawModal: GiftWithdrawModal,
   giftStatusInfoModal: GiftStatusInfoModal,

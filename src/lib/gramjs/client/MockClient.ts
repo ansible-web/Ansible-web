@@ -25,8 +25,8 @@ import MockSender from './MockSender';
 
 const sizeTypes: SizeType[] = ['u', 'v', 'w', 'y', 'd', 'x', 'c', 'm', 'b', 'a', 's', 'f'];
 
-class TelegramClient {
-  private invokeMiddleware?: <A, R>(mockClient: TelegramClient, request: Api.Request<A, R>)
+class AnsibleClient {
+  private invokeMiddleware?: <A, R>(mockClient: AnsibleClient, request: Api.Request<A, R>)
   => Promise<R | undefined | 'pass'>;
 
   public mockData: MockTypes = {
@@ -454,4 +454,4 @@ class TelegramClient {
   }
 }
 
-export default TelegramClient;
+export default AnsibleClient;

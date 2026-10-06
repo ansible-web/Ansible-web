@@ -169,7 +169,7 @@
   left: 0.875rem;
 }
 
-.addStarsButton {
+.addDiamondsButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,7 +190,7 @@
   }
 }
 
-.addStarsIcon {
+.addDiamondsIcon {
   font-size: 0.75rem !important;
 }
 
@@ -258,7 +258,7 @@
   outline: 0.25rem solid var(--color-background);
 }
 
-.avatarStar {
+.avatarDiamond {
   position: absolute;
   z-index: 1;
   right: -1rem;

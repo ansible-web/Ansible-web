@@ -2,7 +2,7 @@ import { memo, useMemo, useRef } from '@teact';
 import { withGlobal } from '../../../../global';
 
 import type { ApiMessage, ApiPeer } from '../../../../api/types';
-import type { ApiMessageActionStarGiftPurchaseOffer } from '../../../../api/types/messageActions';
+import type { ApiMessageActionDiamondGiftPurchaseOffer } from '../../../../api/types/messageActions';
 
 import { getPeerTitle } from '../../../../global/helpers/peers';
 import {
@@ -33,7 +33,7 @@ import styles from './DiamondGiftPurchaseOffer.module.scss';
 
 type OwnProps = {
   message: ApiMessage;
-  action: ApiMessageActionStarGiftPurchaseOffer;
+  action: ApiMessageActionDiamondGiftPurchaseOffer;
   hasButtons?: boolean;
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;

@@ -2,8 +2,8 @@ import { memo, useMemo } from '../../../lib/teact/teact';
 import { getActions } from '../../../global';
 
 import type {
-  ApiEmojiStatusCollectible, ApiEmojiStatusType, ApiSavedStarGift, ApiStarGift,
-} from '../../../api/types';
+  ApiDiamondGift,
+  ApiEmojiStatusCollectible, ApiEmojiStatusType, ApiSavedDiamondGift } from '../../../api/types';
 
 import { DEFAULT_STATUS_ICON_ID, STARS_CURRENCY_CODE, TME_LINK_PREFIX } from '../../../config';
 import { copyTextToClipboard } from '../../../util/clipboard';
@@ -19,7 +19,7 @@ import MenuItem from '../../ui/MenuItem';
 type OwnProps = {
   peerId: string;
   canManage?: boolean;
-  gift: ApiSavedStarGift | ApiStarGift;
+  gift: ApiSavedDiamondGift | ApiDiamondGift;
   currentUserEmojiStatus?: ApiEmojiStatusType;
   collectibleEmojiStatuses?: ApiEmojiStatusType[];
 };

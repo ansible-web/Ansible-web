@@ -53,7 +53,7 @@ import MemorySession from '../sessions/Memory';
 import { LAYER } from '../tl/AllTLObjects';
 import { getDC, getInputPeer, strippedPhotoToJpg } from '../Utils';
 
-type TelegramClientParams = {
+type AnsibleClientParams = {
   connection: typeof Connection;
   fallbackConnection: typeof Connection;
   useIPV6: boolean;
@@ -125,8 +125,8 @@ const sizeTypeRanks: Record<SizeType, number> = sizeTypes.reduce((acc, sizeType,
   return acc;
 }, {} as Record<SizeType, number>);
 
-class TelegramClient {
-  static DEFAULT_OPTIONS: Partial<TelegramClientParams> = {
+class AnsibleClient {
+  static DEFAULT_OPTIONS: Partial<AnsibleClientParams> = {
     connection: ConnectionTCPObfuscated,
     fallbackConnection: HttpConnection,
     useIPV6: false,
@@ -155,7 +155,7 @@ class TelegramClient {
     shouldDebugExportedSenders: false,
   };
 
-  private _args: TelegramClientParams;
+  private _args: AnsibleClientParams;
 
   public session: Session;
 
@@ -220,12 +220,12 @@ class TelegramClient {
     session: Session,
     apiId?: number,
     apiHash?: string,
-    opts: Partial<TelegramClientParams> = TelegramClient.DEFAULT_OPTIONS,
+    opts: Partial<AnsibleClientParams> = AnsibleClient.DEFAULT_OPTIONS,
   ) {
     if (!apiId || !apiHash || !Number.isFinite(apiId)) {
       throw Error('Your API ID or Hash are invalid. Please read "Requirements" on README.md');
     }
-    const args = { ...TelegramClient.DEFAULT_OPTIONS, ...opts } as TelegramClientParams;
+    const args = { ...AnsibleClient.DEFAULT_OPTIONS, ...opts } as AnsibleClientParams;
     this.apiId = apiId;
     this.apiHash = apiHash;
     this.defaultDcId = args.dcId || DEFAULT_DC_ID;
@@ -1431,4 +1431,4 @@ async function attempts(cb: () => Promise<unknown> | void, times: number, pause:
   return undefined;
 }
 
-export default TelegramClient;
+export default AnsibleClient;

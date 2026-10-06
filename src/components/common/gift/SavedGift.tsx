@@ -1,14 +1,14 @@
 import { memo, useMemo, useRef } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
-import type { ApiEmojiStatusType, ApiPeer, ApiSavedStarGift } from '../../../api/types';
+import type { ApiEmojiStatusType, ApiPeer, ApiSavedDiamondGift } from '../../../api/types';
 
 import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../config';
 import { getHasAdminRight } from '../../../global/helpers';
 import { selectChat, selectPeer, selectUser } from '../../../global/selectors';
 import { IS_TOUCH_ENV } from '../../../util/browser/windowEnvironment';
 import buildClassName from '../../../util/buildClassName';
-import { formatStarsAsIcon, formatTonAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon, formatTonAsIcon } from '../../../util/localization/format';
 import { CUSTOM_PEER_HIDDEN } from '../../../util/objects/customPeer';
 import { formatIntegerCompact } from '../../../util/textFormat';
 import { getGiftAttributes, getStickerFromGift, getTotalGiftAvailability } from '../helpers/gifts';
@@ -32,7 +32,7 @@ import styles from './SavedGift.module.scss';
 
 type OwnProps = {
   peerId: string;
-  gift: ApiSavedStarGift;
+  gift: ApiSavedDiamondGift;
   style?: string;
   className?: string;
   observeIntersection?: ObserveFn;
@@ -196,8 +196,8 @@ const SavedGift = ({
           inline
         >
           {resellPrice.currency === 'TON'
-            ? formatTonAsIcon(lang, resellPrice.amount, { shouldConvertFromNanos: true, className: styles.star })
-            : formatStarsAsIcon(lang, resellPrice.amount, { className: styles.star })}
+            ? formatTonAsIcon(lang, resellPrice.amount, { shouldConvertFromNanos: true, className: styles.diamond })
+            : formatDiamondsAsIcon(lang, resellPrice.amount, { className: styles.diamond })}
         </Button>
       )}
       {ribbonText && (

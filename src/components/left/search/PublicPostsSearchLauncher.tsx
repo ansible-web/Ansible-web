@@ -9,7 +9,7 @@ import {
 } from '../../../config';
 import { selectIsCurrentUserPremium } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
-import { formatStarsAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../util/localization/format';
 import { throttle } from '../../../util/schedulers';
 import { getServerTime } from '../../../util/serverTime';
 import { LOCAL_TGS_PREVIEW_URLS, LOCAL_TGS_URLS } from '../../common/helpers/animatedAssets';
@@ -53,7 +53,7 @@ const PublicPostsSearchLauncher = ({
   const {
     checkSearchPostsFlood,
     openPremiumModal,
-    openStarsBalanceModal,
+    openDiamondsBalanceModal,
   } = getActions();
 
   const lang = useLang();
@@ -77,7 +77,7 @@ const PublicPostsSearchLauncher = ({
     const currentBalance = starsBalance;
 
     if (currentBalance < starsAmount) {
-      openStarsBalanceModal({
+      openDiamondsBalanceModal({
         topup: {
           balanceNeeded: starsAmount,
         },
@@ -134,7 +134,7 @@ const PublicPostsSearchLauncher = ({
             onClick={handlePaidSearchClick}
           >
             {lang('PublicPostsSearchForDiamonds', {
-              stars: formatStarsAsIcon(lang, starsAmount, { asFont: true }),
+              stars: formatDiamondsAsIcon(lang, starsAmount, { asFont: true }),
             }, { withNodes: true })}
           </Button>
           {Boolean(waitTill) && (

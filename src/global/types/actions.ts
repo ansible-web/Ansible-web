@@ -11,6 +11,13 @@ import type {
   ApiChatlistInvite,
   ApiChatReactions,
   ApiChatType,
+  ApiDiamondGift,
+  ApiDiamondGiftAttributeOriginalDetails,
+  ApiDiamondGiftRegular,
+  ApiDiamondGiftUnique,
+  ApiDiamondGiftUpgradePrice,
+  ApiDiamondsSubscription,
+  ApiDiamondsTransaction,
   ApiDisallowedGiftsSettings,
   ApiDraft,
   ApiEmojiStatusCollectible,
@@ -22,10 +29,10 @@ import type {
   ApiInputAiComposeTone,
   ApiInputEphemeralReplyInfo,
   ApiInputInvoice,
-  ApiInputInvoiceStarGift,
+  ApiInputInvoiceDiamondGift,
   ApiInputMessageReplyInfo,
   ApiInputRichMessage,
-  ApiInputSavedStarGift,
+  ApiInputSavedDiamondGift,
   ApiInputSuggestedPostInfo,
   ApiKeyboardButton,
   ApiLimitTypeWithModal,
@@ -48,16 +55,9 @@ import type {
   ApiReaction,
   ApiReactionWithPaid,
   ApiReportReason,
-  ApiSavedStarGift,
+  ApiSavedDiamondGift,
   ApiSendMessageAction,
   ApiSessionData,
-  ApiStarGift,
-  ApiStarGiftAttributeOriginalDetails,
-  ApiStarGiftRegular,
-  ApiStarGiftUnique,
-  ApiStarGiftUpgradePrice,
-  ApiStarsSubscription,
-  ApiStarsTransaction,
   ApiSticker,
   ApiStickerSet,
   ApiStickerSetInfo,
@@ -845,7 +845,7 @@ export interface ActionPayloads {
 
   // payment
   closePaymentModal: WithTabId | undefined;
-  closeStarsPaymentModal: WithTabId | undefined;
+  closeDiamondsPaymentModal: WithTabId | undefined;
   resetPaymentStatus: WithTabId | undefined;
   addPaymentError: {
     error: TabState['payment']['error'];
@@ -863,7 +863,7 @@ export interface ActionPayloads {
     savedCredentialId?: string;
     tipAmount?: number;
   } & WithTabId;
-  sendStarPaymentForm: {
+  sendDiamondPaymentForm: {
     directInfo?: {
       formId: string;
       inputInvoice: ApiInputInvoice;
@@ -873,23 +873,23 @@ export interface ActionPayloads {
     chatId: string;
     messageId: number;
   } & WithTabId;
-  openStarsTransactionModal: {
-    transaction: ApiStarsTransaction;
+  openDiamondsTransactionModal: {
+    transaction: ApiDiamondsTransaction;
   } & WithTabId;
-  openStarsTransactionFromGift: {
+  openDiamondsTransactionFromGift: {
     chatId: string;
     messageId: number;
   } & WithTabId;
-  closeStarsTransactionModal: WithTabId | undefined;
-  openStarsSubscriptionModal: {
-    subscription: ApiStarsSubscription;
+  closeDiamondsTransactionModal: WithTabId | undefined;
+  openDiamondsSubscriptionModal: {
+    subscription: ApiDiamondsSubscription;
   } & WithTabId;
-  closeStarsSubscriptionModal: WithTabId | undefined;
-  openPrizeStarsTransactionFromGiveaway: {
+  closeDiamondsSubscriptionModal: WithTabId | undefined;
+  openPrizeDiamondsTransactionFromGiveaway: {
     chatId: string;
     messageId: number;
   } & WithTabId;
-  closePrizeStarsTransactionFromGiveaway: WithTabId | undefined;
+  closePrizeDiamondsTransactionFromGiveaway: WithTabId | undefined;
   sendCredentialsInfo: {
     credentials: ApiCredentials;
   } & WithTabId;
@@ -1237,7 +1237,7 @@ export interface ActionPayloads {
   };
   updatePaidMessagesPrice: {
     chatId: string;
-    paidMessagesStars: number;
+    paidMessagesDiamonds: number;
   } & WithTabId;
   toggleAutoTranslation: {
     chatId: string;
@@ -1400,7 +1400,7 @@ export interface ActionPayloads {
     };
   } & WithTabId;
 
-  launchPrepaidStarsGiveaway: {
+  launchPrepaidDiamondsGiveaway: {
     chatId: string;
     giveawayId: string;
     paymentPurpose: {
@@ -1416,12 +1416,12 @@ export interface ActionPayloads {
     };
   } & WithTabId;
 
-  loadStarStatus: undefined;
-  loadStarsTransactions: {
+  loadDiamondStatus: undefined;
+  loadDiamondsTransactions: {
     type: StarsTransactionType;
     isTon?: boolean;
   };
-  loadStarsSubscriptions: undefined;
+  loadDiamondsSubscriptions: undefined;
   changeStarsSubscription: {
     peerId?: string;
     id: string;
@@ -1431,8 +1431,8 @@ export interface ActionPayloads {
     peerId?: string;
     id: string;
   };
-  openStarsBalanceModal: {
-    originStarsPayment?: TabState['starsPayment'];
+  openDiamondsBalanceModal: {
+    originDiamondsPayment?: TabState['starsPayment'];
     originGift?: StarGiftInfo;
     originReaction?: {
       chatId: string;
@@ -1446,7 +1446,7 @@ export interface ActionPayloads {
     shouldIgnoreBalance?: boolean;
     currency?: ApiTypeCurrencyAmount['currency'];
   } & WithTabId;
-  closeStarsBalanceModal: WithTabId | undefined;
+  closeDiamondsBalanceModal: WithTabId | undefined;
 
   checkChatlistInvite: {
     slug: string;
@@ -2182,7 +2182,7 @@ export interface ActionPayloads {
   forwardStory: {
     toChatId: string;
   } & WithTabId;
-  forwardAudio: { toChatId: string; toThreadId?: ThreadId; confirmedStars?: number } & WithTabId;
+  forwardAudio: { toChatId: string; toThreadId?: ThreadId; confirmedDiamonds?: number } & WithTabId;
   clearAudioPendingSend: WithTabId | undefined;
 
   // GIFs
@@ -2300,7 +2300,7 @@ export interface ActionPayloads {
     threadId: ThreadId;
     isSilent?: boolean;
     scheduledAt?: number;
-    paidMessagesStars?: number;
+    paidMessagesDiamonds?: number;
   } & WithTabId;
   sendInlineBotApiResult: {
     chat: ApiChat;
@@ -2784,7 +2784,7 @@ export interface ActionPayloads {
     shouldArchiveAndMuteNewNonContact?: boolean;
     shouldHideReadMarks?: boolean;
     shouldNewNonContactPeersRequirePremium?: boolean;
-    nonContactPeersPaidStars?: number | null;
+    nonContactPeersPaidDiamonds?: number | null;
     shouldDisplayGiftsButton?: boolean;
     disallowedGifts?: ApiDisallowedGiftsSettings;
   };
@@ -2797,7 +2797,7 @@ export interface ActionPayloads {
     isSuccess?: boolean;
     isGift?: boolean;
     daysAmount?: number;
-    gift?: ApiStarGift;
+    gift?: ApiDiamondGift;
   } & WithTabId) | undefined;
   closePremiumModal: WithTabId | undefined;
 
@@ -2918,8 +2918,8 @@ export interface ActionPayloads {
     shouldSkipInFuture?: boolean;
   } & WithTabId);
 
-  openStarsGiftingPickerModal: WithTabId | undefined;
-  closeStarsGiftingPickerModal: WithTabId | undefined;
+  openDiamondsGiftingPickerModal: WithTabId | undefined;
+  closeDiamondsGiftingPickerModal: WithTabId | undefined;
 
   openPaidReactionModal: {
     chatId: string;
@@ -2989,7 +2989,7 @@ export interface ActionPayloads {
 
   loadPremiumGifts: undefined;
   loadTonGifts: undefined;
-  loadStarGifts: undefined;
+  loadDiamondGifts: undefined;
   loadMyUniqueGifts: {
     shouldRefresh?: true;
   } | undefined;
@@ -3009,22 +3009,22 @@ export interface ActionPayloads {
 
   openGiftModal: {
     forUserId: string;
-    selectedGift?: ApiStarGift;
-    selectedResaleGift?: ApiStarGift;
+    selectedGift?: ApiDiamondGift;
+    selectedResaleGift?: ApiDiamondGift;
   } & WithTabId;
   closeGiftModal: WithTabId | undefined;
   setGiftModalSelectedGift: {
-    gift: ApiPremiumGiftCodeOption | ApiStarGift | undefined;
+    gift: ApiPremiumGiftCodeOption | ApiDiamondGift | undefined;
   } & WithTabId;
-  sendStarGift: StarGiftInfo & WithTabId;
-  buyStarGift: {
+  sendDiamondGift: StarGiftInfo & WithTabId;
+  buyDiamondGift: {
     peerId: string;
     slug: string;
     price: ApiTypeCurrencyAmount;
     shouldShowName?: true;
     message?: ApiFormattedText;
   } & WithTabId;
-  sendPremiumGiftByStars: {
+  sendPremiumGiftByDiamonds: {
     userId: string;
     months: number;
     amount: number;
@@ -3038,10 +3038,10 @@ export interface ActionPayloads {
   openGiftInfoModal: ({
     peerId: string;
     recipientId?: string;
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
     craftSlotIndex?: number;
   } | {
-    gift: ApiStarGift;
+    gift: ApiDiamondGift;
     craftSlotIndex?: number;
   }) & WithTabId;
   openLockedGiftModalInfo: {
@@ -3049,31 +3049,31 @@ export interface ActionPayloads {
     reason?: ApiFormattedText;
   } & WithTabId;
   checkCanSendGift: {
-    gift: ApiStarGift;
+    gift: ApiDiamondGift;
     onSuccess: () => void;
   } & WithTabId;
   openGiftResalePriceComposerModal: ({
     peerId: string;
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
   }) & WithTabId;
   closeGiftInfoModal: WithTabId | undefined;
   closeLockedGiftModal: WithTabId | undefined;
   closeGiftResalePriceComposerModal: WithTabId | undefined;
   openGiftInMarket: {
-    gift: ApiStarGift;
+    gift: ApiDiamondGift;
   } & WithTabId;
   closeResaleGiftsMarket: WithTabId | undefined;
 
   openGiftUpgradeModal: {
     giftId: string;
     peerId?: string;
-    gift?: ApiSavedStarGift;
+    gift?: ApiSavedDiamondGift;
   } & WithTabId;
   closeGiftUpgradeModal: WithTabId | undefined;
   shiftGiftUpgradeNextPrice: WithTabId | undefined;
 
   openGiftCraftModal: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
   } & WithTabId;
   closeGiftCraftModal: WithTabId | undefined;
   resetGiftCraftResult: WithTabId | undefined;
@@ -3082,11 +3082,11 @@ export interface ActionPayloads {
   } & WithTabId;
   closeGiftCraftSelectModal: WithTabId | undefined;
   openGiftCraftInfoModal: {
-    gift: ApiStarGiftUnique;
+    gift: ApiDiamondGiftUnique;
   } & WithTabId;
   closeGiftCraftInfoModal: WithTabId | undefined;
   selectGiftForCraft: {
-    gift?: ApiSavedStarGift;
+    gift?: ApiSavedDiamondGift;
     slotIndex: number;
   } & WithTabId;
   selectPurchasedGiftForCraft: {
@@ -3097,15 +3097,15 @@ export interface ActionPayloads {
   loadMoreMarketCraftableGifts: WithTabId | undefined;
   craftStarGift: WithTabId | undefined;
 
-  openStarGiftPriceDecreaseInfoModal: {
-    prices: ApiStarGiftUpgradePrice[];
+  openDiamondGiftPriceDecreaseInfoModal: {
+    prices: ApiDiamondGiftUpgradePrice[];
     currentPrice: number;
     minPrice: number;
     maxPrice: number;
   } & WithTabId;
-  closeStarGiftPriceDecreaseInfoModal: WithTabId | undefined;
+  closeDiamondGiftPriceDecreaseInfoModal: WithTabId | undefined;
   upgradeGift: {
-    gift: ApiInputSavedStarGift;
+    gift: ApiInputSavedDiamondGift;
     shouldKeepOriginalDetails?: boolean;
     upgradeStars?: number;
   } & WithTabId;
@@ -3116,7 +3116,7 @@ export interface ActionPayloads {
   } & WithTabId;
 
   openGiftWithdrawModal: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
   } & WithTabId;
   clearGiftWithdrawError: WithTabId | undefined;
   closeGiftWithdrawModal: WithTabId | undefined;
@@ -3125,11 +3125,11 @@ export interface ActionPayloads {
   } & WithTabId;
   closeGiftStatusInfoModal: WithTabId | undefined;
   openGiftInfoValueModal: {
-    gift: ApiStarGiftUnique;
+    gift: ApiDiamondGiftUnique;
   } & WithTabId;
   closeGiftInfoValueModal: WithTabId | undefined;
   openGiftPreviewModal: {
-    originGift: ApiStarGift;
+    originGift: ApiDiamondGift;
     shouldShowCraftableOnStart?: boolean;
   } & WithTabId;
   closeGiftPreviewModal: WithTabId | undefined;
@@ -3137,7 +3137,7 @@ export interface ActionPayloads {
   openActiveGiftAuctionsModal: WithTabId | undefined;
   closeActiveGiftAuctionsModal: WithTabId | undefined;
   openGiftAuctionModal: {
-    gift: ApiStarGiftRegular;
+    gift: ApiDiamondGiftRegular;
   } & WithTabId;
   closeGiftAuctionModal: {
     shouldKeepAuction?: boolean;
@@ -3153,8 +3153,8 @@ export interface ActionPayloads {
     auctionGiftId: string;
   } & WithTabId;
   closeGiftAuctionInfoModal: WithTabId | undefined;
-  openAboutStarGiftModal: WithTabId | undefined;
-  closeAboutStarGiftModal: WithTabId | undefined;
+  openAboutDiamondGiftModal: WithTabId | undefined;
+  closeAboutDiamondGiftModal: WithTabId | undefined;
   openGiftAuctionChangeRecipientModal: {
     auctionGiftId: string;
     oldPeerId: string;
@@ -3169,7 +3169,7 @@ export interface ActionPayloads {
     giftSticker?: ApiSticker;
   } & WithTabId;
   closeGiftAuctionAcquiredModal: WithTabId | undefined;
-  sendStarGiftAuctionBid: {
+  sendDiamondGiftAuctionBid: {
     giftId: string;
     bidAmount: number;
     peerId?: string;
@@ -3180,39 +3180,39 @@ export interface ActionPayloads {
   loadGiftAuction: {
     giftId: string;
   };
-  processStarGiftWithdrawal: {
-    gift: ApiInputSavedStarGift;
+  processDiamondGiftWithdrawal: {
+    gift: ApiInputSavedDiamondGift;
     password: string;
   } & WithTabId;
 
   openGiftTransferModal: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
   } & WithTabId;
   transferGift: {
-    gift: ApiInputSavedStarGift;
+    gift: ApiInputSavedDiamondGift;
     transferStars?: number;
     recipientId: string;
   } & WithTabId;
   removeGiftDescription: {
-    gift: ApiInputSavedStarGift;
+    gift: ApiInputSavedDiamondGift;
     price: number;
   } & WithTabId;
   closeGiftTransferModal: WithTabId | undefined;
   openGiftTransferConfirmModal: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
     recipientId: string;
   } & WithTabId;
   closeGiftTransferConfirmModal: WithTabId | undefined;
   openGiftDescriptionRemoveModal: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
     price: number;
-    details: ApiStarGiftAttributeOriginalDetails;
+    details: ApiDiamondGiftAttributeOriginalDetails;
   } & WithTabId;
   closeGiftDescriptionRemoveModal: WithTabId | undefined;
   openGiftOfferAcceptModal: {
     peerId: string;
     messageId: number;
-    gift: ApiStarGiftUnique;
+    gift: ApiDiamondGiftUnique;
     price: ApiTypeCurrencyAmount;
   } & WithTabId;
   closeGiftOfferAcceptModal: WithTabId | undefined;
@@ -3232,39 +3232,39 @@ export interface ActionPayloads {
     peerId: string;
   };
   changeGiftVisibility: {
-    gift: ApiInputSavedStarGift;
+    gift: ApiInputSavedDiamondGift;
     shouldUnsave?: boolean;
   } & WithTabId;
-  convertGiftToStars: {
-    gift: ApiInputSavedStarGift;
+  convertGiftToDiamonds: {
+    gift: ApiInputSavedDiamondGift;
   } & WithTabId;
   toggleSavedGiftPinned: {
     peerId: string;
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
   } & WithTabId;
 
   updateStarGiftPrice: {
-    gift: ApiInputSavedStarGift;
+    gift: ApiInputSavedDiamondGift;
     price: ApiTypeCurrencyAmount;
   } & WithTabId;
 
-  loadStarGiftCollections: {
+  loadDiamondGiftCollections: {
     peerId: string;
     hash?: string;
   } & WithTabId;
 
-  acceptStarGiftOffer: {
+  acceptDiamondGiftOffer: {
     messageId: number;
   } & WithTabId;
-  declineStarGiftOffer: {
+  declineDiamondGiftOffer: {
     messageId: number;
   } & WithTabId;
 
-  openStarsGiftModal: ({
+  openDiamondsGiftModal: ({
     chatId?: string;
     forUserId?: string;
   } & WithTabId) | undefined;
-  closeStarsGiftModal: WithTabId | undefined;
+  closeDiamondsGiftModal: WithTabId | undefined;
 
   setEmojiStatus: {
     emojiStatus: ApiEmojiStatusType;
@@ -3287,14 +3287,14 @@ export interface ActionPayloads {
   } & WithTabId;
 
   // Invoice
-  openInvoice: Exclude<ApiInputInvoice, ApiInputInvoiceStarGift> & WithTabId;
+  openInvoice: Exclude<ApiInputInvoice, ApiInputInvoiceDiamondGift> & WithTabId;
 
   // Payment
   validatePaymentPassword: {
     password: string;
   } & WithTabId;
 
-  processOriginStarsPayment: {
+  processOriginDiamondsPayment: {
     originData: TabState['starsBalanceModal'];
     status: ApiPaymentStatus;
   } & WithTabId;

@@ -65,7 +65,7 @@ import {
 import { getMessageKey, isLocalMessageId } from '../../../util/keys/messageKey';
 import { parseTranslationCacheKey } from '../../../util/keys/translationKey';
 import { getTranslationFn, type RegularLangFnParameters } from '../../../util/localization';
-import { formatStarsAsText } from '../../../util/localization/format';
+import { formatDiamondsAsText } from '../../../util/localization/format';
 import { oldTranslate } from '../../../util/oldLangProvider';
 import { debounce, onTickEnd, rafPromise } from '../../../util/schedulers';
 import { getServerTime } from '../../../util/serverTime';
@@ -165,7 +165,7 @@ import {
   selectMessageReplyInfo,
   selectOutlyingListByMessageId,
   selectPeer,
-  selectPeerPaidMessagesStars,
+  selectPeerPaidMessagesDiamonds,
   selectPeerStory,
   selectPinnedIds,
   selectPollFromMessage,
@@ -614,7 +614,7 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
   const lastMessageId = threadId === MAIN_THREAD_ID
     ? selectChatLastMessageId(global, chatId!) : threadInfo?.lastMessageId;
 
-  const messagePriceInStars = await getPeerStarsForMessage(global, chatId!);
+  const messagePriceInDiamonds = await getPeerDiamondsForMessage(global, chatId!);
 
   const suggestedPostPrice = draftSuggestedPostInfo?.price;
   const suggestedPostCurrency = suggestedPostPrice?.currency || STARS_CURRENCY_CODE;
@@ -624,7 +624,7 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
       const currentBalance = global.stars?.balance?.amount || 0;
 
       if (suggestedPostAmount > currentBalance) {
-        actions.openStarsBalanceModal({
+        actions.openDiamondsBalanceModal({
           topup: {
             balanceNeeded: suggestedPostAmount,
           },
@@ -635,7 +635,7 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
     } else if (suggestedPostCurrency === TON_CURRENCY_CODE) {
       const currentTonBalance = global.ton?.balance?.amount || 0;
       if (suggestedPostAmount > currentTonBalance) {
-        actions.openStarsBalanceModal({
+        actions.openDiamondsBalanceModal({
           currency: TON_CURRENCY_CODE,
           tabId,
         });
@@ -679,13 +679,13 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
     noWebPage: selectNoWebPage(global, chatId!, threadId!),
     sendAs: selectSendAs(global, chatId!),
     lastMessageId,
-    messagePriceInStars,
+    messagePriceInDiamonds,
     isStoryReply,
     dice,
     text: !dice && !payload.richMessage ? payload.text : undefined,
     entities: payload.richMessage ? undefined : payload.entities,
     richMessage: payload.richMessage,
-    isPending: messagePriceInStars ? true : undefined,
+    isPending: messagePriceInDiamonds ? true : undefined,
     ...suggestedMessage && { isInvertedMedia: suggestedMessage?.isInvertedMedia },
   };
 
@@ -2053,7 +2053,7 @@ async function executeForwardMessages(global: GlobalState, sendParams: SendMessa
   const {
     fromChatId, messageIds, toChatId, withMyScore, noAuthors, noCaptions, toThreadId = MAIN_THREAD_ID,
   } = selectTabState(global, tabId).forwardMessages;
-  const { messagePriceInStars, isSilent, scheduledAt, scheduleRepeatPeriod, effectId, attachments } = sendParams;
+  const { messagePriceInDiamonds, isSilent, scheduledAt, scheduleRepeatPeriod, effectId, attachments } = sendParams;
   const isForwardOnly = !sendParams.text && !sendParams.richMessage && !attachments?.length;
   const forwardEffectId = isForwardOnly ? effectId : undefined;
 
@@ -2105,11 +2105,11 @@ async function executeForwardMessages(global: GlobalState, sendParams: SendMessa
         isCurrentUserPremium,
         wasDrafted: Boolean(draft),
         lastMessageId,
-        messagePriceInStars,
+        messagePriceInDiamonds,
         effectId: forwardEffectId,
       };
 
-      if (!messagePriceInStars) {
+      if (!messagePriceInDiamonds) {
         callApi('forwardMessages', forwardParams);
       } else {
         const forwardedLocalMessagesSlice = await callApi('forwardMessagesLocal', forwardParams);
@@ -2404,7 +2404,7 @@ function getViewportSlice(
   return { newViewportIds, areSomeLocal, areAllLocal };
 }
 
-export async function getPeerStarsForMessage<T extends GlobalState>(
+export async function getPeerDiamondsForMessage<T extends GlobalState>(
   global: T,
   peerId: string,
 ): Promise<number | undefined> {
@@ -2415,17 +2415,17 @@ export async function getPeerStarsForMessage<T extends GlobalState>(
     if (isChatAdmin(peer) || selectIsMonoforumAdmin(global, peerId)) {
       return undefined;
     }
-    return peer.paidMessagesStars;
+    return peer.paidMessagesDiamonds;
   }
 
-  if (!peer?.paidMessagesStars) return undefined;
+  if (!peer?.paidMessagesDiamonds) return undefined;
 
   const fullInfo = selectUserFullInfo(global, peer.id);
   if (fullInfo) {
-    return fullInfo.paidMessagesStars;
+    return fullInfo.paidMessagesDiamonds;
   }
 
-  const result = await callApi('fetchPaidMessagesStarsAmount', peer);
+  const result = await callApi('fetchPaidMessagesDiamondsAmount', peer);
   return result;
 }
 
@@ -2434,7 +2434,7 @@ async function sendMessageOrReduceLocal<T extends GlobalState>(
   sendParams: SendMessageParams,
   localMessages: SendMessageParams[],
 ) {
-  if (!sendParams.messagePriceInStars) {
+  if (!sendParams.messagePriceInDiamonds) {
     sendMessage(global, sendParams);
   } else {
     const message = await callApi('sendMessageLocal', sendParams);
@@ -2548,7 +2548,7 @@ async function sendMessagesWithNotification<T extends GlobalState>(
 ) {
   const chat = sendParams[0]?.chat;
   if (!chat || !sendParams.length) return;
-  const starsForOneMessage = await getPeerStarsForMessage(global, chat.id);
+  const starsForOneMessage = await getPeerDiamondsForMessage(global, chat.id);
   if (!starsForOneMessage) {
     getActions().sendMessages({ sendParams });
     return;
@@ -2599,7 +2599,7 @@ async function sendMessagesWithNotification<T extends GlobalState>(
     title: titleKey,
     message: {
       key: 'MessageSentPaidToastText',
-      variables: { amount: formatStarsAsText(getTranslationFn(), starsForOneMessage * messagesCount) },
+      variables: { amount: formatDiamondsAsText(getTranslationFn(), starsForOneMessage * messagesCount) },
     },
     icon: 'star',
     shouldUseCustomIcon: true,
@@ -2617,7 +2617,7 @@ addActionHandler('sendMessages', async (global, actions, payload): Promise<void>
       await sendMessage(global, params);
     }
   }));
-  if (sendParams.length > 0 && sendParams[0].messagePriceInStars) actions.loadStarStatus();
+  if (sendParams.length > 0 && sendParams[0].messagePriceInDiamonds) actions.loadDiamondStatus();
 });
 
 addActionHandler('loadPinnedMessages', async (global, actions, payload): Promise<void> => {
@@ -2904,12 +2904,12 @@ addActionHandler('approveSuggestedPost', async (global, actions, payload): Promi
 
   if (!isAdmin && message?.suggestedPostInfo?.price?.amount) {
     const neededAmount = message.suggestedPostInfo.price.amount;
-    const isCurrencyStars = message.suggestedPostInfo.price.currency === STARS_CURRENCY_CODE;
+    const isCurrencyDiamonds = message.suggestedPostInfo.price.currency === STARS_CURRENCY_CODE;
 
-    if (isCurrencyStars) {
+    if (isCurrencyDiamonds) {
       const currentBalance = global.stars?.balance?.amount || 0;
       if (neededAmount > currentBalance) {
-        actions.openStarsBalanceModal({
+        actions.openDiamondsBalanceModal({
           topup: {
             balanceNeeded: neededAmount,
           },
@@ -2920,7 +2920,7 @@ addActionHandler('approveSuggestedPost', async (global, actions, payload): Promi
     } else {
       const currentTonBalance = global.ton?.balance?.amount || 0;
       if (neededAmount > currentTonBalance) {
-        actions.openStarsBalanceModal({
+        actions.openDiamondsBalanceModal({
           currency: TON_CURRENCY_CODE,
           tabId,
         });
@@ -3314,7 +3314,7 @@ function forwardMessagesToChat({
   const lastMessageId = toThreadId === MAIN_THREAD_ID
     ? selectChatLastMessageId(global, toChat.id)
     : threadInfo?.lastMessageId;
-  const messagePriceInStars = selectPeerPaidMessagesStars(global, toChat.id);
+  const messagePriceInDiamonds = selectPeerPaidMessagesDiamonds(global, toChat.id);
   const targetMessageList = {
     chatId: toChat.id,
     threadId: toThreadId,
@@ -3328,7 +3328,7 @@ function forwardMessagesToChat({
       text: comment,
       sendAs,
       lastMessageId,
-      messagePriceInStars,
+      messagePriceInDiamonds,
     });
   }
 
@@ -3356,7 +3356,7 @@ function forwardMessagesToChat({
           isCurrentUserPremium,
           wasDrafted: false,
           lastMessageId,
-          messagePriceInStars,
+          messagePriceInDiamonds,
         };
 
         callApi('forwardMessages', forwardParams);
@@ -3377,7 +3377,7 @@ function forwardMessagesToChat({
       isSilent: true,
       sendAs,
       lastMessageId,
-      messagePriceInStars,
+      messagePriceInDiamonds,
     });
   }
 }
@@ -3473,7 +3473,7 @@ addActionHandler('forwardStory', (global, actions, payload): ActionReturnType =>
 
 addActionHandler('forwardAudio', async (global, actions, payload): Promise<void> => {
   const {
-    toChatId, toThreadId = MAIN_THREAD_ID, confirmedStars, tabId = getCurrentTabId(),
+    toChatId, toThreadId = MAIN_THREAD_ID, confirmedDiamonds, tabId = getCurrentTabId(),
   } = payload;
 
   const { audioItem } = selectTabState(global, tabId).forwardMessages;
@@ -3485,7 +3485,7 @@ addActionHandler('forwardAudio', async (global, actions, payload): Promise<void>
   const forwardToken = Symbol('audioForward');
   audioForwardTokens.set(tabId, forwardToken);
 
-  const messagePriceInStars = await getPeerStarsForMessage(global, toChatId);
+  const messagePriceInDiamonds = await getPeerDiamondsForMessage(global, toChatId);
 
   global = getGlobal();
   if (audioForwardTokens.get(tabId) !== forwardToken) {
@@ -3506,13 +3506,13 @@ addActionHandler('forwardAudio', async (global, actions, payload): Promise<void>
     return;
   }
 
-  if (messagePriceInStars) {
+  if (messagePriceInDiamonds) {
     const shouldAutoApprove = global.settings.byKey.shouldPaidMessageAutoApprove;
-    if (messagePriceInStars !== confirmedStars && !shouldAutoApprove) {
+    if (messagePriceInDiamonds !== confirmedDiamonds && !shouldAutoApprove) {
       global = updateTabState(global, {
         forwardMessages: {
           ...selectTabState(global, tabId).forwardMessages,
-          audioPendingSend: { toChatId, toThreadId, stars: messagePriceInStars },
+          audioPendingSend: { toChatId, toThreadId, stars: messagePriceInDiamonds },
         },
       }, tabId);
       setGlobal(global);
@@ -3520,8 +3520,8 @@ addActionHandler('forwardAudio', async (global, actions, payload): Promise<void>
     }
 
     const starsBalance = global.stars?.balance?.amount || 0;
-    if (messagePriceInStars > starsBalance) {
-      actions.openStarsBalanceModal({ topup: { balanceNeeded: messagePriceInStars }, tabId });
+    if (messagePriceInDiamonds > starsBalance) {
+      actions.openDiamondsBalanceModal({ topup: { balanceNeeded: messagePriceInDiamonds }, tabId });
       return;
     }
   }
@@ -3532,8 +3532,8 @@ addActionHandler('forwardAudio', async (global, actions, payload): Promise<void>
     chat: toChat,
     audio,
     lastMessageId,
-    messagePriceInStars,
-    isPending: messagePriceInStars ? true : undefined,
+    messagePriceInDiamonds,
+    isPending: messagePriceInDiamonds ? true : undefined,
     replyInfo: topicId ? { type: 'message', replyToMsgId: topicId, replyToTopId: topicId } : undefined,
   });
 

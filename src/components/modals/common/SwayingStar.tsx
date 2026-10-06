@@ -16,7 +16,7 @@ interface OwnProps {
 
 const INTERACTIVE_RADIUS = 50;
 
-function SwayingStar({
+function SwayingDiamond({
   className,
   color,
   centerShift,
@@ -56,7 +56,7 @@ function SwayingStar({
     >
       <div
         ref={starRef}
-        className={buildClassName(styles.star, styles[`star_${color}`])}
+        className={buildClassName(styles.diamond, styles[`star_${color}`])}
         role="img"
         aria-label="Ansible Diamonds"
       />
@@ -64,4 +64,4 @@ function SwayingStar({
   );
 }
 
-export default memo(SwayingStar);
+export default memo(SwayingDiamond);

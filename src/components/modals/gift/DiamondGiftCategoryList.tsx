@@ -15,8 +15,8 @@ import styles from './DiamondGiftCategoryList.module.scss';
 
 type OwnProps = {
   ref?: ElementRef<HTMLDivElement>;
-  areUniqueStarGiftsDisallowed?: boolean;
-  areLimitedStarGiftsDisallowed?: boolean;
+  areUniqueDiamondGiftsDisallowed?: boolean;
+  areLimitedDiamondGiftsDisallowed?: boolean;
   isSelf?: boolean;
   hasMyUnique?: boolean;
   isPinned?: boolean;
@@ -31,8 +31,8 @@ const DiamondGiftCategoryList = ({
   ref: externalRef,
   idsByCategory,
   onCategoryChanged,
-  areUniqueStarGiftsDisallowed,
-  areLimitedStarGiftsDisallowed,
+  areUniqueDiamondGiftsDisallowed,
+  areLimitedDiamondGiftsDisallowed,
   isSelf,
   hasMyUnique,
   isPinned,
@@ -79,8 +79,8 @@ const DiamondGiftCategoryList = ({
   return (
     <div ref={ref} className={buildClassName(styles.list, isPinned && styles.pinned, 'no-scrollbar')}>
       {renderCategoryItem('all')}
-      {!areUniqueStarGiftsDisallowed && !isSelf && hasMyUnique && renderCategoryItem('myUnique')}
-      {(!areUniqueStarGiftsDisallowed || !areLimitedStarGiftsDisallowed)
+      {!areUniqueDiamondGiftsDisallowed && !isSelf && hasMyUnique && renderCategoryItem('myUnique')}
+      {(!areUniqueDiamondGiftsDisallowed || !areLimitedDiamondGiftsDisallowed)
         && hasCollectible && renderCategoryItem('collectible')}
     </div>
   );

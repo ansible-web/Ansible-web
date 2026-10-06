@@ -31,7 +31,7 @@ import type {
   ApiReactionWithPaid,
   ApiReportReason,
   ApiRequestInputInvoice,
-  ApiRequestInputSavedStarGift,
+  ApiRequestInputSavedDiamondGift,
   ApiSendMessageAction,
   ApiSticker,
   ApiStory,
@@ -812,9 +812,9 @@ function buildPremiumGiftCodeOption(optionData: ApiPremiumGiftCodeOption) {
 
 export function buildDisallowedGiftsSettings(disallowedGifts: ApiDisallowedGiftsSettings) {
   return new GramJs.DisallowedGiftsSettings({
-    disallowUnlimitedStargifts: disallowedGifts.shouldDisallowLimitedStarGifts,
-    disallowLimitedStargifts: disallowedGifts.shouldDisallowUnlimitedStarGifts,
-    disallowUniqueStargifts: disallowedGifts.shouldDisallowUniqueStarGifts,
+    disallowUnlimitedStargifts: disallowedGifts.shouldDisallowLimitedDiamondGifts,
+    disallowLimitedStargifts: disallowedGifts.shouldDisallowUnlimitedDiamondGifts,
+    disallowUniqueStargifts: disallowedGifts.shouldDisallowUniqueDiamondGifts,
     disallowPremiumGifts: disallowedGifts.shouldDisallowPremiumGifts,
   });
 }
@@ -893,21 +893,21 @@ export function buildInputInvoice(invoice: ApiRequestInputInvoice) {
 
     case 'stargiftUpgrade': {
       return new GramJs.InputInvoiceStarGiftUpgrade({
-        stargift: buildInputSavedStarGift(invoice.inputSavedGift),
+        stargift: buildInputSavedDiamondGift(invoice.inputSavedGift),
         keepOriginalDetails: invoice.shouldKeepOriginalDetails,
       });
     }
 
     case 'stargiftTransfer': {
       return new GramJs.InputInvoiceStarGiftTransfer({
-        stargift: buildInputSavedStarGift(invoice.inputSavedGift),
+        stargift: buildInputSavedDiamondGift(invoice.inputSavedGift),
         toId: buildInputPeer(invoice.recipient.id, invoice.recipient.accessHash),
       });
     }
 
     case 'stargiftDropOriginalDetails': {
       return new GramJs.InputInvoiceStarGiftDropOriginalDetails({
-        stargift: buildInputSavedStarGift(invoice.inputSavedGift),
+        stargift: buildInputSavedDiamondGift(invoice.inputSavedGift),
       });
     }
 
@@ -1055,7 +1055,7 @@ export function buildInputReplyTo(replyInfo: ApiInputReplyInfo) {
   return undefined;
 }
 
-export function buildInputStarsAmount(amount: ApiTypeCurrencyAmount): GramJs.TypeStarsAmount {
+export function buildInputDiamondsAmount(amount: ApiTypeCurrencyAmount): GramJs.TypeStarsAmount {
   if (amount.currency === STARS_CURRENCY_CODE) {
     return new GramJs.StarsAmount({
       amount: BigInt(amount.amount),
@@ -1070,7 +1070,7 @@ export function buildInputStarsAmount(amount: ApiTypeCurrencyAmount): GramJs.Typ
 
 export function buildInputSuggestedPost(suggestedPostInfo: ApiInputSuggestedPostInfo): GramJs.SuggestedPost {
   return new GramJs.SuggestedPost({
-    price: suggestedPostInfo.price && buildInputStarsAmount(suggestedPostInfo.price),
+    price: suggestedPostInfo.price && buildInputDiamondsAmount(suggestedPostInfo.price),
     scheduleDate: suggestedPostInfo.scheduleDate,
   });
 }
@@ -1139,7 +1139,7 @@ export function buildInputPrivacyRules(
   return privacyRules;
 }
 
-export function buildInputSavedStarGift(inputGift: ApiRequestInputSavedStarGift) {
+export function buildInputSavedDiamondGift(inputGift: ApiRequestInputSavedDiamondGift) {
   if (inputGift.type === 'user') {
     return new GramJs.InputSavedStarGiftUser({
       msgId: inputGift.messageId,

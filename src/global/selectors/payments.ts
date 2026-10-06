@@ -26,7 +26,7 @@ export function selectPaymentForm<T extends GlobalState>(
   return selectTabState(global, tabId).payment.form;
 }
 
-export function selectStarsPayment<T extends GlobalState>(
+export function selectDiamondsPayment<T extends GlobalState>(
   global: T,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ) {
@@ -107,7 +107,7 @@ export function selectActiveGiftsCollectionId<T extends GlobalState>(
   return selectTabState(global, tabId).savedGifts.activeCollectionByPeerId?.[peerId] || 'all';
 }
 
-export function selectStarsGiftResaleCommission<T extends GlobalState>(global: T) {
+export function selectDiamondsGiftResaleCommission<T extends GlobalState>(global: T) {
   const permille = global.appConfig?.starsStargiftResaleCommissionPermille;
   return permille !== undefined ? permille / 1000 : undefined;
 }

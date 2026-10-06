@@ -13,6 +13,17 @@ import type {
   ApiCheckedGiftCode,
   ApiCollectibleInfo,
   ApiDialog,
+  ApiDiamondGift,
+  ApiDiamondGiftAttribute,
+  ApiDiamondGiftAttributeCounter,
+  ApiDiamondGiftAttributeOriginalDetails,
+  ApiDiamondGiftAuctionAcquiredGift,
+  ApiDiamondGiftUnique,
+  ApiDiamondGiftUpgradePrice,
+  ApiDiamondGiveawayOption,
+  ApiDiamondsSubscription,
+  ApiDiamondsTransaction,
+  ApiDiamondTopupOption,
   ApiEmojiStatusCollectible,
   ApiFormattedText,
   ApiGeoPoint,
@@ -28,8 +39,8 @@ import type {
   ApiNewMediaTodo,
   ApiNewPoll,
   ApiNotification,
+  ApiPaymentFormDiamonds,
   ApiPaymentFormRegular,
-  ApiPaymentFormStars,
   ApiPaymentStatus,
   ApiPhoneCall,
   ApiPostStatistics,
@@ -39,27 +50,16 @@ import type {
   ApiPreparedInlineMessage,
   ApiReactionWithPaid,
   ApiReceiptRegular,
+  ApiSavedDiamondGift,
   ApiSavedGifts,
-  ApiSavedStarGift,
   ApiSearchPostsFlood,
   ApiSponsoredPeer,
-  ApiStarGift,
-  ApiStarGiftAttribute,
-  ApiStarGiftAttributeCounter,
-  ApiStarGiftAttributeOriginalDetails,
-  ApiStarGiftAuctionAcquiredGift,
-  ApiStarGiftUnique,
-  ApiStarGiftUpgradePrice,
-  ApiStarGiveawayOption,
-  ApiStarsSubscription,
-  ApiStarsTransaction,
-  ApiStarTopupOption,
   ApiSticker,
   ApiThumbnail,
   ApiTypeCurrencyAmount,
   ApiTypePrepaidGiveaway,
   ApiTypeStoryView,
-  ApiUniqueStarGiftValueInfo,
+  ApiUniqueDiamondGiftValueInfo,
   ApiUrlAuthResultRequest,
   ApiUser,
   ApiVideo,
@@ -298,10 +298,10 @@ export type TabState = {
 
   resaleGifts: {
     giftId?: string;
-    gifts: ApiStarGift[];
+    gifts: ApiDiamondGift[];
     count: number;
-    attributes?: ApiStarGiftAttribute[];
-    counters?: ApiStarGiftAttributeCounter[];
+    attributes?: ApiDiamondGiftAttribute[];
+    counters?: ApiDiamondGiftAttributeCounter[];
     nextOffset?: string;
     attributesHash?: string;
     isLoading?: boolean;
@@ -519,7 +519,7 @@ export type TabState = {
     botId?: string;
   };
   starsPayment: {
-    form?: ApiPaymentFormStars;
+    form?: ApiPaymentFormDiamonds;
     subscriptionInfo?: ApiChatInviteInfo;
     inputInvoice?: ApiInputInvoice;
     status?: ApiPaymentStatus;
@@ -680,7 +680,7 @@ export type TabState = {
     width?: number;
     height?: number;
     style?: ConfettiStyle;
-    withStars?: boolean;
+    withDiamonds?: boolean;
   };
   wave?: {
     lastWaveTime: number;
@@ -708,7 +708,7 @@ export type TabState = {
     isGift?: boolean;
     daysAmount?: number;
     isSuccess?: boolean;
-    gift?: ApiStarGift;
+    gift?: ApiDiamondGift;
   };
 
   aiMessageEditorModal?: {
@@ -765,7 +765,7 @@ export type TabState = {
     selectedMemberIds?: string[];
     selectedChannelIds?: string[];
     prepaidGiveaway?: ApiTypePrepaidGiveaway;
-    starOptions?: ApiStarGiveawayOption[];
+    starOptions?: ApiDiamondGiveawayOption[];
   };
 
   deleteMessageModal?: {
@@ -797,21 +797,21 @@ export type TabState = {
     isCompleted?: boolean;
     isOpen?: boolean;
     forUserId?: string;
-    starsGiftOptions?: ApiStarTopupOption[];
+    starsGiftOptions?: ApiDiamondTopupOption[];
   };
 
   starsTransactionModal?: {
-    transaction: ApiStarsTransaction;
+    transaction: ApiDiamondsTransaction;
   };
   starsSubscriptionModal?: {
-    subscription: ApiStarsSubscription;
+    subscription: ApiDiamondsSubscription;
   };
 
   giftModal?: {
     forPeerId: string;
     gifts?: ApiPremiumGiftCodeOption[];
-    selectedResaleGift?: ApiStarGift;
-    selectedGift?: ApiPremiumGiftCodeOption | ApiStarGift;
+    selectedResaleGift?: ApiDiamondGift;
+    selectedGift?: ApiPremiumGiftCodeOption | ApiDiamondGift;
   };
   chatRefundModal?: {
     userId: string;
@@ -937,7 +937,7 @@ export type TabState = {
   };
 
   starsBalanceModal?: {
-    originStarsPayment?: TabState['starsPayment'];
+    originDiamondsPayment?: TabState['starsPayment'];
     originGift?: StarGiftInfo;
     originReaction?: {
       chatId: string;
@@ -954,13 +954,13 @@ export type TabState = {
   giftInfoModal?: {
     peerId?: string;
     recipientId?: string;
-    gift: ApiSavedStarGift | ApiStarGift;
+    gift: ApiSavedDiamondGift | ApiDiamondGift;
     craftSlotIndex?: number;
   };
 
   giftInfoValueModal?: {
-    valueInfo: ApiUniqueStarGiftValueInfo;
-    gift: ApiStarGiftUnique;
+    valueInfo: ApiUniqueDiamondGiftValueInfo;
+    gift: ApiDiamondGiftUnique;
   };
 
   lockedGiftModal?: {
@@ -970,38 +970,38 @@ export type TabState = {
 
   giftResalePriceComposerModal?: {
     peerId?: string;
-    gift: ApiSavedStarGift | ApiStarGift;
+    gift: ApiSavedDiamondGift | ApiDiamondGift;
   };
 
   giftTransferModal?: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
   };
 
   giftTransferConfirmModal?: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
     recipientId: string;
   };
 
   giftDescriptionRemoveModal?: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
     price: number;
-    details: ApiStarGiftAttributeOriginalDetails;
+    details: ApiDiamondGiftAttributeOriginalDetails;
   };
 
   giftOfferAcceptModal?: {
     peerId: string;
     messageId: number;
-    gift: ApiStarGiftUnique;
+    gift: ApiDiamondGiftUnique;
     price: ApiTypeCurrencyAmount;
   };
 
   giftUpgradeModal?: {
-    sampleAttributes: ApiStarGiftAttribute[];
+    sampleAttributes: ApiDiamondGiftAttribute[];
     recipientId?: string;
-    gift?: ApiSavedStarGift;
-    prices?: ApiStarGiftUpgradePrice[];
-    nextPrices?: ApiStarGiftUpgradePrice[];
-    currentUpgradeStars?: number;
+    gift?: ApiSavedDiamondGift;
+    prices?: ApiDiamondGiftUpgradePrice[];
+    nextPrices?: ApiDiamondGiftUpgradePrice[];
+    currentUpgradeDiamonds?: number;
     minPrice?: number;
     maxPrice?: number;
   };
@@ -1009,26 +1009,26 @@ export type TabState = {
   giftCraftModal?: {
     regularGiftId?: string;
     regularGiftTitle?: string;
-    gift1?: ApiSavedStarGift;
-    gift2?: ApiSavedStarGift;
-    gift3?: ApiSavedStarGift;
-    gift4?: ApiSavedStarGift;
-    previewAttributes?: ApiStarGiftAttribute[];
-    myCraftableGifts?: ApiSavedStarGift[];
+    gift1?: ApiSavedDiamondGift;
+    gift2?: ApiSavedDiamondGift;
+    gift3?: ApiSavedDiamondGift;
+    gift4?: ApiSavedDiamondGift;
+    previewAttributes?: ApiDiamondGiftAttribute[];
+    myCraftableGifts?: ApiSavedDiamondGift[];
     myCraftableGiftsNextOffset?: string;
     shouldRefreshMyCraftableGifts?: boolean;
-    marketCraftableGifts?: ApiStarGiftUnique[];
+    marketCraftableGifts?: ApiDiamondGiftUnique[];
     marketCraftableGiftsNextOffset?: string;
     marketCraftableGiftsCount?: number;
     isMarketLoading?: boolean;
     marketFilter: ResaleGiftsFilterOptions;
-    marketAttributes?: ApiStarGiftAttribute[];
-    marketCounters?: ApiStarGiftAttributeCounter[];
+    marketAttributes?: ApiDiamondGiftAttribute[];
+    marketCounters?: ApiDiamondGiftAttributeCounter[];
     marketAttributesHash?: string;
     marketUpdateIteration: number;
     craftResult?: {
       success: true;
-      gift: ApiStarGiftUnique;
+      gift: ApiDiamondGiftUnique;
     } | {
       success: false;
       isError?: true;
@@ -1041,11 +1041,11 @@ export type TabState = {
   };
 
   giftCraftInfoModal?: {
-    gift: ApiStarGiftUnique;
+    gift: ApiDiamondGiftUnique;
   };
 
   giftWithdrawModal?: {
-    gift: ApiSavedStarGift;
+    gift: ApiSavedDiamondGift;
     isLoading?: boolean;
     errorKey?: RegularLangFnParameters;
   };
@@ -1055,14 +1055,14 @@ export type TabState = {
   };
 
   giftPreviewModal?: {
-    attributes: ApiStarGiftAttribute[];
-    originGift: ApiStarGift;
+    attributes: ApiDiamondGiftAttribute[];
+    originGift: ApiDiamondGift;
     shouldShowCraftableOnStart?: boolean;
   };
 
   giftAuctionModal?: {
     auctionGiftId: string;
-    sampleAttributes?: ApiStarGiftAttribute[];
+    sampleAttributes?: ApiDiamondGiftAttribute[];
   };
 
   giftAuctionBidModal?: {
@@ -1076,7 +1076,7 @@ export type TabState = {
     auctionGiftId: string;
   };
 
-  aboutStarGiftModal?: {
+  aboutDiamondGiftModal?: {
     videoId?: string;
     videoThumbnail?: ApiThumbnail;
   };
@@ -1093,13 +1093,13 @@ export type TabState = {
     giftId?: string;
     giftTitle?: string;
     giftSticker?: ApiSticker;
-    acquiredGifts?: ApiStarGiftAuctionAcquiredGift[];
+    acquiredGifts?: ApiDiamondGiftAuctionAcquiredGift[];
   };
 
   activeGiftAuctionsModal?: true;
 
   starGiftPriceDecreaseInfoModal?: {
-    prices: ApiStarGiftUpgradePrice[];
+    prices: ApiDiamondGiftUpgradePrice[];
     currentPrice: number;
     minPrice: number;
     maxPrice: number;
@@ -1141,8 +1141,8 @@ export type TabState = {
 
   isTwoFaCheckModalOpen?: true;
 
-  isWaitingForStarGiftUpgrade?: true;
-  isWaitingForStarGiftTransfer?: true;
+  isWaitingForDiamondGiftUpgrade?: true;
+  isWaitingForDiamondGiftTransfer?: true;
   insertingPeerIdMention?: string;
   shouldSaveAttachmentsCompression?: boolean;
 

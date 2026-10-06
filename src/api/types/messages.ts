@@ -12,7 +12,7 @@ import type {
 } from './payments';
 import type { ApiTypePeerColor } from './peers';
 import type { ApiRichMessage } from './richMessage';
-import type { ApiStarGiftRegular, ApiStarGiftUnique, ApiTypeCurrencyAmount } from './stars';
+import type { ApiDiamondGiftRegular, ApiDiamondGiftUnique, ApiTypeCurrencyAmount } from './stars';
 import type {
   ApiMessageStoryData, ApiStory, ApiWebPageStickerData, ApiWebPageStoryData,
 } from './stories';
@@ -437,7 +437,7 @@ export interface ApiWebPageFull {
   document?: ApiDocument;
   video?: ApiVideo;
   story?: ApiWebPageStoryData;
-  gift?: ApiStarGiftUnique;
+  gift?: ApiDiamondGiftUnique;
   auction?: ApiWebPageAuctionData;
   stickers?: ApiWebPageStickerData;
   cachedPage?: ApiInstantViewPage;
@@ -447,7 +447,7 @@ export interface ApiWebPageFull {
 }
 
 export type ApiWebPageAuctionData = {
-  gift: ApiStarGiftRegular;
+  gift: ApiDiamondGiftRegular;
   endDate: number;
 };
 

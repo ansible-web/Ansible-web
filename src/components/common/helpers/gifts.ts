@@ -1,11 +1,11 @@
 import type {
   ApiAuctionBidLevel,
-  ApiStarGift,
-  ApiStarGiftAttribute,
-  ApiStarGiftAttributeBackdrop,
-  ApiStarGiftAttributeModel,
-  ApiStarGiftAttributeOriginalDetails,
-  ApiStarGiftAttributePattern,
+  ApiDiamondGift,
+  ApiDiamondGiftAttribute,
+  ApiDiamondGiftAttributeBackdrop,
+  ApiDiamondGiftAttributeModel,
+  ApiDiamondGiftAttributeOriginalDetails,
+  ApiDiamondGiftAttributePattern,
   ApiSticker,
 } from '../../../api/types';
 import type { LangFn } from '../../../util/localization';
@@ -16,27 +16,27 @@ import { fetch } from '../../../util/mediaLoader';
 import { formatPercent } from '../../../util/textFormat';
 
 export type GiftAttributes = {
-  model?: ApiStarGiftAttributeModel;
-  originalDetails?: ApiStarGiftAttributeOriginalDetails;
-  pattern?: ApiStarGiftAttributePattern;
-  backdrop?: ApiStarGiftAttributeBackdrop;
+  model?: ApiDiamondGiftAttributeModel;
+  originalDetails?: ApiDiamondGiftAttributeOriginalDetails;
+  pattern?: ApiDiamondGiftAttributePattern;
+  backdrop?: ApiDiamondGiftAttributeBackdrop;
 };
 
 export type GiftPreviewAttributes = {
-  model: ApiStarGiftAttributeModel;
-  pattern: ApiStarGiftAttributePattern;
-  backdrop: ApiStarGiftAttributeBackdrop;
+  model: ApiDiamondGiftAttributeModel;
+  pattern: ApiDiamondGiftAttributePattern;
+  backdrop: ApiDiamondGiftAttributeBackdrop;
 };
 
-export function getStickerFromGift(gift: ApiStarGift): ApiSticker | undefined {
+export function getStickerFromGift(gift: ApiDiamondGift): ApiSticker | undefined {
   if (gift.type === 'starGift') {
     return gift.sticker;
   }
 
-  return gift.attributes.find((attr): attr is ApiStarGiftAttributeModel => attr.type === 'model')?.sticker;
+  return gift.attributes.find((attr): attr is ApiDiamondGiftAttributeModel => attr.type === 'model')?.sticker;
 }
 
-export function getTotalGiftAvailability(gift: ApiStarGift): number | undefined {
+export function getTotalGiftAvailability(gift: ApiDiamondGift): number | undefined {
   if (gift.type === 'starGift') {
     return gift.availabilityTotal;
   }
@@ -44,17 +44,17 @@ export function getTotalGiftAvailability(gift: ApiStarGift): number | undefined 
   return gift.totalCount;
 }
 
-export function getGiftAttributes(gift: ApiStarGift): GiftAttributes | undefined {
+export function getGiftAttributes(gift: ApiDiamondGift): GiftAttributes | undefined {
   if (gift.type !== 'starGiftUnique') return undefined;
 
   return getGiftAttributesFromList(gift.attributes);
 }
 
-function getGiftAttributesFromList(attributes: ApiStarGiftAttribute[]) {
-  const model = attributes.find((attr): attr is ApiStarGiftAttributeModel => attr.type === 'model');
-  const backdrop = attributes.find((attr): attr is ApiStarGiftAttributeBackdrop => attr.type === 'backdrop');
-  const pattern = attributes.find((attr): attr is ApiStarGiftAttributePattern => attr.type === 'pattern');
-  const originalDetails = attributes.find((attr): attr is ApiStarGiftAttributeOriginalDetails => (
+function getGiftAttributesFromList(attributes: ApiDiamondGiftAttribute[]) {
+  const model = attributes.find((attr): attr is ApiDiamondGiftAttributeModel => attr.type === 'model');
+  const backdrop = attributes.find((attr): attr is ApiDiamondGiftAttributeBackdrop => attr.type === 'backdrop');
+  const pattern = attributes.find((attr): attr is ApiDiamondGiftAttributePattern => attr.type === 'pattern');
+  const originalDetails = attributes.find((attr): attr is ApiDiamondGiftAttributeOriginalDetails => (
     attr.type === 'originalDetails'
   ));
 
@@ -67,29 +67,29 @@ function getGiftAttributesFromList(attributes: ApiStarGiftAttribute[]) {
 }
 
 export function getRandomGiftPreviewAttributes(
-  list: ApiStarGiftAttribute[],
+  list: ApiDiamondGiftAttribute[],
   previousSelection?: GiftPreviewAttributes,
 ): GiftPreviewAttributes {
-  const models = list.filter((attr): attr is ApiStarGiftAttributeModel => (
+  const models = list.filter((attr): attr is ApiDiamondGiftAttributeModel => (
     attr.type === 'model' && attr.name !== previousSelection?.model.name
   ));
-  const patterns = list.filter((attr): attr is ApiStarGiftAttributePattern => (
+  const patterns = list.filter((attr): attr is ApiDiamondGiftAttributePattern => (
     attr.type === 'pattern' && attr.name !== previousSelection?.pattern.name
   ));
-  const backdrops = list.filter((attr): attr is ApiStarGiftAttributeBackdrop => (
+  const backdrops = list.filter((attr): attr is ApiDiamondGiftAttributeBackdrop => (
     attr.type === 'backdrop' && attr.name !== previousSelection?.backdrop.name
   ));
 
   if (!models.length || !patterns.length || !backdrops.length) {
     // Fallback: re-filter without exclusions if any category is empty
     const fallbackModels = models.length ? models
-      : list.filter((attr): attr is ApiStarGiftAttributeModel => attr.type === 'model');
+      : list.filter((attr): attr is ApiDiamondGiftAttributeModel => attr.type === 'model');
 
     const fallbackPatterns = patterns.length ? patterns
-      : list.filter((attr): attr is ApiStarGiftAttributePattern => attr.type === 'pattern');
+      : list.filter((attr): attr is ApiDiamondGiftAttributePattern => attr.type === 'pattern');
 
     const fallbackBackdrops = backdrops.length ? backdrops
-      : list.filter((attr): attr is ApiStarGiftAttributeBackdrop => attr.type === 'backdrop');
+      : list.filter((attr): attr is ApiDiamondGiftAttributeBackdrop => attr.type === 'backdrop');
 
     return {
       model: fallbackModels[Math.floor(Math.random() * fallbackModels.length)],
@@ -109,12 +109,12 @@ export function getRandomGiftPreviewAttributes(
   };
 }
 
-export function preloadGiftAttributeStickers(attributes: ApiStarGiftAttribute[]) {
+export function preloadGiftAttributeStickers(attributes: ApiDiamondGiftAttribute[]) {
   const patternStickers = attributes
-    .filter((attr): attr is ApiStarGiftAttributePattern => attr.type === 'pattern')
+    .filter((attr): attr is ApiDiamondGiftAttributePattern => attr.type === 'pattern')
     .map((attr) => attr.sticker);
   const modelStickers = attributes
-    .filter((attr): attr is ApiStarGiftAttributeModel => attr.type === 'model')
+    .filter((attr): attr is ApiDiamondGiftAttributeModel => attr.type === 'model')
     .map((attr) => attr.sticker);
 
   const mediaHashes = [...patternStickers, ...modelStickers].map((sticker) => getStickerMediaHash(sticker, 'full'));
@@ -138,7 +138,7 @@ export function getBidAuctionPosition(bidAmount: number, bidDate: number, bidLev
 
 export function getGiftRarityTitle(
   lang: LangFn,
-  rarity: ApiStarGiftAttributeModel['rarity'],
+  rarity: ApiDiamondGiftAttributeModel['rarity'],
 ) {
   switch (rarity.type) {
     case 'uncommon':

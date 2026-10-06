@@ -3,10 +3,10 @@ import { memo, useEffect, useMemo, useRef, useState } from '@teact';
 import { getActions, withGlobal } from '../../../global';
 
 import type {
+  ApiDiamondGift,
   ApiPremiumPromo,
   ApiPremiumSection,
   ApiPremiumSubscriptionOption,
-  ApiStarGift,
   ApiSticker,
   ApiStickerSet,
   ApiUser,
@@ -116,7 +116,7 @@ type StateProps = {
   isSuccess?: boolean;
   isGift?: boolean;
   daysAmount?: number;
-  gift?: ApiStarGift;
+  gift?: ApiDiamondGift;
   limitChannels: number;
   limitPins: number;
   limitLinks: number;
@@ -226,7 +226,7 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
         left,
         width,
         height,
-        withStars: true,
+        withDiamonds: true,
       });
     }
   });

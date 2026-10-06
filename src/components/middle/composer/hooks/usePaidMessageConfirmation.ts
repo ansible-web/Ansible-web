@@ -9,7 +9,7 @@ import useLastCallback from '../../../../hooks/useLastCallback';
 export default function usePaidMessageConfirmation(
   dialogKey: string,
   starsForAllMessages: number,
-  isStarsBalanceModeOpen: boolean,
+  isDiamondsBalanceModeOpen: boolean,
   starsBalance: number,
   shouldDelayConfirmHandler?: boolean,
 ) {
@@ -18,7 +18,7 @@ export default function usePaidMessageConfirmation(
   } = getGlobal().settings.byKey;
 
   const [shouldAutoApprove, setShouldAutoApprove] = useState(Boolean(shouldPaidMessageAutoApprove));
-  const [isWaitingStarsTopup, setIsWaitingStarsTopup] = useState(false);
+  const [isWaitingDiamondsTopup, setIsWaitingDiamondsTopup] = useState(false);
   const confirmPaymentHandlerRef = useRef<NoneToVoidFunction | undefined>(undefined);
 
   const closeConfirmDialog = useLastCallback(() => {
@@ -35,28 +35,28 @@ export default function usePaidMessageConfirmation(
   }, [dialogKey]);
 
   useEffect(() => {
-    if (isWaitingStarsTopup && !isStarsBalanceModeOpen) {
-      setIsWaitingStarsTopup(false);
+    if (isWaitingDiamondsTopup && !isDiamondsBalanceModeOpen) {
+      setIsWaitingDiamondsTopup(false);
 
       if (starsBalance > starsForAllMessages) {
         confirmPaymentHandlerRef?.current?.();
       }
     }
-  }, [isWaitingStarsTopup, isStarsBalanceModeOpen, starsBalance, starsForAllMessages]);
+  }, [isWaitingDiamondsTopup, isDiamondsBalanceModeOpen, starsBalance, starsForAllMessages]);
 
-  const handleStarsTopup = useLastCallback(() => {
-    getActions().openStarsBalanceModal({
+  const handleDiamondsTopup = useLastCallback(() => {
+    getActions().openDiamondsBalanceModal({
       topup: {
         balanceNeeded: starsForAllMessages,
         purpose: PAID_MESSAGES_PURPOSE,
       },
     });
-    setIsWaitingStarsTopup(true);
+    setIsWaitingDiamondsTopup(true);
   });
 
   const dialogHandler = useLastCallback(() => {
     if (starsForAllMessages > starsBalance) {
-      handleStarsTopup();
+      handleDiamondsTopup();
     } else if (shouldDelayConfirmHandler) {
       setTimeout(() => {
         confirmPaymentHandlerRef?.current?.();
@@ -81,7 +81,7 @@ export default function usePaidMessageConfirmation(
       }
 
       if (starsForAllMessages > starsBalance) {
-        handleStarsTopup();
+        handleDiamondsTopup();
         return;
       }
     }

@@ -1,12 +1,12 @@
 import { memo, useMemo, useRef, useState } from '@teact';
 import { getActions, withGlobal } from '../../../global';
 
-import type { ApiStarGift, ApiTypeCurrencyAmount } from '../../../api/types';
+import type { ApiDiamondGift, ApiTypeCurrencyAmount } from '../../../api/types';
 
 import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../config';
 import { selectIsCurrentUserPremium } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
-import { formatStarsAsIcon, formatTonAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon, formatTonAsIcon } from '../../../util/localization/format';
 import { getGiftAttributes, getStickerFromGift } from '../../common/helpers/gifts';
 
 import { type ObserveFn, useOnIntersect } from '../../../hooks/useIntersectionObserver';
@@ -21,13 +21,13 @@ import GiftAttributeItem from './GiftAttributeItem';
 import styles from './GiftItem.module.scss';
 
 export type OwnProps = {
-  gift: ApiStarGift;
+  gift: ApiDiamondGift;
   isResale?: boolean;
   withTransferBadge?: boolean;
   hideBadge?: boolean;
   noClickable?: boolean;
   observeIntersection?: ObserveFn;
-  onClick?: (gift: ApiStarGift, target: 'original' | 'resell') => void;
+  onClick?: (gift: ApiDiamondGift, target: 'original' | 'resell') => void;
 };
 
 type StateProps = {
@@ -182,12 +182,12 @@ function GiftItemDiamond({
       return formatTonAsIcon(lang, formattedPrice || 0, {
         shouldConvertFromNanos: true,
         isMono: true,
-        className: styles.star,
+        className: styles.diamond,
       });
     }
 
-    return formatStarsAsIcon(lang, formattedPrice || 0, {
-      className: styles.star,
+    return formatDiamondsAsIcon(lang, formattedPrice || 0, {
+      className: styles.diamond,
     });
   }, [withTransferBadge, priceCurrency, formattedPrice, isAuction, lang]);
 
@@ -218,7 +218,7 @@ function GiftItemDiamond({
           )}
           nonInteractive
           size="tiny"
-          color={isGiftUnique ? 'bluredStarsBadge' : 'stars'}
+          color={isGiftUnique ? 'bluredDiamondsBadge' : 'stars'}
           withSparkleEffect={isVisible && !withTransferBadge}
           pill
           fluid

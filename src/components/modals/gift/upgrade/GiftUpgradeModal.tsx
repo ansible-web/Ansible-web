@@ -3,7 +3,7 @@ import {
 } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
-import type { ApiPeer, ApiStarGiftAttributeModel } from '../../../../api/types';
+import type { ApiDiamondGiftAttributeModel, ApiPeer } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
 import { getPeerTitle } from '../../../../global/helpers/peers';
@@ -47,7 +47,7 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
     closeGiftInfoModal,
     upgradeGift,
     upgradePrepaidGift,
-    openStarGiftPriceDecreaseInfoModal,
+    openDiamondGiftPriceDecreaseInfoModal,
     shiftGiftUpgradeNextPrice,
     openGiftPreviewModal,
   } = getActions();
@@ -71,11 +71,11 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
 
   const nextPrice = renderingModal?.nextPrices?.[0];
   const nextPriceDate = nextPrice?.date;
-  const upgradeStars = renderingModal?.currentUpgradeStars;
+  const upgradeStars = renderingModal?.currentUpgradeDiamonds;
 
   const previewModels = useMemo(() => {
     return renderingModal?.sampleAttributes
-      ?.filter((attr): attr is ApiStarGiftAttributeModel => attr.type === 'model')
+      ?.filter((attr): attr is ApiDiamondGiftAttributeModel => attr.type === 'model')
       .slice(0, BUTTON_MODELS_COUNT);
   }, [renderingModal?.sampleAttributes]);
 
@@ -102,7 +102,7 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
     upgradeGift({
       gift: gift.inputGift,
       shouldKeepOriginalDetails,
-      upgradeStars: !gift.alreadyPaidUpgradeStars ? upgradeStars : undefined,
+      upgradeStars: !gift.alreadyPaidUpgradeDiamonds ? upgradeStars : undefined,
     });
     handleClose();
   });
@@ -120,7 +120,7 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
   const handleOpenPriceInfo = useLastCallback(() => {
     if (!renderingModal?.prices) return;
 
-    openStarGiftPriceDecreaseInfoModal({
+    openDiamondGiftPriceDecreaseInfoModal({
       prices: renderingModal.prices,
       currentPrice: upgradeStars || 0,
       minPrice: renderingModal.minPrice || 0,
@@ -201,7 +201,7 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
 
     const hasPriceDecreaseInfo = Boolean(nextPriceDate)
       && Boolean(renderingModal?.prices?.length)
-      && !gift?.alreadyPaidUpgradeStars;
+      && !gift?.alreadyPaidUpgradeDiamonds;
 
     const header = (
       <UniqueGiftHeader
@@ -233,7 +233,7 @@ const GiftUpgradeModal = ({ modal, recipient }: OwnProps & StateProps) => {
             <Button className={styles.footerButton} isShiny onClick={handleUpgrade}>
               <div className={styles.buttonContent}>
                 <div>
-                  {gift.alreadyPaidUpgradeStars
+                  {gift.alreadyPaidUpgradeDiamonds
                     ? lang('GeneralConfirm')
                     : isPrepaid
                       ? lang('GiftPayForUpgradeButton', { amount: formattedPriceElement }, { withNodes: true })

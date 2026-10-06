@@ -3,7 +3,7 @@ import {
 } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
-import type { ApiDraft, ApiPeer, ApiStarsAmount, ApiTypeCurrencyAmount } from '../../../api/types';
+import type { ApiDiamondsAmount, ApiDraft, ApiPeer, ApiTypeCurrencyAmount } from '../../../api/types';
 import type { TabState } from '../../../global/types';
 import { MAIN_THREAD_ID } from '../../../api/types';
 
@@ -17,8 +17,8 @@ import buildClassName from '../../../util/buildClassName';
 import { formatScheduledDateTime, formatShortDuration } from '../../../util/dates/oldDateFormat';
 import { convertTonFromNanos, convertTonToNanos } from '../../../util/formatCurrency';
 import {
-  formatStarsAsIcon,
-  formatStarsAsText,
+  formatDiamondsAsIcon,
+  formatDiamondsAsText,
   formatTonAsIcon,
   formatTonAsText } from '../../../util/localization/format';
 import { getServerTime } from '../../../util/serverTime';
@@ -42,12 +42,12 @@ export type OwnProps = {
 };
 
 type StateProps = {
-  starBalance?: ApiStarsAmount;
+  starBalance?: ApiDiamondsAmount;
   tonBalance?: number;
   peer?: ApiPeer;
   currentDraft?: ApiDraft;
-  maxStarsAmount: number;
-  minStarsAmount: number;
+  maxDiamondsAmount: number;
+  minDiamondsAmount: number;
   tonMaxAmount: number;
   tonMinAmount: number;
   ageMinSeconds: number;
@@ -65,8 +65,8 @@ const SuggestMessageModal = ({
   tonBalance,
   peer,
   currentDraft,
-  maxStarsAmount,
-  minStarsAmount,
+  maxDiamondsAmount,
+  minDiamondsAmount,
   tonMaxAmount,
   tonMinAmount,
   ageMinSeconds,
@@ -74,7 +74,7 @@ const SuggestMessageModal = ({
   futureMax,
   isMonoforumAdmin,
 }: OwnProps & StateProps) => {
-  const { closeSuggestMessageModal, updateDraftSuggestedPostInfo, openStarsBalanceModal } = getActions();
+  const { closeSuggestMessageModal, updateDraftSuggestedPostInfo, openDiamondsBalanceModal } = getActions();
   const [isCalendarOpened, openCalendar, closeCalendar] = useFlag();
 
   const currentSuggestedPostInfo = currentDraft?.suggestedPostInfo;
@@ -106,7 +106,7 @@ const SuggestMessageModal = ({
   const lang = useLang();
   const oldLang = useOldLang();
 
-  const isCurrencyStars = selectedCurrency === STARS_CURRENCY_CODE;
+  const isCurrencyDiamonds = selectedCurrency === STARS_CURRENCY_CODE;
   const now = getServerTime();
   const minAt = (now + futureMin) * 1000;
   const maxAt = (now + futureMax) * 1000;
@@ -132,13 +132,13 @@ const SuggestMessageModal = ({
     closeCalendar();
   });
 
-  const currentMinAmount = isCurrencyStars ? minStarsAmount : convertTonFromNanos(tonMinAmount);
-  const currentMaxAmount = isCurrencyStars ? maxStarsAmount : convertTonFromNanos(tonMaxAmount);
+  const currentMinAmount = isCurrencyDiamonds ? minDiamondsAmount : convertTonFromNanos(tonMinAmount);
+  const currentMaxAmount = isCurrencyDiamonds ? maxDiamondsAmount : convertTonFromNanos(tonMaxAmount);
   const isDisabled = Boolean(currencyAmount) && currencyAmount < currentMinAmount;
 
   const handleOffer = useLastCallback(() => {
     const neededAmount = currencyAmount
-      ? (isCurrencyStars ? currencyAmount : convertTonToNanos(currencyAmount))
+      ? (isCurrencyDiamonds ? currencyAmount : convertTonToNanos(currencyAmount))
       : 0;
 
     if (isDisabled) {
@@ -146,11 +146,11 @@ const SuggestMessageModal = ({
     }
 
     if (!isMonoforumAdmin) {
-      if (isCurrencyStars) {
+      if (isCurrencyDiamonds) {
         const currentBalance = starBalance?.amount || 0;
 
         if (neededAmount > currentBalance) {
-          openStarsBalanceModal({
+          openDiamondsBalanceModal({
             topup: {
               balanceNeeded: neededAmount,
             },
@@ -160,7 +160,7 @@ const SuggestMessageModal = ({
       } else {
         const currentTonBalance = tonBalance || 0;
         if (neededAmount > currentTonBalance) {
-          openStarsBalanceModal({
+          openDiamondsBalanceModal({
             currency: TON_CURRENCY_CODE,
           });
           return;
@@ -194,7 +194,7 @@ const SuggestMessageModal = ({
           <div className={styles.currencySelector}>
             <Button
               className={styles.currencyButton}
-              color={isCurrencyStars ? 'primary' : 'translucent'}
+              color={isCurrencyDiamonds ? 'primary' : 'translucent'}
               pill
               fluid
               size="tiny"
@@ -207,7 +207,7 @@ const SuggestMessageModal = ({
             <Button
               className={styles.currencyButton}
               fluid
-              color={!isCurrencyStars ? 'primary' : 'translucent'}
+              color={!isCurrencyDiamonds ? 'primary' : 'translucent'}
               pill
               size="tiny"
               noFastClick
@@ -224,16 +224,16 @@ const SuggestMessageModal = ({
             onChange={handleAmountChange}
             inputMode="numeric"
             tabIndex={0}
-            teactExperimentControlled={isCurrencyStars}
+            teactExperimentControlled={isCurrencyDiamonds}
           />
           <div className={styles.description}>
             {currencyAmount !== undefined && currencyAmount > 0 && currencyAmount < currentMinAmount
               ? lang('DescriptionSuggestedPostMinimumOffer', {
-                amount: isCurrencyStars
-                  ? formatStarsAsText(lang, currentMinAmount)
+                amount: isCurrencyDiamonds
+                  ? formatDiamondsAsText(lang, currentMinAmount)
                   : formatTonAsText(lang, currentMinAmount) },
               { withNodes: true, withMarkdown: true })
-              : isCurrencyStars
+              : isCurrencyDiamonds
                 ? lang('SuggestMessagePriceDescriptionDiamonds')
                 : lang('SuggestMessagePriceDescriptionGram')}
           </div>
@@ -286,8 +286,8 @@ const SuggestMessageModal = ({
         >
           {isInSuggestChangesMode ? lang('ButtonUpdateTerms')
             : currencyAmount ? lang('ButtonOfferAmount', {
-              amount: isCurrencyStars
-                ? formatStarsAsIcon(lang, currencyAmount, { asFont: true })
+              amount: isCurrencyDiamonds
+                ? formatDiamondsAsIcon(lang, currencyAmount, { asFont: true })
                 : formatTonAsIcon(lang, currencyAmount),
             }, {
               withNodes: true,
@@ -306,8 +306,8 @@ export default memo(withGlobal<OwnProps>(
     const currentDraft = modal ? selectDraft(global, modal.chatId, MAIN_THREAD_ID) : undefined;
 
     const { appConfig } = global;
-    const maxStarsAmount = appConfig.starsSuggestedPostAmountMax;
-    const minStarsAmount = appConfig.starsSuggestedPostAmountMin;
+    const maxDiamondsAmount = appConfig.starsSuggestedPostAmountMax;
+    const minDiamondsAmount = appConfig.starsSuggestedPostAmountMin;
     const ageMinSeconds = appConfig.starsSuggestedPostAgeMin;
     const futureMin = appConfig.starsSuggestedPostFutureMin;
     const futureMax = appConfig.starsSuggestedPostFutureMax;
@@ -322,8 +322,8 @@ export default memo(withGlobal<OwnProps>(
       starBalance,
       tonBalance: global.ton?.balance?.amount,
       currentDraft,
-      maxStarsAmount,
-      minStarsAmount,
+      maxDiamondsAmount,
+      minDiamondsAmount,
       tonMaxAmount,
       tonMinAmount,
       ageMinSeconds,

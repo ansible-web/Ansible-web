@@ -32,7 +32,7 @@ interface Confetti {
   };
   size: number;
   color: string;
-  isStar?: boolean;
+  isDiamond?: boolean;
   flicker: number;
   flickerFrequency: number;
   rotation: number;
@@ -79,7 +79,7 @@ const ConfettiContainer = ({ confetti }: StateProps) => {
         rotation: 0,
         lastDrawnAt: Date.now(),
         frameCount: 0,
-        isStar: confetti?.withStars && Math.random() > 0.8,
+        isDiamond: confetti?.withDiamonds && Math.random() > 0.8,
       });
     }
   });
@@ -147,7 +147,7 @@ const ConfettiContainer = ({ confetti }: StateProps) => {
 
       confettiRef.current[i] = newConfetti;
       ctx.fillStyle = color;
-      if (c.isStar) {
+      if (c.isDiamond) {
         ctx.save();
         ctx.translate(pos.x, pos.y);
         ctx.scale(

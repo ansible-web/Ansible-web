@@ -35,7 +35,7 @@ import styles from './BoostStatistics.module.scss';
 import GiftBlueRound from '../../../assets/premium/GiftBlueRound.svg';
 import GiftGreenRound from '../../../assets/premium/GiftGreenRound.svg';
 import GiftRedRound from '../../../assets/premium/GiftRedRound.svg';
-import GiftStar from '../../../assets/premium/GiftStar.svg';
+import GiftDiamond from '../../../assets/premium/GiftStar.svg';
 
 type StateProps = {
   boostStatistics: TabState['boostStatistics'];
@@ -207,10 +207,10 @@ const BoostStatistics = ({
   });
 
   const renderBoostList = useLastCallback((boost) => {
-    const hasStars = Boolean(boost?.stars);
+    const hasDiamonds = Boolean(boost?.stars);
 
     let customPeer: CustomPeer | undefined;
-    if (hasStars) {
+    if (hasDiamonds) {
       customPeer = {
         ...CUSTOM_PEER_STAR_TEMPLATE,
         title: lang('Diamonds', boost.stars),
@@ -316,7 +316,7 @@ const BoostStatistics = ({
               </IslandTitle>
               <Island>
                 {statsOverview?.prepaidGiveaways?.map((prepaidGiveaway) => {
-                  const isStarsGiveaway = 'stars' in prepaidGiveaway;
+                  const isDiamondsGiveaway = 'stars' in prepaidGiveaway;
 
                   return (
                     <ListItem
@@ -327,10 +327,10 @@ const BoostStatistics = ({
                     >
                       <div className={buildClassName(styles.status, 'status-clickable')}>
                         <div>
-                          {isStarsGiveaway
+                          {isDiamondsGiveaway
                             ? (
                               <img
-                                src={GiftStar}
+                                src={GiftDiamond}
                                 className={styles.giveawayIcon}
                                 alt={lang('GiftDiamond')}
                               />
@@ -344,13 +344,13 @@ const BoostStatistics = ({
                         </div>
                         <div className={styles.info}>
                           <h3>
-                            {isStarsGiveaway
+                            {isDiamondsGiveaway
                               ? lang('Giveaway.Diamonds.Prepaid.Title', prepaidGiveaway.stars)
                               : lang('BoostingAnsiblePremiumCountPlural', prepaidGiveaway.quantity)}
                           </h3>
                           <p className={styles.month}>
                             {
-                              isStarsGiveaway ? lang('Giveaway.Diamonds.Prepaid.Desc', prepaidGiveaway.quantity)
+                              isDiamondsGiveaway ? lang('Giveaway.Diamonds.Prepaid.Desc', prepaidGiveaway.quantity)
                                 : lang('PrepaidGiveawayMonths', prepaidGiveaway.months)
                             }
                           </p>
@@ -362,7 +362,7 @@ const BoostStatistics = ({
                           >
                             <Icon name="boost" className={styles.floatingBadgeIcon} />
                             <div className={styles.floatingBadgeValue} dir={lang.isRtl ? 'rtl' : undefined}>
-                              {isStarsGiveaway ? prepaidGiveaway.boosts
+                              {isDiamondsGiveaway ? prepaidGiveaway.boosts
                                 : prepaidGiveaway.quantity * (giveawayBoostsPerPremium ?? GIVEAWAY_BOOST_PER_PREMIUM)}
                             </div>
                           </div>

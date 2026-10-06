@@ -6,7 +6,7 @@ import type { ApiMessageAction } from '../../types/messageActions';
 import { toJSNumber } from '../../../util/numbers';
 import { buildApiBotApp } from './bots';
 import { buildApiFormattedText, buildApiPhoto } from './common';
-import { buildApiStarGift } from './gifts';
+import { buildApiDiamondGift } from './gifts';
 import { buildPollAnswer, buildTodoItem } from './messageContent';
 import { buildApiCurrencyAmount } from './payments';
 import { buildApiPeerId, getApiChatIdFromMtpPeer } from './peers';
@@ -361,7 +361,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
     return {
       mediaType: 'action',
       type: 'giveawayResults',
-      isStars: stars,
+      isDiamonds: stars,
       winnersCount,
       unclaimedCount,
     };
@@ -428,7 +428,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       prepaidUpgradeHash, toId, giftNum,
     } = action;
 
-    const starGift = buildApiStarGift(gift);
+    const starGift = buildApiDiamondGift(gift);
     if (starGift.type !== 'starGift') return UNSUPPORTED_ACTION;
 
     return {
@@ -447,7 +447,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       starsToConvert: toJSNumber(convertStars),
       upgradeMsgId,
       giftMsgId,
-      alreadyPaidUpgradeStars: toJSNumber(upgradeStars),
+      alreadyPaidUpgradeDiamonds: toJSNumber(upgradeStars),
       fromId: fromId && getApiChatIdFromMtpPeer(fromId),
       peerId: peer && getApiChatIdFromMtpPeer(peer),
       savedId: savedId !== undefined ? buildApiPeerId(savedId, 'user') : undefined,
@@ -462,7 +462,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       resaleAmount, prepaidUpgrade, dropOriginalDetailsStars, fromOffer, canCraftAt, nameHidden, message,
     } = action;
 
-    const starGift = buildApiStarGift(gift);
+    const starGift = buildApiDiamondGift(gift);
     if (starGift.type !== 'starGiftUnique') return UNSUPPORTED_ACTION;
 
     return {
@@ -585,7 +585,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       accepted, declined, gift, price, expiresAt,
     } = action;
 
-    const starGift = buildApiStarGift(gift);
+    const starGift = buildApiDiamondGift(gift);
     if (starGift.type !== 'starGiftUnique') return UNSUPPORTED_ACTION;
 
     return {
@@ -601,7 +601,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
   if (action instanceof GramJs.MessageActionStarGiftPurchaseOfferDeclined) {
     const { expired, gift, price } = action;
 
-    const starGift = buildApiStarGift(gift);
+    const starGift = buildApiDiamondGift(gift);
     if (starGift.type !== 'starGiftUnique') return UNSUPPORTED_ACTION;
 
     return {

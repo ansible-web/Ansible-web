@@ -2,22 +2,22 @@ import { Api as GramJs } from '../../../lib/gramjs';
 
 import type {
   ApiAuctionBidLevel,
+  ApiDiamondGift,
+  ApiDiamondGiftAttribute,
+  ApiDiamondGiftAttributeCounter,
+  ApiDiamondGiftAttributeId,
+  ApiDiamondGiftAttributeRarity,
+  ApiDiamondGiftAuctionAcquiredGift,
+  ApiDiamondGiftAuctionState,
+  ApiDiamondGiftAuctionUserState,
+  ApiDiamondGiftCollection,
+  ApiDiamondGiftUpgradePreview,
+  ApiDiamondGiftUpgradePrice,
   ApiDisallowedGiftsSettings,
-  ApiInputSavedStarGift,
-  ApiSavedStarGift,
-  ApiStarGift,
-  ApiStarGiftAttribute,
-  ApiStarGiftAttributeCounter,
-  ApiStarGiftAttributeId,
-  ApiStarGiftAttributeRarity,
-  ApiStarGiftAuctionAcquiredGift,
-  ApiStarGiftAuctionState,
-  ApiStarGiftAuctionUserState,
-  ApiStarGiftCollection,
-  ApiStarGiftUpgradePreview,
-  ApiStarGiftUpgradePrice,
-  ApiTypeResaleStarGifts,
-  ApiTypeStarGiftAuctionState,
+  ApiInputSavedDiamondGift,
+  ApiSavedDiamondGift,
+  ApiTypeDiamondGiftAuctionState,
+  ApiTypeResaleDiamondGifts,
 } from '../../types';
 
 import int2hex from '../../../util/int2hex';
@@ -29,7 +29,7 @@ import { buildApiPeerId, getApiChatIdFromMtpPeer } from './peers';
 import { buildStickerFromDocument } from './symbols';
 import { buildApiUser } from './users';
 
-export function buildApiStarGift(starGift: GramJs.TypeStarGift): ApiStarGift {
+export function buildApiDiamondGift(starGift: GramJs.TypeStarGift): ApiDiamondGift {
   if (starGift instanceof GramJs.StarGiftUnique) {
     const {
       id, num, ownerId, ownerName, title, attributes, availabilityIssued, availabilityTotal, slug, ownerAddress,
@@ -44,7 +44,7 @@ export function buildApiStarGift(starGift: GramJs.TypeStarGift): ApiStarGift {
       ownerId: ownerId && getApiChatIdFromMtpPeer(ownerId),
       ownerName,
       ownerAddress,
-      attributes: attributes.map(buildApiStarGiftAttribute).filter(Boolean),
+      attributes: attributes.map(buildApiDiamondGiftAttribute).filter(Boolean),
       title,
       totalCount: availabilityTotal,
       issuedCount: availabilityIssued,
@@ -108,7 +108,7 @@ export function buildApiStarGift(starGift: GramJs.TypeStarGift): ApiStarGift {
   };
 }
 
-function buildApiStarGiftAttributeRarity(rarity: GramJs.TypeStarGiftAttributeRarity): ApiStarGiftAttributeRarity {
+function buildApiDiamondGiftAttributeRarity(rarity: GramJs.TypeStarGiftAttributeRarity): ApiDiamondGiftAttributeRarity {
   if (rarity instanceof GramJs.StarGiftAttributeRarityUncommon) {
     return { type: 'uncommon' };
   }
@@ -128,7 +128,9 @@ function buildApiStarGiftAttributeRarity(rarity: GramJs.TypeStarGiftAttributeRar
   return { type: 'regular', rarityPercent: rarity.permille / 10 };
 }
 
-export function buildApiStarGiftAttribute(attribute: GramJs.TypeStarGiftAttribute): ApiStarGiftAttribute | undefined {
+export function buildApiDiamondGiftAttribute(
+  attribute: GramJs.TypeStarGiftAttribute,
+): ApiDiamondGiftAttribute | undefined {
   if (attribute instanceof GramJs.StarGiftAttributeModel) {
     const sticker = buildStickerFromDocument(attribute.document);
     if (!sticker) {
@@ -139,7 +141,7 @@ export function buildApiStarGiftAttribute(attribute: GramJs.TypeStarGiftAttribut
       type: 'model',
       name: attribute.name,
       sticker,
-      rarity: buildApiStarGiftAttributeRarity(attribute.rarity),
+      rarity: buildApiDiamondGiftAttributeRarity(attribute.rarity),
     };
   }
 
@@ -153,7 +155,7 @@ export function buildApiStarGiftAttribute(attribute: GramJs.TypeStarGiftAttribut
       type: 'pattern',
       name: attribute.name,
       sticker,
-      rarity: buildApiStarGiftAttributeRarity(attribute.rarity),
+      rarity: buildApiDiamondGiftAttributeRarity(attribute.rarity),
     };
   }
 
@@ -170,7 +172,7 @@ export function buildApiStarGiftAttribute(attribute: GramJs.TypeStarGiftAttribut
       edgeColor: int2hex(edgeColor),
       patternColor: int2hex(patternColor),
       textColor: int2hex(textColor),
-      rarity: buildApiStarGiftAttributeRarity(rarity),
+      rarity: buildApiDiamondGiftAttributeRarity(rarity),
     };
   }
 
@@ -191,19 +193,19 @@ export function buildApiStarGiftAttribute(attribute: GramJs.TypeStarGiftAttribut
   return undefined;
 }
 
-export function buildApiSavedStarGift(userStarGift: GramJs.SavedStarGift, peerId: string): ApiSavedStarGift {
+export function buildApiSavedDiamondGift(userDiamondGift: GramJs.SavedStarGift, peerId: string): ApiSavedDiamondGift {
   const {
     gift, date, convertStars, fromId, message, msgId, nameHidden, unsaved, refunded, upgradeStars, transferStars,
     canUpgrade, savedId, canExportAt, pinnedToTop, canResellAt, canTransferAt, prepaidUpgradeHash,
     dropOriginalDetailsStars, canCraftAt,
-  } = userStarGift;
+  } = userDiamondGift;
 
-  const inputGift: ApiInputSavedStarGift | undefined = savedId && peerId
+  const inputGift: ApiInputSavedDiamondGift | undefined = savedId && peerId
     ? { type: 'chat', chatId: peerId, savedId: savedId.toString() }
     : msgId ? { type: 'user', messageId: msgId } : undefined;
 
   return {
-    gift: buildApiStarGift(gift),
+    gift: buildApiDiamondGift(gift),
     date,
     starsToConvert: toJSNumber(convertStars),
     fromId: fromId && getApiChatIdFromMtpPeer(fromId),
@@ -213,7 +215,7 @@ export function buildApiSavedStarGift(userStarGift: GramJs.SavedStarGift, peerId
     isUnsaved: unsaved,
     isRefunded: refunded,
     canUpgrade,
-    alreadyPaidUpgradeStars: toJSNumber(upgradeStars),
+    alreadyPaidUpgradeDiamonds: toJSNumber(upgradeStars),
     transferStars: toJSNumber(transferStars),
     inputGift,
     savedId: savedId?.toString(),
@@ -238,16 +240,16 @@ export function buildApiDisallowedGiftsSettings(
   } = result;
 
   return {
-    shouldDisallowUnlimitedStarGifts: disallowUnlimitedStargifts,
-    shouldDisallowLimitedStarGifts: disallowLimitedStargifts,
-    shouldDisallowUniqueStarGifts: disallowUniqueStargifts,
+    shouldDisallowUnlimitedDiamondGifts: disallowUnlimitedStargifts,
+    shouldDisallowLimitedDiamondGifts: disallowLimitedStargifts,
+    shouldDisallowUniqueDiamondGifts: disallowUniqueStargifts,
     shouldDisallowPremiumGifts: disallowPremiumGifts,
   };
 }
 
-export function buildApiStarGiftAttributeId(
+export function buildApiDiamondGiftAttributeId(
   result: GramJs.TypeStarGiftAttributeId,
-): ApiStarGiftAttributeId | undefined {
+): ApiDiamondGiftAttributeId | undefined {
   if (result instanceof GramJs.StarGiftAttributeIdModel) {
     return {
       type: 'model',
@@ -272,14 +274,14 @@ export function buildApiStarGiftAttributeId(
   return undefined;
 }
 
-export function buildApiStarGiftAttributeCounter(
+export function buildApiDiamondGiftAttributeCounter(
   result: GramJs.TypeStarGiftAttributeCounter,
-): ApiStarGiftAttributeCounter | undefined {
+): ApiDiamondGiftAttributeCounter | undefined {
   const {
     count,
   } = result;
 
-  const attribute = buildApiStarGiftAttributeId(result.attribute);
+  const attribute = buildApiDiamondGiftAttributeId(result.attribute);
   if (!attribute) return undefined;
 
   return {
@@ -290,18 +292,18 @@ export function buildApiStarGiftAttributeCounter(
 
 export function buildApiResaleGifts(
   result: GramJs.payments.TypeResaleStarGifts,
-): ApiTypeResaleStarGifts {
+): ApiTypeResaleDiamondGifts {
   const {
     count,
     nextOffset,
     attributesHash,
   } = result;
 
-  const gifts = result.gifts.map((g) => buildApiStarGift(g));
-  const attributes = result.attributes?.map((a) => buildApiStarGiftAttribute(a)).filter(Boolean);
+  const gifts = result.gifts.map((g) => buildApiDiamondGift(g));
+  const attributes = result.attributes?.map((a) => buildApiDiamondGiftAttribute(a)).filter(Boolean);
   const users = result.users.map((u) => buildApiUser(u)).filter(Boolean);
   const chats = result.chats.map((c) => buildApiChatFromPreview(c)).filter(Boolean);
-  const counters = result.counters?.map((c) => buildApiStarGiftAttributeCounter(c)).filter(Boolean);
+  const counters = result.counters?.map((c) => buildApiDiamondGiftAttributeCounter(c)).filter(Boolean);
 
   return {
     count,
@@ -315,7 +317,7 @@ export function buildApiResaleGifts(
   };
 }
 
-export function buildInputResaleGiftsAttributes(attributes: ApiStarGiftAttributeId[]):
+export function buildInputResaleGiftsAttributes(attributes: ApiDiamondGiftAttributeId[]):
 GramJs.TypeStarGiftAttributeId[] {
   return attributes.map((attr) => {
     switch (attr.type) {
@@ -337,7 +339,9 @@ GramJs.TypeStarGiftAttributeId[] {
   });
 }
 
-export function buildApiStarGiftCollection(collection: GramJs.StarGiftCollection): ApiStarGiftCollection | undefined {
+export function buildApiDiamondGiftCollection(
+  collection: GramJs.StarGiftCollection,
+): ApiDiamondGiftCollection | undefined {
   if (!collection) return undefined;
 
   const { collectionId, title, icon, giftsCount, hash } = collection;
@@ -351,20 +355,20 @@ export function buildApiStarGiftCollection(collection: GramJs.StarGiftCollection
   };
 }
 
-export function buildApiStarGiftUpgradePrice(price: GramJs.StarGiftUpgradePrice): ApiStarGiftUpgradePrice {
+export function buildApiDiamondGiftUpgradePrice(price: GramJs.StarGiftUpgradePrice): ApiDiamondGiftUpgradePrice {
   return {
     date: price.date,
     upgradeStars: toJSNumber(price.upgradeStars),
   };
 }
 
-export function buildApiStarGiftUpgradePreview(
+export function buildApiDiamondGiftUpgradePreview(
   result: GramJs.payments.StarGiftUpgradePreview,
-): ApiStarGiftUpgradePreview {
+): ApiDiamondGiftUpgradePreview {
   return {
-    sampleAttributes: result.sampleAttributes.map(buildApiStarGiftAttribute).filter(Boolean),
-    prices: result.prices?.map(buildApiStarGiftUpgradePrice) || [],
-    nextPrices: result.nextPrices?.map(buildApiStarGiftUpgradePrice) || [],
+    sampleAttributes: result.sampleAttributes.map(buildApiDiamondGiftAttribute).filter(Boolean),
+    prices: result.prices?.map(buildApiDiamondGiftUpgradePrice) || [],
+    nextPrices: result.nextPrices?.map(buildApiDiamondGiftUpgradePrice) || [],
   };
 }
 
@@ -376,9 +380,9 @@ export function buildApiAuctionBidLevel(bidLevel: GramJs.AuctionBidLevel): ApiAu
   };
 }
 
-export function buildApiTypeStarGiftAuctionState(
+export function buildApiTypeDiamondGiftAuctionState(
   state: GramJs.TypeStarGiftAuctionState,
-): ApiTypeStarGiftAuctionState | undefined {
+): ApiTypeDiamondGiftAuctionState | undefined {
   if (state instanceof GramJs.StarGiftAuctionStateNotModified) {
     return undefined;
   }
@@ -420,9 +424,9 @@ export function buildApiTypeStarGiftAuctionState(
   };
 }
 
-export function buildApiStarGiftAuctionUserState(
+export function buildApiDiamondGiftAuctionUserState(
   userState: GramJs.StarGiftAuctionUserState,
-): ApiStarGiftAuctionUserState {
+): ApiDiamondGiftAuctionUserState {
   const {
     returned, bidAmount, bidDate, minBidAmount, bidPeer, acquiredCount,
   } = userState;
@@ -437,26 +441,26 @@ export function buildApiStarGiftAuctionUserState(
   };
 }
 
-export function buildApiStarGiftAuctionState(
+export function buildApiDiamondGiftAuctionState(
   result: GramJs.payments.StarGiftAuctionState | GramJs.StarGiftActiveAuctionState,
-): ApiStarGiftAuctionState | undefined {
-  const gift = buildApiStarGift(result.gift);
+): ApiDiamondGiftAuctionState | undefined {
+  const gift = buildApiDiamondGift(result.gift);
   if (gift.type !== 'starGift') return undefined;
 
-  const state = buildApiTypeStarGiftAuctionState(result.state);
+  const state = buildApiTypeDiamondGiftAuctionState(result.state);
   if (!state) return undefined;
 
   return {
     gift,
     state,
-    userState: buildApiStarGiftAuctionUserState(result.userState),
+    userState: buildApiDiamondGiftAuctionUserState(result.userState),
     timeout: 'timeout' in result ? result.timeout : undefined,
   };
 }
 
-export function buildApiStarGiftAuctionAcquiredGift(
+export function buildApiDiamondGiftAuctionAcquiredGift(
   result: GramJs.StarGiftAuctionAcquiredGift,
-): ApiStarGiftAuctionAcquiredGift {
+): ApiDiamondGiftAuctionAcquiredGift {
   return {
     peerId: getApiChatIdFromMtpPeer(result.peer),
     date: result.date,

@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from '@teact';
 import { getActions, getGlobal, withGlobal } from '../../../global';
 
-import type { ApiStarTopupOption } from '../../../api/types';
+import type { ApiDiamondTopupOption } from '../../../api/types';
 import type { GlobalState, TabState } from '../../../global/types';
 import type { AnimationLevel } from '../../../types';
 import type { RegularLangKey } from '../../../types/language';
@@ -70,7 +70,8 @@ const DiamondsBalanceModal = ({
   modal, starsBalanceState, tonBalanceState, canBuyPremium, shouldForceHeight, tonUsdRate, tonTopupUrl, animationLevel,
 }: OwnProps & StateProps) => {
   const {
-    closeStarsBalanceModal, loadStarsTransactions, loadStarsSubscriptions, openStarsGiftingPickerModal, openInvoice,
+    closeDiamondsBalanceModal, loadDiamondsTransactions, loadDiamondsSubscriptions,
+    openDiamondsGiftingPickerModal, openInvoice,
     openUrl,
   } = getActions();
 
@@ -92,13 +93,13 @@ const DiamondsBalanceModal = ({
   const isOpen = Boolean(modal && (starsBalanceState || tonBalanceState));
 
   const {
-    originStarsPayment, originReaction, originGift, topup,
+    originDiamondsPayment, originReaction, originGift, topup,
   } = modal || {};
 
-  const shouldOpenOnBuy = originStarsPayment || originReaction || originGift || topup;
+  const shouldOpenOnBuy = originDiamondsPayment || originReaction || originGift || topup;
 
-  const ongoingTransactionAmount = originStarsPayment?.form?.invoice?.totalAmount
-    || originStarsPayment?.subscriptionInfo?.subscriptionPricing?.amount
+  const ongoingTransactionAmount = originDiamondsPayment?.form?.invoice?.totalAmount
+    || originDiamondsPayment?.subscriptionInfo?.subscriptionPricing?.amount
     || originReaction?.amount
     || originGift?.gift.stars
     || topup?.balanceNeeded;
@@ -112,8 +113,8 @@ const DiamondsBalanceModal = ({
       return oldLang('DiamondsNeededTextReactions', getChatTitle(oldLang, channel));
     }
 
-    if (originStarsPayment) {
-      const bot = originStarsPayment.form?.botId ? selectUser(global, originStarsPayment.form.botId) : undefined;
+    if (originDiamondsPayment) {
+      const bot = originDiamondsPayment.form?.botId ? selectUser(global, originDiamondsPayment.form.botId) : undefined;
       if (!bot) return undefined;
       return oldLang('DiamondsNeededText', getUserFullName(bot));
     }
@@ -136,7 +137,7 @@ const DiamondsBalanceModal = ({
     }
 
     return undefined;
-  }, [originReaction, originStarsPayment, originGift, topup?.purpose, lang, oldLang]);
+  }, [originReaction, originDiamondsPayment, originGift, topup?.purpose, lang, oldLang]);
 
   const shouldShowItems = Boolean(history?.all?.transactions.length && !shouldOpenOnBuy);
   const shouldSuggestGifting = !shouldOpenOnBuy;
@@ -191,7 +192,7 @@ const DiamondsBalanceModal = ({
     ];
   }, [isOpen, oldLang]);
 
-  const renderStarsHeaderSection = () => {
+  const renderDiamondsHeaderSection = () => {
     return (
       <>
         <ParticlesHeader
@@ -219,7 +220,7 @@ const DiamondsBalanceModal = ({
             noForcedUpperCase
             className={styles.starButton}
             fluid
-            onClick={openStarsGiftingPickerModalHandler}
+            onClick={openDiamondsGiftingPickerModalHandler}
           >
             {oldLang('AnsibleDiamondsGift')}
           </Button>
@@ -228,7 +229,7 @@ const DiamondsBalanceModal = ({
           <DiamondTopupOptionList
             starsNeeded={starsNeeded}
             options={starsBalanceState.topupOptions}
-            onClick={handleBuyStars}
+            onClick={handleBuyDiamonds}
           />
         )}
       </>
@@ -296,22 +297,22 @@ const DiamondsBalanceModal = ({
   }
 
   const handleLoadMoreTransactions = useLastCallback(() => {
-    loadStarsTransactions({
+    loadDiamondsTransactions({
       type: TRANSACTION_TYPES[selectedTabIndex],
       isTon: currency === TON_CURRENCY_CODE,
     });
   });
 
   const handleLoadMoreSubscriptions = useLastCallback(() => {
-    loadStarsSubscriptions();
+    loadDiamondsSubscriptions();
   });
 
-  const openStarsGiftingPickerModalHandler = useLastCallback(() => {
-    openStarsGiftingPickerModal({});
+  const openDiamondsGiftingPickerModalHandler = useLastCallback(() => {
+    openDiamondsGiftingPickerModal({});
   });
 
-  const handleBuyStars = useLastCallback((option: ApiStarTopupOption) => {
-    const originPaymentInputInvoice = originStarsPayment?.inputInvoice;
+  const handleBuyDiamonds = useLastCallback((option: ApiDiamondTopupOption) => {
+    const originPaymentInputInvoice = originDiamondsPayment?.inputInvoice;
 
     let spendPurposePeerId: string | undefined;
 
@@ -322,7 +323,7 @@ const DiamondsBalanceModal = ({
       }
 
       case 'slug': {
-        const form = originStarsPayment?.form;
+        const form = originDiamondsPayment?.form;
         spendPurposePeerId = form?.botId;
         break;
       }
@@ -349,7 +350,7 @@ const DiamondsBalanceModal = ({
     <Modal
       className={buildClassName(styles.root, !shouldForceHeight && !areBuyOptionsShown && styles.minimal)}
       isOpen={isOpen}
-      onClose={closeStarsBalanceModal}
+      onClose={closeDiamondsBalanceModal}
       dialogStyle={`--modal-height: ${modalHeight}`}
       hasAbsoluteCloseButton
     >
@@ -365,7 +366,7 @@ const DiamondsBalanceModal = ({
           </h2>
         </div>
         <div className={styles.section}>
-          {currency === TON_CURRENCY_CODE ? renderTonHeaderSection() : renderStarsHeaderSection()}
+          {currency === TON_CURRENCY_CODE ? renderTonHeaderSection() : renderDiamondsHeaderSection()}
         </div>
         {areBuyOptionsShown && (
           <div className={styles.tos}>

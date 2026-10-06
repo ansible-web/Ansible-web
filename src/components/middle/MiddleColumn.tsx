@@ -46,7 +46,7 @@ import {
   selectIsUserBlocked,
   selectNotifyDefaults,
   selectNotifyException,
-  selectPeerPaidMessagesStars,
+  selectPeerPaidMessagesDiamonds,
   selectPinnedIds,
   selectTabState,
   selectTheme,
@@ -164,7 +164,7 @@ type StateProps = {
   canShowOpenChatButton?: boolean;
   isContactRequirePremium?: boolean;
   topics?: Record<number, ApiTopic>;
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
   isAccountFrozen?: boolean;
   freezeAppealChat?: ApiChat;
   shouldBlockSendInMonoforum?: boolean;
@@ -239,7 +239,7 @@ function MiddleColumn({
   canShowOpenChatButton,
   isContactRequirePremium,
   topics,
-  paidMessagesStars,
+  paidMessagesDiamonds,
   isAccountFrozen,
   freezeAppealChat,
   shouldBlockSendInMonoforum,
@@ -622,7 +622,7 @@ function MiddleColumn({
                 onScrollDownToggle={setIsScrollDownNeeded}
                 isReady={isReady}
                 isContactRequirePremium={isContactRequirePremium}
-                paidMessagesStars={paidMessagesStars}
+                paidMessagesDiamonds={paidMessagesDiamonds}
                 withBottomShift={withMessageListBottomShift}
                 withDefaultBg={Boolean(!customBackground && !backgroundColor)}
                 onIntersectPinnedMessage={renderingHandleIntersectPinnedMessage}
@@ -813,7 +813,7 @@ export default memo(withGlobal<OwnProps>(
     const userFull = selectUserFullInfo(global, chatId);
 
     const isContactRequirePremium = userFull?.isContactRequirePremium;
-    const paidMessagesStars = selectPeerPaidMessagesStars(global, chatId);
+    const paidMessagesDiamonds = selectPeerPaidMessagesDiamonds(global, chatId);
     const isAccountFrozen = selectIsCurrentUserFrozen(global);
     const botFreezeAppealId = global.botFreezeAppealId;
     const freezeAppealChat = botFreezeAppealId
@@ -831,7 +831,7 @@ export default memo(withGlobal<OwnProps>(
       ? getIsChatMuted(chat, selectNotifyDefaults(global), selectNotifyException(global, chatId))
       : undefined;
     const linkedMonoforumId = chat?.linkedMonoforumId;
-    const areGiftsAvailable = chatFullInfo?.areStarGiftsAvailable;
+    const areGiftsAvailable = chatFullInfo?.areDiamondGiftsAvailable;
     const isChannelMuteBar = Boolean(isChannel && !chat?.isNotJoined && isMainThread && !canPostFooter);
 
     return {
@@ -868,7 +868,7 @@ export default memo(withGlobal<OwnProps>(
       canShowOpenChatButton,
       isContactRequirePremium,
       topics,
-      paidMessagesStars,
+      paidMessagesDiamonds,
       isAccountFrozen,
       freezeAppealChat,
       shouldBlockSendInMonoforum,

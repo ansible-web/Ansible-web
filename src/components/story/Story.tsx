@@ -21,7 +21,7 @@ import {
   selectIsCurrentUserFrozen,
   selectIsCurrentUserPremium,
   selectPeer,
-  selectPeerPaidMessagesStars,
+  selectPeerPaidMessagesDiamonds,
   selectPeerStory,
   selectPerformanceSettingsValue,
   selectTabState,
@@ -34,7 +34,7 @@ import captureKeyboardListeners from '../../util/captureKeyboardListeners';
 import { formatMediaDuration, formatRelativePastTime } from '../../util/dates/oldDateFormat';
 import download from '../../util/download';
 import { isUserId } from '../../util/entities/ids';
-import { formatStarsAsIcon } from '../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../util/localization/format';
 import { round } from '../../util/math';
 import { getServerTime } from '../../util/serverTime';
 import renderText from '../common/helpers/renderText';
@@ -104,7 +104,7 @@ interface StateProps {
   isCurrentUserPremium?: boolean;
   stealthMode: ApiStealthMode;
   withHeaderAnimation?: boolean;
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
   isAccountFrozen?: boolean;
 }
 
@@ -135,7 +135,7 @@ function Story({
   isCurrentUserPremium,
   stealthMode,
   withHeaderAnimation,
-  paidMessagesStars,
+  paidMessagesDiamonds,
   isAccountFrozen,
   onDelete,
   onClose,
@@ -769,9 +769,9 @@ function Story({
     );
   }
 
-  const inputPlaceholder = paidMessagesStars
+  const inputPlaceholder = paidMessagesDiamonds
     ? lang('ComposerPlaceholderPaidReply', {
-      amount: formatStarsAsIcon(lang, paidMessagesStars, { asFont: true, className: 'placeholder-star-icon' }),
+      amount: formatDiamondsAsIcon(lang, paidMessagesDiamonds, { asFont: true, className: 'placeholder-star-icon' }),
     }, {
       withNodes: true,
     })
@@ -973,7 +973,7 @@ export default memo(withGlobal<OwnProps>((global, {
   const withHeaderAnimation = selectPerformanceSettingsValue(global, 'mediaViewerAnimations');
 
   const fromPeer = isLoadedStory && story.fromId ? selectPeer(global, story.fromId) : undefined;
-  const paidMessagesStars = selectPeerPaidMessagesStars(global, peerId);
+  const paidMessagesDiamonds = selectPeerPaidMessagesDiamonds(global, peerId);
   const isAccountFrozen = selectIsCurrentUserFrozen(global);
 
   return {
@@ -991,7 +991,7 @@ export default memo(withGlobal<OwnProps>((global, {
     arePeerSettingsLoaded: Boolean(userFullInfo?.settings),
     stealthMode: global.stories.stealthMode,
     withHeaderAnimation,
-    paidMessagesStars,
+    paidMessagesDiamonds,
     isAccountFrozen,
   };
 })(Story));

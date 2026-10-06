@@ -1,8 +1,8 @@
 import type {
+  ApiDiamondsSubscription,
+  ApiDiamondsTransaction,
+  ApiReceiptDiamonds,
   ApiReceiptRegular,
-  ApiReceiptStars,
-  ApiStarsSubscription,
-  ApiStarsTransaction,
   ApiTypeCurrencyAmount,
 } from '../../api/types';
 import type {
@@ -17,7 +17,7 @@ import type {
 
 import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../config';
 import { getCurrentTabId } from '../../util/establishMultitabRole';
-import { selectStarsPayment, selectTabState } from '../selectors';
+import { selectDiamondsPayment, selectTabState } from '../selectors';
 import { updateTabState } from './tabs';
 
 export function updatePayment<T extends GlobalState>(
@@ -32,11 +32,11 @@ export function updatePayment<T extends GlobalState>(
   }, tabId);
 }
 
-export function updateStarsPayment<T extends GlobalState>(
+export function updateDiamondsPayment<T extends GlobalState>(
   global: T, update: Partial<TabState['starsPayment']>,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
-  const starPayment = selectStarsPayment(global, tabId);
+  const starPayment = selectDiamondsPayment(global, tabId);
   if (!starPayment) {
     return global;
   }
@@ -110,7 +110,7 @@ export function clearPayment<T extends GlobalState>(
   }, tabId);
 }
 
-export function clearStarPayment<T extends GlobalState>(
+export function clearDiamondPayment<T extends GlobalState>(
   global: T,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
@@ -157,10 +157,10 @@ export function updateStarsBalance<T extends GlobalState>(
   return global;
 }
 
-export function appendStarsTransactions<T extends GlobalState>(
+export function appendDiamondsTransactions<T extends GlobalState>(
   global: T,
   type: StarsTransactionType,
-  transactions: ApiStarsTransaction[],
+  transactions: ApiDiamondsTransaction[],
   nextOffset?: string,
   isTon?: boolean,
 ): T {
@@ -209,9 +209,9 @@ export function appendStarsTransactions<T extends GlobalState>(
   };
 }
 
-export function appendStarsSubscriptions<T extends GlobalState>(
+export function appendDiamondsSubscriptions<T extends GlobalState>(
   global: T,
-  subscriptions: ApiStarsSubscription[],
+  subscriptions: ApiDiamondsSubscription[],
   nextOffset?: string,
 ): T {
   if (!global.stars) {
@@ -232,7 +232,7 @@ export function appendStarsSubscriptions<T extends GlobalState>(
   };
 }
 
-export function updateStarsSubscriptionLoading<T extends GlobalState>(
+export function updateDiamondsSubscriptionLoading<T extends GlobalState>(
   global: T, isLoading: boolean,
 ): T {
   const subscriptions = global.stars?.subscriptions;
@@ -252,8 +252,8 @@ export function updateStarsSubscriptionLoading<T extends GlobalState>(
   };
 }
 
-export function openStarsTransactionModal<T extends GlobalState>(
-  global: T, transaction: ApiStarsTransaction, ...[tabId = getCurrentTabId()]: TabArgs<T>
+export function openDiamondsTransactionModal<T extends GlobalState>(
+  global: T, transaction: ApiDiamondsTransaction, ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
   return updateTabState(global, {
     starsTransactionModal: {
@@ -262,10 +262,10 @@ export function openStarsTransactionModal<T extends GlobalState>(
   }, tabId);
 }
 
-export function openStarsTransactionFromReceipt<T extends GlobalState>(
-  global: T, receipt: ApiReceiptStars, ...[tabId = getCurrentTabId()]: TabArgs<T>
+export function openDiamondsTransactionFromReceipt<T extends GlobalState>(
+  global: T, receipt: ApiReceiptDiamonds, ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
-  const transaction: ApiStarsTransaction = {
+  const transaction: ApiDiamondsTransaction = {
     id: receipt.transactionId,
     peer: {
       type: 'peer',
@@ -282,5 +282,5 @@ export function openStarsTransactionFromReceipt<T extends GlobalState>(
     photo: receipt.photo,
   };
 
-  return openStarsTransactionModal(global, transaction, tabId);
+  return openDiamondsTransactionModal(global, transaction, tabId);
 }

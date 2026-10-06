@@ -338,7 +338,7 @@ addActionHandler('sendPaidReaction', async (global, actions, payload): Promise<v
     });
   } catch (error) {
     if ((error as ApiError).message === 'BALANCE_TOO_LOW') {
-      actions.openStarsBalanceModal({ originReaction: { chatId, messageId, amount: count }, tabId });
+      actions.openDiamondsBalanceModal({ originReaction: { chatId, messageId, amount: count }, tabId });
     }
   }
 });

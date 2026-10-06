@@ -12,7 +12,7 @@ import type {
 } from './messages';
 import type { ApiPremiumSection } from './payments';
 import type { ApiBotVerification } from './peers';
-import type { ApiStarsSubscriptionPricing } from './stars';
+import type { ApiDiamondsSubscriptionPricing } from './stars';
 import type { ApiUser } from './users';
 
 export interface ApiInitialArgs {
@@ -244,7 +244,7 @@ export type ApiChatInviteInfo = {
   isRequestNeeded?: boolean;
   subscriptionFormId?: string;
   canRefulfillSubscription?: boolean;
-  subscriptionPricing?: ApiStarsSubscriptionPricing;
+  subscriptionPricing?: ApiDiamondsSubscriptionPricing;
   botVerification?: ApiBotVerification;
 };
 
@@ -317,7 +317,7 @@ export interface ApiAppConfig {
   channelLevelMax: number;
   paidReactionMaxAmount?: number;
   isChannelRevenueWithdrawalEnabled?: boolean;
-  isStarsGiftEnabled?: boolean;
+  isDiamondsGiftEnabled?: boolean;
   starGiftMaxMessageLength?: number;
   starGiftMaxConvertPeriod?: number;
   starRefStartPrefixes?: string[];

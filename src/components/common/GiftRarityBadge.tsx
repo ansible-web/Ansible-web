@@ -1,4 +1,4 @@
-import type { ApiStarGiftAttributeRarity } from '../../api/types';
+import type { ApiDiamondGiftAttributeRarity } from '../../api/types';
 
 import buildClassName from '../../util/buildClassName';
 import { getGiftRarityTitle } from './helpers/gifts';
@@ -10,7 +10,7 @@ import BadgeButton from './BadgeButton';
 import styles from './GiftRarityBadge.module.scss';
 
 type OwnProps = {
-  rarity: ApiStarGiftAttributeRarity;
+  rarity: ApiDiamondGiftAttributeRarity;
   shouldInvertRare?: boolean;
   className?: string;
   onClick?: NoneToVoidFunction;

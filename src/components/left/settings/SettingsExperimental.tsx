@@ -70,7 +70,7 @@ const SettingsExperimental = ({
   });
 
   const handleRequestConfetti = useLastCallback(() => {
-    requestConfetti({ withStars: true });
+    requestConfetti({ withDiamonds: true });
   });
 
   const handleSnap = useLastCallback(() => {

@@ -3,15 +3,15 @@ import { memo, useMemo } from '@teact';
 import { getActions } from '../../../global';
 
 import type {
+  ApiDiamondGiftAttributeBackdrop, ApiDiamondGiftAttributeModel, ApiDiamondGiftAttributePattern,
   ApiPeer,
-  ApiSavedStarGift,
-  ApiStarGiftAttributeBackdrop, ApiStarGiftAttributeModel, ApiStarGiftAttributePattern,
+  ApiSavedDiamondGift,
   ApiTypeCurrencyAmount,
 } from '../../../api/types';
 
 import { NNBSP } from '../../../config.ts';
 import {
-  formatStarsTransactionAmount,
+  formatDiamondsTransactionAmount,
 } from '../../../global/helpers/payments';
 import { IS_TOUCH_ENV } from '../../../util/browser/windowEnvironment.ts';
 import buildClassName from '../../../util/buildClassName';
@@ -33,9 +33,9 @@ import UniqueGiftManageButtons from './UniqueGiftManageButtons';
 import styles from './UniqueGiftHeader.module.scss';
 
 type OwnProps = {
-  modelAttribute: ApiStarGiftAttributeModel;
-  backdropAttribute: ApiStarGiftAttributeBackdrop;
-  patternAttribute: ApiStarGiftAttributePattern;
+  modelAttribute: ApiDiamondGiftAttributeModel;
+  backdropAttribute: ApiDiamondGiftAttributeBackdrop;
+  patternAttribute: ApiDiamondGiftAttributePattern;
   title?: TeactNode;
   badge?: TeactNode;
   subtitle?: TeactNode;
@@ -43,7 +43,7 @@ type OwnProps = {
   className?: string;
   resellPrice?: ApiTypeCurrencyAmount;
   showManageButtons?: boolean;
-  savedGift?: ApiSavedStarGift;
+  savedGift?: ApiSavedDiamondGift;
   noLoop?: boolean;
   onStickerAnimationEnded?: (modelName: string) => void;
   children?: React.ReactNode;
@@ -149,7 +149,7 @@ const UniqueGiftHeader = ({
       )}
       {resellPrice && (
         <span className={styles.amount}>
-          {formatStarsTransactionAmount(lang, resellPrice)}
+          {formatDiamondsTransactionAmount(lang, resellPrice)}
           {NNBSP}
           {resellPrice.currency === 'XTR' && <DiamondIcon type="gold" size="adaptive" />}
           {resellPrice.currency === 'TON' && <Icon className="in-text-icon" name="toncoin" />}

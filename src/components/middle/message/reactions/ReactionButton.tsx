@@ -47,7 +47,7 @@ type OwnProps = {
   onPaidClick?: (count: number) => void;
 };
 
-function selectStarsState(global: GlobalState) {
+function selectDiamondsState(global: GlobalState) {
   return global.stars;
 }
 
@@ -66,7 +66,7 @@ const ReactionButton = ({
   onPaidClick,
 }: OwnProps) => {
   const {
-    openStarsBalanceModal,
+    openDiamondsBalanceModal,
     resetLocalPaidReactions,
     openPaidReactionModal,
     requestWave,
@@ -79,8 +79,8 @@ const ReactionButton = ({
 
   const isPaid = reaction.reaction.type === 'paid';
 
-  const starsState = useSelector(selectStarsState);
-  const areStarsLoaded = Boolean(starsState);
+  const starsState = useSelector(selectDiamondsState);
+  const areDiamondsLoaded = Boolean(starsState);
 
   const handlePaidClick = useLastCallback((count = 1) => {
     onPaidClick?.(count);
@@ -122,8 +122,8 @@ const ReactionButton = ({
     const button = ref.current;
     if (!amount || !button || amount === prevReaction?.localAmount) return;
 
-    if (areStarsLoaded && amount > starsState.balance.amount) {
-      openStarsBalanceModal({
+    if (areDiamondsLoaded && amount > starsState.balance.amount) {
+      openDiamondsBalanceModal({
         originReaction: {
           chatId,
           messageId,
@@ -155,7 +155,7 @@ const ReactionButton = ({
       duration: 500 * currentScale,
       easing: 'ease-out',
     });
-  }, [reaction, starsState?.balance, areStarsLoaded, chatId, messageId]);
+  }, [reaction, starsState?.balance, areDiamondsLoaded, chatId, messageId]);
 
   const prevAmount = usePrevious(reaction.localAmount);
 

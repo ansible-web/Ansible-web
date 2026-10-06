@@ -7,10 +7,10 @@ import { getActions, getGlobal, withGlobal } from '../../../global';
 
 import type {
   ApiCountry,
+  ApiDiamondGiveawayOption,
   ApiPremiumGiftCodeOption,
+  ApiPrepaidDiamondsGiveaway,
   ApiPrepaidGiveaway,
-  ApiPrepaidStarsGiveaway,
-  ApiStarGiveawayOption,
   ApiTypePrepaidGiveaway,
 } from '../../../api/types';
 
@@ -59,7 +59,7 @@ import styles from './GiveawayModal.module.scss';
 import GiftBlueRound from '../../../assets/premium/GiftBlueRound.svg';
 import GiftGreenRound from '../../../assets/premium/GiftGreenRound.svg';
 import GiftRedRound from '../../../assets/premium/GiftRedRound.svg';
-import GiftStar from '../../../assets/premium/GiftStar.svg';
+import GiftDiamond from '../../../assets/premium/GiftStar.svg';
 import PremiumLogo from '../../../assets/premium/PremiumStar.svg';
 
 export type OwnProps = {
@@ -78,8 +78,8 @@ type StateProps = {
   prepaidGiveaway?: ApiTypePrepaidGiveaway;
   countrySelectionLimit: number | undefined;
   isChannel?: boolean;
-  isStarsGiftEnabled?: boolean;
-  starsGiftOptions?: ApiStarGiveawayOption[] | undefined;
+  isDiamondsGiftEnabled?: boolean;
+  starsGiftOptions?: ApiDiamondGiveawayOption[] | undefined;
 };
 
 type GiveawayAction = 'createPremiumGiveaway' | 'createStarsGiveaway';
@@ -118,13 +118,13 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   prepaidGiveaway,
   countrySelectionLimit = GIVEAWAY_MAX_ADDITIONAL_COUNTRIES,
   userSelectionLimit = GIVEAWAY_MAX_ADDITIONAL_USERS,
-  isStarsGiftEnabled,
+  isDiamondsGiftEnabled,
   starsGiftOptions,
 }) => {
   const dialogRef = useRef<HTMLDivElement>();
   const {
     closeGiveawayModal, openInvoice, openPremiumModal,
-    launchPrepaidGiveaway, launchPrepaidStarsGiveaway, showNotification,
+    launchPrepaidGiveaway, launchPrepaidDiamondsGiveaway, showNotification,
   } = getActions();
 
   const lang = useOldLang();
@@ -146,12 +146,12 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
     },
   }];
 
-  if (isStarsGiftEnabled) {
+  if (isDiamondsGiftEnabled) {
     TYPE_OPTIONS.push({
       name: 'AnsibleDiamonds',
       text: 'BoostingWinnersRandomly',
       value: 'stars_giveaway',
-      img: GiftStar,
+      img: GiftDiamond,
       actions: 'createStarsGiveaway',
       isLink: false,
     });
@@ -161,7 +161,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   const [isHeaderHidden, setIsHeaderHidden] = useState(true);
   const [selectedRandomUserCount, setSelectedRandomUserCount] = useState<number>(DEFAULT_BOOST_COUNT);
   const [selectedGiveawayOption, setSelectedGiveawayOption] = useState<ApiGiveawayType>(TYPE_OPTIONS[0].value);
-  const [selectedStarOption, setSelectedStarOption] = useState<ApiStarGiveawayOption | undefined>();
+  const [selectedDiamondOption, setSelectedDiamondOption] = useState<ApiDiamondGiveawayOption | undefined>();
   const [selectedSubscriberOption, setSelectedSubscriberOption] = useState<SubscribersType>('all');
   const [selectedMonthOption, setSelectedMonthOption] = useState<number | undefined>();
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
@@ -172,15 +172,15 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   const [prizeDescription, setPrizeDescription] = useState<string | undefined>(undefined);
   const [dataPrepaidGiveaway, setDataPrepaidGiveaway] = useState<ApiPrepaidGiveaway | undefined>(undefined);
   const [
-    dataStarsPrepaidGiveaway, setDataStarsPrepaidGiveaway,
-  ] = useState<ApiPrepaidStarsGiveaway | undefined>(undefined);
+    dataDiamondsPrepaidGiveaway, setDataDiamondsPrepaidGiveaway,
+  ] = useState<ApiPrepaidDiamondsGiveaway | undefined>(undefined);
 
   const isPremiumGiveaway = selectedGiveawayOption === 'premium_giveaway';
-  const isStarsGiveaway = selectedGiveawayOption === 'stars_giveaway';
+  const isDiamondsGiveaway = selectedGiveawayOption === 'stars_giveaway';
   const selectedUserCount = isPremiumGiveaway
     && !selectedUserIds.length ? selectedRandomUserCount : selectedUserIds.length;
   const boostQuantity = selectedUserCount * giveawayBoostPerPremiumLimit;
-  const boostStarsQuantity = selectedStarOption?.yearlyBoosts;
+  const boostDiamondsQuantity = selectedDiamondOption?.yearlyBoosts;
 
   const SUBSCRIBER_OPTIONS = useMemo(() => [
     {
@@ -200,18 +200,18 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   ], [isChannel, lang, selectedCountryIds]);
 
   const monthQuantity = lang('Months', selectedMonthOption);
-  const isStarsPrepaidGiveaway = prepaidGiveaway?.type === 'starsGiveaway';
+  const isDiamondsPrepaidGiveaway = prepaidGiveaway?.type === 'starsGiveaway';
   const isPremiumPrepaidGiveaway = prepaidGiveaway?.type === 'giveaway';
 
   const selectedGift = useMemo(() => {
     return gifts?.find((gift) => gift.months === selectedMonthOption && gift.users === selectedUserCount);
   }, [gifts, selectedMonthOption, selectedUserCount]);
 
-  const selectedStarsGift = useMemo(() => {
+  const selectedDiamondsGift = useMemo(() => {
     return starsGiftOptions?.find((gift) => {
-      return isStarsPrepaidGiveaway && gift.stars === (dataStarsPrepaidGiveaway?.stars);
+      return isDiamondsPrepaidGiveaway && gift.stars === (dataDiamondsPrepaidGiveaway?.stars);
     });
-  }, [dataStarsPrepaidGiveaway, starsGiftOptions, isStarsPrepaidGiveaway]);
+  }, [dataDiamondsPrepaidGiveaway, starsGiftOptions, isDiamondsPrepaidGiveaway]);
 
   const filteredGifts = useMemo(() => {
     return gifts?.filter((gift) => gift.users === selectedUserCount && gift.currency !== STARS_CURRENCY_CODE);
@@ -231,27 +231,27 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   }, [gifts]);
 
   const winnerCountOptions = useMemo(() => {
-    return unique((selectedStarOption?.winners?.map((winner) => winner.users) || [])).sort((a, b) => a - b);
-  }, [selectedStarOption]);
+    return unique((selectedDiamondOption?.winners?.map((winner) => winner.users) || [])).sort((a, b) => a - b);
+  }, [selectedDiamondOption]);
 
   useEffect(() => {
-    if (isOpen && gifts?.length && !isStarsPrepaidGiveaway) {
+    if (isOpen && gifts?.length && !isDiamondsPrepaidGiveaway) {
       setSelectedMonthOption(gifts?.[0].months);
     }
-  }, [isOpen, gifts, isStarsPrepaidGiveaway]);
+  }, [isOpen, gifts, isDiamondsPrepaidGiveaway]);
 
   useEffect(() => {
     if (isOpen && starsGiftOptions?.length && !isPremiumPrepaidGiveaway) {
-      setSelectedStarOption(starsGiftOptions?.[0]);
+      setSelectedDiamondOption(starsGiftOptions?.[0]);
     }
   }, [isOpen, starsGiftOptions, isPremiumPrepaidGiveaway]);
 
   useEffect(() => {
-    if (isOpen && isStarsPrepaidGiveaway) {
+    if (isOpen && isDiamondsPrepaidGiveaway) {
       setSelectedRandomUserCount(prepaidGiveaway.quantity);
-      setDataStarsPrepaidGiveaway(prepaidGiveaway);
+      setDataDiamondsPrepaidGiveaway(prepaidGiveaway);
     }
-  }, [isOpen, isStarsPrepaidGiveaway, prepaidGiveaway]);
+  }, [isOpen, isDiamondsPrepaidGiveaway, prepaidGiveaway]);
 
   useEffect(() => {
     if (isOpen && isPremiumPrepaidGiveaway) {
@@ -278,9 +278,9 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   });
 
   const handleClose = useLastCallback(() => {
-    setDataStarsPrepaidGiveaway(undefined);
+    setDataDiamondsPrepaidGiveaway(undefined);
     setDataPrepaidGiveaway(undefined);
-    setSelectedStarOption(undefined);
+    setSelectedDiamondOption(undefined);
     setSelectedMonthOption(undefined);
     setSelectedRandomUserCount(DEFAULT_BOOST_COUNT);
     closeGiveawayModal();
@@ -322,9 +322,9 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
         areWinnersVisible: shouldShowWinners,
         prizeDescription,
         untilDate: customExpireDate / 1000,
-        currency: selectedStarOption!.currency,
-        amount: selectedStarOption!.amount,
-        stars: selectedStarOption!.stars,
+        currency: selectedDiamondOption!.currency,
+        amount: selectedDiamondOption!.amount,
+        stars: selectedDiamondOption!.stars,
         users: selectedRandomUserCount,
       });
     }
@@ -333,20 +333,20 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   });
 
   const confirmLaunchPrepaidGiveaway = useLastCallback(() => {
-    if (isStarsPrepaidGiveaway) {
-      launchPrepaidStarsGiveaway({
+    if (isDiamondsPrepaidGiveaway) {
+      launchPrepaidDiamondsGiveaway({
         chatId: chatId!,
-        giveawayId: dataStarsPrepaidGiveaway!.id,
+        giveawayId: dataDiamondsPrepaidGiveaway!.id,
         paymentPurpose: {
           additionalChannelIds: selectedChannelIds,
           countries: selectedCountryIds,
           prizeDescription,
           areWinnersVisible: shouldShowWinners,
           untilDate: customExpireDate / 1000,
-          stars: dataStarsPrepaidGiveaway!.stars,
-          currency: selectedStarsGift!.currency,
-          amount: selectedStarsGift!.amount,
-          users: dataStarsPrepaidGiveaway!.quantity,
+          stars: dataDiamondsPrepaidGiveaway!.stars,
+          currency: selectedDiamondsGift!.currency,
+          amount: selectedDiamondsGift!.amount,
+          users: dataDiamondsPrepaidGiveaway!.quantity,
         },
       });
     } else {
@@ -432,8 +432,8 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
     openCountryPickerModal();
   });
 
-  const handleStarClick = useLastCallback((option) => {
-    setSelectedStarOption(option);
+  const handleDiamondClick = useLastCallback((option) => {
+    setSelectedDiamondOption(option);
   });
 
   function renderTypeOptions() {
@@ -515,14 +515,14 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
     setSelectedChannelIds(filteredChannelIds);
   }
 
-  function renderStarOptionList() {
+  function renderDiamondOptionList() {
     return (
       <DiamondTopupOptionList
         className={styles.starOptions}
         options={starsGiftOptions}
-        selectedStarCount={selectedRandomUserCount}
-        selectedStarOption={selectedStarOption}
-        onClick={handleStarClick}
+        selectedDiamondCount={selectedRandomUserCount}
+        selectedDiamondOption={selectedDiamondOption}
+        onClick={handleDiamondClick}
       />
     );
   }
@@ -542,7 +542,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
             <GroupChatInfo
               chatId={chatId!}
               status={lang(isChannel ? 'BoostingChannelWillReceiveBoost'
-                : 'BoostingGroupWillReceiveBoost', boostQuantity || boostStarsQuantity, 'i')}
+                : 'BoostingGroupWillReceiveBoost', boostQuantity || boostDiamondsQuantity, 'i')}
             />
           </ListItem>
 
@@ -617,7 +617,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
         </div>
 
         {shouldShowPrizes ? (
-          !isStarsGiveaway && !isStarsPrepaidGiveaway ? (
+          !isDiamondsGiveaway && !isDiamondsPrepaidGiveaway ? (
             <div className={styles.subscription}>
               {prizeDescription?.length ? renderText(lang('BoostingGiveawayAdditionPrizeCountNameHint',
                 dataPrepaidGiveaway
@@ -657,7 +657,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
         </div>
 
         <div className={buildClassName(styles.section,
-          (dataPrepaidGiveaway || dataStarsPrepaidGiveaway || isStarsGiveaway) && styles.subscriptionFooter)}
+          (dataPrepaidGiveaway || dataDiamondsPrepaidGiveaway || isDiamondsGiveaway) && styles.subscriptionFooter)}
         >
           <h2 className={styles.giveawayTitle}>
             {lang('BoostingDateWhenGiveawayEnds')}
@@ -685,7 +685,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
       onClose={handleClose}
       isOpen={isOpen}
       dialogRef={dialogRef}
-      onEnter={(dataPrepaidGiveaway || dataStarsPrepaidGiveaway) ? openConfirmModal : handleClick}
+      onEnter={(dataPrepaidGiveaway || dataDiamondsPrepaidGiveaway) ? openConfirmModal : handleClick}
       hasAbsoluteCloseButton
     >
       <div className={buildClassName(styles.main, 'custom-scroll')} onScroll={handleScroll}>
@@ -701,11 +701,11 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
             {lang('BoostingBoostsViaGifts')}
           </h2>
         </div>
-        {(dataPrepaidGiveaway || dataStarsPrepaidGiveaway) ? (
+        {(dataPrepaidGiveaway || dataDiamondsPrepaidGiveaway) ? (
           <div className={styles.status}>
             <div>
-              {dataStarsPrepaidGiveaway ? (
-                <img className={styles.prepaidImg} src={GiftStar} alt="" />
+              {dataDiamondsPrepaidGiveaway ? (
+                <img className={styles.prepaidImg} src={GiftDiamond} alt="" />
               ) : (
                 <img
                   className={styles.prepaidImg}
@@ -716,11 +716,13 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
             </div>
             <div className={styles.info}>
               <h3 className={styles.title}>
-                {dataStarsPrepaidGiveaway ? lang('Giveaway.Diamonds.Prepaid.Title', dataStarsPrepaidGiveaway?.stars)
+                {dataDiamondsPrepaidGiveaway
+                  ? lang('Giveaway.Diamonds.Prepaid.Title', dataDiamondsPrepaidGiveaway?.stars)
                   : lang('BoostingAnsiblePremiumCountPlural', dataPrepaidGiveaway!.quantity)}
               </h3>
               <p className={styles.month}>
-                {dataStarsPrepaidGiveaway ? lang('Giveaway.Diamonds.Prepaid.Desc', dataStarsPrepaidGiveaway?.quantity)
+                {dataDiamondsPrepaidGiveaway
+                  ? lang('Giveaway.Diamonds.Prepaid.Desc', dataDiamondsPrepaidGiveaway?.quantity)
                   : lang('PrepaidGiveawayMonths', dataPrepaidGiveaway?.months)}
               </p>
             </div>
@@ -728,7 +730,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
               <div className={buildClassName(styles.floatingBadge, styles.floatingBadgeColor)}>
                 <Icon name="boost" className={styles.floatingBadgeIcon} />
                 <div className={styles.floatingBadgeValue} dir={lang.isRtl ? 'rtl' : undefined}>
-                  {dataStarsPrepaidGiveaway ? dataStarsPrepaidGiveaway?.boosts
+                  {dataDiamondsPrepaidGiveaway ? dataDiamondsPrepaidGiveaway?.boosts
                     : dataPrepaidGiveaway!.quantity * (giveawayBoostPerPremiumLimit ?? GIVEAWAY_BOOST_PER_PREMIUM)}
                 </div>
               </div>
@@ -742,7 +744,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
 
         {isPremiumGiveaway && !selectedUserIds?.length && (
           <>
-            {!dataPrepaidGiveaway && !dataStarsPrepaidGiveaway && (
+            {!dataPrepaidGiveaway && !dataDiamondsPrepaidGiveaway && (
               <>
                 <div className={styles.section}>
                   <div className={styles.quantity}>
@@ -774,9 +776,9 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
           </>
         )}
 
-        {isStarsGiveaway && (
+        {isDiamondsGiveaway && (
           <>
-            {!dataStarsPrepaidGiveaway && !dataPrepaidGiveaway && (
+            {!dataDiamondsPrepaidGiveaway && !dataPrepaidGiveaway && (
               <>
                 <div className={styles.section}>
                   <div className={styles.quantity}>
@@ -786,12 +788,12 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
                     <div className={buildClassName(styles.floatingBadge, styles.floatingBadgeColor)}>
                       <Icon name="boost" className={styles.floatingBadgeIcon} />
                       <div className={styles.floatingBadgeValue} dir={lang.isRtl ? 'rtl' : undefined}>
-                        {boostStarsQuantity}
+                        {boostDiamondsQuantity}
                       </div>
                     </div>
                   </div>
 
-                  {renderStarOptionList()}
+                  {renderDiamondOptionList()}
                 </div>
 
                 <div className={buildClassName(styles.subscription, styles.starSubscription)}>
@@ -820,7 +822,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
           </>
         )}
 
-        {!dataPrepaidGiveaway && !dataStarsPrepaidGiveaway && isPremiumGiveaway && (
+        {!dataPrepaidGiveaway && !dataDiamondsPrepaidGiveaway && isPremiumGiveaway && (
           <>
             <div className={styles.section}>
               <h2 className={styles.giveawayTitle}>
@@ -840,7 +842,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
           <div className={styles.footer}>
             <Button
               className={styles.button}
-              onClick={(dataPrepaidGiveaway || dataStarsPrepaidGiveaway) ? openConfirmModal : handleClick}
+              onClick={(dataPrepaidGiveaway || dataDiamondsPrepaidGiveaway) ? openConfirmModal : handleClick}
             >
               {lang('BoostingStartGiveaway')}
             </Button>
@@ -908,7 +910,7 @@ export default memo(withGlobal<OwnProps>((global): Complete<StateProps> => {
     selectedMemberList: giveawayModal?.selectedMemberIds,
     selectedChannelList: giveawayModal?.selectedChannelIds,
     giveawayBoostPerPremiumLimit: global.appConfig.giveawayBoostsPerPremium,
-    isStarsGiftEnabled: global.appConfig.isStarsGiftEnabled,
+    isDiamondsGiftEnabled: global.appConfig.isDiamondsGiftEnabled,
     userSelectionLimit: global.appConfig.giveawayAddPeersMax,
     countrySelectionLimit: global.appConfig.giveawayCountriesMax,
     countryList: global.countryList.general,

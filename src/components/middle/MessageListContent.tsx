@@ -30,7 +30,7 @@ import { isUserId } from '../../util/entities/ids';
 import { convertTonFromNanos } from '../../util/formatCurrency';
 import { compact } from '../../util/iteratees';
 import { formatMessageListDate } from '../../util/localization/dateFormat';
-import { formatStarsAsText, formatTonAsText } from '../../util/localization/format';
+import { formatDiamondsAsText, formatTonAsText } from '../../util/localization/format';
 import { isAlbum, isDocumentGroup } from './helpers/groupMessages';
 import { consumePendingTopGrowth } from './helpers/messageListReserves';
 import { preventMessageInputBlur } from './helpers/preventMessageInputBlur';
@@ -257,14 +257,14 @@ const MessageListContent = ({
             {
               message.isOutgoing
                 ? lang('ActionPaidOneMessageOutgoing', {
-                  amount: formatStarsAsText(lang, amount),
+                  amount: formatDiamondsAsText(lang, amount),
                 })
                 : (() => {
                   const sender = selectSender(getGlobal(), message);
                   const userTitle = sender ? getPeerTitle(lang, sender) : '';
                   return lang('ActionPaidOneMessageIncoming', {
                     user: userTitle,
-                    amount: formatStarsAsText(lang, amount),
+                    amount: formatDiamondsAsText(lang, amount),
                   });
                 })()
             }
@@ -296,7 +296,7 @@ const MessageListContent = ({
       const tableData: TableEntry[] = compact([
         [lang('TitlePrice'), price ? (price.currency === 'TON'
           ? formatTonAsText(lang, convertTonFromNanos(price.amount))
-          : formatStarsAsText(lang, price.amount)) : lang('SuggestMessageNoPrice')],
+          : formatDiamondsAsText(lang, price.amount)) : lang('SuggestMessageNoPrice')],
         [lang('TitleTime'),
           scheduleDate
             ? formatScheduledDateTime(scheduleDate, lang, oldLang)

@@ -10,7 +10,7 @@ import type { LangFn } from '../../../util/localization';
 import buildClassName from '../../../util/buildClassName';
 import { formatDateTimeToString, formatPastTimeShort, formatTime } from '../../../util/dates/oldDateFormat';
 import { formatDateTime, isSameLocalDay, secondsToDate } from '../../../util/localization/dateFormat';
-import { formatStarsAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../util/localization/format';
 import { getRepeatPeriodText } from '../../../util/scheduledMessages';
 import { formatIntegerCompact } from '../../../util/textFormat';
 import renderText from '../../common/helpers/renderText';
@@ -208,7 +208,7 @@ const MessageMeta = ({
       {Boolean(paidMessageStars) && (
         <span className="message-price">
           {
-            formatStarsAsIcon(lang, paidMessageStars, {
+            formatDiamondsAsIcon(lang, paidMessageStars, {
               asFont: true,
             })
           }

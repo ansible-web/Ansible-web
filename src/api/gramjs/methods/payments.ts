@@ -129,7 +129,7 @@ export async function sendPaymentForm({
   };
 }
 
-export async function sendStarPaymentForm({
+export async function sendDiamondPaymentForm({
   formId,
   inputInvoice,
 }: {

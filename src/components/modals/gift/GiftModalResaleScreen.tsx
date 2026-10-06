@@ -6,7 +6,7 @@ import {
 import { getActions, withGlobal } from '../../../global';
 
 import type {
-  ApiStarGift,
+  ApiDiamondGift,
 } from '../../../api/types';
 import type { ResaleGiftsFilterOptions } from '../../../types';
 
@@ -27,12 +27,12 @@ import ResaleGiftsNotFound from './ResaleGiftsNotFound';
 import styles from './GiftModal.module.scss';
 
 export type OwnProps = {
-  onGiftClick: (gift: ApiStarGift) => void;
+  onGiftClick: (gift: ApiDiamondGift) => void;
 };
 
 type StateProps = {
-  gift?: ApiStarGift;
-  resellGifts?: ApiStarGift[];
+  gift?: ApiDiamondGift;
+  resellGifts?: ApiDiamondGift[];
   filter: ResaleGiftsFilterOptions;
   areGiftsAllLoaded?: boolean;
   areGiftsLoading?: boolean;

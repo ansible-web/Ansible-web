@@ -379,7 +379,7 @@ export function sendMessageLocal(
     chat, lastMessageId, text, entities, richMessage, replyInfo, suggestedPostInfo,
     attachment, sticker, story, gif, audio, poll, todo,
     contact, scheduledAt, scheduleRepeatPeriod, groupedId, sendAs, wasDrafted, isInvertedMedia, effectId, isPending,
-    messagePriceInStars, dice,
+    messagePriceInDiamonds, dice,
   } = params;
 
   if (!chat) return undefined;
@@ -410,7 +410,7 @@ export function sendMessageLocal(
     isInvertedMedia,
     effectId,
     isPending,
-    messagePriceInStars,
+    messagePriceInDiamonds,
     dice,
   });
 
@@ -436,7 +436,7 @@ export function sendApiMessage(
     attachment, sticker, story, gif, audio, poll, todo, contact, dice,
 
     isSilent, scheduledAt, scheduleRepeatPeriod, groupedId, noWebPage, sendAs, shouldUpdateStickerSetOrder,
-    isInvertedMedia, effectId, webPageMediaSize, webPageUrl, messagePriceInStars,
+    isInvertedMedia, effectId, webPageMediaSize, webPageUrl, messagePriceInDiamonds,
   } = params;
 
   if (!chat) return undefined;
@@ -474,7 +474,7 @@ export function sendApiMessage(
       isSilent,
       scheduledAt,
       scheduleRepeatPeriod,
-      messagePriceInStars,
+      messagePriceInDiamonds,
     }, randomId, localMessage, onProgress, cancelSendingStatusTimeout);
   }
 
@@ -611,7 +611,7 @@ export function sendApiMessage(
       updateStickersetsOrder: shouldUpdateStickerSetOrder || undefined,
       invertMedia: isInvertedMedia || undefined,
       effect: effectId ? BigInt(effectId) : undefined,
-      allowPaidStars: messagePriceInStars ? BigInt(messagePriceInStars) : undefined,
+      allowPaidStars: messagePriceInDiamonds ? BigInt(messagePriceInDiamonds) : undefined,
       suggestedPost: suggestedPostInfo && buildInputSuggestedPost(suggestedPostInfo),
     };
 
@@ -886,7 +886,7 @@ function sendGroupedMedia(
     scheduledAt,
     scheduleRepeatPeriod,
     sendAs,
-    messagePriceInStars,
+    messagePriceInDiamonds,
   }: {
     chat: ApiChat;
     text?: string;
@@ -899,7 +899,7 @@ function sendGroupedMedia(
     scheduledAt?: number;
     scheduleRepeatPeriod?: number;
     sendAs?: ApiPeer;
-    messagePriceInStars?: number;
+    messagePriceInDiamonds?: number;
   },
   randomId: GramJs.long,
   localMessage: ApiMessage,
@@ -986,7 +986,7 @@ function sendGroupedMedia(
       ...(scheduledAt && { scheduleDate: scheduledAt }),
       ...(scheduleRepeatPeriod && { scheduleRepeatPeriod }),
       ...(sendAs && { sendAs: buildInputPeer(sendAs.id, sendAs.accessHash) }),
-      ...(messagePriceInStars && { allowPaidStars: BigInt(messagePriceInStars * count) }),
+      ...(messagePriceInDiamonds && { allowPaidStars: BigInt(messagePriceInDiamonds * count) }),
       ...(suggestedPostInfo && { suggestedPost: buildInputSuggestedPost(suggestedPostInfo) }),
     }), {
       shouldIgnoreUpdates: true,
@@ -2402,7 +2402,7 @@ export async function forwardApiMessages(params: ForwardMessagesParams) {
   const {
     fromChat, toChat, toThreadId, messages, isSilent,
     scheduledAt, scheduleRepeatPeriod, sendAs, withMyScore, noAuthors, noCaptions,
-    forwardedLocalMessagesSlice, messagePriceInStars, effectId,
+    forwardedLocalMessagesSlice, messagePriceInDiamonds, effectId,
   } = params;
 
   if (!forwardedLocalMessagesSlice) return;
@@ -2411,7 +2411,7 @@ export async function forwardApiMessages(params: ForwardMessagesParams) {
     messageIds, localMessages,
   } = forwardedLocalMessagesSlice;
 
-  const priceInStars = messagePriceInStars ? messagePriceInStars * messageIds.length : undefined;
+  const priceInDiamonds = messagePriceInDiamonds ? messagePriceInDiamonds * messageIds.length : undefined;
   const isFromEphemeral = messages[0]?.isEphemeral;
   const apiMessageIds = isFromEphemeral ? messageIds.map(getMtpEphemeralMessageId) : messageIds;
 
@@ -2431,7 +2431,7 @@ export async function forwardApiMessages(params: ForwardMessagesParams) {
       ...(scheduledAt && { scheduleDate: scheduledAt }),
       ...(scheduleRepeatPeriod && { scheduleRepeatPeriod }),
       ...(sendAs && { sendAs: buildInputPeer(sendAs.id, sendAs.accessHash) }),
-      ...(priceInStars && { allowPaidStars: BigInt(priceInStars) }),
+      ...(priceInDiamonds && { allowPaidStars: BigInt(priceInDiamonds) }),
       effect: effectId ? BigInt(effectId) : undefined,
     }), {
       shouldThrow: true,

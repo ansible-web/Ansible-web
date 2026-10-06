@@ -6,7 +6,7 @@ import {
 import { getActions, withGlobal } from '../../../../global';
 
 import type {
-  ApiStarTopupOption, ApiUser,
+  ApiDiamondTopupOption, ApiUser,
 } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
@@ -29,7 +29,7 @@ import DiamondTopupOptionList from '../DiamondTopupOptionList';
 
 import styles from './DiamondsGiftModal.module.scss';
 
-import StarLogo from '../../../../assets/icons/star/GoldStar.svg';
+import DiamondLogo from '../../../../assets/icons/star/GoldStar.svg';
 import StarsBackground from '../../../../assets/stars-bg.png';
 
 export type OwnProps = {
@@ -47,7 +47,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
   user,
 }) => {
   const {
-    closeStarsGiftModal, openInvoice, requestConfetti,
+    closeDiamondsGiftModal, openInvoice, requestConfetti,
   } = getActions();
   const dialogRef = useRef<HTMLDivElement>();
 
@@ -57,7 +57,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
 
   const oldLang = useOldLang();
 
-  const [selectedOption, setSelectedOption] = useState<ApiStarTopupOption | undefined>();
+  const [selectedOption, setSelectedOption] = useState<ApiDiamondTopupOption | undefined>();
   const [isHeaderHidden, setIsHeaderHidden] = useState(true);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
         left,
         width,
         height,
-        withStars: true,
+        withDiamonds: true,
       });
     }
   });
@@ -89,7 +89,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
     }
   }, [renderingModal, showConfetti]);
 
-  const handleClick = useLastCallback((option: ApiStarTopupOption) => {
+  const handleClick = useLastCallback((option: ApiDiamondTopupOption) => {
     if (!renderingModal) return;
 
     setSelectedOption(option);
@@ -118,7 +118,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
   }
 
   const handleClose = useLastCallback(() => {
-    closeStarsGiftModal();
+    closeDiamondsGiftModal();
   });
 
   function renderGiftTitle() {
@@ -172,7 +172,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
             </>
           ) : (
             <>
-              <img className={styles.logo} src={StarLogo} alt="" draggable={false} />
+              <img className={styles.logo} src={DiamondLogo} alt="" draggable={false} />
               <img className={styles.logoBackground} src={StarsBackground} alt="" draggable={false} />
             </>
           )}

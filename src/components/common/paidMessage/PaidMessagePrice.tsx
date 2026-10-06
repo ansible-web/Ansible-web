@@ -101,9 +101,9 @@ export default memo(withGlobal<OwnProps>(
   (global): Complete<StateProps> => {
     const starsUsdWithdrawRateX1000 = global.appConfig.starsUsdWithdrawRateX1000;
     const starsUsdWithdrawRate = starsUsdWithdrawRateX1000 ? starsUsdWithdrawRateX1000 / 1000 : 1;
-    const configStarsPaidMessageCommissionPermille = global.appConfig.starsPaidMessageCommissionPermille;
-    const starsPaidMessageCommissionPermille = configStarsPaidMessageCommissionPermille
-      ? configStarsPaidMessageCommissionPermille / 1000 : 100;
+    const configDiamondsPaidMessageCommissionPermille = global.appConfig.starsPaidMessageCommissionPermille;
+    const starsPaidMessageCommissionPermille = configDiamondsPaidMessageCommissionPermille
+      ? configDiamondsPaidMessageCommissionPermille / 1000 : 100;
 
     return {
       starsPaidMessageCommissionPermille,

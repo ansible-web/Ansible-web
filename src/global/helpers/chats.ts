@@ -208,11 +208,11 @@ export function getAllowedAttachmentOptions(
   isChatWithBot = false,
   isSavedMessages = false,
   isStoryReply = false,
-  paidMessagesStars?: number,
+  paidMessagesDiamonds?: number,
   isInScheduledList = false,
   isEphemeral = false,
 ): IAllowedAttachmentOptions {
-  if (!chat || (paidMessagesStars && isInScheduledList)) {
+  if (!chat || (paidMessagesDiamonds && isInScheduledList)) {
     return {
       canAttachMedia: false,
       canAttachPolls: false,

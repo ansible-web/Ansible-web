@@ -12,7 +12,7 @@ import { getPeerFullTitle } from '../../../global/helpers/peers';
 import { selectChatMessage, selectIsMonoforumAdmin, selectSender } from '../../../global/selectors';
 import { formatScheduledDateTime, formatShortDuration } from '../../../util/dates/oldDateFormat';
 import { convertTonFromNanos } from '../../../util/formatCurrency';
-import { formatStarsAsText, formatTonAsText } from '../../../util/localization/format';
+import { formatDiamondsAsText, formatTonAsText } from '../../../util/localization/format';
 import { getServerTime } from '../../../util/serverTime';
 import renderText from '../../common/helpers/renderText';
 
@@ -137,7 +137,7 @@ const SuggestedPostApprovalModal = ({
 
     const formattedAmount = currency === TON_CURRENCY_CODE
       ? formatTonAsText(lang, convertTonFromNanos(amountWithCommission))
-      : formatStarsAsText(lang, amountWithCommission);
+      : formatDiamondsAsText(lang, amountWithCommission);
 
     const ageMinSeconds = minAge;
     const duration = formatShortDuration(lang, ageMinSeconds, true);

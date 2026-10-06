@@ -7,12 +7,12 @@ export * as tl from './tl';
 
 import type { SizeType, Update } from './client/TelegramClient';
 
-import TelegramClient from './client/TelegramClient';
+import AnsibleClient from './client/TelegramClient';
 export * as helpers from './Helpers';
 export * as utils from './Utils';
 
 export {
-  TelegramClient,
+  AnsibleClient,
 };
 
 export type {

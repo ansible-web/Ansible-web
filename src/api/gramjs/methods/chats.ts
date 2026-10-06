@@ -861,7 +861,7 @@ async function getFullChannelInfo(
       isPaidReactionAvailable: paidReactionsAvailable,
       hasScheduledMessages: hasScheduled,
       starGiftCount: stargiftsCount,
-      areStarGiftsAvailable: Boolean(stargiftsAvailable),
+      areDiamondGiftsAvailable: Boolean(stargiftsAvailable),
       arePaidMessagesAvailable: paidMessagesAvailable,
       mainTab: mainTab && buildApiProfileTab(mainTab),
       guardBotId: guardBotId ? buildApiPeerId(guardBotId, 'user') : undefined,
@@ -2181,13 +2181,13 @@ export async function fetchChannelRecommendations({ chat }: { chat?: ApiChat }) 
 }
 
 export function updatePaidMessagesPrice({
-  chat, paidMessagesStars,
+  chat, paidMessagesDiamonds,
 }: {
-  chat?: ApiChat; paidMessagesStars: number;
+  chat?: ApiChat; paidMessagesDiamonds: number;
 }) {
   return invokeRequest(new GramJs.channels.UpdatePaidMessagesPrice({
     channel: chat ? buildInputChannel(chat.id, chat.accessHash) : new GramJs.InputChannelEmpty(),
-    sendPaidMessagesStars: BigInt(paidMessagesStars),
+    sendPaidMessagesStars: BigInt(paidMessagesDiamonds),
   }), {
     shouldReturnTrue: true,
   });

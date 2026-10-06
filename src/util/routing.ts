@@ -48,7 +48,7 @@ function captureInitialLocation() {
   parsedInitialLocationHash = parameters.size ? Object.fromEntries(parameters) : undefined;
   if (!hasAuth) return;
 
-  const { tgWebAuthToken: token, tgWebAuthUserId: userId, tgWebAuthDcId: dc, tgWebAuthTest: test } = auth;
+  const { asWebAuthToken: token, asWebAuthUserId: userId, asWebAuthDcId: dc, asWebAuthTest: test } = auth;
   const dcId = Number(dc);
   const isTest = test === '1';
   if (!token || !/^[A-Za-z0-9_-]+={0,2}$/.test(token) || !userId || !/^[1-9]\d*$/.test(userId)

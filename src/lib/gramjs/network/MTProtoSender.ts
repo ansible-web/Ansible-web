@@ -1318,7 +1318,7 @@ export default class MTProtoSender {
       // which contain the real response right after.
       try {
         const reader = new BinaryReader(result.body);
-        if (!(reader.tgReadObject() instanceof Api.upload.File)) {
+        if (!(reader.asReadObject() instanceof Api.upload.File)) {
           throw new TypeNotFoundError(0, new Uint8Array(0));
         }
       } catch (e) {
@@ -1380,7 +1380,7 @@ export default class MTProtoSender {
     this._log.debug('Handling gzipped data');
     const { data } = message.obj;
     const reader = new BinaryReader(data);
-    const obj = reader.tgReadObject();
+    const obj = reader.asReadObject();
     if (obj instanceof MessageContainer || reader.tellPosition() !== data.length) {
       throw new SecurityError();
     }

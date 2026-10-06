@@ -1,12 +1,12 @@
 import { memo } from '../../lib/teact/teact';
 import { getActions, withGlobal } from '../../global';
 
-import type { ApiStarsAmount, ApiTonAmount } from '../../api/types';
+import type { ApiDiamondsAmount, ApiTonAmount } from '../../api/types';
 
-import { formatStarsAmount } from '../../global/helpers/payments';
+import { formatDiamondsAmount } from '../../global/helpers/payments';
 import buildClassName from '../../util/buildClassName';
 import { convertTonFromNanos, convertTonToUsd, formatCurrencyAsString } from '../../util/formatCurrency';
-import { formatStarsAsIcon, formatTonAsIcon, NEXT_ARROW_REPLACEMENT } from '../../util/localization/format';
+import { formatDiamondsAsIcon, formatTonAsIcon, NEXT_ARROW_REPLACEMENT } from '../../util/localization/format';
 
 import useIsTopmostBalanceBarModal from '../../hooks/element/useIsTopmostBalanceBarModal';
 import useLang from '../../hooks/useLang';
@@ -24,12 +24,12 @@ export type OwnProps = {
 };
 
 export type StateProps = {
-  starBalance?: ApiStarsAmount;
+  starBalance?: ApiDiamondsAmount;
   tonBalance?: ApiTonAmount;
   tonUsdRate?: number;
 };
 
-function ModalStarBalanceBar({
+function ModalDiamondBalanceBar({
   starBalance,
   tonBalance,
   tonUsdRate,
@@ -38,7 +38,7 @@ function ModalStarBalanceBar({
   onCloseAnimationEnd,
 }: StateProps & OwnProps) {
   const {
-    openStarsBalanceModal,
+    openDiamondsBalanceModal,
   } = getActions();
 
   const lang = useLang();
@@ -57,8 +57,8 @@ function ModalStarBalanceBar({
 
   const isTopmost = useIsTopmostBalanceBarModal(ref, Boolean(shouldRender && currentBalance));
 
-  const handleGetMoreStars = useLastCallback(() => {
-    openStarsBalanceModal(isTonMode ? { currency: 'TON' } : {});
+  const handleGetMoreDiamonds = useLastCallback(() => {
+    openDiamondsBalanceModal(isTonMode ? { currency: 'TON' } : {});
   });
 
   if (!shouldRender || !currentBalance) {
@@ -80,7 +80,7 @@ function ModalStarBalanceBar({
           })
         ) : (
           lang('ModalDiamondsBalanceBarDescription', {
-            stars: formatStarsAsIcon(lang, formatStarsAmount(lang, currentBalance as ApiStarsAmount)),
+            stars: formatDiamondsAsIcon(lang, formatDiamondsAmount(lang, currentBalance as ApiDiamondsAmount)),
           }, {
             withNodes: true,
             withMarkdown: true,
@@ -98,7 +98,7 @@ function ModalStarBalanceBar({
           </div>
         )}
         {!isTonMode && (
-          <Link className={styles.getMoreStarsLink} isPrimary onClick={handleGetMoreStars}>
+          <Link className={styles.getMoreDiamondsLink} isPrimary onClick={handleGetMoreDiamonds}>
             {lang('GetMoreDiamondsLinkText', undefined, {
               withNodes: true,
               specialReplacement: NEXT_ARROW_REPLACEMENT,
@@ -123,4 +123,4 @@ export default memo(withGlobal(
       tonUsdRate: global.appConfig.tonUsdRate,
     };
   },
-)(ModalStarBalanceBar));
+)(ModalDiamondBalanceBar));

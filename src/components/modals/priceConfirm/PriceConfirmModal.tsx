@@ -2,12 +2,12 @@ import type { FC } from '../../../lib/teact/teact';
 import { memo, useCallback } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
-import type { ApiStarsAmount } from '../../../api/types';
+import type { ApiDiamondsAmount } from '../../../api/types';
 import type { TabState } from '../../../global/types';
 
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { convertTonFromNanos } from '../../../util/formatCurrency';
-import { formatStarsAsText, formatTonAsText } from '../../../util/localization/format';
+import { formatDiamondsAsText, formatTonAsText } from '../../../util/localization/format';
 
 import useLang from '../../../hooks/useLang';
 
@@ -18,7 +18,7 @@ export type OwnProps = {
 };
 
 type StateProps = {
-  starBalance?: ApiStarsAmount;
+  starBalance?: ApiDiamondsAmount;
   tonBalance?: number;
 };
 
@@ -47,7 +47,7 @@ const PriceConfirmModal: FC<OwnProps & StateProps> = ({
     }
 
     if (currentBalance < newAmount!) {
-      actions.openStarsBalanceModal({
+      actions.openDiamondsBalanceModal({
         currency: isTon ? 'TON' : 'XTR',
         tabId: getCurrentTabId(),
       });
@@ -55,7 +55,7 @@ const PriceConfirmModal: FC<OwnProps & StateProps> = ({
       return;
     }
 
-    actions.sendStarPaymentForm({
+    actions.sendDiamondPaymentForm({
       directInfo: modal.directInfo,
       tabId: getCurrentTabId(),
     });
@@ -85,8 +85,8 @@ const PriceConfirmModal: FC<OwnProps & StateProps> = ({
     originalAmountText = formatTonAsText(lang, convertTonFromNanos(originalAmount!));
     newAmountText = formatTonAsText(lang, convertTonFromNanos(newAmount!));
   } else {
-    originalAmountText = formatStarsAsText(lang, originalAmount!);
-    newAmountText = formatStarsAsText(lang, newAmount!);
+    originalAmountText = formatDiamondsAsText(lang, originalAmount!);
+    newAmountText = formatDiamondsAsText(lang, newAmount!);
   }
 
   return (

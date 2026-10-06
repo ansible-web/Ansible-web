@@ -13,7 +13,7 @@ import {
   selectChat,
   selectUserFullInfo,
 } from '../../../global/selectors';
-import { formatStarsAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../util/localization/format';
 
 import useFrozenProps from '../../../hooks/useFrozenProps';
 import useLang from '../../../hooks/useLang';
@@ -30,24 +30,24 @@ type OwnProps = {
 };
 
 type StateProps = {
-  chargedPaidMessageStars?: number;
+  chargedPaidMessageDiamonds?: number;
   chat?: ApiChat;
 };
 
 const PaidMessageChargePane: FC<OwnProps & StateProps> = ({
-  chargedPaidMessageStars,
+  chargedPaidMessageDiamonds,
   chat,
   peerId,
   onPaneStateChange,
 }) => {
-  const isOpen = Boolean(chargedPaidMessageStars);
+  const isOpen = Boolean(chargedPaidMessageDiamonds);
   const lang = useLang();
 
   const {
     peerId: renderingPeerId,
-    chargedPaidMessageStars: renderingChargedStars,
+    chargedPaidMessageDiamonds: renderingChargedDiamonds,
     chat: renderingChat,
-  } = useFrozenProps({ peerId, chargedPaidMessageStars, chat }, !isOpen);
+  } = useFrozenProps({ peerId, chargedPaidMessageDiamonds, chat }, !isOpen);
 
   const {
     openChatRefundModal,
@@ -64,14 +64,14 @@ const PaidMessageChargePane: FC<OwnProps & StateProps> = ({
     openChatRefundModal({ userId: renderingPeerId });
   });
 
-  if (!shouldRender || !renderingChargedStars) return undefined;
+  if (!shouldRender || !renderingChargedDiamonds) return undefined;
 
   const peerName = renderingChat ? getPeerTitle(lang, renderingChat) : undefined;
 
   const message = lang('PaneMessagePaidMessageCharge', {
     peer: peerName,
-    amount: formatStarsAsIcon(lang,
-      renderingChargedStars,
+    amount: formatDiamondsAsIcon(lang,
+      renderingChargedDiamonds,
       { asFont: true }),
   }, {
     withMarkdown: true,
@@ -102,10 +102,10 @@ export default memo(withGlobal<OwnProps>(
   (global, { peerId }): Complete<StateProps> => {
     const chat = selectChat(global, peerId);
     const peerFullInfo = selectUserFullInfo(global, peerId);
-    const chargedPaidMessageStars = peerFullInfo?.settings?.chargedPaidMessageStars;
+    const chargedPaidMessageDiamonds = peerFullInfo?.settings?.chargedPaidMessageDiamonds;
 
     return {
-      chargedPaidMessageStars,
+      chargedPaidMessageDiamonds,
       chat,
     };
   },

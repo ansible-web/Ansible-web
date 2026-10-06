@@ -19,7 +19,7 @@ import {
   selectTabState,
 } from '../../selectors';
 import { fetchChatByUsername } from '../api/chats';
-import { getPeerStarsForMessage } from '../api/messages';
+import { getPeerDiamondsForMessage } from '../api/messages';
 
 addActionHandler('openStoryViewer', async (global, actions, payload): Promise<void> => {
   const {
@@ -299,8 +299,8 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
   if (!isStoryReply) {
     return;
   }
-  const messagePriceInStars = await getPeerStarsForMessage(global, storyPeerId!);
-  if (messagePriceInStars === undefined) return;
+  const messagePriceInDiamonds = await getPeerDiamondsForMessage(global, storyPeerId!);
+  if (messagePriceInDiamonds === undefined) return;
 
   const { gif, sticker, isReaction } = payload;
 

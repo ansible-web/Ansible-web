@@ -1,4 +1,4 @@
-import type TelegramClient from './TelegramClient';
+import type AnsibleClient from './TelegramClient';
 import type { SizeType } from './TelegramClient';
 
 import { getDcBandwidthManager } from '../../../util/dcBandwithManager';
@@ -110,7 +110,7 @@ class FileView {
 }
 
 export async function downloadFile(
-  client: TelegramClient,
+  client: AnsibleClient,
   inputLocation: Api.TypeInputFileLocation,
   fileParams: DownloadFileWithDcParams,
   shouldDebugExportedSenders?: boolean,
@@ -135,7 +135,7 @@ export async function downloadFile(
 }
 
 async function downloadFile2(
-  client: TelegramClient,
+  client: AnsibleClient,
   inputLocation: Api.TypeInputFileLocation,
   fileParams: DownloadFileWithDcParams,
   shouldDebugExportedSenders?: boolean,

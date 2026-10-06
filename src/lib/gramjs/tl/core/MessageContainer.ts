@@ -75,7 +75,7 @@ export default class MessageContainer {
             }
 
             messageReader.setPosition(0);
-            const obj = messageReader.tgReadObject();
+            const obj = messageReader.asReadObject();
             if (messageReader.tellPosition() !== messageBodyLength) {
                 throw new SecurityError('Server sent trailing inner message body data');
             }

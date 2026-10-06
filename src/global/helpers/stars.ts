@@ -1,6 +1,6 @@
-import type { ApiSavedStarGift } from '../../api/types';
+import type { ApiSavedDiamondGift } from '../../api/types';
 
-export function getSavedGiftKey(gift: ApiSavedStarGift, withoutTag?: boolean) {
+export function getSavedGiftKey(gift: ApiSavedDiamondGift, withoutTag?: boolean) {
   return [
     gift.date,
     gift.fromId,

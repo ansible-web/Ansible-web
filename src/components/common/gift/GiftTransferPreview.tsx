@@ -1,8 +1,8 @@
 import { memo, useMemo } from '../../../lib/teact/teact';
 
 import type {
-  ApiPeer, ApiStarGiftUnique,
-} from '../../../api/types';
+  ApiDiamondGiftUnique,
+  ApiPeer } from '../../../api/types';
 
 import { getGiftAttributes } from '../helpers/gifts';
 import { REM } from '../helpers/mediaDimensions';
@@ -16,7 +16,7 @@ import styles from './GiftTransferPreview.module.scss';
 
 type OwnProps = {
   peer: ApiPeer;
-  gift: ApiStarGiftUnique;
+  gift: ApiDiamondGiftUnique;
 };
 
 const AVATAR_SIZE = 4 * REM;

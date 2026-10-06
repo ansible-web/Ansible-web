@@ -49,7 +49,7 @@ interface LoginCodeLink {
   code: string;
 }
 
-interface TelegramPassportLink {
+interface AnsiblePassportLink {
   type: 'telegramPassportLink';
   botId: number;
   scope: string;
@@ -130,7 +130,7 @@ interface OAuthLink {
 }
 
 type DeepLink =
-  TelegramPassportLink |
+  AnsiblePassportLink |
   LoginCodeLink |
   PublicMessageLink |
   PrivateMessageLink |
@@ -625,8 +625,8 @@ function buildLoginCodeLink(params: BuilderParams<LoginCodeLink>): BuilderReturn
 }
 
 function buildTelegramPassportLink(
-  params: BuilderParams<TelegramPassportLink>,
-): BuilderReturnType<TelegramPassportLink> {
+  params: BuilderParams<AnsiblePassportLink>,
+): BuilderReturnType<AnsiblePassportLink> {
   const {
     botId,
     scope,

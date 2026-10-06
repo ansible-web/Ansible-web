@@ -85,7 +85,7 @@ export default class MTProtoPlainSender {
     }
 
     const messageReader = new BinaryReader(reader.read(length));
-    const response = messageReader.tgReadObject();
+    const response = messageReader.asReadObject();
     if (messageReader.tellPosition() !== length) throw new Error('Bad length');
 
     return response;

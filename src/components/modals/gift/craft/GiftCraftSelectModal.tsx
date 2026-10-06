@@ -3,7 +3,7 @@ import {
 } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
-import type { ApiSavedStarGift, ApiStarGift, ApiStarGiftUnique } from '../../../../api/types';
+import type { ApiDiamondGift, ApiDiamondGiftUnique, ApiSavedDiamondGift } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 import type { ObserveFn } from '../../../../hooks/useIntersectionObserver';
 
@@ -48,12 +48,12 @@ const SCROLL_THROTTLE = 200;
 const runThrottledForScroll = throttle((cb: NoneToVoidFunction) => cb(), SCROLL_THROTTLE, true);
 
 type CraftGiftItemProps = {
-  gift: ApiStarGift;
+  gift: ApiDiamondGift;
   chancePercent?: number;
   chanceColor?: string;
   showPrice?: boolean;
   observe?: ObserveFn;
-  onClick: (gift: ApiStarGift) => void;
+  onClick: (gift: ApiDiamondGift) => void;
 };
 
 const CraftGiftItem = memo(({ gift, chancePercent, chanceColor, showPrice, observe, onClick }: CraftGiftItemProps) => {
@@ -91,7 +91,7 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isFiltersSeparatorAbove, setIsFiltersSeparatorAbove] = useState(false);
-  const [wasStarsOnlyToggleShown, markStarsOnlyToggleShown, resetStarsOnlyToggleShown] = useFlag(false);
+  const [wasDiamondsOnlyToggleShown, markDiamondsOnlyToggleShown, resetDiamondsOnlyToggleShown] = useFlag(false);
 
   const lang = useLang();
   const isOpen = Boolean(modal);
@@ -151,7 +151,7 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
   const selectedIds = useMemo(() => {
     return new Set(
       [gift1, gift2, gift3, gift4]
-        .filter((g): g is ApiSavedStarGift => Boolean(g))
+        .filter((g): g is ApiSavedDiamondGift => Boolean(g))
         .map((g) => getSavedGiftKey(g)),
     );
   }, [gift1, gift2, gift3, gift4]);
@@ -159,8 +159,8 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
   const selectedUniqueIds = useMemo(() => {
     return new Set(
       [gift1, gift2, gift3, gift4]
-        .filter((g): g is ApiSavedStarGift => Boolean(g) && g.gift.type === 'starGiftUnique')
-        .map((g) => (g.gift as ApiStarGiftUnique).id),
+        .filter((g): g is ApiSavedDiamondGift => Boolean(g) && g.gift.type === 'starGiftUnique')
+        .map((g) => (g.gift as ApiDiamondGiftUnique).id),
     );
   }, [gift1, gift2, gift3, gift4]);
 
@@ -180,7 +180,7 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
   }, [marketCraftableGifts, selectedUniqueIds]);
 
   const myGiftByIdMap = useMemo(() => {
-    const map = new Map<string, ApiSavedStarGift>();
+    const map = new Map<string, ApiSavedDiamondGift>();
     availableMyGifts.forEach((g) => {
       if (g.gift.type === 'starGiftUnique') {
         map.set(g.gift.id, g);
@@ -214,7 +214,7 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
     closeGiftCraftSelectModal();
   });
 
-  const handleMyGiftClick = useLastCallback((gift: ApiStarGift) => {
+  const handleMyGiftClick = useLastCallback((gift: ApiDiamondGift) => {
     if (gift.type !== 'starGiftUnique') return;
     const savedGift = myGiftByIdMap.get(gift.id);
     const slotIndex = renderingModal?.slotIndex;
@@ -223,7 +223,7 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
     }
   });
 
-  const handleMarketGiftClick = useLastCallback((gift: ApiStarGift) => {
+  const handleMarketGiftClick = useLastCallback((gift: ApiDiamondGift) => {
     const slotIndex = renderingModal?.slotIndex;
     if (slotIndex === undefined) return;
 
@@ -242,7 +242,7 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
     });
   });
 
-  const handleStarsOnlyChange = useLastCallback((isChecked: boolean) => {
+  const handleDiamondsOnlyChange = useLastCallback((isChecked: boolean) => {
     updateCraftGiftsFilter({
       filter: {
         ...marketFilter,
@@ -252,19 +252,19 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
     });
   });
 
-  const isStarsOnly = Boolean(marketFilter?.starsOnly);
+  const isDiamondsOnly = Boolean(marketFilter?.starsOnly);
 
   useEffect(() => {
     if (!isOpen) {
-      resetStarsOnlyToggleShown();
+      resetDiamondsOnlyToggleShown();
     }
-  }, [isOpen, resetStarsOnlyToggleShown]);
+  }, [isOpen, resetDiamondsOnlyToggleShown]);
 
   useEffect(() => {
     if (marketCraftableGiftsCount && !isMarketLoading) {
-      markStarsOnlyToggleShown();
+      markDiamondsOnlyToggleShown();
     }
-  }, [marketCraftableGiftsCount, isMarketLoading, markStarsOnlyToggleShown]);
+  }, [marketCraftableGiftsCount, isMarketLoading, markDiamondsOnlyToggleShown]);
 
   const hasMyGifts = availableMyGifts.length > 0;
   const hasMarketGifts = availableMarketGifts.length > 0;
@@ -387,12 +387,12 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
         <Checkbox
           className={buildClassName(
             styles.starsOnlyToggle,
-            wasStarsOnlyToggleShown && styles.starsOnlyToggleVisible,
+            wasDiamondsOnlyToggleShown && styles.starsOnlyToggleVisible,
           )}
           label={lang('GiftResaleDiamondsOnly')}
-          checked={isStarsOnly}
+          checked={isDiamondsOnly}
           isRound
-          onCheck={handleStarsOnlyChange}
+          onCheck={handleDiamondsOnlyChange}
         />
       )}
     </Modal>

@@ -11,7 +11,7 @@ import useLastCallback from '../../../hooks/useLastCallback.ts';
 import InteractiveSparkles from '../../common/InteractiveSparkles';
 import StickerView from '../../common/StickerView';
 import SpeedingDiamond from './SpeedingDiamond.tsx';
-import SwayingStar from './SwayingStar.tsx';
+import SwayingDiamond from './SwayingStar.tsx';
 
 import styles from './ParticlesHeader.module.scss';
 
@@ -66,7 +66,7 @@ function ParticlesHeader({
       />
 
       {model === 'swaying-star' ? (
-        <SwayingStar
+        <SwayingDiamond
           className={modelClassName}
           color={color as 'purple' | 'gold'}
           centerShift={PARTICLE_PARAMS.centerShift}

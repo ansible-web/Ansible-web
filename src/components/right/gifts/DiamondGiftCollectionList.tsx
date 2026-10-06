@@ -1,7 +1,7 @@
 import { memo, useMemo } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
-import type { ApiStarGiftCollection } from '../../../api/types';
+import type { ApiDiamondGiftCollection } from '../../../api/types';
 import type { ProfileCollectionKey } from '../../../global/selectors/payments';
 import type { AnimationLevel } from '../../../types';
 import type { TabItem } from '../../common/AnimatedTabList';
@@ -22,7 +22,7 @@ type OwnProps = {
 };
 
 type StateProps = {
-  collections?: ApiStarGiftCollection[];
+  collections?: ApiDiamondGiftCollection[];
   activeCollectionId: ProfileCollectionKey;
   animationLevel: AnimationLevel;
 };

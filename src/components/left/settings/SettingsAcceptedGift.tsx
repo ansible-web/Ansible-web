@@ -45,7 +45,7 @@ const SettingsAcceptedGift = ({
     updateGlobalPrivacySettings({
       disallowedGifts: {
         ...disallowedGifts,
-        shouldDisallowLimitedStarGifts: !disallowedGifts?.shouldDisallowLimitedStarGifts || undefined,
+        shouldDisallowLimitedDiamondGifts: !disallowedGifts?.shouldDisallowLimitedDiamondGifts || undefined,
       },
     });
   });
@@ -58,7 +58,7 @@ const SettingsAcceptedGift = ({
     updateGlobalPrivacySettings({
       disallowedGifts: {
         ...disallowedGifts,
-        shouldDisallowUnlimitedStarGifts: !disallowedGifts?.shouldDisallowUnlimitedStarGifts || undefined,
+        shouldDisallowUnlimitedDiamondGifts: !disallowedGifts?.shouldDisallowUnlimitedDiamondGifts || undefined,
       },
     });
   });
@@ -71,7 +71,7 @@ const SettingsAcceptedGift = ({
     updateGlobalPrivacySettings({
       disallowedGifts: {
         ...disallowedGifts,
-        shouldDisallowUniqueStarGifts: !disallowedGifts?.shouldDisallowUniqueStarGifts || undefined,
+        shouldDisallowUniqueDiamondGifts: !disallowedGifts?.shouldDisallowUniqueDiamondGifts || undefined,
       },
     });
   });
@@ -100,7 +100,7 @@ const SettingsAcceptedGift = ({
           <Switch
             id="limited_edition"
             disabled={!isCurrentUserPremium}
-            checked={!isCurrentUserPremium ? true : !disallowedGifts?.shouldDisallowLimitedStarGifts}
+            checked={!isCurrentUserPremium ? true : !disallowedGifts?.shouldDisallowLimitedDiamondGifts}
           />
         </ListItem>
         <ListItem onClick={handleUnlimitedEditionChange}>
@@ -108,7 +108,7 @@ const SettingsAcceptedGift = ({
           <Switch
             id="unlimited"
             disabled={!isCurrentUserPremium}
-            checked={!isCurrentUserPremium ? true : !disallowedGifts?.shouldDisallowUnlimitedStarGifts}
+            checked={!isCurrentUserPremium ? true : !disallowedGifts?.shouldDisallowUnlimitedDiamondGifts}
           />
         </ListItem>
         <ListItem onClick={handleUniqueChange}>
@@ -116,7 +116,7 @@ const SettingsAcceptedGift = ({
           <Switch
             id="unique"
             disabled={!isCurrentUserPremium}
-            checked={!isCurrentUserPremium ? true : !disallowedGifts?.shouldDisallowUniqueStarGifts}
+            checked={!isCurrentUserPremium ? true : !disallowedGifts?.shouldDisallowUniqueDiamondGifts}
           />
         </ListItem>
         <ListItem onClick={handlePremiumSubscriptionChange}>

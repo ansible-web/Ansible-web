@@ -152,7 +152,7 @@ export function resolveRichMediaRef(value: string, expectedType?: RichEditorMedi
 }
 
 export function parseRichMediaRef(value: string) {
-  const match = /^tg:\/\/(photo|video|audio|document)\?id=(\d{1,20})$/.exec(value);
+  const match = /^as:\/\/(photo|video|audio|document)\?id=(\d{1,20})$/.exec(value);
   if (!match) {
     return undefined;
   }

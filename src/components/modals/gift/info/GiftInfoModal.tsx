@@ -12,13 +12,13 @@ import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../../config';
 import { getHasAdminRight } from '../../../../global/helpers';
 import { getPeerTitle, isApiPeerChat, isApiPeerUser } from '../../../../global/helpers/peers';
 import { getMainUsername } from '../../../../global/helpers/users';
-import { selectPeer, selectPeerPaidMessagesStars, selectUser } from '../../../../global/selectors';
+import { selectPeer, selectPeerPaidMessagesDiamonds, selectUser } from '../../../../global/selectors';
 import buildClassName from '../../../../util/buildClassName';
 import { copyTextToClipboard } from '../../../../util/clipboard';
 import { formatDateTimeToString } from '../../../../util/dates/oldDateFormat';
 import { formatCurrency, formatCurrencyAsString } from '../../../../util/formatCurrency';
 import {
-  formatStarsAsIcon, formatStarsAsText, formatTonAsIcon, formatTonAsText,
+  formatDiamondsAsIcon, formatDiamondsAsText, formatTonAsIcon, formatTonAsText,
   NEXT_ARROW_REPLACEMENT,
 } from '../../../../util/localization/format';
 import { CUSTOM_PEER_HIDDEN } from '../../../../util/objects/customPeer';
@@ -68,7 +68,7 @@ type StateProps = {
   currentUser?: ApiUser;
   recipientPeer?: ApiPeer;
   giftMessageLimit?: number;
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
 };
 
 const STICKER_SIZE = 120;
@@ -87,18 +87,18 @@ const GiftInfoModal = ({
   currentUser,
   recipientPeer,
   giftMessageLimit,
-  paidMessagesStars,
+  paidMessagesDiamonds,
 }: OwnProps & StateProps) => {
   const {
     closeGiftInfoModal,
     changeGiftVisibility,
-    convertGiftToStars,
+    convertGiftToDiamonds,
     openChatWithInfo,
     focusMessage,
     openGiftUpgradeModal,
     openGiftCraftModal,
     showNotification,
-    buyStarGift,
+    buyDiamondGift,
     closeGiftModal,
     openGiftInfoValueModal,
     openGiftDescriptionRemoveModal,
@@ -173,7 +173,7 @@ const GiftInfoModal = ({
 
   const resellPrice = getResalePrice();
   const confirmPrice = getResalePrice(shouldPayInTon);
-  const resellPriceInStars = resellPrice?.currency === TON_CURRENCY_CODE && isGiftUnique
+  const resellPriceInDiamonds = resellPrice?.currency === TON_CURRENCY_CODE && isGiftUnique
     ? gift.resellPrice?.find((amount) => amount.currency === STARS_CURRENCY_CODE)
     : undefined;
   const canBuyGift = !isSelfUnique && gift?.type === 'starGiftUnique'
@@ -205,9 +205,9 @@ const GiftInfoModal = ({
     handleClose();
   });
 
-  const handleConvertToStars = useLastCallback(() => {
+  const handleConvertToDiamonds = useLastCallback(() => {
     const { inputGift } = savedGift!;
-    convertGiftToStars({ gift: inputGift! });
+    convertGiftToDiamonds({ gift: inputGift! });
     closeConvertConfirm();
     handleClose();
   });
@@ -248,11 +248,11 @@ const GiftInfoModal = ({
     if (!peer || !price || gift?.type !== 'starGiftUnique') return;
     closeConfirmModal();
     closeGiftModal();
-    buyStarGift({
+    buyDiamondGift({
       peerId: peer.id,
       slug: gift.slug,
       price,
-      message: recipientPeer && !paidMessagesStars && giftMessage ? { text: giftMessage } : undefined,
+      message: recipientPeer && !paidMessagesDiamonds && giftMessage ? { text: giftMessage } : undefined,
       shouldShowName: recipientPeer && !shouldHideName ? true : undefined,
     });
   });
@@ -328,10 +328,10 @@ const GiftInfoModal = ({
               stars: formatCurrency(lang, resellPrice.amount, resellPrice.currency, { asFontIcon: false }),
             }, { withNodes: true })}
           </span>
-          {resellPrice?.currency === TON_CURRENCY_CODE && Boolean(resellPriceInStars) && (
+          {resellPrice?.currency === TON_CURRENCY_CODE && Boolean(resellPriceInDiamonds) && (
             <span className={styles.footerHint}>
               {lang('GiftBuyEqualsTo', {
-                stars: formatStarsAsIcon(lang, resellPriceInStars.amount),
+                stars: formatDiamondsAsIcon(lang, resellPriceInDiamonds.amount),
               }, { withNodes: true })}
             </span>
           )}
@@ -347,7 +347,7 @@ const GiftInfoModal = ({
       );
     }
 
-    if (canManage && savedGift?.alreadyPaidUpgradeStars && !savedGift.upgradeMsgId) {
+    if (canManage && savedGift?.alreadyPaidUpgradeDiamonds && !savedGift.upgradeMsgId) {
       return (
         <Button
           isShiny
@@ -440,7 +440,7 @@ const GiftInfoModal = ({
       if (savedGift.isRefunded) return lang('GiftInfoDescriptionRefunded');
 
       if (savedGift.upgradeMsgId) return lang('GiftInfoDescriptionUpgraded');
-      if (canManage && savedGift.canUpgrade && savedGift.alreadyPaidUpgradeStars && !savedGift.upgradeMsgId) {
+      if (canManage && savedGift.canUpgrade && savedGift.alreadyPaidUpgradeDiamonds && !savedGift.upgradeMsgId) {
         return lang('GiftInfoDescriptionUpgrade2');
       }
       if (savedGift.canUpgrade && canManage) {
@@ -537,7 +537,7 @@ const GiftInfoModal = ({
           <div className={styles.giftResalePriceContainer}>
             {formatCurrency(lang, resellPrice.amount, resellPrice.currency, {
               asFontIcon: false,
-              iconClassName: styles.giftResalePriceStar,
+              iconClassName: styles.giftResalePriceDiamond,
             })}
           </div>
         )}
@@ -626,12 +626,12 @@ const GiftInfoModal = ({
         ]);
       }
 
-      const starsValue = gift.stars + (savedGift?.alreadyPaidUpgradeStars || 0);
+      const starsValue = gift.stars + (savedGift?.alreadyPaidUpgradeDiamonds || 0);
 
       tableData.push([
         lang('GiftInfoValue'),
         <div className={styles.giftValue}>
-          {formatStarsAsIcon(lang, starsValue, { className: styles.starAmountIcon, withWrapper: true })}
+          {formatDiamondsAsIcon(lang, starsValue, { className: styles.starAmountIcon, withWrapper: true })}
           {canManage && hasConvertOption && Boolean(starsToConvert) && (
             <BadgeButton onClick={openConvertConfirm}>
               {lang('GiftInfoConvert', { amount: starsToConvert }, { pluralValue: starsToConvert })}
@@ -741,7 +741,7 @@ const GiftInfoModal = ({
       if (gift.valueAmount && gift.valueCurrency) {
         // Crystals (XTR) render as the diamond icon, not the "XTR" currency code.
         const formattedValue = gift.valueCurrency === STARS_CURRENCY_CODE
-          ? formatStarsAsIcon(lang, gift.valueAmount)
+          ? formatDiamondsAsIcon(lang, gift.valueAmount)
           : formatCurrencyAsString(gift.valueAmount, gift.valueCurrency, lang.code);
         tableData.push([
           lang('GiftInfoValue'),
@@ -896,7 +896,7 @@ const GiftInfoModal = ({
           confirmLabel={lang('ButtonBuyGift', {
             stars: confirmPrice?.currency === TON_CURRENCY_CODE
               ? formatTonAsIcon(lang, confirmPrice.amount, { shouldConvertFromNanos: true })
-              : formatStarsAsIcon(lang, confirmPrice.amount),
+              : formatDiamondsAsIcon(lang, confirmPrice.amount),
           }, { withNodes: true })}
           confirmHandler={handleConfirmBuyGift}
         >
@@ -921,7 +921,7 @@ const GiftInfoModal = ({
                   gift: lang('GiftUnique', { title: uniqueGift.title, number: uniqueGift.number }),
                   stars: confirmPrice?.currency === TON_CURRENCY_CODE
                     ? formatTonAsText(lang, confirmPrice.amount, true)
-                    : formatStarsAsText(lang, confirmPrice.amount),
+                    : formatDiamondsAsText(lang, confirmPrice.amount),
                 }, {
                   withNodes: true,
                   withMarkdown: true,
@@ -935,7 +935,7 @@ const GiftInfoModal = ({
                   gift: lang('GiftUnique', { title: uniqueGift.title, number: uniqueGift.number }),
                   stars: confirmPrice?.currency === TON_CURRENCY_CODE
                     ? formatTonAsText(lang, confirmPrice.amount, true)
-                    : formatStarsAsText(lang, confirmPrice.amount),
+                    : formatDiamondsAsText(lang, confirmPrice.amount),
                   peer: getPeerTitle(lang, recipientPeer),
                 }, {
                   withNodes: true,
@@ -948,7 +948,7 @@ const GiftInfoModal = ({
               onCheck=setShouldPayInTon/> + <div>DescriptionPayInTON</div> (и вернуть сеттер на L108). */}
           {recipientPeer && (
             <div className={styles.resaleOptions}>
-              {!paidMessagesStars && (
+              {!paidMessagesDiamonds && (
                 <TextArea
                   className={styles.resaleMessage}
                   label={lang('GiftMessagePlaceholder')}
@@ -976,12 +976,12 @@ const GiftInfoModal = ({
         <ConfirmDialog
           isOpen={isConvertConfirmOpen}
           onClose={closeConvertConfirm}
-          confirmHandler={handleConvertToStars}
+          confirmHandler={handleConvertToDiamonds}
           title={lang('GiftInfoConvertTitle')}
         >
           <div>
             {lang('GiftInfoPeerConvertDescription', {
-              amount: formatStarsAsText(lang, savedGift.starsToConvert!),
+              amount: formatDiamondsAsText(lang, savedGift.starsToConvert!),
               peer: getPeerTitle(lang, renderingFromPeer!)!,
             }, {
               withNodes: true,
@@ -1040,7 +1040,7 @@ export default memo(withGlobal<OwnProps>(
       currentUser,
       recipientPeer,
       giftMessageLimit: global.appConfig.starGiftMaxMessageLength,
-      paidMessagesStars: recipientPeer ? selectPeerPaidMessagesStars(global, recipientPeer.id) : undefined,
+      paidMessagesDiamonds: recipientPeer ? selectPeerPaidMessagesDiamonds(global, recipientPeer.id) : undefined,
     };
   },
 )(GiftInfoModal));

@@ -1,6 +1,6 @@
 import type { TeactNode } from '../../../lib/teact/teact';
 
-import type { ApiPeer, ApiStarGiftAttributeOriginalDetails } from '../../../api/types';
+import type { ApiDiamondGiftAttributeOriginalDetails, ApiPeer } from '../../../api/types';
 
 import { getPeerTitle } from '../../../global/helpers/peers';
 import { formatDateTimeToString } from '../../../util/dates/oldDateFormat';
@@ -10,7 +10,7 @@ import { renderTextWithEntities } from './renderTextWithEntities';
 import Link from '../../ui/Link';
 
 type GiftOriginalInfoOptions = {
-  originalDetails: ApiStarGiftAttributeOriginalDetails;
+  originalDetails: ApiDiamondGiftAttributeOriginalDetails;
   recipient: ApiPeer;
   sender?: ApiPeer;
   onOpenChat: (peerId: string) => void;

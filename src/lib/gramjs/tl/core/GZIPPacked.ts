@@ -73,7 +73,7 @@ export default class GZIPPacked {
   }
 
   static fromReader(reader: BinaryReader) {
-    const data = reader.tgReadBytes();
+    const data = reader.asReadBytes();
     return new GZIPPacked(GZIPPacked.ungzip(data));
   }
 }

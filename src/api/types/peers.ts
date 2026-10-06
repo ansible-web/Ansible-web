@@ -44,7 +44,7 @@ export interface ApiPeerSettings {
   canReportSpam?: boolean;
   canAddContact?: boolean;
   canBlockContact?: boolean;
-  chargedPaidMessageStars?: number;
+  chargedPaidMessageDiamonds?: number;
   registrationMonth?: string;
   phoneCountry?: string;
   nameChangeDate?: number;

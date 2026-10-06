@@ -159,9 +159,9 @@ const ActionMessage = ({
     openMediaViewer,
     getReceipt,
     checkGiftCode,
-    openPrizeStarsTransactionFromGiveaway,
+    openPrizeDiamondsTransactionFromGiveaway,
     openPremiumModal,
-    openStarsTransactionFromGift,
+    openDiamondsTransactionFromGift,
     openGiftInfoModalFromMessage,
     toggleChannelRecommendations,
     animateUnreadReaction,
@@ -169,7 +169,7 @@ const ActionMessage = ({
     markPollVotesRead,
     focusMessage,
     openGiftOfferAcceptModal,
-    declineStarGiftOffer,
+    declineDiamondGiftOffer,
     showNotification,
     toggleNoForwards,
   } = getActions();
@@ -264,7 +264,7 @@ const ActionMessage = ({
 
   const handleRejectOfferConfirm = useLastCallback(() => {
     closeRejectOfferDialog();
-    declineStarGiftOffer({ messageId: id });
+    declineDiamondGiftOffer({ messageId: id });
   });
 
   const handleRejectOfferClose = useLastCallback(() => {
@@ -398,7 +398,7 @@ const ActionMessage = ({
       }
 
       case 'prizeStars': {
-        openPrizeStarsTransactionFromGiveaway({
+        openPrizeDiamondsTransactionFromGiveaway({
           chatId: message.chatId,
           messageId: message.id,
         });
@@ -417,7 +417,7 @@ const ActionMessage = ({
 
       case 'giftTon':
       case 'giftStars': {
-        openStarsTransactionFromGift({
+        openDiamondsTransactionFromGift({
           chatId: message.chatId,
           messageId: message.id,
         });

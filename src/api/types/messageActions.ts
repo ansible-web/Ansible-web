@@ -1,6 +1,6 @@
 import type { ApiGroupCall, ApiPhoneCallDiscardReason } from './calls';
 import type { ApiBotApp, ApiFormattedText, ApiPhoto, ApiPollAnswer, ApiTodoItem } from './messages';
-import type { ApiStarGiftRegular, ApiStarGiftUnique, ApiTypeCurrencyAmount } from './stars';
+import type { ApiDiamondGiftRegular, ApiDiamondGiftUnique, ApiTypeCurrencyAmount } from './stars';
 import type { ApiBirthday } from './users';
 
 interface ActionMediaType {
@@ -210,7 +210,7 @@ export interface ApiMessageActionGiveawayLaunch extends ActionMediaType {
 
 export interface ApiMessageActionGiveawayResults extends ActionMediaType {
   type: 'giveawayResults';
-  isStars?: true;
+  isDiamonds?: true;
   winnersCount: number;
   unclaimedCount: number;
 }
@@ -227,7 +227,7 @@ export interface ApiMessageActionPaymentRefunded extends ActionMediaType {
   totalAmount: number;
 }
 
-export interface ApiMessageActionGiftStars extends ActionMediaType {
+export interface ApiMessageActionGiftDiamonds extends ActionMediaType {
   type: 'giftStars';
   currency: string;
   amount: number;
@@ -246,7 +246,7 @@ export interface ApiMessageActionGiftTon extends ActionMediaType {
   transactionId?: string;
 }
 
-export interface ApiMessageActionPrizeStars extends ActionMediaType {
+export interface ApiMessageActionPrizeDiamonds extends ActionMediaType {
   type: 'prizeStars';
   isUnclaimed?: true;
   stars: number;
@@ -255,7 +255,7 @@ export interface ApiMessageActionPrizeStars extends ActionMediaType {
   giveawayMsgId: number;
 }
 
-export interface ApiMessageActionStarGift extends ActionMediaType {
+export interface ApiMessageActionDiamondGift extends ActionMediaType {
   type: 'starGift';
   isNameHidden?: true;
   isSaved?: true;
@@ -265,12 +265,12 @@ export interface ApiMessageActionStarGift extends ActionMediaType {
   canUpgrade?: true;
   isPrepaidUpgrade?: true;
   isAuctionAcquired?: true;
-  gift: ApiStarGiftRegular;
+  gift: ApiDiamondGiftRegular;
   message?: ApiFormattedText;
   starsToConvert?: number;
   upgradeMsgId?: number;
   giftMsgId?: number;
-  alreadyPaidUpgradeStars?: number;
+  alreadyPaidUpgradeDiamonds?: number;
   fromId?: string;
   peerId?: string;
   savedId?: string;
@@ -279,7 +279,7 @@ export interface ApiMessageActionStarGift extends ActionMediaType {
   giftNumber?: number;
 }
 
-export interface ApiMessageActionStarGiftUnique extends ActionMediaType {
+export interface ApiMessageActionDiamondGiftUnique extends ActionMediaType {
   type: 'starGiftUnique';
   isNameHidden?: true;
   message?: ApiFormattedText;
@@ -289,7 +289,7 @@ export interface ApiMessageActionStarGiftUnique extends ActionMediaType {
   isRefunded?: true;
   isPrepaidUpgrade?: true;
   isFromOffer?: true;
-  gift: ApiStarGiftUnique;
+  gift: ApiDiamondGiftUnique;
   canExportAt?: number;
   transferStars?: number;
   fromId?: string;
@@ -364,19 +364,19 @@ export interface ApiMessageActionPollDeleteAnswer extends ActionMediaType {
   answer: ApiPollAnswer;
 }
 
-export interface ApiMessageActionStarGiftPurchaseOffer extends ActionMediaType {
+export interface ApiMessageActionDiamondGiftPurchaseOffer extends ActionMediaType {
   type: 'starGiftPurchaseOffer';
   isAccepted?: true;
   isDeclined?: true;
-  gift: ApiStarGiftUnique;
+  gift: ApiDiamondGiftUnique;
   price: ApiTypeCurrencyAmount;
   expiresAt: number;
 }
 
-export interface ApiMessageActionStarGiftPurchaseOfferDeclined extends ActionMediaType {
+export interface ApiMessageActionDiamondGiftPurchaseOfferDeclined extends ActionMediaType {
   type: 'starGiftPurchaseOfferDeclined';
   isExpired?: true;
-  gift: ApiStarGiftUnique;
+  gift: ApiDiamondGiftUnique;
   price: ApiTypeCurrencyAmount;
 }
 
@@ -421,12 +421,13 @@ export type ApiMessageAction = ApiMessageActionUnsupported | ApiMessageActionCha
   | ApiMessageActionTopicCreate | ApiMessageActionTopicEdit | ApiMessageActionSuggestProfilePhoto
   | ApiMessageActionSuggestBirthday
   | ApiMessageActionChannelJoined | ApiMessageActionGiftCode | ApiMessageActionGiveawayLaunch
-  | ApiMessageActionGiveawayResults | ApiMessageActionPaymentRefunded | ApiMessageActionGiftStars
-  | ApiMessageActionGiftTon | ApiMessageActionPrizeStars | ApiMessageActionStarGift | ApiMessageActionStarGiftUnique
+  | ApiMessageActionGiveawayResults | ApiMessageActionPaymentRefunded | ApiMessageActionGiftDiamonds
+  | ApiMessageActionGiftTon | ApiMessageActionPrizeDiamonds | ApiMessageActionDiamondGift
+  | ApiMessageActionDiamondGiftUnique
   | ApiMessageActionPaidMessagesRefunded | ApiMessageActionPaidMessagesPrice | ApiMessageActionSuggestedPostApproval
   | ApiMessageActionSuggestedPostSuccess | ApiMessageActionSuggestedPostRefund | ApiMessageActionTodoCompletions
   | ApiMessageActionTodoAppendTasks | ApiMessageActionPollAppendAnswer | ApiMessageActionPollDeleteAnswer
-  | ApiMessageActionStarGiftPurchaseOffer
-  | ApiMessageActionStarGiftPurchaseOfferDeclined | ApiMessageActionNewCreatorPending
+  | ApiMessageActionDiamondGiftPurchaseOffer
+  | ApiMessageActionDiamondGiftPurchaseOfferDeclined | ApiMessageActionNewCreatorPending
   | ApiMessageActionChangeCreator | ApiMessageActionNoForwardsToggle | ApiMessageActionNoForwardsRequest
   | ApiMessageActionChangeCommunity;

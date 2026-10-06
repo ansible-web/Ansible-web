@@ -5,10 +5,10 @@ import {
 import { getActions, withGlobal } from '../../../../global';
 
 import type {
-  ApiStarGiftAttributeBackdrop,
-  ApiStarGiftAttributeModel,
-  ApiStarGiftAttributePattern,
-  ApiStarGiftUnique,
+  ApiDiamondGiftAttributeBackdrop,
+  ApiDiamondGiftAttributeModel,
+  ApiDiamondGiftAttributePattern,
+  ApiDiamondGiftUnique,
   ApiSticker,
 } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
@@ -168,7 +168,7 @@ const PatternAttributePreview = memo(({ sticker }: { sticker: ApiSticker }) => {
 
 type CraftSlotProps = {
   index: number;
-  gift?: ApiStarGiftUnique;
+  gift?: ApiDiamondGiftUnique;
   isUsed: boolean;
   isAnimating: boolean;
   isActivated: boolean;
@@ -303,7 +303,7 @@ const GiftCraftModal = ({ modal, craftAttributePermilles }: OwnProps & StateProp
   );
 
   const totalChancePermille = useMemo(() => {
-    const getChance = (g?: ApiStarGiftUnique) => g?.craftChancePermille || 0;
+    const getChance = (g?: ApiDiamondGiftUnique) => g?.craftChancePermille || 0;
     return getChance(gift1) + getChance(gift2) + getChance(gift3) + getChance(gift4);
   }, [gift1, gift2, gift3, gift4]);
 
@@ -323,18 +323,18 @@ const GiftCraftModal = ({ modal, craftAttributePermilles }: OwnProps & StateProp
   const previewModelStickers = useMemo(() => {
     if (!previewAttributes?.length) return undefined;
     return previewAttributes
-      .filter((attr): attr is ApiStarGiftAttributeModel => attr.type === 'model')
+      .filter((attr): attr is ApiDiamondGiftAttributeModel => attr.type === 'model')
       .slice(0, 3)
       .map((attr) => attr.sticker);
   }, [previewAttributes]);
 
   // Calculate attribute stats for probability circles
   const attributeStats = useMemo(() => {
-    const selectedGifts = gifts.filter((g): g is ApiStarGiftUnique => Boolean(g));
+    const selectedGifts = gifts.filter((g): g is ApiDiamondGiftUnique => Boolean(g));
     if (selectedGifts.length === 0) return { backdrops: [], patterns: [] };
 
-    const backdropCounts = new Map<number, { count: number; attr: ApiStarGiftAttributeBackdrop }>();
-    const patternCounts = new Map<string, { count: number; attr: ApiStarGiftAttributePattern }>();
+    const backdropCounts = new Map<number, { count: number; attr: ApiDiamondGiftAttributeBackdrop }>();
+    const patternCounts = new Map<string, { count: number; attr: ApiDiamondGiftAttributePattern }>();
 
     for (const gift of selectedGifts) {
       for (const attr of gift.attributes) {
@@ -414,7 +414,7 @@ const GiftCraftModal = ({ modal, craftAttributePermilles }: OwnProps & StateProp
   const [removingSlots, setRemovingSlots] = useState<Set<number>>(() => new Set());
   const [craftedGiftFace, setCraftedGiftFace] = useState<{
     face: FaceName;
-    gift: ApiStarGiftUnique;
+    gift: ApiDiamondGiftUnique;
   } | undefined>(undefined);
   const [failedFace, setFailedFace] = useState<{
     face: FaceName;
@@ -1081,7 +1081,7 @@ const GiftCraftModal = ({ modal, craftAttributePermilles }: OwnProps & StateProp
       // After braking + rotation + display duration, close and show result
       setTimeout(() => {
         closeGiftCraftModal();
-        requestConfetti({ withStars: true });
+        requestConfetti({ withDiamonds: true });
         openGiftInfoModal({ gift: craftResult.gift });
       }, CONFIG.brakingDuration + CONFIG.resultRotationDuration + CONFIG.resultDisplayDuration);
     } else {
@@ -1121,7 +1121,7 @@ const GiftCraftModal = ({ modal, craftAttributePermilles }: OwnProps & StateProp
   useEffect(() => {
     if (allAttributes === renderingAttributes) return;
 
-    const getAttrKey = (a: { attr: ApiStarGiftAttributeBackdrop | ApiStarGiftAttributePattern }) => (
+    const getAttrKey = (a: { attr: ApiDiamondGiftAttributeBackdrop | ApiDiamondGiftAttributePattern }) => (
       a.attr.type === 'backdrop' ? `b-${a.attr.backdropId}` : `p-${a.attr.sticker.id}`
     );
 
@@ -1140,7 +1140,7 @@ const GiftCraftModal = ({ modal, craftAttributePermilles }: OwnProps & StateProp
   }, [allAttributes, renderingAttributes, startViewTransition]);
 
   const burnedGifts = useMemo(
-    () => gifts.filter((g): g is ApiStarGiftUnique => Boolean(g)),
+    () => gifts.filter((g): g is ApiDiamondGiftUnique => Boolean(g)),
     [gifts],
   );
 
@@ -1312,7 +1312,7 @@ const GiftCraftModal = ({ modal, craftAttributePermilles }: OwnProps & StateProp
   }
 
   function renderAttributeDial(
-    attr: ApiStarGiftAttributeBackdrop | ApiStarGiftAttributePattern,
+    attr: ApiDiamondGiftAttributeBackdrop | ApiDiamondGiftAttributePattern,
     permille: number,
   ) {
     const percent = permille / 10;

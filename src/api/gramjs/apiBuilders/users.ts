@@ -2,8 +2,8 @@ import { Api as GramJs } from '../../../lib/gramjs';
 
 import type {
   ApiBirthday,
+  ApiDiamondsRating,
   ApiPeerSettings,
-  ApiStarsRating,
   ApiUser,
   ApiUserFullInfo,
   ApiUserStatus,
@@ -74,12 +74,12 @@ export function buildApiUserFullInfo(mtpUserFull: GramJs.users.UserFull): ApiUse
     botVerification: botVerification && buildApiBotVerification(botVerification),
     areAdsEnabled: sponsoredEnabled,
     starGiftCount: stargiftsCount,
-    starsRating: starsRating && buildApiStarsRating(starsRating),
-    starsMyPendingRating: starsMyPendingRating && buildApiStarsRating(starsMyPendingRating),
+    starsRating: starsRating && buildApiDiamondsRating(starsRating),
+    starsMyPendingRating: starsMyPendingRating && buildApiDiamondsRating(starsMyPendingRating),
     starsMyPendingRatingDate,
     isBotCanManageEmojiStatus: botCanManageEmojiStatus,
     hasScheduledMessages: hasScheduled,
-    paidMessagesStars: toJSNumber(sendPaidMessagesStars),
+    paidMessagesDiamonds: toJSNumber(sendPaidMessagesStars),
     settings: buildApiPeerSettings(settings),
     mainTab: mainTab && buildApiProfileTab(mainTab),
     savedMusic: savedMusic && buildApiSavedMusic(savedMusic, userId),
@@ -110,7 +110,7 @@ export function buildApiPeerSettings({
     phoneCountry,
     nameChangeDate,
     photoChangeDate,
-    chargedPaidMessageStars: toJSNumber(chargePaidMessageStars),
+    chargedPaidMessageDiamonds: toJSNumber(chargePaidMessageStars),
   };
 }
 
@@ -166,7 +166,7 @@ export function buildApiUser(mtpUser: GramJs.TypeUser): ApiUser | undefined {
     botVerificationIconId: botVerificationIcon?.toString(),
     color: mtpUser.color && buildApiPeerColor(mtpUser.color),
     profileColor: profileColor && buildApiPeerColor(profileColor),
-    paidMessagesStars: toJSNumber(sendPaidMessagesStars),
+    paidMessagesDiamonds: toJSNumber(sendPaidMessagesStars),
     isBotForum: botForumView,
     canManageBotForumTopics: botForumCanManageTopics,
     isGuestChatBot: botGuestchat,
@@ -217,7 +217,7 @@ export function buildApiBirthday(birthday: GramJs.TypeBirthday): ApiBirthday {
   return omitVirtualClassFields(birthday);
 }
 
-export function buildApiStarsRating(starsRating: GramJs.StarsRating): ApiStarsRating {
+export function buildApiDiamondsRating(starsRating: GramJs.StarsRating): ApiDiamondsRating {
   return {
     level: starsRating.level,
     currentLevelStars: toJSNumber(starsRating.currentLevelStars),

@@ -194,7 +194,7 @@ export async function doAuthentication(
   const plainTextAnswer = ige.decryptIge(serverDhParams.encryptedAnswer);
   const reader = new BinaryReader(plainTextAnswer);
   const hash = reader.read(20); // hash sum
-  const serverDhInner = reader.tgReadObject();
+  const serverDhInner = reader.asReadObject();
   if (!(serverDhInner instanceof Api.ServerDHInnerData)) {
     throw new Error(`Step 3 answer was ${serverDhInner}`);
   }

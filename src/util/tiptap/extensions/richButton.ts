@@ -67,7 +67,7 @@ export function buildButtonHtmlAttrs(attrs: Record<string, unknown>) {
 function parseButtonHtmlAttrs(element: HTMLElement) {
   const type = element.getAttribute('type');
   const url = element.getAttribute('url');
-  const userId = type === 'url' && url?.match(/^tg:\/\/user\?id=(\d+)$/)?.[1];
+  const userId = type === 'url' && url?.match(/^as:\/\/user\?id=(\d+)$/)?.[1];
   const color = element.getAttribute('style');
   const attrs = {
     buttonType: userId ? 'userProfile' : type === 'copy_text' ? 'copy' : type,

@@ -37,7 +37,7 @@ import {
   buildApiMessageEntity,
   buildApiPhoto, buildApiUsernames, buildPrivacyRules,
 } from '../apiBuilders/common';
-import { buildApiStarGiftAuctionUserState, buildApiTypeStarGiftAuctionState } from '../apiBuilders/gifts';
+import { buildApiDiamondGiftAuctionUserState, buildApiTypeDiamondGiftAuctionState } from '../apiBuilders/gifts';
 import { omitVirtualClassFields } from '../apiBuilders/helpers';
 import {
   buildApiMessageExtendedMediaPreview,
@@ -1224,7 +1224,7 @@ export function updater(update: Update) {
       balance,
     });
   } else if (update instanceof GramJs.UpdateStarGiftAuctionState) {
-    const state = buildApiTypeStarGiftAuctionState(update.state);
+    const state = buildApiTypeDiamondGiftAuctionState(update.state);
     if (!state) {
       return;
     }
@@ -1237,7 +1237,7 @@ export function updater(update: Update) {
     sendApiUpdate({
       '@type': 'updateStarGiftAuctionUserState',
       giftId: update.giftId.toString(),
-      userState: buildApiStarGiftAuctionUserState(update.userState),
+      userState: buildApiDiamondGiftAuctionUserState(update.userState),
     });
   } else if (update instanceof GramJs.UpdateStarGiftCraftFail) {
     sendApiUpdate({

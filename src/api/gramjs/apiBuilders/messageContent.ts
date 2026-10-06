@@ -3,6 +3,7 @@ import { Api as GramJs } from '../../../lib/gramjs';
 import type {
   ApiAudio,
   ApiContact,
+  ApiDiamondGiftUnique,
   ApiDice,
   ApiFormattedText,
   ApiGame,
@@ -21,7 +22,6 @@ import type {
   ApiPollAnswer,
   ApiPollResults,
   ApiRichMessage,
-  ApiStarGiftUnique,
   ApiSticker,
   ApiTodoItem,
   ApiVideo,
@@ -50,7 +50,7 @@ import {
   buildApiPhoto,
   buildApiThumbnailFromStripped,
 } from './common';
-import { buildApiStarGift } from './gifts';
+import { buildApiDiamondGift } from './gifts';
 import {
   buildApiInstantViewPage,
   buildApiPageBlock,
@@ -797,7 +797,7 @@ export function buildWebPage(webPage: GramJs.TypeWebPage): ApiWebPage | undefine
     const audio = document instanceof GramJs.Document ? buildAudioFromDocument(document) : undefined;
 
     let story: ApiWebPageStoryData | undefined;
-    let gift: ApiStarGiftUnique | undefined;
+    let gift: ApiDiamondGiftUnique | undefined;
     let auction: ApiWebPageAuctionData | undefined;
     let stickers: ApiWebPageStickerData | undefined;
     const attributeStory = attributes
@@ -820,11 +820,11 @@ export function buildWebPage(webPage: GramJs.TypeWebPage): ApiWebPage | undefine
       }
     }
     if (attributeGift) {
-      const starGift = buildApiStarGift(attributeGift.gift);
+      const starGift = buildApiDiamondGift(attributeGift.gift);
       gift = starGift.type === 'starGiftUnique' ? starGift : undefined;
     }
     if (attributeAuction) {
-      const starGift = buildApiStarGift(attributeAuction.gift);
+      const starGift = buildApiDiamondGift(attributeAuction.gift);
       if (starGift.type === 'starGift') {
         auction = {
           gift: starGift,

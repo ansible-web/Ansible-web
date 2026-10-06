@@ -23,14 +23,14 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
       const { totalAmount, currency } = invoice;
       const inputInvoice = paymentState.inputInvoice;
       if (inputInvoice?.type === 'stars') {
-        actions.closeStarsBalanceModal({ tabId });
+        actions.closeDiamondsBalanceModal({ tabId });
         actions.showNotification({
           message: langProvider.oldTranslate('DiamondsAcquiredInfo', inputInvoice.stars),
           title: langProvider.oldTranslate('StarsAcquired'),
           icon: 'star',
           tabId,
         });
-        actions.requestConfetti({ withStars: true, tabId });
+        actions.requestConfetti({ withDiamonds: true, tabId });
       } else if (inputInvoice?.type === 'giftcode') {
         const giftModalState = selectTabState(global, tabId).giftModal;
 
@@ -41,7 +41,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             },
             tabId,
           });
-          actions.requestConfetti({ withStars: true, tabId });
+          actions.requestConfetti({ withDiamonds: true, tabId });
           actions.closeGiftModal({ tabId });
         }
       } else {
@@ -102,7 +102,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             },
             tabId,
           });
-          actions.requestConfetti({ withStars: true, tabId });
+          actions.requestConfetti({ withDiamonds: true, tabId });
           actions.closeGiftModal({ tabId });
         }
       }
@@ -117,7 +117,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             },
             tabId,
           });
-          actions.requestConfetti({ withStars: true, tabId });
+          actions.requestConfetti({ withDiamonds: true, tabId });
           actions.closeGiftModal({ tabId });
         }
       }
@@ -153,7 +153,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             tabId,
           });
           actions.reloadPeerSavedGifts({ peerId: starGiftModalState.forPeerId });
-          actions.requestConfetti({ withStars: true, tabId });
+          actions.requestConfetti({ withDiamonds: true, tabId });
           actions.closeGiftModal({ tabId });
         }
       }
@@ -176,7 +176,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             actions.reloadPeerSavedGifts({ peerId: starGiftModalState.peerId });
           }
           actions.reloadPeerSavedGifts({ peerId: inputInvoice.peerId });
-          actions.requestConfetti({ withStars: true, tabId });
+          actions.requestConfetti({ withDiamonds: true, tabId });
 
           if (craftSlotIndex !== undefined && giftId) {
             actions.selectPurchasedGiftForCraft({ giftId, slotIndex: craftSlotIndex, tabId });
@@ -253,7 +253,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
 
       setGlobal(global);
 
-      actions.loadStarStatus();
+      actions.loadDiamondStatus();
       break;
     }
 

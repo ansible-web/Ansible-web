@@ -6,7 +6,7 @@ import type { TabState } from '../../../../global/types';
 
 import { getPeerTitle } from '../../../../global/helpers/peers';
 import { selectPeer } from '../../../../global/selectors';
-import { formatStarsAsIcon, formatStarsAsText } from '../../../../util/localization/format';
+import { formatDiamondsAsIcon, formatDiamondsAsText } from '../../../../util/localization/format';
 
 import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
 import useLang from '../../../../hooks/useLang';
@@ -64,7 +64,7 @@ const GiftTransferConfirmModal = ({ modal, selectedPeer }: OwnProps & StateProps
       confirmLabel={gift.transferStars
         ? lang(
           'GiftTransferConfirmButton',
-          { amount: formatStarsAsIcon(lang, gift.transferStars) },
+          { amount: formatDiamondsAsIcon(lang, gift.transferStars) },
           { withNodes: true },
         ) : lang('GiftTransferConfirmButtonFree')}
       confirmHandler={handleConfirm}
@@ -79,7 +79,7 @@ const GiftTransferConfirmModal = ({ modal, selectedPeer }: OwnProps & StateProps
         {gift.transferStars
           ? lang('GiftTransferConfirmDescription', {
             gift: lang('GiftUnique', { title: uniqueGift.title, number: uniqueGift.number }),
-            amount: formatStarsAsText(lang, gift.transferStars),
+            amount: formatDiamondsAsText(lang, gift.transferStars),
             peer: getPeerTitle(lang, renderingSelectedPeer!),
           }, {
             withNodes: true,

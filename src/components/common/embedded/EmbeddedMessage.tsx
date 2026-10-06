@@ -23,7 +23,7 @@ import { getRichMessagePreviewText } from '../../../global/helpers/richMessage';
 import buildClassName from '../../../util/buildClassName';
 import { formatScheduledDateTime } from '../../../util/dates/oldDateFormat';
 import { isUserId } from '../../../util/entities/ids';
-import { formatStarsAsIcon, formatTonAsIcon } from '../../../util/localization/format';
+import { formatDiamondsAsIcon, formatTonAsIcon } from '../../../util/localization/format';
 import renderText from '../helpers/renderText';
 import { renderTextWithEntities } from '../helpers/renderTextWithEntities';
 
@@ -150,7 +150,7 @@ const EmbeddedMessage = ({
             className: 'suggested-price-ton-icon',
             shouldConvertFromNanos: true,
           })
-          : formatStarsAsIcon(lang, suggestedPostInfo.price.amount, {
+          : formatDiamondsAsIcon(lang, suggestedPostInfo.price.amount, {
             className: 'suggested-price-star-icon',
           }))
         : '';

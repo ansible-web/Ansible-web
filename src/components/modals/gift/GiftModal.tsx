@@ -5,13 +5,13 @@ import {
 import { getActions, withGlobal } from '../../../global';
 
 import type {
+  ApiDiamondGift,
+  ApiDiamondGiftRegular,
+  ApiDiamondsAmount,
   ApiDisallowedGifts,
   ApiPeer,
   ApiPremiumGiftCodeOption,
-  ApiSavedStarGift,
-  ApiStarGift,
-  ApiStarGiftRegular,
-  ApiStarsAmount,
+  ApiSavedDiamondGift,
 } from '../../../api/types';
 import type { TabState } from '../../../global/types';
 import type { ResaleGiftsFilterOptions, StarGiftCategory } from '../../../types';
@@ -53,21 +53,21 @@ export type OwnProps = {
   modal: TabState['giftModal'];
 };
 
-export type GiftOption = ApiPremiumGiftCodeOption | ApiStarGift;
+export type GiftOption = ApiPremiumGiftCodeOption | ApiDiamondGift;
 
 type StateProps = {
   boostPerSentGift?: number;
-  starGiftsById?: Record<string, ApiStarGiftRegular>;
+  starGiftsById?: Record<string, ApiDiamondGiftRegular>;
   starGiftIdsByCategory?: Record<StarGiftCategory, string[]>;
-  myUniqueGiftsById?: Record<string, ApiSavedStarGift>;
+  myUniqueGiftsById?: Record<string, ApiSavedDiamondGift>;
   myUniqueGiftIds?: string[];
-  starBalance?: ApiStarsAmount;
+  starBalance?: ApiDiamondsAmount;
   peer?: ApiPeer;
   currentUserId?: string;
   disallowedGifts?: ApiDisallowedGifts;
   resaleGiftsCount?: number;
   areResaleGiftsLoading?: boolean;
-  selectedResaleGift?: ApiStarGift;
+  selectedResaleGift?: ApiDiamondGift;
   resaleFilter?: ResaleGiftsFilterOptions;
   tabId: number;
 };
@@ -125,11 +125,11 @@ const GiftModal: FC<OwnProps & StateProps> = ({
 
   const selectedGift = renderingModal?.selectedGift;
   const [shouldShowMainScreenHeader, setShouldShowMainScreenHeader] = useState(false);
-  const [isMainScreenHeaderForStarGifts, setIsMainScreenHeaderForStarGifts] = useState(false);
-  const [isGiftScreenHeaderForStarGifts, setIsGiftScreenHeaderForStarGifts] = useState(false);
+  const [isMainScreenHeaderForDiamondGifts, setIsMainScreenHeaderForDiamondGifts] = useState(false);
+  const [isGiftScreenHeaderForDiamondGifts, setIsGiftScreenHeaderForDiamondGifts] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<StarGiftCategory>('all');
   const [isCategoryListPinned, pinCategoryList, unpinCategoryList] = useFlag(false);
-  const [wasStarsOnlyToggleShown, markStarsOnlyToggleShown, resetStarsOnlyToggleShown] = useFlag(false);
+  const [wasDiamondsOnlyToggleShown, markDiamondsOnlyToggleShown, resetDiamondsOnlyToggleShown] = useFlag(false);
   const triggerSparklesRef = useRef<(() => void) | undefined>();
 
   const areAllGiftsDisallowed = useMemo(() => {
@@ -143,9 +143,9 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     return !isSelf && Object.values(disallowedGiftTypes).every(Boolean);
   }, [isSelf, disallowedGifts]);
 
-  const areUnlimitedStarGiftsDisallowed = !isSelf && disallowedGifts?.shouldDisallowUnlimitedStarGifts;
-  const areLimitedStarGiftsDisallowed = !isSelf && disallowedGifts?.shouldDisallowLimitedStarGifts;
-  const areUniqueStarGiftsDisallowed = !isSelf && disallowedGifts?.shouldDisallowUniqueStarGifts;
+  const areUnlimitedDiamondGiftsDisallowed = !isSelf && disallowedGifts?.shouldDisallowUnlimitedDiamondGifts;
+  const areLimitedDiamondGiftsDisallowed = !isSelf && disallowedGifts?.shouldDisallowLimitedDiamondGifts;
+  const areUniqueDiamondGiftsDisallowed = !isSelf && disallowedGifts?.shouldDisallowUniqueDiamondGifts;
 
   const oldLang = useOldLang();
   const lang = useLang();
@@ -155,18 +155,18 @@ const GiftModal: FC<OwnProps & StateProps> = ({
       .filter((gift) => gift.users === 1 && gift.currency !== STARS_CURRENCY_CODE);
   }, [allGifts]);
 
-  const giftsByStars = useMemo(() => {
+  const giftsByDiamonds = useMemo(() => {
     const mapGifts = new Map();
 
     if (!filteredGifts) return mapGifts;
 
     filteredGifts.forEach((gift) => {
-      const giftByStars = allGifts?.find(
+      const giftByDiamonds = allGifts?.find(
         (starsGift) => starsGift.currency === STARS_CURRENCY_CODE
           && starsGift.months === gift.months,
       );
-      if (giftByStars) {
-        mapGifts.set(gift, giftByStars);
+      if (giftByDiamonds) {
+        mapGifts.set(gift, giftByDiamonds);
       }
     });
 
@@ -184,7 +184,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
   const isResaleScreen = Boolean(selectedResaleGift) && !selectedGift;
   const isGiftScreen = Boolean(selectedGift);
   const shouldShowHeader = isResaleScreen || isGiftScreen || shouldShowMainScreenHeader;
-  const isHeaderForStarGifts = isGiftScreen ? isGiftScreenHeaderForStarGifts : isMainScreenHeaderForStarGifts;
+  const isHeaderForDiamondGifts = isGiftScreen ? isGiftScreenHeaderForDiamondGifts : isMainScreenHeaderForDiamondGifts;
 
   useEffect(() => {
     if (selectedResaleGift) {
@@ -204,7 +204,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
   }, [isOpen]);
 
   useEffect(() => {
-    setIsGiftScreenHeaderForStarGifts(Boolean(selectedGift && 'id' in selectedGift));
+    setIsGiftScreenHeaderForDiamondGifts(Boolean(selectedGift && 'id' in selectedGift));
   }, [selectedGift]);
 
   const handleScroll = useLastCallback((e: React.UIEvent<HTMLDivElement>) => {
@@ -219,7 +219,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
       if (transitionRef.current && giftHeaderRef.current) {
         const { top: headerTop } = giftHeaderRef.current.getBoundingClientRect();
         const { top: transitionTop } = transitionRef.current.getBoundingClientRect();
-        setIsMainScreenHeaderForStarGifts(headerTop - transitionTop <= 0);
+        setIsMainScreenHeaderForDiamondGifts(headerTop - transitionTop <= 0);
       }
 
       if (categoryListRef.current && scrollerRef.current) {
@@ -290,7 +290,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     );
   }
 
-  function renderStarGiftsHeader() {
+  function renderDiamondGiftsHeader() {
     return (
       <h2 ref={giftHeaderRef} className={buildClassName(styles.headerText, styles.center)}>
         {lang(isSelf ? 'DiamondsGiftHeaderSelf' : 'DiamondsGiftHeader')}
@@ -298,7 +298,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     );
   }
 
-  function renderStarGiftsDescription() {
+  function renderDiamondGiftsDescription() {
     return (
       <p className={buildClassName(styles.description, styles.starGiftsDescription, styles.center)}>
         {starGiftDescription}
@@ -321,7 +321,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     setGiftModalSelectedGift({ gift });
   });
 
-  const handleMyGiftClick = useLastCallback((gift: ApiStarGift) => {
+  const handleMyGiftClick = useLastCallback((gift: ApiDiamondGift) => {
     if (gift.type === 'starGift' || !myUniqueGiftsById || !peer?.id) return;
     const savedGift = myUniqueGiftsById[gift.id];
 
@@ -337,7 +337,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     }
   });
 
-  function renderStarGifts() {
+  function renderDiamondGifts() {
     if (selectedCategory === 'myUnique') {
       return (
         <InfiniteScroll
@@ -371,11 +371,11 @@ const GiftModal: FC<OwnProps & StateProps> = ({
 
       const { isLimited, availabilityResale } = gift;
 
-      if (areLimitedStarGiftsDisallowed && isLimited) {
-        return !areUniqueStarGiftsDisallowed ? availabilityResale : false;
+      if (areLimitedDiamondGiftsDisallowed && isLimited) {
+        return !areUniqueDiamondGiftsDisallowed ? availabilityResale : false;
       }
 
-      if (areUnlimitedStarGiftsDisallowed && !isLimited) return false;
+      if (areUnlimitedDiamondGiftsDisallowed && !isLimited) return false;
 
       return true;
     });
@@ -384,8 +384,8 @@ const GiftModal: FC<OwnProps & StateProps> = ({
       <div className={styles.starGiftsContainer}>
         {starGiftsById && filteredGiftIds?.flatMap((giftId) => {
           const gift = starGiftsById[giftId];
-          const shouldShowResale = Boolean(gift.availabilityResale) && !areUniqueStarGiftsDisallowed;
-          const shouldDuplicateAsResale = shouldShowResale && !gift.isSoldOut && !areLimitedStarGiftsDisallowed;
+          const shouldShowResale = Boolean(gift.availabilityResale) && !areUniqueDiamondGiftsDisallowed;
+          const shouldDuplicateAsResale = shouldShowResale && !gift.isSoldOut && !areLimitedDiamondGiftsDisallowed;
 
           const elements = [
             <GiftItemDiamond
@@ -422,7 +422,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
           return (
             <GiftItemPremium
               option={gift}
-              optionByStars={giftsByStars.get(gift)}
+              optionByDiamonds={giftsByDiamonds.get(gift)}
               baseMonthAmount={baseGift ? Math.floor(baseGift.amount / baseGift.months) : undefined}
               onClick={handleGiftClick}
             />
@@ -462,7 +462,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     triggerSparklesRef.current = animate;
   });
 
-  const handleStarsOnlyChange = useLastCallback((isChecked: boolean) => {
+  const handleDiamondsOnlyChange = useLastCallback((isChecked: boolean) => {
     updateResaleGiftsFilter({
       filter: {
         ...resaleFilter,
@@ -472,17 +472,17 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     });
   });
 
-  const isStarsOnly = Boolean(resaleFilter?.starsOnly);
+  const isDiamondsOnly = Boolean(resaleFilter?.starsOnly);
 
   useEffect(() => {
-    resetStarsOnlyToggleShown();
-  }, [selectedResaleGift, resetStarsOnlyToggleShown]);
+    resetDiamondsOnlyToggleShown();
+  }, [selectedResaleGift, resetDiamondsOnlyToggleShown]);
 
   useEffect(() => {
     if (resaleGiftsCount && !areResaleGiftsLoading) {
-      markStarsOnlyToggleShown();
+      markDiamondsOnlyToggleShown();
     }
-  }, [resaleGiftsCount, areResaleGiftsLoading, markStarsOnlyToggleShown]);
+  }, [resaleGiftsCount, areResaleGiftsLoading, markDiamondsOnlyToggleShown]);
 
   function renderMainScreen() {
     return (
@@ -511,12 +511,12 @@ const GiftModal: FC<OwnProps & StateProps> = ({
 
         {!areAllGiftsDisallowed && (
           <>
-            {renderStarGiftsHeader()}
-            {renderStarGiftsDescription()}
+            {renderDiamondGiftsHeader()}
+            {renderDiamondGiftsDescription()}
             <DiamondGiftCategoryList
               ref={categoryListRef}
-              areUniqueStarGiftsDisallowed={areUniqueStarGiftsDisallowed}
-              areLimitedStarGiftsDisallowed={areLimitedStarGiftsDisallowed}
+              areUniqueDiamondGiftsDisallowed={areUniqueDiamondGiftsDisallowed}
+              areLimitedDiamondGiftsDisallowed={areLimitedDiamondGiftsDisallowed}
               isSelf={isSelf}
               hasMyUnique={Boolean(myUniqueGiftIds?.length)}
               isPinned={isCategoryListPinned}
@@ -527,7 +527,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
               activeKey={getCategoryKey(selectedCategory)}
               className={styles.starGiftsTransition}
             >
-              {renderStarGifts()}
+              {renderDiamondGifts()}
             </Transition>
           </>
         )}
@@ -573,7 +573,9 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     }
     return (
       <h2 className={styles.commonHeaderText}>
-        {lang(isHeaderForStarGifts ? (isSelf ? 'DiamondsGiftHeaderSelf' : 'DiamondsGiftHeader') : 'GiftPremiumHeader')}
+        {lang(isHeaderForDiamondGifts
+          ? (isSelf ? 'DiamondsGiftHeaderSelf' : 'DiamondsGiftHeader')
+          : 'GiftPremiumHeader')}
       </h2>
     );
   }
@@ -607,7 +609,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
       >
         <Transition
           name="slideVerticalFade"
-          activeKey={!shouldShowHeader ? 0 : isResaleScreen ? 1 : isHeaderForStarGifts ? 2 : 3}
+          activeKey={!shouldShowHeader ? 0 : isResaleScreen ? 1 : isHeaderForDiamondGifts ? 2 : 3}
           slideClassName={styles.headerSlide}
         >
           {renderHeader()}
@@ -629,7 +631,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
         {isGiftScreen && renderingModal?.forPeerId && (
           <GiftComposer
             gift={selectedGift}
-            giftByStars={giftsByStars.get(selectedGift)}
+            giftByDiamonds={giftsByDiamonds.get(selectedGift)}
             peerId={renderingModal.forPeerId}
           />
         )}
@@ -638,12 +640,12 @@ const GiftModal: FC<OwnProps & StateProps> = ({
         <Checkbox
           className={buildClassName(
             styles.starsOnlyToggle,
-            wasStarsOnlyToggleShown && styles.starsOnlyToggleVisible,
+            wasDiamondsOnlyToggleShown && styles.starsOnlyToggleVisible,
           )}
           label={lang('GiftResaleDiamondsOnly')}
-          checked={isStarsOnly}
+          checked={isDiamondsOnly}
           isRound
-          onCheck={handleStarsOnlyChange}
+          onCheck={handleDiamondsOnlyChange}
         />
       )}
     </Modal>

@@ -1,11 +1,11 @@
 import type {
+  ApiDiamondsAmount,
+  ApiDiamondsTransaction,
   ApiInputInvoice,
-  ApiInputSavedStarGift,
+  ApiInputSavedDiamondGift,
   ApiMessage,
   ApiRequestInputInvoice,
-  ApiRequestInputSavedStarGift,
-  ApiStarsAmount,
-  ApiStarsTransaction,
+  ApiRequestInputSavedDiamondGift,
   ApiTypeCurrencyAmount,
 } from '../../api/types';
 import type { CustomPeer } from '../../types';
@@ -217,7 +217,7 @@ export function getRequestInputInvoice<T extends GlobalState>(
 
   if (inputInvoice.type === 'stargiftUpgrade') {
     const { inputSavedGift, shouldKeepOriginalDetails } = inputInvoice;
-    const savedGift = getRequestInputSavedStarGift(global, inputSavedGift);
+    const savedGift = getRequestInputSavedDiamondGift(global, inputSavedGift);
     if (!savedGift) return undefined;
 
     return {
@@ -229,7 +229,7 @@ export function getRequestInputInvoice<T extends GlobalState>(
 
   if (inputInvoice.type === 'stargiftTransfer') {
     const { inputSavedGift, recipientId } = inputInvoice;
-    const savedGift = getRequestInputSavedStarGift(global, inputSavedGift);
+    const savedGift = getRequestInputSavedDiamondGift(global, inputSavedGift);
     const peer = selectPeer(global, recipientId);
     if (!savedGift || !peer) return undefined;
 
@@ -242,7 +242,7 @@ export function getRequestInputInvoice<T extends GlobalState>(
 
   if (inputInvoice.type === 'stargiftDropOriginalDetails') {
     const { inputSavedGift } = inputInvoice;
-    const savedGift = getRequestInputSavedStarGift(global, inputSavedGift);
+    const savedGift = getRequestInputSavedDiamondGift(global, inputSavedGift);
     if (!savedGift) return undefined;
 
     return {
@@ -283,9 +283,9 @@ export function getRequestInputInvoice<T extends GlobalState>(
   return undefined;
 }
 
-export function getRequestInputSavedStarGift<T extends GlobalState>(
-  global: T, inputGift: ApiInputSavedStarGift,
-): ApiRequestInputSavedStarGift | undefined {
+export function getRequestInputSavedDiamondGift<T extends GlobalState>(
+  global: T, inputGift: ApiInputSavedDiamondGift,
+): ApiRequestInputSavedDiamondGift | undefined {
   if (inputGift.type === 'user') return inputGift;
 
   if (inputGift.type === 'chat') {
@@ -302,12 +302,12 @@ export function getRequestInputSavedStarGift<T extends GlobalState>(
   return undefined;
 }
 
-export function shouldUseCustomPeer(transaction: ApiStarsTransaction) {
+export function shouldUseCustomPeer(transaction: ApiDiamondsTransaction) {
   return transaction.peer.type !== 'peer' || Boolean(transaction.isPostsSearch);
 }
 
-export function buildStarsTransactionCustomPeer(
-  transaction: ApiStarsTransaction,
+export function buildDiamondsTransactionCustomPeer(
+  transaction: ApiDiamondsTransaction,
 ): CustomPeer {
   const { peer } = transaction;
   const isForTon = transaction.amount.currency === TON_CURRENCY_CODE;
@@ -400,7 +400,7 @@ export function buildStarsTransactionCustomPeer(
   };
 }
 
-export function formatStarsTransactionAmount(lang: LangFn, currencyAmount: ApiTypeCurrencyAmount) {
+export function formatDiamondsTransactionAmount(lang: LangFn, currencyAmount: ApiTypeCurrencyAmount) {
   if (currencyAmount.currency === STARS_CURRENCY_CODE) {
     const amount = currencyAmount.amount + currencyAmount.nanos / 1e9;
     if (amount < 0) {
@@ -424,11 +424,11 @@ export function formatStarsTransactionAmount(lang: LangFn, currencyAmount: ApiTy
   return undefined;
 }
 
-export function formatStarsAmount(lang: LangFn, starsAmount: ApiStarsAmount) {
+export function formatDiamondsAmount(lang: LangFn, starsAmount: ApiDiamondsAmount) {
   return lang.number(starsAmount.amount + starsAmount.nanos / 1e9);
 }
 
-export function getStarsTransactionFromGift(message: ApiMessage): ApiStarsTransaction | undefined {
+export function getDiamondsTransactionFromGift(message: ApiMessage): ApiDiamondsTransaction | undefined {
   const { action } = message.content;
 
   if (action?.type === 'giftStars') {
@@ -472,7 +472,7 @@ export function getStarsTransactionFromGift(message: ApiMessage): ApiStarsTransa
   return undefined;
 }
 
-export function getPrizeStarsTransactionFromGiveaway(message: ApiMessage): ApiStarsTransaction | undefined {
+export function getPrizeDiamondsTransactionFromGiveaway(message: ApiMessage): ApiDiamondsTransaction | undefined {
   const { action } = message.content;
 
   if (action?.type !== 'prizeStars') return undefined;
@@ -495,6 +495,6 @@ export function getPrizeStarsTransactionFromGiveaway(message: ApiMessage): ApiSt
   };
 }
 
-export function areInputSavedGiftsEqual(one: ApiInputSavedStarGift, two: ApiInputSavedStarGift) {
+export function areInputSavedGiftsEqual(one: ApiInputSavedDiamondGift, two: ApiInputSavedDiamondGift) {
   return areRecordsShallowEqual(one, two);
 }

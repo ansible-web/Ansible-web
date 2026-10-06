@@ -709,7 +709,7 @@ export async function fetchGlobalPrivacySettings() {
     shouldArchiveAndMuteNewNonContact: Boolean(result.archiveAndMuteNewNoncontactPeers),
     shouldHideReadMarks: Boolean(result.hideReadMarks),
     shouldNewNonContactPeersRequirePremium: Boolean(result.newNoncontactPeersRequirePremium),
-    nonContactPeersPaidStars: toJSNumber(result.noncontactPeersPaidStars),
+    nonContactPeersPaidDiamonds: toJSNumber(result.noncontactPeersPaidStars),
     shouldDisplayGiftsButton: Boolean(result.displayGiftsButton),
     disallowedGifts: result.disallowedGifts && buildApiDisallowedGiftsSettings(result.disallowedGifts),
   };
@@ -719,14 +719,14 @@ export async function updateGlobalPrivacySettings({
   shouldArchiveAndMuteNewNonContact,
   shouldHideReadMarks,
   shouldNewNonContactPeersRequirePremium,
-  nonContactPeersPaidStars,
+  nonContactPeersPaidDiamonds,
   shouldDisplayGiftsButton,
   disallowedGifts,
 }: {
   shouldArchiveAndMuteNewNonContact?: boolean;
   shouldHideReadMarks?: boolean;
   shouldNewNonContactPeersRequirePremium?: boolean;
-  nonContactPeersPaidStars?: number | null;
+  nonContactPeersPaidDiamonds?: number | null;
   shouldDisplayGiftsButton?: boolean;
   disallowedGifts?: ApiDisallowedGiftsSettings;
 }) {
@@ -736,7 +736,7 @@ export async function updateGlobalPrivacySettings({
       ...(shouldHideReadMarks && { hideReadMarks: true }),
       ...(shouldNewNonContactPeersRequirePremium && { newNoncontactPeersRequirePremium: true }),
       displayGiftsButton: shouldDisplayGiftsButton || undefined,
-      noncontactPeersPaidStars: BigInt(nonContactPeersPaidStars || 0),
+      noncontactPeersPaidStars: BigInt(nonContactPeersPaidDiamonds || 0),
       disallowedGifts: disallowedGifts && buildDisallowedGiftsSettings(disallowedGifts),
     }),
   }));
@@ -749,7 +749,7 @@ export async function updateGlobalPrivacySettings({
     shouldArchiveAndMuteNewNonContact: Boolean(result.archiveAndMuteNewNoncontactPeers),
     shouldHideReadMarks: Boolean(result.hideReadMarks),
     shouldNewNonContactPeersRequirePremium: Boolean(result.newNoncontactPeersRequirePremium),
-    nonContactPeersPaidStars: toJSNumber(result.noncontactPeersPaidStars),
+    nonContactPeersPaidDiamonds: toJSNumber(result.noncontactPeersPaidStars),
     shouldDisplayGiftsButton,
     disallowedGifts,
   };

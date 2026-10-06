@@ -5,7 +5,7 @@ import type { ApiPeer } from '../../api/types';
 
 import { getPeerTitle, isApiPeerUser } from '../../global/helpers/peers';
 import { selectPeer, selectTheme, selectThemeValues } from '../../global/selectors';
-import { formatStarsAsIcon } from '../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../util/localization/format';
 import { LOCAL_TGS_URLS } from '../common/helpers/animatedAssets';
 import renderText from '../common/helpers/renderText';
 
@@ -22,7 +22,7 @@ import styles from './RequirementToContactMessage.module.scss';
 
 type OwnProps = {
   peerId: string;
-  paidMessagesStars?: number;
+  paidMessagesDiamonds?: number;
 };
 
 type StateProps = {
@@ -31,16 +31,16 @@ type StateProps = {
 };
 
 function RequirementToContactMessage({
-  patternColor, peer, paidMessagesStars,
+  patternColor, peer, paidMessagesDiamonds,
 }: OwnProps & StateProps) {
   const oldLang = useOldLang();
   const lang = useLang();
-  const { openPremiumModal, openStarsBalanceModal } = getActions();
+  const { openPremiumModal, openDiamondsBalanceModal } = getActions();
 
   const handleOpenPremiumModal = useLastCallback(() => openPremiumModal());
 
-  const handleGetMoreStars = useLastCallback(() => {
-    openStarsBalanceModal({});
+  const handleGetMoreDiamonds = useLastCallback(() => {
+    openDiamondsBalanceModal({});
   });
 
   if (!peer) return undefined;
@@ -59,11 +59,11 @@ function RequirementToContactMessage({
         </div>
         <span className={styles.description}>
           {
-            paidMessagesStars
+            paidMessagesDiamonds
               ? lang(isApiPeerUser(peer) ? 'MessagesPlaceholderPaidUser' : 'MessagesPlaceholderPaidChannel', {
                 peer: getPeerTitle(lang, peer),
-                amount: formatStarsAsIcon(lang,
-                  paidMessagesStars,
+                amount: formatDiamondsAsIcon(lang,
+                  paidMessagesDiamonds,
                   {
                     asFont: true,
                     containerClassName: styles.starIconContainer,
@@ -79,11 +79,11 @@ function RequirementToContactMessage({
           color="translucent-black"
           size="default"
           pill
-          onClick={paidMessagesStars ? handleGetMoreStars : handleOpenPremiumModal}
+          onClick={paidMessagesDiamonds ? handleGetMoreDiamonds : handleOpenPremiumModal}
           className={styles.button}
         >
           {
-            paidMessagesStars
+            paidMessagesDiamonds
               ? (
                 <>
                   {lang('ButtonBuyDiamonds')}

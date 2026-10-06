@@ -253,7 +253,7 @@ export function buildAppConfig(json: GramJs.TypeJSONValue, hash: number): ApiApp
     channelAutoTranslationLevelMin: appConfig.channel_autotranslation_level_min,
     paidReactionMaxAmount: appConfig.stars_paid_reaction_amount_max,
     isChannelRevenueWithdrawalEnabled: appConfig.channel_revenue_withdrawal_enabled,
-    isStarsGiftEnabled: appConfig.stars_gifts_enabled,
+    isDiamondsGiftEnabled: appConfig.stars_gifts_enabled,
     starGiftMaxMessageLength: appConfig.stargifts_message_length_max,
     starGiftMaxConvertPeriod: appConfig.stargifts_convert_period_max,
     starRefStartPrefixes: appConfig.starref_start_param_prefixes,

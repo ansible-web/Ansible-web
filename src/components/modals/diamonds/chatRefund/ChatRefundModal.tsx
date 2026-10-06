@@ -6,7 +6,7 @@ import type { TabState } from '../../../../global/types';
 
 import { getPeerTitle } from '../../../../global/helpers/peers';
 import { selectUser } from '../../../../global/selectors';
-import { formatStarsAsText } from '../../../../util/localization/format';
+import { formatDiamondsAsText } from '../../../../util/localization/format';
 
 import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
 import useLang from '../../../../hooks/useLang';
@@ -26,7 +26,7 @@ type StateProps = {
 const ChatRefundModal = ({ modal, user }: OwnProps & StateProps) => {
   const { closeChatRefundModal, toggleNoPaidMessagesException } = getActions();
 
-  const [shouldRefundStars, setShouldRefundStars] = useState(false);
+  const [shouldRefundDiamonds, setShouldRefundDiamonds] = useState(false);
 
   const renderingModal = useCurrentOrPrev(modal);
   const renderingUser = useCurrentOrPrev(user);
@@ -41,7 +41,7 @@ const ChatRefundModal = ({ modal, user }: OwnProps & StateProps) => {
     closeChatRefundModal();
     if (!userId) return;
 
-    toggleNoPaidMessagesException ({ userId, shouldRefundCharged: shouldRefundStars });
+    toggleNoPaidMessagesException ({ userId, shouldRefundCharged: shouldRefundDiamonds });
   });
 
   return (
@@ -63,13 +63,13 @@ const ChatRefundModal = ({ modal, user }: OwnProps & StateProps) => {
           <Checkbox
             className="dialog-checkbox"
             label={lang('ConfirmDialogRemoveFeeRefundDiamonds', {
-              amount: formatStarsAsText(lang, starsToRefund),
+              amount: formatDiamondsAsText(lang, starsToRefund),
             }, {
               withMarkdown: true,
               withNodes: true,
             })}
-            checked={shouldRefundStars}
-            onCheck={setShouldRefundStars}
+            checked={shouldRefundDiamonds}
+            onCheck={setShouldRefundDiamonds}
           />
         )
       }

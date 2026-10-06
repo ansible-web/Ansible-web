@@ -120,7 +120,7 @@ const PaidReactionEmoji = ({
           ref={effectRef}
           className={styles.effect}
           size={effectSize}
-          tgsUrl={LOCAL_TGS_URLS.StarReactionEffect}
+          tgsUrl={LOCAL_TGS_URLS.DiamondReactionEffect}
           play={isIntersecting}
           noLoop
           forceAlways

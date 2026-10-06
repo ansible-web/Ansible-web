@@ -113,10 +113,10 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
         }
         break;
       case 'stars':
-        actions.openStarsBalanceModal({});
+        actions.openDiamondsBalanceModal({});
         return true;
       case 'ton':
-        actions.openStarsBalanceModal({ currency: TON_CURRENCY_CODE });
+        actions.openDiamondsBalanceModal({ currency: TON_CURRENCY_CODE });
         return true;
       case 'oauth':
         if (linkContext?.type !== 'inner') return false;
@@ -153,7 +153,7 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
     checkChatlistInvite,
     openStoryViewerByUsername,
     checkGiftCode,
-    openStarsBalanceModal,
+    openDiamondsBalanceModal,
   } = actions;
 
   switch (method) {
@@ -263,7 +263,7 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
       const balanceNeeded = Number(balance);
       if (!balanceNeeded || balanceNeeded < 0) return true;
 
-      openStarsBalanceModal({ topup: { balanceNeeded, purpose } });
+      openDiamondsBalanceModal({ topup: { balanceNeeded, purpose } });
       break;
     }
 

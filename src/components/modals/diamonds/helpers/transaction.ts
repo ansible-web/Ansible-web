@@ -1,14 +1,14 @@
-import type { ApiStarsTransaction, ApiTypeCurrencyAmount } from '../../../../api/types';
+import type { ApiDiamondsTransaction, ApiTypeCurrencyAmount } from '../../../../api/types';
 import type { OldLangFn } from '../../../../hooks/useOldLang';
 
 import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../../config';
-import { buildStarsTransactionCustomPeer, shouldUseCustomPeer } from '../../../../global/helpers/payments';
+import { buildDiamondsTransactionCustomPeer, shouldUseCustomPeer } from '../../../../global/helpers/payments';
 import {
   type LangFn,
 } from '../../../../util/localization';
 import { formatPercent } from '../../../../util/textFormat';
 
-export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transaction: ApiStarsTransaction) {
+export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transaction: ApiDiamondsTransaction) {
   if (transaction.paidMessages) {
     return lang(
       'PaidMessageTransaction',
@@ -37,7 +37,7 @@ export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transactio
     return lang('GiftPrepaidUpgradeTransactionTitle');
   }
 
-  if (transaction.isStarGiftAuctionBid) {
+  if (transaction.isDiamondGiftAuctionBid) {
     return isNegativeAmount(transaction.amount)
       ? lang('DiamondGiftAuctionBidTransaction')
       : lang('DiamondGiftAuctionBidRefundedTransaction');
@@ -63,7 +63,7 @@ export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transactio
   }
 
   const customPeer = (transaction.peer && shouldUseCustomPeer(transaction)
-    && buildStarsTransactionCustomPeer(transaction)) || undefined;
+    && buildDiamondsTransactionCustomPeer(transaction)) || undefined;
 
   if (customPeer) return customPeer.title || oldLang(customPeer.titleKey!);
 

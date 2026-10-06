@@ -1,20 +1,20 @@
-import type { ApiSavedStarGift, ApiStarGiftUnique } from '../../../api/types';
+import type { ApiDiamondGiftUnique, ApiSavedDiamondGift } from '../../../api/types';
 import type { ActionReturnType } from '../../types';
 
 import { STARS_CURRENCY_CODE } from '../../../config';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import * as langProvider from '../../../util/oldLangProvider';
 import { addTabStateResetterAction } from '../../helpers/meta';
-import { getPrizeStarsTransactionFromGiveaway, getStarsTransactionFromGift } from '../../helpers/payments';
+import { getDiamondsTransactionFromGift, getPrizeDiamondsTransactionFromGiveaway } from '../../helpers/payments';
 import { addActionHandler, setGlobal } from '../../index';
-import { clearStarPayment, openStarsTransactionModal } from '../../reducers';
+import { clearDiamondPayment, openDiamondsTransactionModal } from '../../reducers';
 import { removeGiftAuction } from '../../reducers/gifts';
 import { updateTabState } from '../../reducers/tabs';
 import {
-  selectChatMessage, selectIsCurrentUserFrozen, selectShouldRemoveGiftAuction, selectStarsPayment, selectTabState,
+  selectChatMessage, selectDiamondsPayment, selectIsCurrentUserFrozen, selectShouldRemoveGiftAuction, selectTabState,
 } from '../../selectors';
 
-function buildShortSavedGift(gift: ApiStarGiftUnique, fromId?: string): ApiSavedStarGift {
+function buildShortSavedGift(gift: ApiDiamondGiftUnique, fromId?: string): ApiSavedDiamondGift {
   return {
     gift,
     date: Math.floor(Date.now() / 1000),
@@ -22,26 +22,26 @@ function buildShortSavedGift(gift: ApiStarGiftUnique, fromId?: string): ApiSaved
   };
 }
 
-addActionHandler('processOriginStarsPayment', (global, actions, payload): ActionReturnType => {
+addActionHandler('processOriginDiamondsPayment', (global, actions, payload): ActionReturnType => {
   const { originData, status, tabId = getCurrentTabId() } = payload;
   const {
-    originStarsPayment, originReaction, originGift, topup,
+    originDiamondsPayment, originReaction, originGift, topup,
   } = originData || {};
 
-  if (!originStarsPayment && !originReaction && !originGift && !topup) {
+  if (!originDiamondsPayment && !originReaction && !originGift && !topup) {
     return undefined;
   }
 
-  actions.closeStarsBalanceModal({ tabId });
+  actions.closeDiamondsBalanceModal({ tabId });
 
   if (status !== 'paid') {
     return undefined;
   }
 
   // Re-open previous payment modal
-  if (originStarsPayment) {
+  if (originDiamondsPayment) {
     global = updateTabState(global, {
-      starsPayment: originStarsPayment,
+      starsPayment: originDiamondsPayment,
     }, tabId);
   }
 
@@ -55,7 +55,7 @@ addActionHandler('processOriginStarsPayment', (global, actions, payload): Action
   }
 
   if (originGift) {
-    actions.sendStarGift({
+    actions.sendDiamondGift({
       ...originGift,
       tabId,
     });
@@ -81,7 +81,7 @@ addActionHandler('openGiftRecipientPicker', (global, actions, payload): ActionRe
 
 addTabStateResetterAction('closeGiftRecipientPicker', 'isGiftRecipientPickerOpen');
 
-addActionHandler('openStarsGiftingPickerModal', (global, actions, payload): ActionReturnType => {
+addActionHandler('openDiamondsGiftingPickerModal', (global, actions, payload): ActionReturnType => {
   const {
     tabId = getCurrentTabId(),
   } = payload || {};
@@ -93,9 +93,9 @@ addActionHandler('openStarsGiftingPickerModal', (global, actions, payload): Acti
   }, tabId);
 });
 
-addTabStateResetterAction('closeStarsGiftingPickerModal', 'starsGiftingPickerModal');
+addTabStateResetterAction('closeDiamondsGiftingPickerModal', 'starsGiftingPickerModal');
 
-addActionHandler('openPrizeStarsTransactionFromGiveaway', (global, actions, payload): ActionReturnType => {
+addActionHandler('openPrizeDiamondsTransactionFromGiveaway', (global, actions, payload): ActionReturnType => {
   const {
     chatId,
     messageId,
@@ -105,15 +105,15 @@ addActionHandler('openPrizeStarsTransactionFromGiveaway', (global, actions, payl
   const message = selectChatMessage(global, chatId, messageId);
   if (!message) return undefined;
 
-  const transaction = getPrizeStarsTransactionFromGiveaway(message);
+  const transaction = getPrizeDiamondsTransactionFromGiveaway(message);
   if (!transaction) return undefined;
 
-  return openStarsTransactionModal(global, transaction, tabId);
+  return openDiamondsTransactionModal(global, transaction, tabId);
 });
 
-addActionHandler('openStarsBalanceModal', (global, actions, payload): ActionReturnType => {
+addActionHandler('openDiamondsBalanceModal', (global, actions, payload): ActionReturnType => {
   const {
-    originStarsPayment,
+    originDiamondsPayment,
     originReaction,
     originGift,
     topup,
@@ -129,7 +129,7 @@ addActionHandler('openStarsBalanceModal', (global, actions, payload): ActionRetu
       message: langProvider.oldTranslate('StarsTopupLinkEnough'),
       actionText: langProvider.oldTranslate('StarsTopupLinkTopupAnyway'),
       action: {
-        action: 'openStarsBalanceModal',
+        action: 'openDiamondsBalanceModal',
         payload: { topup, shouldIgnoreBalance: true, tabId },
       },
       icon: 'star',
@@ -138,14 +138,14 @@ addActionHandler('openStarsBalanceModal', (global, actions, payload): ActionRetu
     return undefined;
   }
 
-  global = clearStarPayment(global, tabId);
+  global = clearDiamondPayment(global, tabId);
 
   // Always refresh status on opening
-  actions.loadStarStatus();
+  actions.loadDiamondStatus();
 
   return updateTabState(global, {
     starsBalanceModal: {
-      originStarsPayment,
+      originDiamondsPayment,
       originReaction,
       originGift,
       topup,
@@ -154,12 +154,12 @@ addActionHandler('openStarsBalanceModal', (global, actions, payload): ActionRetu
   }, tabId);
 });
 
-addTabStateResetterAction('closeStarsBalanceModal', 'starsBalanceModal');
+addTabStateResetterAction('closeDiamondsBalanceModal', 'starsBalanceModal');
 
-addActionHandler('closeStarsPaymentModal', (global, actions, payload): ActionReturnType => {
+addActionHandler('closeDiamondsPaymentModal', (global, actions, payload): ActionReturnType => {
   const { tabId = getCurrentTabId() } = payload || {};
 
-  const starsPayment = selectStarsPayment(global, tabId);
+  const starsPayment = selectDiamondsPayment(global, tabId);
   let status = starsPayment?.status;
   if (!status || status === 'pending') {
     status = 'cancelled';
@@ -172,12 +172,12 @@ addActionHandler('closeStarsPaymentModal', (global, actions, payload): ActionRet
   }, tabId);
 });
 
-addActionHandler('openStarsTransactionModal', (global, actions, payload): ActionReturnType => {
+addActionHandler('openDiamondsTransactionModal', (global, actions, payload): ActionReturnType => {
   const { transaction, tabId = getCurrentTabId() } = payload;
-  return openStarsTransactionModal(global, transaction, tabId);
+  return openDiamondsTransactionModal(global, transaction, tabId);
 });
 
-addActionHandler('openStarsTransactionFromGift', (global, actions, payload): ActionReturnType => {
+addActionHandler('openDiamondsTransactionFromGift', (global, actions, payload): ActionReturnType => {
   const {
     chatId,
     messageId,
@@ -187,15 +187,15 @@ addActionHandler('openStarsTransactionFromGift', (global, actions, payload): Act
   const message = selectChatMessage(global, chatId, messageId);
   if (!message) return undefined;
 
-  const transaction = getStarsTransactionFromGift(message);
+  const transaction = getDiamondsTransactionFromGift(message);
   if (!transaction) return undefined;
 
-  return openStarsTransactionModal(global, transaction, tabId);
+  return openDiamondsTransactionModal(global, transaction, tabId);
 });
 
-addTabStateResetterAction('closeStarsTransactionModal', 'starsTransactionModal');
+addTabStateResetterAction('closeDiamondsTransactionModal', 'starsTransactionModal');
 
-addActionHandler('openStarsSubscriptionModal', (global, actions, payload): ActionReturnType => {
+addActionHandler('openDiamondsSubscriptionModal', (global, actions, payload): ActionReturnType => {
   const { subscription, tabId = getCurrentTabId() } = payload;
 
   return updateTabState(global, {
@@ -205,7 +205,7 @@ addActionHandler('openStarsSubscriptionModal', (global, actions, payload): Actio
   }, tabId);
 });
 
-addTabStateResetterAction('closeStarsSubscriptionModal', 'starsSubscriptionModal');
+addTabStateResetterAction('closeDiamondsSubscriptionModal', 'starsSubscriptionModal');
 
 addTabStateResetterAction('closeGiftModal', 'giftModal');
 
@@ -245,7 +245,7 @@ addActionHandler('setGiftModalSelectedGift', (global, actions, payload): ActionR
   return undefined;
 });
 
-addActionHandler('closeStarsGiftModal', (global, actions, payload): ActionReturnType => {
+addActionHandler('closeDiamondsGiftModal', (global, actions, payload): ActionReturnType => {
   const { tabId = getCurrentTabId() } = payload || {};
   return updateTabState(global, {
     starsGiftModal: { isOpen: false },
@@ -494,7 +494,7 @@ addActionHandler('closeGiftAuctionInfoModal', (global, _actions, payload): Actio
   return global;
 });
 
-addTabStateResetterAction('closeAboutStarGiftModal', 'aboutStarGiftModal');
+addTabStateResetterAction('closeAboutDiamondGiftModal', 'aboutDiamondGiftModal');
 
 addActionHandler('openGiftAuctionChangeRecipientModal', (global, _actions, payload): ActionReturnType => {
   const {
@@ -512,7 +512,7 @@ addTabStateResetterAction('closeGiftAuctionChangeRecipientModal', 'giftAuctionCh
 
 addTabStateResetterAction('closeGiftAuctionAcquiredModal', 'giftAuctionAcquiredModal');
 
-addActionHandler('openStarGiftPriceDecreaseInfoModal', (global, actions, payload): ActionReturnType => {
+addActionHandler('openDiamondGiftPriceDecreaseInfoModal', (global, actions, payload): ActionReturnType => {
   const {
     prices, currentPrice, minPrice, maxPrice, tabId = getCurrentTabId(),
   } = payload;
@@ -527,7 +527,7 @@ addActionHandler('openStarGiftPriceDecreaseInfoModal', (global, actions, payload
   }, tabId);
 });
 
-addTabStateResetterAction('closeStarGiftPriceDecreaseInfoModal', 'starGiftPriceDecreaseInfoModal');
+addTabStateResetterAction('closeDiamondGiftPriceDecreaseInfoModal', 'starGiftPriceDecreaseInfoModal');
 
 addActionHandler('openGiftWithdrawModal', (global, actions, payload): ActionReturnType => {
   const { gift, tabId = getCurrentTabId() } = payload || {};

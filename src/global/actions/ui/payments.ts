@@ -6,8 +6,8 @@ import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { addActionHandler, setGlobal } from '../../index';
 import {
   clearPayment,
+  updateDiamondsPayment,
   updatePayment,
-  updateStarsPayment,
 } from '../../reducers';
 import { updateTabState } from '../../reducers/tabs';
 import { selectActiveGiftsCollectionId, selectTabState } from '../../selectors';
@@ -18,7 +18,7 @@ addActionHandler('closePaymentModal', (global, actions, payload): ActionReturnTy
   const status = payment.status || 'cancelled';
   const starsBalanceModal = selectTabState(global, tabId).starsBalanceModal;
 
-  actions.processOriginStarsPayment({
+  actions.processOriginDiamondsPayment({
     originData: starsBalanceModal,
     status,
     tabId,
@@ -36,7 +36,7 @@ addActionHandler('resetPaymentStatus', (global, actions, payload): ActionReturnT
   const { tabId = getCurrentTabId() } = payload || {};
 
   global = updatePayment(global, { status: undefined }, tabId);
-  global = updateStarsPayment(global, { status: undefined }, tabId);
+  global = updateDiamondsPayment(global, { status: undefined }, tabId);
   return global;
 });
 

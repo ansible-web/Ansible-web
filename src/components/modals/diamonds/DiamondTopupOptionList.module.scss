@@ -48,14 +48,14 @@
   line-height: 1;
 }
 
-.stackedStars {
+.stackedDiamonds {
   display: grid;
   grid-auto-columns: 0.4375rem;
   grid-auto-flow: column;
   justify-items: end;
 }
 
-.stackedStar {
+.stackedDiamond {
   @include mixins.filter-outline(0.0625rem, var(--_background-color));
 
   transition: filter 0.25s ease-out;

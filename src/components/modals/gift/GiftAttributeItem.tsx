@@ -2,8 +2,8 @@ import type { ElementRef, TeactNode } from '@teact';
 import { memo, useMemo, useRef } from '@teact';
 
 import type {
-  ApiStarGiftAttributeBackdrop,
-  ApiStarGiftAttributeRarity,
+  ApiDiamondGiftAttributeBackdrop,
+  ApiDiamondGiftAttributeRarity,
   ApiSticker,
 } from '../../../api/types';
 
@@ -22,12 +22,12 @@ import styles from './GiftAttributeItem.module.scss';
 type OwnProps<T> = {
   ref?: ElementRef<HTMLDivElement>;
   children?: TeactNode;
-  backdrop?: ApiStarGiftAttributeBackdrop;
+  backdrop?: ApiDiamondGiftAttributeBackdrop;
   patternSticker?: ApiSticker;
   sticker?: ApiSticker;
   stickerSize?: number;
   stickerNoPlay?: boolean;
-  rarity?: ApiStarGiftAttributeRarity;
+  rarity?: ApiDiamondGiftAttributeRarity;
   isSelected?: boolean;
   className?: string;
   clickArg?: T;

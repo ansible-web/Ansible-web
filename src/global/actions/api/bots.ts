@@ -18,7 +18,7 @@ import { getUsernameFromDeepLink } from '../../../util/deepLinkParser';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { pick } from '../../../util/iteratees.ts';
 import { type AdvancedLangFnParameters, getTranslationFn } from '../../../util/localization';
-import { formatStarsAsText } from '../../../util/localization/format';
+import { formatDiamondsAsText } from '../../../util/localization/format';
 import { oldTranslate } from '../../../util/oldLangProvider';
 import requestActionTimeout from '../../../util/requestActionTimeout';
 import { debounce } from '../../../util/schedulers';
@@ -77,7 +77,7 @@ import {
 import { selectSharedSettings } from '../../selectors/sharedState';
 import { selectDraft } from '../../selectors/threads.ts';
 import { fetchChatByUsername } from './chats';
-import { getPeerStarsForMessage, sendEphemeralMessages } from './messages';
+import { getPeerDiamondsForMessage, sendEphemeralMessages } from './messages';
 
 import { getIsWebAppsFullscreenSupported } from '../../../hooks/useAppLayout';
 
@@ -464,7 +464,7 @@ addActionHandler('sendInlineBotApiResult', async (global, actions, payload): Pro
     allowPaidStars,
   });
 
-  if (allowPaidStars) actions.loadStarStatus();
+  if (allowPaidStars) actions.loadDiamondStatus();
 });
 
 addActionHandler('sendInlineBotResult', async (global, actions, payload): Promise<void> => {
@@ -486,7 +486,7 @@ addActionHandler('sendInlineBotResult', async (global, actions, payload): Promis
   actions.resetDraftReplyInfo({ tabId });
   actions.clearWebPagePreview({ tabId });
 
-  const starsForOneMessage = await getPeerStarsForMessage(global, chatId);
+  const starsForOneMessage = await getPeerDiamondsForMessage(global, chatId);
   const params = {
     chat,
     id,
@@ -513,7 +513,8 @@ addActionHandler('sendInlineBotResult', async (global, actions, payload): Promis
     localId: queryId,
     title: { key: 'MessageSentPaidToastTitle', variables: { count: 1 }, options: { pluralValue: 1 } },
     message: {
-      key: 'MessageSentPaidToastText', variables: { amount: formatStarsAsText(getTranslationFn(), starsForOneMessage) },
+      key: 'MessageSentPaidToastText',
+      variables: { amount: formatDiamondsAsText(getTranslationFn(), starsForOneMessage) },
     },
 
     icon: 'star',

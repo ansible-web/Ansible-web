@@ -2,9 +2,9 @@ import { memo, useEffect, useMemo, useRef, useState } from '../../../../lib/teac
 import { getActions, withGlobal } from '../../../../global';
 
 import type {
-  ApiStarGiftAttributeBackdrop,
-  ApiStarGiftAttributeModel,
-  ApiStarGiftAttributePattern,
+  ApiDiamondGiftAttributeBackdrop,
+  ApiDiamondGiftAttributeModel,
+  ApiDiamondGiftAttributePattern,
 } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 import type { AnimationLevel } from '../../../../types';
@@ -80,10 +80,10 @@ const GiftPreviewModal = ({ modal, animationLevel }: OwnProps & StateProps) => {
     }
 
     const result: {
-      regularModels: ApiStarGiftAttributeModel[];
-      craftableModels: ApiStarGiftAttributeModel[];
-      patterns: ApiStarGiftAttributePattern[];
-      backdrops: ApiStarGiftAttributeBackdrop[];
+      regularModels: ApiDiamondGiftAttributeModel[];
+      craftableModels: ApiDiamondGiftAttributeModel[];
+      patterns: ApiDiamondGiftAttributePattern[];
+      backdrops: ApiDiamondGiftAttributeBackdrop[];
     } = { regularModels: [], craftableModels: [], patterns: [], backdrops: [] };
 
     for (const attr of renderingModal.attributes) {
@@ -105,9 +105,9 @@ const GiftPreviewModal = ({ modal, animationLevel }: OwnProps & StateProps) => {
   const firstPattern = patterns[0];
   const firstBackdrop = backdrops[0];
 
-  const [selectedModel, setSelectedModel] = useState<ApiStarGiftAttributeModel | undefined>(firstModel);
-  const [selectedPattern, setSelectedPattern] = useState<ApiStarGiftAttributePattern | undefined>(firstPattern);
-  const [selectedBackdrop, setSelectedBackdrop] = useState<ApiStarGiftAttributeBackdrop | undefined>(firstBackdrop);
+  const [selectedModel, setSelectedModel] = useState<ApiDiamondGiftAttributeModel | undefined>(firstModel);
+  const [selectedPattern, setSelectedPattern] = useState<ApiDiamondGiftAttributePattern | undefined>(firstPattern);
+  const [selectedBackdrop, setSelectedBackdrop] = useState<ApiDiamondGiftAttributeBackdrop | undefined>(firstBackdrop);
 
   useEffect(() => {
     if (isOpen) return;
@@ -178,17 +178,17 @@ const GiftPreviewModal = ({ modal, animationLevel }: OwnProps & StateProps) => {
 
   const handleClose = useLastCallback(() => closeGiftPreviewModal());
 
-  const handleSelectModel = useLastCallback((model: ApiStarGiftAttributeModel) => {
+  const handleSelectModel = useLastCallback((model: ApiDiamondGiftAttributeModel) => {
     setSelectedModel(model);
     stopRandomPreviews();
   });
 
-  const handleSelectPattern = useLastCallback((pattern: ApiStarGiftAttributePattern) => {
+  const handleSelectPattern = useLastCallback((pattern: ApiDiamondGiftAttributePattern) => {
     setSelectedPattern(pattern);
     stopRandomPreviews();
   });
 
-  const handleSelectBackdrop = useLastCallback((backdrop: ApiStarGiftAttributeBackdrop) => {
+  const handleSelectBackdrop = useLastCallback((backdrop: ApiDiamondGiftAttributeBackdrop) => {
     setSelectedBackdrop(backdrop);
     stopRandomPreviews();
   });

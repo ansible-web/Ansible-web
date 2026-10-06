@@ -10,6 +10,11 @@ import type {
   ApiChat,
   ApiChatInviteImporter,
   ApiContact,
+  ApiDiamondGiftAttributeIdBackdrop,
+  ApiDiamondGiftAttributeIdPattern,
+  ApiDiamondGiftRegular,
+  ApiDiamondsSubscription,
+  ApiDiamondsTransaction,
   ApiDisallowedGiftsSettings,
   ApiDocument,
   ApiDraft,
@@ -32,11 +37,6 @@ import type {
   ApiReaction,
   ApiReactionWithPaid,
   ApiRichMessage,
-  ApiStarGiftAttributeIdBackdrop,
-  ApiStarGiftAttributeIdPattern,
-  ApiStarGiftRegular,
-  ApiStarsSubscription,
-  ApiStarsTransaction,
   ApiSticker,
   ApiStickerSet,
   ApiStory,
@@ -178,7 +178,7 @@ export interface AccountSettings {
   shouldArchiveAndMuteNewNonContact?: boolean;
   shouldNewNonContactPeersRequirePremium?: boolean;
   defaultHistoryTtl?: number;
-  nonContactPeersPaidStars?: number;
+  nonContactPeersPaidDiamonds?: number;
   shouldDisplayGiftsButton?: boolean;
   disallowedGifts?: ApiDisallowedGiftsSettings;
   shouldHideReadMarks?: boolean;
@@ -661,11 +661,11 @@ export type IDimensions = {
 
 export type StarsTransactionType = 'all' | 'inbound' | 'outbound';
 export type StarsTransactionHistory = Record<StarsTransactionType, {
-  transactions: ApiStarsTransaction[];
+  transactions: ApiDiamondsTransaction[];
   nextOffset?: string;
 } | undefined>;
 export type StarsSubscriptions = {
-  list: ApiStarsSubscription[];
+  list: ApiDiamondsSubscription[];
   nextOffset?: string;
   isLoading?: boolean;
 };
@@ -674,7 +674,7 @@ export type ConfettiStyle = 'poppers' | 'top-down';
 
 export type StarGiftInfo = {
   peerId: string;
-  gift: ApiStarGiftRegular;
+  gift: ApiDiamondGiftRegular;
   shouldHideName?: boolean;
   message?: ApiFormattedText;
   shouldUpgrade?: boolean;
@@ -795,7 +795,7 @@ export type SimilarBotsInfo = {
 
 export type ConfettiParams = OptionalCombine<{
   style?: ConfettiStyle;
-  withStars?: boolean;
+  withDiamonds?: boolean;
 }, {
   top?: number;
   left?: number;
@@ -840,8 +840,8 @@ export type ResaleGiftsSortType = 'byDate' | 'byPrice' | 'byNumber';
 export type ResaleGiftsFilterOptions = {
   sortType: ResaleGiftsSortType;
   modelAttributes?: StarGiftAttributeIdModel[];
-  patternAttributes?: ApiStarGiftAttributeIdPattern[];
-  backdropAttributes?: ApiStarGiftAttributeIdBackdrop[];
+  patternAttributes?: ApiDiamondGiftAttributeIdPattern[];
+  backdropAttributes?: ApiDiamondGiftAttributeIdBackdrop[];
   starsOnly?: boolean;
 };
 
@@ -880,7 +880,7 @@ export type SendMessageParams = {
   isPending?: true;
   messageList?: MessageList;
   isReaction?: true; // Reaction to the story are sent in the form of a message
-  messagePriceInStars?: number;
+  messagePriceInDiamonds?: number;
   localMessage?: ApiMessage;
   forwardedLocalMessagesSlice?: ForwardedLocalMessagesSlice;
   forwardParams?: ForwardMessagesParams;
@@ -910,6 +910,6 @@ export type ForwardMessagesParams = {
   wasDrafted?: boolean;
   lastMessageId?: number;
   forwardedLocalMessagesSlice?: ForwardedLocalMessagesSlice;
-  messagePriceInStars?: number;
+  messagePriceInDiamonds?: number;
   effectId?: string;
 };

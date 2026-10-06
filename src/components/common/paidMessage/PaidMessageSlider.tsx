@@ -1,7 +1,7 @@
 import { memo, useMemo } from '../../../lib/teact/teact';
 
 import buildClassName from '../../../util/buildClassName';
-import { formatStarsAsText } from '../../../util/localization/format';
+import { formatDiamondsAsText } from '../../../util/localization/format';
 
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
@@ -72,7 +72,7 @@ const PaidMessageSlider = ({
         <span className="value-min" dir="auto">{lang.number(min)}</span>
         <span className="settings-range-value">
           {!canChangeChargeForMessages && (<Icon name="lock-filled" />)}
-          {formatStarsAsText(lang, getValue(points, getProgress(points, value)))}
+          {formatDiamondsAsText(lang, getValue(points, getProgress(points, value)))}
         </span>
         <span className="value-max" dir="auto">{lang.number(max)}</span>
       </div>

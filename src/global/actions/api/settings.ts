@@ -827,23 +827,23 @@ addActionHandler('updateGlobalPrivacySettings', async (global, actions, payload)
   const shouldNewNonContactPeersRequirePremium = payload.shouldNewNonContactPeersRequirePremium
     ?? Boolean(global.settings.byKey.shouldNewNonContactPeersRequirePremium);
     // eslint-disable-next-line no-null/no-null
-  const nonContactPeersPaidStars = payload.nonContactPeersPaidStars === null ? undefined
-    : payload.nonContactPeersPaidStars || global.settings.byKey.nonContactPeersPaidStars;
+  const nonContactPeersPaidDiamonds = payload.nonContactPeersPaidDiamonds === null ? undefined
+    : payload.nonContactPeersPaidDiamonds || global.settings.byKey.nonContactPeersPaidDiamonds;
   const shouldDisplayGiftsButton = payload.shouldDisplayGiftsButton
     ?? Boolean(global.settings.byKey.shouldDisplayGiftsButton);
   const disallowedGifts = payload.disallowedGifts
     ?? global.settings.byKey.disallowedGifts;
 
   // eslint-disable-next-line no-null/no-null
-  const shouldUpdateUsersSettings = (payload.nonContactPeersPaidStars === null)
-    || payload.nonContactPeersPaidStars;
+  const shouldUpdateUsersSettings = (payload.nonContactPeersPaidDiamonds === null)
+    || payload.nonContactPeersPaidDiamonds;
 
   global = getGlobal();
   global = replaceSettings(global, {
     shouldArchiveAndMuteNewNonContact,
     shouldHideReadMarks,
     shouldNewNonContactPeersRequirePremium,
-    nonContactPeersPaidStars,
+    nonContactPeersPaidDiamonds,
     shouldDisplayGiftsButton,
     disallowedGifts,
   });
@@ -853,7 +853,7 @@ addActionHandler('updateGlobalPrivacySettings', async (global, actions, payload)
     shouldArchiveAndMuteNewNonContact,
     shouldHideReadMarks,
     shouldNewNonContactPeersRequirePremium,
-    nonContactPeersPaidStars,
+    nonContactPeersPaidDiamonds,
     shouldDisplayGiftsButton,
     disallowedGifts,
   });
@@ -867,9 +867,9 @@ addActionHandler('updateGlobalPrivacySettings', async (global, actions, payload)
     shouldNewNonContactPeersRequirePremium: !result
       ? !shouldNewNonContactPeersRequirePremium
       : result.shouldNewNonContactPeersRequirePremium,
-    nonContactPeersPaidStars: !result
+    nonContactPeersPaidDiamonds: !result
       ? undefined
-      : result.nonContactPeersPaidStars,
+      : result.nonContactPeersPaidDiamonds,
     shouldDisplayGiftsButton: !result ? !shouldDisplayGiftsButton : result.shouldDisplayGiftsButton,
     disallowedGifts: !result ? disallowedGifts : result.disallowedGifts,
   });

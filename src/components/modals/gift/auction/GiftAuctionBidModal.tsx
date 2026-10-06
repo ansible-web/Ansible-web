@@ -2,14 +2,14 @@ import { memo, useEffect, useMemo, useState } from '../../../../lib/teact/teact'
 import { getActions, getGlobal, withGlobal } from '../../../../global';
 
 import type {
+  ApiDiamondGiftAuctionState,
+  ApiDiamondsAmount,
   ApiPeer,
-  ApiStarGiftAuctionState,
-  ApiStarsAmount,
 } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
 import { selectPeer, selectTabState } from '../../../../global/selectors';
-import { formatStarsAsIcon } from '../../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../../util/localization/format';
 import { getBidAuctionPosition } from '../../../common/helpers/gifts';
 import renderText from '../../../common/helpers/renderText';
 
@@ -31,7 +31,7 @@ import Modal from '../../../ui/Modal';
 import TextTimer from '../../../ui/TextTimer';
 import Transition from '../../../ui/Transition';
 import BalanceBlock from '../../diamonds/BalanceBlock';
-import StarSlider from '../../paidReaction/StarSlider';
+import DiamondSlider from '../../paidReaction/StarSlider';
 
 import styles from './GiftAuctionBidModal.module.scss';
 
@@ -40,8 +40,8 @@ export type OwnProps = {
 };
 
 type StateProps = {
-  auctionState?: ApiStarGiftAuctionState;
-  starBalance?: ApiStarsAmount;
+  auctionState?: ApiDiamondGiftAuctionState;
+  starBalance?: ApiDiamondsAmount;
   currentUserPeer?: ApiPeer;
   topBidderIds?: string[];
 };
@@ -61,7 +61,7 @@ const GiftAuctionBidModal = ({
   currentUserPeer,
   topBidderIds,
 }: OwnProps & StateProps) => {
-  const { closeGiftAuctionBidModal, sendStarGiftAuctionBid, loadGiftAuction } = getActions();
+  const { closeGiftAuctionBidModal, sendDiamondGiftAuctionBid, loadGiftAuction } = getActions();
 
   const isOpen = Boolean(modal);
 
@@ -161,7 +161,7 @@ const GiftAuctionBidModal = ({
     const { peerId, message, shouldHideName } = modal;
     const isUpdateBid = Boolean(userState?.bidAmount);
 
-    sendStarGiftAuctionBid({
+    sendDiamondGiftAuctionBid({
       giftId: renderingAuctionState.gift.id,
       bidAmount: resultValue,
       peerId,
@@ -176,7 +176,7 @@ const GiftAuctionBidModal = ({
     const { peerId, message, shouldHideName } = modal;
     const isUpdateBid = Boolean(userState?.bidAmount);
 
-    sendStarGiftAuctionBid({
+    sendDiamondGiftAuctionBid({
       giftId: renderingAuctionState.gift.id,
       bidAmount: selectedBidAmount,
       peerId,
@@ -200,7 +200,7 @@ const GiftAuctionBidModal = ({
       <div className={styles.infoCards}>
         <div className={styles.infoCard}>
           <div className={styles.infoCardValue}>
-            {formatStarsAsIcon(lang, currentMinBid, { withWrapper: true })}
+            {formatDiamondsAsIcon(lang, currentMinBid, { withWrapper: true })}
           </div>
           <div className={styles.infoCardLabel}>{lang('GiftAuctionMinimumBid')}</div>
         </div>
@@ -268,7 +268,7 @@ const GiftAuctionBidModal = ({
             {currentUserPeer && <FullNameTitle peer={currentUserPeer} className={styles.bidderName} />}
           </div>
           <div className={styles.bidderAmount}>
-            {formatStarsAsIcon(lang, selectedBidAmount)}
+            {formatDiamondsAsIcon(lang, selectedBidAmount)}
           </div>
         </div>
       </div>
@@ -302,7 +302,7 @@ const GiftAuctionBidModal = ({
         </Transition>
         {amount !== undefined && (
           <div className={styles.bidderAmount}>
-            {formatStarsAsIcon(lang, amount)}
+            {formatDiamondsAsIcon(lang, amount)}
           </div>
         )}
       </div>
@@ -339,7 +339,7 @@ const GiftAuctionBidModal = ({
         <BalanceBlock balance={starBalance} className={styles.modalBalance} withAddButton />
       </div>
 
-      <StarSlider
+      <DiamondSlider
         className={styles.slider}
         defaultValue={currentMinBid}
         minValue={baseMinBid}
@@ -362,7 +362,7 @@ const GiftAuctionBidModal = ({
 
       <Button noForcedUpperCase inline onClick={handleSubmit}>
         {lang(userState?.bidAmount ? 'GiftAuctionAddToBid' : 'GiftAuctionPlaceBidButton', {
-          amount: formatStarsAsIcon(lang,
+          amount: formatDiamondsAsIcon(lang,
             userState?.bidAmount ? selectedBidAmount - userState.bidAmount : selectedBidAmount),
         }, { withNodes: true })}
       </Button>

@@ -1,7 +1,7 @@
 import type {
+  ApiDiamondGiftCollection,
   ApiMissingInvitedUser,
-  ApiSavedStarGift,
-  ApiStarGiftCollection,
+  ApiSavedDiamondGift,
   ApiUser,
   ApiUserCommonChats,
   ApiUserFullInfo,
@@ -335,7 +335,7 @@ export function updateBotAppPermissions<T extends GlobalState>(
 export function replacePeerSavedGifts<T extends GlobalState>(
   global: T,
   peerId: string,
-  gifts: ApiSavedStarGift[],
+  gifts: ApiSavedDiamondGift[],
   nextOffset?: string,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
@@ -371,10 +371,10 @@ export function replacePeerSavedGifts<T extends GlobalState>(
   }, tabId);
 }
 
-export function updatePeerStarGiftCollections<T extends GlobalState>(
+export function updatePeerDiamondGiftCollections<T extends GlobalState>(
   global: T,
   peerId: string,
-  collections: ApiStarGiftCollection[],
+  collections: ApiDiamondGiftCollection[],
 ): T {
   return {
     ...global,

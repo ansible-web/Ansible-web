@@ -4,6 +4,12 @@ import type {
   ApiBoost,
   ApiBoostsStatus,
   ApiCheckedGiftCode,
+  ApiDiamondGiveawayOption,
+  ApiDiamondsGiveawayWinnerOption,
+  ApiDiamondsSubscription,
+  ApiDiamondsTransaction,
+  ApiDiamondsTransactionPeer,
+  ApiDiamondTopupOption,
   ApiGiveawayInfo,
   ApiInvoice,
   ApiLabeledPrice,
@@ -15,26 +21,20 @@ import type {
   ApiPremiumPromo,
   ApiPremiumSection,
   ApiPremiumSubscriptionOption,
+  ApiPrepaidDiamondsGiveaway,
   ApiPrepaidGiveaway,
-  ApiPrepaidStarsGiveaway,
   ApiReceipt,
-  ApiStarGiveawayOption,
-  ApiStarsGiveawayWinnerOption,
-  ApiStarsSubscription,
-  ApiStarsTransaction,
-  ApiStarsTransactionPeer,
-  ApiStarTopupOption,
   ApiTypeCurrencyAmount,
-  ApiUniqueStarGiftValueInfo,
+  ApiUniqueDiamondGiftValueInfo,
   BoughtPaidMedia,
 } from '../../types';
 
 import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../config';
 import { toJSNumber } from '../../../util/numbers';
 import { addWebDocumentToLocalDb } from '../helpers/localDb';
-import { buildApiStarsSubscriptionPricing } from './chats';
+import { buildApiDiamondsSubscriptionPricing } from './chats';
 import { buildApiMessageEntity } from './common';
-import { buildApiStarGift } from './gifts';
+import { buildApiDiamondGift } from './gifts';
 import { omitVirtualClassFields } from './helpers';
 import { buildApiDocument, buildApiWebDocument, buildMessageMediaContent } from './messageContent';
 import { buildApiPeerId, getApiChatIdFromMtpPeer } from './peers';
@@ -301,7 +301,7 @@ export function buildApiPaymentCredentials(credentials: GramJs.PaymentSavedCrede
 
 export function buildPrepaidGiveaway(
   interaction: GramJs.TypePrepaidGiveaway,
-): ApiPrepaidGiveaway | ApiPrepaidStarsGiveaway {
+): ApiPrepaidGiveaway | ApiPrepaidDiamondsGiveaway {
   if (interaction instanceof GramJs.PrepaidGiveaway) {
     return {
       type: 'giveaway',
@@ -452,7 +452,7 @@ export function buildApiPremiumGiftCodeOption(option: GramJs.PremiumGiftCodeOpti
   };
 }
 
-export function buildApiStarsGiftOptions(option: GramJs.StarsGiftOption): ApiStarTopupOption {
+export function buildApiDiamondsGiftOptions(option: GramJs.StarsGiftOption): ApiDiamondTopupOption {
   const {
     extended, stars, amount, currency,
   } = option;
@@ -485,9 +485,9 @@ export function buildApiCurrencyAmount(amount: GramJs.TypeStarsAmount): ApiTypeC
   return _exhaustive;
 }
 
-export function buildApiStarsGiveawayWinnersOption(
+export function buildApiDiamondsGiveawayWinnersOption(
   option: GramJs.StarsGiveawayWinnersOption,
-): ApiStarsGiveawayWinnerOption {
+): ApiDiamondsGiveawayWinnerOption {
   const {
     default: isDefault, users, perUserStars,
   } = option;
@@ -499,12 +499,12 @@ export function buildApiStarsGiveawayWinnersOption(
   };
 }
 
-export function buildApiStarsGiveawayOptions(option: GramJs.StarsGiveawayOption): ApiStarGiveawayOption {
+export function buildApiDiamondsGiveawayOptions(option: GramJs.StarsGiveawayOption): ApiDiamondGiveawayOption {
   const {
     extended, default: isDefault, stars, yearlyBoosts, amount, winners, currency,
   } = option;
 
-  const winnerList = winners?.map((m) => buildApiStarsGiveawayWinnersOption(m)).filter(Boolean);
+  const winnerList = winners?.map((m) => buildApiDiamondsGiveawayWinnersOption(m)).filter(Boolean);
 
   return {
     isExtended: extended,
@@ -517,7 +517,7 @@ export function buildApiStarsGiveawayOptions(option: GramJs.StarsGiveawayOption)
   };
 }
 
-export function buildApiStarsTransactionPeer(peer: GramJs.TypeStarsTransactionPeer): ApiStarsTransactionPeer {
+export function buildApiDiamondsTransactionPeer(peer: GramJs.TypeStarsTransactionPeer): ApiDiamondsTransactionPeer {
   if (peer instanceof GramJs.StarsTransactionPeerAppStore) {
     return { type: 'appStore' };
   }
@@ -549,7 +549,7 @@ export function buildApiStarsTransactionPeer(peer: GramJs.TypeStarsTransactionPe
   return { type: 'unsupported' };
 }
 
-export function buildApiStarsTransaction(transaction: GramJs.StarsTransaction): ApiStarsTransaction | undefined {
+export function buildApiDiamondsTransaction(transaction: GramJs.StarsTransaction): ApiDiamondsTransaction | undefined {
   const {
     date, id, peer, amount, description, photo, title, refund, extendedMedia, failed, msgId, pending, gift, reaction,
     subscriptionPeriod, stargift, giveawayPostId, starrefCommissionPermille, stargiftUpgrade, paidMessages,
@@ -573,7 +573,7 @@ export function buildApiStarsTransaction(transaction: GramJs.StarsTransaction): 
   return {
     id,
     date,
-    peer: buildApiStarsTransactionPeer(peer),
+    peer: buildApiDiamondsTransactionPeer(peer),
     amount: starsAmount,
     title,
     description,
@@ -586,7 +586,7 @@ export function buildApiStarsTransaction(transaction: GramJs.StarsTransaction): 
     extendedMedia: boughtExtendedMedia,
     subscriptionPeriod,
     isReaction: reaction,
-    starGift: stargift && buildApiStarGift(stargift),
+    starGift: stargift && buildApiDiamondGift(stargift),
     giveawayPostId,
     starRefCommision,
     isGiftUpgrade: stargiftUpgrade,
@@ -595,11 +595,11 @@ export function buildApiStarsTransaction(transaction: GramJs.StarsTransaction): 
     isPostsSearch: postsSearch,
     isDropOriginalDetails: stargiftDropOriginalDetails,
     isPrepaidUpgrade: stargiftPrepaidUpgrade,
-    isStarGiftAuctionBid: stargiftAuctionBid,
+    isDiamondGiftAuctionBid: stargiftAuctionBid,
   };
 }
 
-export function buildApiStarsSubscription(subscription: GramJs.StarsSubscription): ApiStarsSubscription {
+export function buildApiDiamondsSubscription(subscription: GramJs.StarsSubscription): ApiDiamondsSubscription {
   const {
     id, peer, pricing, untilDate, canRefulfill, canceled, chatInviteHash, missingBalance, botCanceled, photo, title,
     invoiceSlug,
@@ -613,7 +613,7 @@ export function buildApiStarsSubscription(subscription: GramJs.StarsSubscription
     id,
     peerId: getApiChatIdFromMtpPeer(peer),
     until: untilDate,
-    pricing: buildApiStarsSubscriptionPricing(pricing),
+    pricing: buildApiDiamondsSubscriptionPricing(pricing),
     isCancelled: canceled,
     canRefulfill,
     hasMissingBalance: missingBalance,
@@ -625,7 +625,7 @@ export function buildApiStarsSubscription(subscription: GramJs.StarsSubscription
   };
 }
 
-export function buildApiStarTopupOption(option: GramJs.TypeStarsTopupOption): ApiStarTopupOption {
+export function buildApiDiamondTopupOption(option: GramJs.TypeStarsTopupOption): ApiDiamondTopupOption {
   const {
     amount, currency, stars, extended,
   } = option;
@@ -638,8 +638,8 @@ export function buildApiStarTopupOption(option: GramJs.TypeStarsTopupOption): Ap
   };
 }
 
-export function buildApiUniqueStarGiftValueInfo(
-  info: GramJs.payments.UniqueStarGiftValueInfo): ApiUniqueStarGiftValueInfo {
+export function buildApiUniqueDiamondGiftValueInfo(
+  info: GramJs.payments.UniqueStarGiftValueInfo): ApiUniqueDiamondGiftValueInfo {
   const {
     lastSaleOnFragment, currency, value, initialSaleDate, initialSaleStars, initialSalePrice,
     lastSaleDate, lastSalePrice, floorPrice, averagePrice, listedCount, fragmentListedCount,

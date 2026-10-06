@@ -127,7 +127,7 @@ export default class BinaryReader {
      * Reads a Telegram-encoded byte array, without the need of
      * specifying its length.
      */
-  tgReadBytes() {
+  asReadBytes() {
     const firstByte = this.readByte();
     let padding;
     let length;
@@ -152,15 +152,15 @@ export default class BinaryReader {
      * Reads a Telegram-encoded string.
      * @returns {string}
      */
-  tgReadString() {
-    return bufferToUtf8(this.tgReadBytes());
+  asReadString() {
+    return bufferToUtf8(this.asReadBytes());
   }
 
   /**
      * Reads a Telegram boolean value.
      * @returns {boolean}
      */
-  tgReadBool() {
+  asReadBool() {
     const value = this.readInt(false);
     if (value === 0x997275b5) {
       // boolTrue
@@ -178,7 +178,7 @@ export default class BinaryReader {
      * into a Javascript {Date} object.
      * @returns {Date}
      */
-  tgReadDate() {
+  asReadDate() {
     const value = this.readInt();
     return new Date(value * 1000);
   }
@@ -186,7 +186,7 @@ export default class BinaryReader {
   /**
      * Reads a Telegram object.
      */
-  tgReadObject(): any {
+  asReadObject(): any {
     const constructorId = this.readInt(false);
 
     let clazz = tlobjects[constructorId];
@@ -207,7 +207,7 @@ export default class BinaryReader {
         const temp = [];
         const length = this.readInt();
         for (let i = 0; i < length; i++) {
-          temp.push(this.tgReadObject());
+          temp.push(this.asReadObject());
         }
         return temp;
       }
@@ -231,14 +231,14 @@ export default class BinaryReader {
   /**
      * Reads a vector (a list) of Telegram objects.
      */
-  tgReadVector() {
+  asReadVector() {
     if (this.readInt(false) !== 0x1cb5c415) {
       throw new Error('Invalid constructor code, vector was expected');
     }
     const count = this.readInt();
     const temp = [];
     for (let i = 0; i < count; i++) {
-      temp.push(this.tgReadObject());
+      temp.push(this.asReadObject());
     }
     return temp;
   }

@@ -1,7 +1,7 @@
 import { memo, useMemo, useRef } from '@teact';
 import { getActions } from '../../../global';
 
-import type { ApiSavedStarGift } from '../../../api/types';
+import type { ApiSavedDiamondGift } from '../../../api/types';
 
 import buildClassName from '../../../util/buildClassName';
 import buildStyle from '../../../util/buildStyle';
@@ -20,7 +20,7 @@ import styles from './ProfilePinnedGifts.module.scss';
 type OwnProps = {
   peerId: string;
   className?: string;
-  gifts?: ApiSavedStarGift[];
+  gifts?: ApiSavedDiamondGift[];
   isExpanded?: boolean;
   withGlow?: boolean;
 };
@@ -81,7 +81,7 @@ function getExpandedPosition(position: { x: number; y: number }) {
 const PinnedGift = ({
   gift, style, className, withGlow, peerId,
 }: {
-  gift: ApiSavedStarGift;
+  gift: ApiSavedDiamondGift;
   style?: string;
   className?: string;
   withGlow?: boolean;

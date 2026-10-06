@@ -8,7 +8,7 @@ import {
 import { addExtraClass, setExtraStyles } from '../../lib/teact/teact-dom';
 import { getActions, getGlobal, withGlobal } from '../../global';
 
-import type { ApiChatFolder, ApiLimitTypeWithModal, ApiStarGiftAuctionState, ApiUser } from '../../api/types';
+import type { ApiChatFolder, ApiDiamondGiftAuctionState, ApiLimitTypeWithModal, ApiUser } from '../../api/types';
 import type { TabState } from '../../global/types';
 import type { ThemeKey } from '../../types';
 
@@ -143,7 +143,7 @@ type StateProps = {
   isReactionPickerOpen: boolean;
   isGiveawayModalOpen?: boolean;
   isDeleteMessageModalOpen?: boolean;
-  isStarsGiftingPickerModal?: boolean;
+  isDiamondsGiftingPickerModal?: boolean;
   isCurrentUserPremium?: boolean;
   noRightColumnAnimation?: boolean;
   withInterfaceAnimations?: boolean;
@@ -152,7 +152,7 @@ type StateProps = {
   isAppConfigLoaded?: boolean;
   isFoldersSidebarShown: boolean;
   diceEmojies?: string[];
-  selectedGiftAuction?: ApiStarGiftAuctionState;
+  selectedGiftAuction?: ApiDiamondGiftAuctionState;
   theme: ThemeKey;
   customBackground?: string;
   backgroundColor?: string;
@@ -198,7 +198,7 @@ const Main = ({
   isPremiumModalOpen,
   isGiveawayModalOpen,
   isDeleteMessageModalOpen,
-  isStarsGiftingPickerModal,
+  isDiamondsGiftingPickerModal,
   isPaymentModalOpen,
   isReceiptModalOpen,
   isReactionPickerOpen,
@@ -236,7 +236,7 @@ const Main = ({
     loadDiceStickers,
     loadPremiumGifts,
     loadTonGifts,
-    loadStarGifts,
+    loadDiamondGifts,
     loadMyUniqueGifts,
     loadDefaultTopicIcons,
     loadAddedStickers,
@@ -269,7 +269,7 @@ const Main = ({
     loadTimezones,
     loadAiComposeTones,
     loadQuickReplies,
-    loadStarStatus,
+    loadDiamondStatus,
     loadAvailableEffects,
     loadPaidReactionPrivacy,
     loadPasswordInfo,
@@ -354,7 +354,7 @@ const Main = ({
       loadNotificationExceptions();
       loadTopPeers({ category: 'botsInline' });
       loadTopReactions();
-      loadStarStatus();
+      loadDiamondStatus();
       loadEmojiKeywords({ language: BASE_EMOJI_KEYWORD_LANG });
       loadFeaturedEmojiStickers();
       loadSavedReactionTags();
@@ -368,7 +368,7 @@ const Main = ({
       loadGenericEmojiEffects();
       loadPremiumGifts();
       loadTonGifts();
-      loadStarGifts();
+      loadDiamondGifts();
       loadMyUniqueGifts();
       loadAvailableEffects();
       loadBirthdayNumbersStickers();
@@ -683,7 +683,7 @@ const Main = ({
       <MessageListHistoryHandler />
       <PremiumMainModal isOpen={isPremiumModalOpen} />
       <GiveawayModal isOpen={isGiveawayModalOpen} />
-      <DiamondsGiftingPickerModal isOpen={isStarsGiftingPickerModal} />
+      <DiamondsGiftingPickerModal isOpen={isDiamondsGiftingPickerModal} />
       <PremiumLimitReachedModal limit={limitReached} />
       <PaymentModal isOpen={isPaymentModalOpen} onClose={closePaymentModal} />
       <ReceiptModal isOpen={isReceiptModalOpen} onClose={clearReceipt} />
@@ -770,7 +770,7 @@ export default memo(withGlobal<OwnProps>(
       isPremiumModalOpen: premiumModal?.isOpen,
       isGiveawayModalOpen: giveawayModal?.isOpen,
       isDeleteMessageModalOpen: Boolean(deleteMessageModal),
-      isStarsGiftingPickerModal: starsGiftingPickerModal?.isOpen,
+      isDiamondsGiftingPickerModal: starsGiftingPickerModal?.isOpen,
       limitReached: limitReachedModal?.limit,
       isPaymentModalOpen: payment.isPaymentModalOpen,
       isReceiptModalOpen: Boolean(payment.receipt),

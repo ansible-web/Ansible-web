@@ -1,8 +1,8 @@
 import type {
-  ApiSavedStarGift,
-  ApiStarGiftAuctionState,
-  ApiStarGiftAuctionUserState,
-  ApiTypeStarGiftAuctionState,
+  ApiDiamondGiftAuctionState,
+  ApiDiamondGiftAuctionUserState,
+  ApiSavedDiamondGift,
+  ApiTypeDiamondGiftAuctionState,
 } from '../../api/types';
 import type { GlobalState } from '../types';
 
@@ -39,7 +39,7 @@ export function removeGiftInfoOriginalDetails<T extends GlobalState>(
     attributes: innerGift.attributes?.filter((attr) => attr.type !== 'originalDetails'),
   };
 
-  const updatedGift: ApiSavedStarGift = {
+  const updatedGift: ApiSavedDiamondGift = {
     ...savedGift,
     dropOriginalDetailsStars: undefined,
     gift: updatedInnerGift,
@@ -53,13 +53,13 @@ export function removeGiftInfoOriginalDetails<T extends GlobalState>(
   }, tabId);
 }
 
-function getAuctionStateVersion(state: ApiTypeStarGiftAuctionState): number {
+function getAuctionStateVersion(state: ApiTypeDiamondGiftAuctionState): number {
   return state.type === 'active' ? state.version : 0;
 }
 
 export function updateGiftAuction<T extends GlobalState>(
   global: T,
-  auctionState: ApiStarGiftAuctionState,
+  auctionState: ApiDiamondGiftAuctionState,
 ): T {
   const giftId = auctionState.gift.id;
   const currentAuction = global.giftAuctionByGiftId?.[giftId];
@@ -89,7 +89,7 @@ export function updateGiftAuction<T extends GlobalState>(
 export function updateGiftAuctionState<T extends GlobalState>(
   global: T,
   giftId: string,
-  state: ApiTypeStarGiftAuctionState,
+  state: ApiTypeDiamondGiftAuctionState,
 ): T {
   const giftAuction = global.giftAuctionByGiftId?.[giftId];
 
@@ -119,7 +119,7 @@ export function updateGiftAuctionState<T extends GlobalState>(
 export function updateGiftAuctionUserState<T extends GlobalState>(
   global: T,
   giftId: string,
-  userState: ApiStarGiftAuctionUserState,
+  userState: ApiDiamondGiftAuctionUserState,
 ): T {
   const giftAuction = global.giftAuctionByGiftId?.[giftId];
 
@@ -156,7 +156,7 @@ export function updateGiftAuctionUserState<T extends GlobalState>(
 
 export function replaceGiftAuction<T extends GlobalState>(
   global: T,
-  auctionState: ApiStarGiftAuctionState,
+  auctionState: ApiDiamondGiftAuctionState,
 ): T {
   const giftId = auctionState.gift.id;
 

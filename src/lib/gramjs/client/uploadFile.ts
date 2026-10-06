@@ -1,4 +1,4 @@
-import type TelegramClient from './TelegramClient';
+import type AnsibleClient from './TelegramClient';
 
 import { getDcBandwidthManager } from '../../../util/dcBandwithManager';
 import { FloodPremiumWaitError, FloodWaitError } from '../errors';
@@ -26,7 +26,7 @@ const LARGE_FILE_THRESHOLD = 10 * 1024 * 1024;
 const DISCONNECT_SLEEP = 1000;
 
 export async function uploadFile(
-  client: TelegramClient,
+  client: AnsibleClient,
   fileParams: UploadFileParams,
   shouldDebugExportedSenders?: boolean,
 ): Promise<Api.InputFile | Api.InputFileBig> {

@@ -489,7 +489,7 @@ export default class MTProtoState {
       if (hasInvalidEncryptedPacket) throw new SecurityError();
 
       const messageReader = reader.createSubReader(messageBodyLength);
-      const obj = messageReader.tgReadObject();
+      const obj = messageReader.asReadObject();
       if (messageReader.tellPosition() !== messageBodyLength) {
         throw new SecurityError();
       }
@@ -714,7 +714,7 @@ export default class MTProtoState {
     while (message.obj instanceof GZIPPacked) {
       const { data } = message.obj;
       const reader = new BinaryReader(data);
-      const obj = reader.tgReadObject();
+      const obj = reader.asReadObject();
 
       // https://core.telegram.org/api/invoking#decompressing-data
       if (obj instanceof MessageContainer || reader.tellPosition() !== data.length) {

@@ -1,4 +1,4 @@
-import type { ApiPeer, ApiSavedGifts, ApiStarGiftCollection } from '../../api/types';
+import type { ApiDiamondGiftCollection, ApiPeer, ApiSavedGifts } from '../../api/types';
 import type { GlobalState, TabArgs } from '../types';
 
 import { SERVICE_NOTIFICATIONS_USER_ID } from '../../config';
@@ -27,7 +27,7 @@ export function selectCanGift<T extends GlobalState>(global: T, peerId: string) 
     return !bot && peerId !== SERVICE_NOTIFICATIONS_USER_ID && !isDeletedUser(user);
   }
 
-  return selectChatFullInfo(global, peerId)?.areStarGiftsAvailable;
+  return selectChatFullInfo(global, peerId)?.areDiamondGiftsAvailable;
 }
 
 export function selectPeerCollectionSavedGifts<T extends GlobalState>(
@@ -48,27 +48,27 @@ export function selectPeerSavedGifts<T extends GlobalState>(
   return selectPeerCollectionSavedGifts(global, peerId, 'all', tabId);
 }
 
-export function selectPeerStarGiftCollections<T extends GlobalState>(
+export function selectPeerDiamondGiftCollections<T extends GlobalState>(
   global: T,
   peerId: string,
-): ApiStarGiftCollection[] | undefined {
+): ApiDiamondGiftCollection[] | undefined {
   return global.starGiftCollections?.byPeerId[peerId];
 }
 
-export function selectPeerPaidMessagesStars<T extends GlobalState>(
+export function selectPeerPaidMessagesDiamonds<T extends GlobalState>(
   global: T,
   peerId: string,
 ) {
   const isChatWithUser = isUserId(peerId);
   if (isChatWithUser) {
     const userFullInfo = isChatWithUser ? selectUserFullInfo(global, peerId) : undefined;
-    return userFullInfo?.paidMessagesStars;
+    return userFullInfo?.paidMessagesDiamonds;
   }
 
   const chat = selectChat(global, peerId);
   if (!chat) return undefined;
   if (isChatAdmin(chat) || selectIsMonoforumAdmin(global, chat.id)) return undefined;
-  return chat.paidMessagesStars;
+  return chat.paidMessagesDiamonds;
 }
 
 export function selectPeerHasProfileBackground<T extends GlobalState>(global: T, peerId: string) {

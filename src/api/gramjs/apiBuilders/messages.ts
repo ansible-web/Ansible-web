@@ -523,7 +523,7 @@ export function buildLocalMessage({
   isInvertedMedia,
   effectId,
   isPending,
-  messagePriceInStars,
+  messagePriceInDiamonds,
   dice,
 }: {
   chat: ApiChat;
@@ -548,7 +548,7 @@ export function buildLocalMessage({
   isInvertedMedia?: true;
   effectId?: string;
   isPending?: true;
-  messagePriceInStars?: number;
+  messagePriceInDiamonds?: number;
   dice?: string;
 }) {
   const localId = getNextLocalMessageId(lastMessageId);
@@ -601,7 +601,7 @@ export function buildLocalMessage({
     isInvertedMedia,
     effectId,
     ...(isPending && { sendingState: 'messageSendingStatePending' }),
-    ...(messagePriceInStars && { paidMessageStars: messagePriceInStars }),
+    ...(messagePriceInDiamonds && { paidMessageStars: messagePriceInDiamonds }),
   } satisfies ApiMessage;
 
   const emojiOnlyCount = getEmojiOnlyCountForMessage(message.content, message.groupedId);

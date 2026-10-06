@@ -3559,7 +3559,7 @@ addActionHandler('toggleCommunityCollapsed', async (global, actions, payload): P
 });
 
 addActionHandler('updatePaidMessagesPrice', async (global, actions, payload): Promise<void> => {
-  const { chatId, paidMessagesStars, tabId = getCurrentTabId() } = payload;
+  const { chatId, paidMessagesDiamonds, tabId = getCurrentTabId() } = payload;
   const chat = chatId ? selectChat(global, chatId) : undefined;
   if (!chat) return;
 
@@ -3568,14 +3568,14 @@ addActionHandler('updatePaidMessagesPrice', async (global, actions, payload): Pr
 
   const result = await callApi('updatePaidMessagesPrice', {
     chat,
-    paidMessagesStars,
+    paidMessagesDiamonds,
   });
 
   if (!result) return;
 
   global = getGlobal();
   global = updateManagementProgress(global, ManagementProgress.Complete, tabId);
-  global = updateChat(global, chatId, { paidMessagesStars });
+  global = updateChat(global, chatId, { paidMessagesDiamonds });
   setGlobal(global);
 });
 

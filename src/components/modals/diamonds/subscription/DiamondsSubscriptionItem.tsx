@@ -2,7 +2,7 @@ import { memo } from '../../../../lib/teact/teact';
 import { getActions } from '../../../../global';
 
 import type {
-  ApiStarsSubscription,
+  ApiDiamondsSubscription,
 } from '../../../../api/types';
 import type { GlobalState } from '../../../../global/types';
 
@@ -26,7 +26,7 @@ import styles from './DiamondsSubscriptionItem.module.scss';
 const AVATAR_SIZE = 42;
 
 type OwnProps = {
-  subscription: ApiStarsSubscription;
+  subscription: ApiDiamondsSubscription;
 };
 
 function selectProvidedPeer(peerId: string) {
@@ -36,7 +36,7 @@ function selectProvidedPeer(peerId: string) {
 }
 
 const DiamondsSubscriptionItem = ({ subscription }: OwnProps) => {
-  const { openStarsSubscriptionModal } = getActions();
+  const { openDiamondsSubscriptionModal } = getActions();
   const {
     peerId, pricing, until, isCancelled, title, photo,
   } = subscription;
@@ -45,7 +45,7 @@ const DiamondsSubscriptionItem = ({ subscription }: OwnProps) => {
   const peer = useSelector(selectProvidedPeer(peerId))!;
 
   const handleClick = useLastCallback(() => {
-    openStarsSubscriptionModal({ subscription });
+    openDiamondsSubscriptionModal({ subscription });
   });
 
   if (!peer) {
@@ -59,7 +59,7 @@ const DiamondsSubscriptionItem = ({ subscription }: OwnProps) => {
     <div className={styles.root} onClick={handleClick}>
       <div className={styles.preview}>
         <Avatar size={AVATAR_SIZE} peer={peer} />
-        <DiamondIcon className={styles.subscriptionStar} type="gold" size="small" />
+        <DiamondIcon className={styles.subscriptionDiamond} type="gold" size="small" />
       </div>
       <div className={styles.info}>
         <h3 className={styles.title}>{renderText(getPeerTitle(lang, peer) || '')}</h3>
@@ -85,7 +85,7 @@ const DiamondsSubscriptionItem = ({ subscription }: OwnProps) => {
         ) : (
           <>
             <div className={styles.statusPricing}>
-              <DiamondIcon className={styles.star} type="gold" size="adaptive" />
+              <DiamondIcon className={styles.diamond} type="gold" size="adaptive" />
               {NNBSP}
               <span className={styles.amount}>
                 {formatInteger(pricing.amount)}

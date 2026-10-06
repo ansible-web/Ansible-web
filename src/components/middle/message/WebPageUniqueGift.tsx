@@ -1,6 +1,6 @@
 import { memo, useRef } from '@teact';
 
-import type { ApiStarGiftUnique } from '../../../api/types';
+import type { ApiDiamondGiftUnique } from '../../../api/types';
 
 import { IS_TOUCH_ENV } from '../../../util/browser/windowEnvironment.ts';
 import buildClassName from '../../../util/buildClassName.ts';
@@ -15,7 +15,7 @@ import StickerView from '../../common/StickerView';
 import styles from './WebPageUniqueGift.module.scss';
 
 type OwnProps = {
-  gift: ApiStarGiftUnique;
+  gift: ApiDiamondGiftUnique;
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;
   onClick?: NoneToVoidFunction;

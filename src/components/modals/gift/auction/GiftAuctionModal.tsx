@@ -3,7 +3,7 @@ import {
 } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
-import type { ApiStarGiftAuctionState } from '../../../../api/types';
+import type { ApiDiamondGiftAuctionState } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
 import { TME_LINK_PREFIX } from '../../../../config';
@@ -11,7 +11,7 @@ import { selectTabState } from '../../../../global/selectors';
 import { copyTextToClipboard } from '../../../../util/clipboard';
 import { formatCountdown, formatDateTimeToString } from '../../../../util/dates/oldDateFormat';
 import { HOUR } from '../../../../util/dates/units';
-import { formatStarsAsIcon } from '../../../../util/localization/format';
+import { formatDiamondsAsIcon } from '../../../../util/localization/format';
 import { getServerTime } from '../../../../util/serverTime';
 import {
   getRandomGiftPreviewAttributes, getStickerFromGift, type GiftPreviewAttributes,
@@ -41,7 +41,7 @@ export type OwnProps = {
 };
 
 type StateProps = {
-  auctionState?: ApiStarGiftAuctionState;
+  auctionState?: ApiDiamondGiftAuctionState;
 };
 
 const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
@@ -50,7 +50,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
     setGiftModalSelectedGift,
     openGiftAuctionInfoModal,
     openGiftAuctionAcquiredModal,
-    openAboutStarGiftModal,
+    openAboutDiamondGiftModal,
     showNotification,
     openChatWithDraft,
     openUrl,
@@ -103,7 +103,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
   });
 
   const handleLearnMoreAboutGiftsClick = useLastCallback(() => {
-    openAboutStarGiftModal({});
+    openAboutDiamondGiftModal({});
   });
 
   const handleItemsBoughtClick = useLastCallback(() => {
@@ -251,7 +251,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
     if (isFinished) {
       tableData.push([
         lang('GiftAuctionAveragePrice'),
-        formatStarsAsIcon(lang, state.averagePrice, { className: styles.starIcon }),
+        formatDiamondsAsIcon(lang, state.averagePrice, { className: styles.starIcon }),
       ]);
     }
 

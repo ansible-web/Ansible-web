@@ -4,7 +4,7 @@ import {
 } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
-import type { ApiStarGiftUnique } from '../../../../api/types';
+import type { ApiDiamondGiftUnique } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 import { type CustomPeer, SettingsScreens } from '../../../../types';
 
@@ -49,7 +49,7 @@ const GiftWithdrawModal = ({ modal, hasPassword, passwordHint }: OwnProps & Stat
     closeGiftWithdrawModal,
     clearGiftWithdrawError,
     closeGiftInfoModal,
-    processStarGiftWithdrawal,
+    processDiamondGiftWithdrawal,
     openSettingsScreen,
   } = getActions();
   const isOpen = Boolean(modal);
@@ -59,7 +59,7 @@ const GiftWithdrawModal = ({ modal, hasPassword, passwordHint }: OwnProps & Stat
   const lang = useLang();
 
   const renderingModal = useCurrentOrPrev(modal);
-  const gift = renderingModal?.gift?.gift as ApiStarGiftUnique;
+  const gift = renderingModal?.gift?.gift as ApiDiamondGiftUnique;
   const giftAttributes = gift && getGiftAttributes(gift);
   const exportDelay = renderingModal?.gift?.canExportAt
     ? Math.max(renderingModal.gift.canExportAt - getServerTime(), 0) : undefined;
@@ -69,7 +69,7 @@ const GiftWithdrawModal = ({ modal, hasPassword, passwordHint }: OwnProps & Stat
   });
 
   const handleSubmit = useLastCallback((password: string) => {
-    processStarGiftWithdrawal({
+    processDiamondGiftWithdrawal({
       gift: renderingModal!.gift.inputGift!,
       password,
     });

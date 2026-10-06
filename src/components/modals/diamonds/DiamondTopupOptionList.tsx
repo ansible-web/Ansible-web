@@ -3,7 +3,7 @@ import {
   memo, useEffect, useMemo,
 } from '../../../lib/teact/teact';
 
-import type { ApiStarGiveawayOption, ApiStarTopupOption } from '../../../api/types';
+import type { ApiDiamondGiveawayOption, ApiDiamondTopupOption } from '../../../api/types';
 
 import buildClassName from '../../../util/buildClassName';
 import { formatCurrency } from '../../../util/formatCurrency';
@@ -24,20 +24,20 @@ const MAX_STARS_COUNT = 6;
 
 type OwnProps = {
   isActive?: boolean;
-  options?: ApiStarTopupOption[] | ApiStarGiveawayOption[];
-  selectedStarOption?: ApiStarTopupOption | ApiStarGiveawayOption;
-  selectedStarCount?: number;
+  options?: ApiDiamondTopupOption[] | ApiDiamondGiveawayOption[];
+  selectedDiamondOption?: ApiDiamondTopupOption | ApiDiamondGiveawayOption;
+  selectedDiamondCount?: number;
   starsNeeded?: number;
   className?: string;
-  onClick: (option: ApiStarTopupOption | ApiStarGiveawayOption) => void;
+  onClick: (option: ApiDiamondTopupOption | ApiDiamondGiveawayOption) => void;
 };
 
 const DiamondTopupOptionList: FC<OwnProps> = ({
   isActive,
   className,
   options,
-  selectedStarOption,
-  selectedStarCount,
+  selectedDiamondOption,
+  selectedDiamondCount,
   starsNeeded,
   onClick,
 }) => {
@@ -60,11 +60,13 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
     ));
     const forceShowAll = starsNeeded && maxOption.stars < starsNeeded;
 
-    const result: { option: ApiStarTopupOption | ApiStarGiveawayOption; starsCount: number; isWide: boolean }[] = [];
-    let currentStackedStarsCount = 0;
+    const result: {
+      option: ApiDiamondTopupOption | ApiDiamondGiveawayOption; starsCount: number; isWide: boolean;
+    }[] = [];
+    let currentStackedDiamondsCount = 0;
     let canExtendOptions = false;
     options.forEach((option, index) => {
-      if (!option.isExtended) currentStackedStarsCount++;
+      if (!option.isExtended) currentStackedDiamondsCount++;
 
       if (starsNeeded && !forceShowAll && option.stars < starsNeeded) return;
       if (!areOptionsExtended && option.isExtended) {
@@ -73,7 +75,7 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
       }
       result.push({
         option,
-        starsCount: Math.min(currentStackedStarsCount, MAX_STARS_COUNT),
+        starsCount: Math.min(currentStackedDiamondsCount, MAX_STARS_COUNT),
         isWide: index === options.length - 1,
       });
     });
@@ -86,13 +88,13 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
       {renderingOptions?.map(({ option, starsCount, isWide }) => {
         const length = renderingOptions?.length;
         const isOdd = length % 2 === 0;
-        const isActiveOption = option === selectedStarOption;
+        const isActiveOption = option === selectedDiamondOption;
 
-        let perUserStarCount;
+        let perUserDiamondCount;
         if (option && 'winners' in option) {
-          const winner = option.winners.find((opt) => opt.users === selectedStarCount)
+          const winner = option.winners.find((opt) => opt.users === selectedDiamondCount)
             || option.winners.reduce((max, opt) => (opt.users > max.users ? opt : max), option.winners[0]);
-          perUserStarCount = winner?.perUserStars;
+          perUserDiamondCount = winner?.perUserStars;
         }
 
         return (
@@ -106,20 +108,20 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
             <div className={styles.optionTop}>
               +
               {formatInteger(option.stars)}
-              <div className={styles.stackedStars} dir={lang.isRtl ? 'ltr' : 'rtl'}>
+              <div className={styles.stackedDiamonds} dir={lang.isRtl ? 'ltr' : 'rtl'}>
                 {Array.from({ length: starsCount }).map(() => (
-                  <DiamondIcon className={styles.stackedStar} type="gold" size="big" />
+                  <DiamondIcon className={styles.stackedDiamond} type="gold" size="big" />
                 ))}
               </div>
             </div>
             <div className={styles.optionBottom}>
               {formatCurrency(lang, option.amount, option.currency)}
             </div>
-            {(isActiveOption || (selectedStarOption && 'winners' in selectedStarOption))
-              && Boolean(perUserStarCount) && (
+            {(isActiveOption || (selectedDiamondOption && 'winners' in selectedDiamondOption))
+              && Boolean(perUserDiamondCount) && (
               <div className={styles.optionBottom}>
                 <div className={styles.perUserStars}>
-                  {renderText(oldLang('BoostGift.Diamonds.PerUser', formatInteger(perUserStarCount)))}
+                  {renderText(oldLang('BoostGift.Diamonds.PerUser', formatInteger(perUserDiamondCount)))}
                 </div>
               </div>
             )}
