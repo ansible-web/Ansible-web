@@ -10,6 +10,37 @@ Authors.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.5] - 2026-10-08
+
+Versions 0.3.2 – 0.3.4 were not published as separate releases; this entry covers
+the changes made since 0.3.1.
+
+### Added
+- Profile music: the track bar in the profile and its privacy setting.
+- `setlanguage` deep link.
+
+### Changed
+- Brand media redrawn: the Ansible mark replaces the paper plane and the diamond
+  replaces the star across launch icons, favicons, PWA and Tauri icons, the tray
+  and push badge, login logos, Premium and currency artwork, giveaway icons,
+  five Lottie animations, the default chat pattern and the icon font. The login
+  logos and `GiftDiamond.svg` are now true vectors instead of embedded rasters.
+- Send button glyph is the app's own dart instead of the Telegram logo silhouette.
+- Dev icons are distinguishable from production ones again.
+- Currency is named Diamonds throughout the code, assets and icon names
+  (`star` icon → `diamond`, `stars-*` → `diamonds-*`).
+- The managing bot is @BotManager; the three buttons of the bot "Edit" screen work again.
+- Translation keys use our own names.
+- Notifications use a light icon and a separate badge instead of one heavy image.
+- Rebased onto upstream Telegram Web A 12.0.45 (see UPSTREAM_CHANGELOG.md).
+
+### Fixed
+- Language no longer resets after a reload: settings changes now reach the SharedWorker.
+- Calls: a late update from a previous call no longer affects the current one, and
+  a call placed right after a declined one no longer starts with the "declined" sound.
+- Icon font: `menu` and `unlock-badge` glyphs were missing from the built font.
+- The fallback HTTP transport is disabled and a `SecurityError` no longer drops the connection.
+
 ## [0.3.1] - 2026-08-01
 
 ### Changed
