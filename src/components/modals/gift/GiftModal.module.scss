@@ -64,8 +64,8 @@
   padding: 0.5rem;
 }
 
-.resaleStarGiftsContainer,
-.starGiftsContainer,
+.resaleDiamondGiftsContainer,
+.diamondGiftsContainer,
 .premiumGiftsGallery {
   display: flex;
   gap: 0.5rem;
@@ -75,8 +75,8 @@
   margin-bottom: 0.75rem;
 }
 
-.resaleStarGiftsContainer,
-.starGiftsContainer {
+.resaleDiamondGiftsContainer,
+.diamondGiftsContainer {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 
@@ -85,7 +85,7 @@
   padding-top: 0.75rem;
 }
 
-.resaleStarGiftsContainer {
+.resaleDiamondGiftsContainer {
   padding-bottom: 0.625rem;
 }
 
@@ -225,7 +225,7 @@
   text-align: center;
 }
 
-.starGiftsDescription {
+.diamondGiftsDescription {
   margin-bottom: 0.625rem;
 }
 
@@ -251,7 +251,7 @@
   margin: 0 1.5rem 1rem;
 }
 
-.starGiftsTransition {
+.diamondGiftsTransition {
   overflow: hidden;
   height: auto;
   min-height: calc(100% - 3.5rem);
@@ -290,7 +290,7 @@
   }
 }
 
-.starsOnlyToggle {
+.diamondsOnlyToggle {
   position: absolute;
   z-index: 1;
   bottom: 1rem;
@@ -325,7 +325,7 @@
   }
 }
 
-.starsOnlyToggleVisible {
+.diamondsOnlyToggleVisible {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
 }

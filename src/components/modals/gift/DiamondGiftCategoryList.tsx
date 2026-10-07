@@ -4,7 +4,7 @@ import {
 } from '../../../lib/teact/teact';
 import { withGlobal } from '../../../global';
 
-import type { StarGiftCategory } from '../../../types';
+import type { DiamondGiftCategory } from '../../../types';
 
 import buildClassName from '../../../util/buildClassName';
 
@@ -20,11 +20,11 @@ type OwnProps = {
   isSelf?: boolean;
   hasMyUnique?: boolean;
   isPinned?: boolean;
-  onCategoryChanged: (category: StarGiftCategory) => void;
+  onCategoryChanged: (category: DiamondGiftCategory) => void;
 };
 
 type StateProps = {
-  idsByCategory?: Record<StarGiftCategory, string[]>;
+  idsByCategory?: Record<DiamondGiftCategory, string[]>;
 };
 
 const DiamondGiftCategoryList = ({
@@ -46,21 +46,21 @@ const DiamondGiftCategoryList = ({
 
   const hasCollectible = Boolean(idsByCategory?.collectible?.length);
 
-  const [selectedCategory, setSelectedCategory] = useState<StarGiftCategory>('all');
+  const [selectedCategory, setSelectedCategory] = useState<DiamondGiftCategory>('all');
 
-  function handleItemClick(category: StarGiftCategory) {
+  function handleItemClick(category: DiamondGiftCategory) {
     setSelectedCategory(category);
     onCategoryChanged(category);
   }
 
-  function renderCategoryName(category: StarGiftCategory) {
+  function renderCategoryName(category: DiamondGiftCategory) {
     if (category === 'all') return lang('AllGiftsCategory');
     if (category === 'myUnique') return lang('GiftCategoryMyGifts');
     if (category === 'collectible') return lang('GiftCategoryCollectibles');
     return category;
   }
 
-  function renderCategoryItem(category: StarGiftCategory) {
+  function renderCategoryItem(category: DiamondGiftCategory) {
     return (
       <div
         className={buildClassName(

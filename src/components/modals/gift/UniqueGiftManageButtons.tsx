@@ -55,17 +55,17 @@ const UniqueGiftManageButtons = ({
   const modal = selectTabState(global).giftInfoModal;
   const peerId = modal?.peerId;
 
-  const starGiftUniqueSlug = gift?.type === 'starGiftUnique' ? gift.slug : undefined;
+  const diamondGiftUniqueSlug = gift?.type === 'starGiftUnique' ? gift.slug : undefined;
   const userCollectibleStatus = useMemo(() => {
-    if (!starGiftUniqueSlug) return undefined;
+    if (!diamondGiftUniqueSlug) return undefined;
     return collectibleEmojiStatuses?.find((status) =>
-      status.type === 'collectible' && status.slug === starGiftUniqueSlug,
+      status.type === 'collectible' && status.slug === diamondGiftUniqueSlug,
     ) as ApiEmojiStatusCollectible | undefined;
-  }, [starGiftUniqueSlug, collectibleEmojiStatuses]);
+  }, [diamondGiftUniqueSlug, collectibleEmojiStatuses]);
 
   const currentUniqueEmojiStatusSlug = currentUserEmojiStatus?.type === 'collectible'
     ? currentUserEmojiStatus.slug : undefined;
-  const canTakeOff = starGiftUniqueSlug !== undefined && currentUniqueEmojiStatusSlug === starGiftUniqueSlug;
+  const canTakeOff = diamondGiftUniqueSlug !== undefined && currentUniqueEmojiStatusSlug === diamondGiftUniqueSlug;
   const canWear = Boolean(userCollectibleStatus) && !canTakeOff;
 
   const handleTransfer = useLastCallback(() => {

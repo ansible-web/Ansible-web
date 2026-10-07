@@ -1151,7 +1151,7 @@ addActionHandler('initDraftFromSuggestedMessage', (global, actions, payload): Ac
   if (message.suggestedPostInfo) {
     const { scheduleDate, ...messageSuggestedPost } = message.suggestedPostInfo;
     const now = getServerTime();
-    const futureMin = global.appConfig.starsSuggestedPostFutureMin;
+    const futureMin = global.appConfig.diamondsSuggestedPostFutureMin;
 
     const validScheduleDate = scheduleDate && scheduleDate > now + futureMin ? scheduleDate : undefined;
 
@@ -2548,8 +2548,8 @@ async function sendMessagesWithNotification<T extends GlobalState>(
 ) {
   const chat = sendParams[0]?.chat;
   if (!chat || !sendParams.length) return;
-  const starsForOneMessage = await getPeerDiamondsForMessage(global, chat.id);
-  if (!starsForOneMessage) {
+  const diamondsForOneMessage = await getPeerDiamondsForMessage(global, chat.id);
+  if (!diamondsForOneMessage) {
     getActions().sendMessages({ sendParams });
     return;
   }
@@ -2599,7 +2599,7 @@ async function sendMessagesWithNotification<T extends GlobalState>(
     title: titleKey,
     message: {
       key: 'MessageSentPaidToastText',
-      variables: { amount: formatDiamondsAsText(getTranslationFn(), starsForOneMessage * messagesCount) },
+      variables: { amount: formatDiamondsAsText(getTranslationFn(), diamondsForOneMessage * messagesCount) },
     },
     icon: 'diamond',
     shouldUseCustomIcon: true,
@@ -3519,8 +3519,8 @@ addActionHandler('forwardAudio', async (global, actions, payload): Promise<void>
       return;
     }
 
-    const starsBalance = global.stars?.balance?.amount || 0;
-    if (messagePriceInDiamonds > starsBalance) {
+    const diamondsBalance = global.stars?.balance?.amount || 0;
+    if (messagePriceInDiamonds > diamondsBalance) {
       actions.openDiamondsBalanceModal({ topup: { balanceNeeded: messagePriceInDiamonds }, tabId });
       return;
     }

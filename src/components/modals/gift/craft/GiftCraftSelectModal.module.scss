@@ -143,7 +143,7 @@
   padding-bottom: 12rem;
 }
 
-.starsOnlyToggle {
+.diamondsOnlyToggle {
   position: absolute;
   z-index: 1;
   bottom: 1rem;
@@ -174,7 +174,7 @@
   }
 }
 
-.starsOnlyToggleVisible {
+.diamondsOnlyToggleVisible {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
 }

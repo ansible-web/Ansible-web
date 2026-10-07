@@ -77,7 +77,7 @@ export interface ApiUserFullInfo {
   businessLocation?: ApiBusinessLocation;
   businessWorkHours?: ApiBusinessWorkHours;
   businessIntro?: ApiBusinessIntro;
-  starGiftCount?: number;
+  diamondGiftCount?: number;
   starsRating?: ApiDiamondsRating;
   starsMyPendingRating?: ApiDiamondsRating;
   starsMyPendingRatingDate?: number;

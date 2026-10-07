@@ -16,10 +16,10 @@ addActionHandler('closePaymentModal', (global, actions, payload): ActionReturnTy
   const { tabId = getCurrentTabId() } = payload || {};
   const payment = selectTabState(global, tabId).payment;
   const status = payment.status || 'cancelled';
-  const starsBalanceModal = selectTabState(global, tabId).starsBalanceModal;
+  const diamondsBalanceModal = selectTabState(global, tabId).diamondsBalanceModal;
 
   actions.processOriginDiamondsPayment({
-    originData: starsBalanceModal,
+    originData: diamondsBalanceModal,
     status,
     tabId,
   });

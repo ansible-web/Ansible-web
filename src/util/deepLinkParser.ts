@@ -111,7 +111,7 @@ interface GiftAuctionLink {
   slug: string;
 }
 
-interface StarsModalLink {
+interface DiamondsModalLink {
   type: 'stars';
 }
 
@@ -144,7 +144,7 @@ type DeepLink =
   ChatBoostLink |
   GiftUniqueLink |
   GiftAuctionLink |
-  StarsModalLink |
+  DiamondsModalLink |
   TonModalLink |
   SettingsScreenLink |
   OAuthLink;
@@ -292,7 +292,7 @@ function parseTgLink(url: URL) {
     case 'giftAuctionLink':
       return buildGiftAuctionLink({ slug: queryParams.slug });
     case 'stars':
-      return { type: 'stars' } satisfies StarsModalLink;
+      return { type: 'stars' } satisfies DiamondsModalLink;
     case 'ton':
       return { type: 'ton' } satisfies TonModalLink;
     case 'settings':

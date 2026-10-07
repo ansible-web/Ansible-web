@@ -60,7 +60,7 @@ type StateProps = {
   targetPeer?: ApiPeer;
   releasedByPeer?: ApiPeer;
   currentUserId?: string;
-  starGiftMaxConvertPeriod?: number;
+  diamondGiftMaxConvertPeriod?: number;
   hasAdminRights?: boolean;
   currentUserEmojiStatus?: ApiEmojiStatusType;
   collectibleEmojiStatuses?: ApiEmojiStatusType[];
@@ -79,7 +79,7 @@ const GiftInfoModal = ({
   targetPeer,
   releasedByPeer,
   currentUserId,
-  starGiftMaxConvertPeriod,
+  diamondGiftMaxConvertPeriod,
   hasAdminRights,
   currentUserEmojiStatus,
   collectibleEmojiStatuses,
@@ -129,25 +129,25 @@ const GiftInfoModal = ({
   const isSavedGift = typeGift && 'gift' in typeGift;
   const savedGift = isSavedGift ? typeGift : undefined;
   const isSender = savedGift?.fromId === currentUserId;
-  const canConvertDifference = (savedGift && starGiftMaxConvertPeriod && (
-    savedGift.date + starGiftMaxConvertPeriod - getServerTime()
+  const canConvertDifference = (savedGift && diamondGiftMaxConvertPeriod && (
+    savedGift.date + diamondGiftMaxConvertPeriod - getServerTime()
   )) || 0;
   const conversionLeft = Math.ceil(canConvertDifference / 60 / 60 / 24);
 
   const gift = isSavedGift ? typeGift.gift : typeGift;
   const giftSticker = gift && getStickerFromGift(gift);
-  const hasConvertOption = canConvertDifference > 0 && Boolean(savedGift?.starsToConvert);
+  const hasConvertOption = canConvertDifference > 0 && Boolean(savedGift?.diamondsToConvert);
 
   const isGiftUnique = gift && gift.type === 'starGiftUnique';
   const uniqueGift = isGiftUnique ? gift : undefined;
 
-  const starGiftUniqueSlug = gift?.type === 'starGiftUnique' ? gift.slug : undefined;
+  const diamondGiftUniqueSlug = gift?.type === 'starGiftUnique' ? gift.slug : undefined;
 
   const selfCollectibleStatus = useMemo(() => {
-    if (!starGiftUniqueSlug) return undefined;
+    if (!diamondGiftUniqueSlug) return undefined;
     return collectibleEmojiStatuses?.find((status) =>
-      status.type === 'collectible' && status.slug === starGiftUniqueSlug);
-  }, [starGiftUniqueSlug, collectibleEmojiStatuses]);
+      status.type === 'collectible' && status.slug === diamondGiftUniqueSlug);
+  }, [diamondGiftUniqueSlug, collectibleEmojiStatuses]);
 
   const isSelfUnique = Boolean(selfCollectibleStatus);
   const canFocusUpgrade = Boolean(savedGift?.upgradeMsgId);
@@ -426,9 +426,9 @@ const GiftInfoModal = ({
     }
 
     const {
-      fromId, isNameHidden, starsToConvert, isUnsaved, isConverted, upgradeMsgId,
+      fromId, isNameHidden, diamondsToConvert, isUnsaved, isConverted, upgradeMsgId,
     } = savedGift || {};
-    const canConvert = hasConvertOption && Boolean(starsToConvert);
+    const canConvert = hasConvertOption && Boolean(diamondsToConvert);
 
     const isVisibleForMe = isNameHidden && renderingTargetPeer;
 
@@ -452,17 +452,17 @@ const GiftInfoModal = ({
       if (isConverted && canConvert) {
         return canManage
           ? lang('GiftInfoDescriptionConverted', {
-            amount: starsToConvert,
+            amount: diamondsToConvert,
           }, {
-            pluralValue: starsToConvert,
+            pluralValue: diamondsToConvert,
             withNodes: true,
             withMarkdown: true,
           })
           : lang('GiftInfoPeerDescriptionOutConverted', {
-            amount: starsToConvert,
+            amount: diamondsToConvert,
             peer: getPeerTitle(lang, renderingTargetPeer!)!,
           }, {
-            pluralValue: starsToConvert,
+            pluralValue: diamondsToConvert,
             withNodes: true,
             withMarkdown: true,
           });
@@ -471,9 +471,9 @@ const GiftInfoModal = ({
       if (savedGift.canUpgrade && canManage) {
         if (canConvert) {
           return lang('GiftInfoDescriptionUpgrade', {
-            amount: starsToConvert,
+            amount: diamondsToConvert,
           }, {
-            pluralValue: starsToConvert,
+            pluralValue: diamondsToConvert,
             withNodes: true,
             withMarkdown: true,
           });
@@ -485,11 +485,11 @@ const GiftInfoModal = ({
       if (canManage) {
         if (canConvert) {
           return lang('GiftInfoDescription', {
-            amount: starsToConvert,
+            amount: diamondsToConvert,
           }, {
             withNodes: true,
             withMarkdown: true,
-            pluralValue: starsToConvert,
+            pluralValue: diamondsToConvert,
           });
         }
 
@@ -498,12 +498,12 @@ const GiftInfoModal = ({
 
       if (canConvert) {
         return lang('GiftInfoPeerDescriptionOut', {
-          amount: starsToConvert,
+          amount: diamondsToConvert,
           peer: getPeerTitle(lang, renderingTargetPeer!)!,
         }, {
           withNodes: true,
           withMarkdown: true,
-          pluralValue: starsToConvert,
+          pluralValue: diamondsToConvert,
         });
       }
 
@@ -626,15 +626,15 @@ const GiftInfoModal = ({
         ]);
       }
 
-      const starsValue = gift.stars + (savedGift?.alreadyPaidUpgradeDiamonds || 0);
+      const diamondsValue = gift.stars + (savedGift?.alreadyPaidUpgradeDiamonds || 0);
 
       tableData.push([
         lang('GiftInfoValue'),
         <div className={styles.giftValue}>
-          {formatDiamondsAsIcon(lang, starsValue, { className: styles.diamondAmountIcon, withWrapper: true })}
-          {canManage && hasConvertOption && Boolean(starsToConvert) && (
+          {formatDiamondsAsIcon(lang, diamondsValue, { className: styles.diamondAmountIcon, withWrapper: true })}
+          {canManage && hasConvertOption && Boolean(diamondsToConvert) && (
             <BadgeButton onClick={openConvertConfirm}>
-              {lang('GiftInfoConvert', { amount: starsToConvert }, { pluralValue: starsToConvert })}
+              {lang('GiftInfoConvert', { amount: diamondsToConvert }, { pluralValue: diamondsToConvert })}
             </BadgeButton>
           )}
         </div>,
@@ -981,7 +981,7 @@ const GiftInfoModal = ({
         >
           <div>
             {lang('GiftInfoPeerConvertDescription', {
-              amount: formatDiamondsAsText(lang, savedGift.starsToConvert!),
+              amount: formatDiamondsAsText(lang, savedGift.diamondsToConvert!),
               peer: getPeerTitle(lang, renderingFromPeer!)!,
             }, {
               withNodes: true,
@@ -1032,14 +1032,14 @@ export default memo(withGlobal<OwnProps>(
       targetPeer,
       releasedByPeer,
       currentUserId,
-      starGiftMaxConvertPeriod: global.appConfig.starGiftMaxConvertPeriod,
+      diamondGiftMaxConvertPeriod: global.appConfig.diamondGiftMaxConvertPeriod,
       tonExplorerUrl: global.appConfig.tonExplorerUrl,
       hasAdminRights,
       currentUserEmojiStatus,
       collectibleEmojiStatuses,
       currentUser,
       recipientPeer,
-      giftMessageLimit: global.appConfig.starGiftMaxMessageLength,
+      giftMessageLimit: global.appConfig.diamondGiftMaxMessageLength,
       paidMessagesDiamonds: recipientPeer ? selectPeerPaidMessagesDiamonds(global, recipientPeer.id) : undefined,
     };
   },

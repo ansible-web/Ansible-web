@@ -38,14 +38,14 @@ export type OwnProps = {
 
 type StateProps = {
   recipientPeer?: ApiPeer;
-  starsCommission?: number;
+  diamondsCommission?: number;
   tonCommission?: number;
-  starsUsdRate?: number;
+  diamondsUsdRate?: number;
   tonUsdRate?: number;
 };
 
 const GiftOfferAcceptModal = ({
-  modal, recipientPeer, starsCommission, tonCommission, starsUsdRate, tonUsdRate,
+  modal, recipientPeer, diamondsCommission, tonCommission, diamondsUsdRate, tonUsdRate,
 }: OwnProps & StateProps) => {
   const {
     closeGiftOfferAcceptModal, acceptDiamondGiftOffer,
@@ -68,7 +68,7 @@ const GiftOfferAcceptModal = ({
   }, [renderingModal?.gift]);
 
   const isPriceInTon = renderingModal?.price.currency === TON_CURRENCY_CODE;
-  const commission = isPriceInTon ? tonCommission : starsCommission;
+  const commission = isPriceInTon ? tonCommission : diamondsCommission;
   const priceAmount = renderingModal?.price.amount || 0;
   const receiveAmount = commission
     ? (round(priceAmount * commission, isPriceInTon ? 2 : 0))
@@ -136,8 +136,8 @@ const GiftOfferAcceptModal = ({
       if (!tonUsdRate) return undefined;
       receiveValueUsd = convertTonToUsd(receiveAmount, tonUsdRate, true) / 100;
     } else {
-      if (!starsUsdRate) return undefined;
-      receiveValueUsd = receiveAmount * starsUsdRate / 100;
+      if (!diamondsUsdRate) return undefined;
+      receiveValueUsd = receiveAmount * diamondsUsdRate / 100;
     }
 
     const isLower = avgValueUsd >= receiveValueUsd;
@@ -148,7 +148,7 @@ const GiftOfferAcceptModal = ({
     if (percent <= PRICE_WARNING_THRESHOLD_PERCENT) return undefined;
 
     return { percent, isLow: isLower };
-  }, [renderingModal, receiveAmount, isPriceInTon, tonUsdRate, starsUsdRate]);
+  }, [renderingModal, receiveAmount, isPriceInTon, tonUsdRate, diamondsUsdRate]);
 
   if (!renderingModal || !renderingBuyerPeer) return undefined;
 
@@ -208,18 +208,18 @@ const GiftOfferAcceptModal = ({
 export default memo(
   withGlobal<OwnProps>((global, { modal }): Complete<StateProps> => {
     const recipientPeer = modal?.peerId ? selectPeer(global, modal.peerId) : undefined;
-    const starsCommission = selectDiamondsGiftResaleCommission(global);
+    const diamondsCommission = selectDiamondsGiftResaleCommission(global);
     const tonCommission = selectTonGiftResaleCommission(global);
 
-    const starsUsdSellRateX1000 = global.appConfig?.starsUsdSellRateX1000;
-    const starsUsdRate = starsUsdSellRateX1000 ? starsUsdSellRateX1000 / 1000 : undefined;
+    const diamondsUsdSellRateX1000 = global.appConfig?.diamondsUsdSellRateX1000;
+    const diamondsUsdRate = diamondsUsdSellRateX1000 ? diamondsUsdSellRateX1000 / 1000 : undefined;
     const tonUsdRate = global.appConfig?.tonUsdRate;
 
     return {
       recipientPeer,
-      starsCommission,
+      diamondsCommission,
       tonCommission,
-      starsUsdRate,
+      diamondsUsdRate,
       tonUsdRate,
     };
   })(GiftOfferAcceptModal),

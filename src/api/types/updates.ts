@@ -672,7 +672,7 @@ export type ApiUpdatePaymentStateCompleted = {
 
 export type ApiUpdateDiamondPaymentStateCompleted = {
   '@type': 'updateStarPaymentStateCompleted';
-  paymentState: TabState['starsPayment'];
+  paymentState: TabState['diamondsPayment'];
   tabId: number;
 };
 

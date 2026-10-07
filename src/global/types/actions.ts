@@ -85,6 +85,8 @@ import type {
   CallSound,
   ChatListType,
   ConfettiParams,
+  DiamondGiftInfo,
+  DiamondsTransactionType,
   EditingDraft,
   ForwardTarget,
   GiftProfileFilterOptions,
@@ -115,8 +117,6 @@ import type {
   SettingsScreens,
   SharedMediaType,
   Size,
-  StarGiftInfo,
-  StarsTransactionType,
   StoryViewerOrigin,
   ThemeKey,
   ThreadId,
@@ -1418,7 +1418,7 @@ export interface ActionPayloads {
 
   loadDiamondStatus: undefined;
   loadDiamondsTransactions: {
-    type: StarsTransactionType;
+    type: DiamondsTransactionType;
     isTon?: boolean;
   };
   loadDiamondsSubscriptions: undefined;
@@ -1432,8 +1432,8 @@ export interface ActionPayloads {
     id: string;
   };
   openDiamondsBalanceModal: {
-    originDiamondsPayment?: TabState['starsPayment'];
-    originGift?: StarGiftInfo;
+    originDiamondsPayment?: TabState['diamondsPayment'];
+    originGift?: DiamondGiftInfo;
     originReaction?: {
       chatId: string;
       messageId: number;
@@ -3016,7 +3016,7 @@ export interface ActionPayloads {
   setGiftModalSelectedGift: {
     gift: ApiPremiumGiftCodeOption | ApiDiamondGift | undefined;
   } & WithTabId;
-  sendDiamondGift: StarGiftInfo & WithTabId;
+  sendDiamondGift: DiamondGiftInfo & WithTabId;
   buyDiamondGift: {
     peerId: string;
     slug: string;
@@ -3295,7 +3295,7 @@ export interface ActionPayloads {
   } & WithTabId;
 
   processOriginDiamondsPayment: {
-    originData: TabState['starsBalanceModal'];
+    originData: TabState['diamondsBalanceModal'];
     status: ApiPaymentStatus;
   } & WithTabId;
 

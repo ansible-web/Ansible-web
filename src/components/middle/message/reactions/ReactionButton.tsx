@@ -79,8 +79,8 @@ const ReactionButton = ({
 
   const isPaid = reaction.reaction.type === 'paid';
 
-  const starsState = useSelector(selectDiamondsState);
-  const areDiamondsLoaded = Boolean(starsState);
+  const diamondsState = useSelector(selectDiamondsState);
+  const areDiamondsLoaded = Boolean(diamondsState);
 
   const handlePaidClick = useLastCallback((count = 1) => {
     onPaidClick?.(count);
@@ -122,7 +122,7 @@ const ReactionButton = ({
     const button = ref.current;
     if (!amount || !button || amount === prevReaction?.localAmount) return;
 
-    if (areDiamondsLoaded && amount > starsState.balance.amount) {
+    if (areDiamondsLoaded && amount > diamondsState.balance.amount) {
       openDiamondsBalanceModal({
         originReaction: {
           chatId,
@@ -155,7 +155,7 @@ const ReactionButton = ({
       duration: 500 * currentScale,
       easing: 'ease-out',
     });
-  }, [reaction, starsState?.balance, areDiamondsLoaded, chatId, messageId]);
+  }, [reaction, diamondsState?.balance, areDiamondsLoaded, chatId, messageId]);
 
   const prevAmount = usePrevious(reaction.localAmount);
 

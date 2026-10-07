@@ -37,7 +37,7 @@ type StateProps = {
   currentUserId?: string;
   canBuyPremium?: boolean;
   isGiveawayAvailable?: boolean;
-  starsBalance?: ApiDiamondsAmount;
+  diamondsBalance?: ApiDiamondsAmount;
 };
 
 const SettingsMain = ({
@@ -46,7 +46,7 @@ const SettingsMain = ({
   sessionCount,
   canBuyPremium,
   isGiveawayAvailable,
-  starsBalance,
+  diamondsBalance,
   onReset,
 }: OwnProps & StateProps) => {
   const {
@@ -232,9 +232,9 @@ const SettingsMain = ({
             onClick={() => openDiamondsBalanceModal({})}
           >
             {lang('MenuDiamonds')}
-            {Boolean(starsBalance) && (
+            {Boolean(diamondsBalance) && (
               <span className="settings-item__current-value">
-                {formatDiamondsAsIcon(lang, formatDiamondsAmount(lang, starsBalance), {
+                {formatDiamondsAsIcon(lang, formatDiamondsAmount(lang, diamondsBalance), {
                   asFont: true,
                   withIconLast: true,
                   className: styles.balanceDiamond,
@@ -300,14 +300,14 @@ export default memo(withGlobal<OwnProps>(
   (global): Complete<StateProps> => {
     const { currentUserId } = global;
     const isGiveawayAvailable = selectIsGiveawayGiftsPurchaseAvailable(global);
-    const starsBalance = global.stars?.balance;
+    const diamondsBalance = global.stars?.balance;
 
     return {
       sessionCount: global.activeSessions.orderedHashes.length,
       currentUserId,
       canBuyPremium: !selectIsPremiumPurchaseBlocked(global),
       isGiveawayAvailable,
-      starsBalance,
+      diamondsBalance,
     };
   },
 )(SettingsMain));

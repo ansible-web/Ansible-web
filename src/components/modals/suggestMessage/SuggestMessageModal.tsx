@@ -306,11 +306,11 @@ export default memo(withGlobal<OwnProps>(
     const currentDraft = modal ? selectDraft(global, modal.chatId, MAIN_THREAD_ID) : undefined;
 
     const { appConfig } = global;
-    const maxDiamondsAmount = appConfig.starsSuggestedPostAmountMax;
-    const minDiamondsAmount = appConfig.starsSuggestedPostAmountMin;
-    const ageMinSeconds = appConfig.starsSuggestedPostAgeMin;
-    const futureMin = appConfig.starsSuggestedPostFutureMin;
-    const futureMax = appConfig.starsSuggestedPostFutureMax;
+    const maxDiamondsAmount = appConfig.diamondsSuggestedPostAmountMax;
+    const minDiamondsAmount = appConfig.diamondsSuggestedPostAmountMin;
+    const ageMinSeconds = appConfig.diamondsSuggestedPostAgeMin;
+    const futureMin = appConfig.diamondsSuggestedPostFutureMin;
+    const futureMax = appConfig.diamondsSuggestedPostFutureMax;
 
     const tonMaxAmount = appConfig.tonSuggestedPostAmountMax;
     const tonMinAmount = appConfig.tonSuggestedPostAmountMin;

@@ -114,7 +114,7 @@ type StateProps = {
   countryList: ApiCountry[];
   paidMessagesDiamonds?: number;
   paymentMessageConfirmDialogKey?: string;
-  starsBalance: number;
+  diamondsBalance: number;
   isDiamondsBalanceModalOpen: boolean;
   isSilentPosting?: boolean;
 };
@@ -155,7 +155,7 @@ const PollModal = ({
   countryList,
   paidMessagesDiamonds,
   paymentMessageConfirmDialogKey,
-  starsBalance,
+  diamondsBalance,
   isDiamondsBalanceModalOpen,
   isSilentPosting,
 }: OwnProps & StateProps) => {
@@ -218,7 +218,7 @@ const PollModal = ({
     PAYMENT_DIALOG_KEY,
     paidMessagesDiamonds || 0,
     isDiamondsBalanceModalOpen,
-    starsBalance,
+    diamondsBalance,
     true,
   );
 
@@ -1033,8 +1033,8 @@ export default memo(withGlobal<OwnProps>(
       countryList: global.countryList.general,
       paidMessagesDiamonds: selectPeerPaidMessagesDiamonds(global, chatId),
       paymentMessageConfirmDialogKey: tabState.paymentMessageConfirmDialogKey,
-      starsBalance: global.stars?.balance.amount || 0,
-      isDiamondsBalanceModalOpen: Boolean(tabState.starsBalanceModal),
+      diamondsBalance: global.stars?.balance.amount || 0,
+      isDiamondsBalanceModalOpen: Boolean(tabState.diamondsBalanceModal),
       isSilentPosting: chat ? getChatNotifySettings(
         chat,
         selectNotifyDefaults(global),

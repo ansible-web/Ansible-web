@@ -67,14 +67,14 @@ import type {
   BotAppPermissions,
   ChatListType,
   ChatTranslatedMessages,
+  DiamondGiftCategory,
+  DiamondsSubscriptions,
+  DiamondsTransactionHistory,
   EmojiKeywords,
   OrderMode,
   RepeatMode,
   ServiceNotification,
   SimilarBotsInfo,
-  StarGiftCategory,
-  StarsSubscriptions,
-  StarsTransactionHistory,
   TextSummary,
   Thread,
   ThreadId,
@@ -344,7 +344,7 @@ export type GlobalState = {
   availableEffectById: Record<string, ApiAvailableEffect>;
   starGifts?: {
     byId: Record<string, ApiDiamondGiftRegular>;
-    idsByCategory: Record<StarGiftCategory, string[]>;
+    idsByCategory: Record<DiamondGiftCategory, string[]>;
   };
   myUniqueGifts?: {
     byId: Record<string, ApiSavedDiamondGift>;
@@ -505,12 +505,12 @@ export type GlobalState = {
   stars?: {
     topupOptions: ApiDiamondTopupOption[];
     balance: ApiDiamondsAmount;
-    history: StarsTransactionHistory;
-    subscriptions?: StarsSubscriptions;
+    history: DiamondsTransactionHistory;
+    subscriptions?: DiamondsSubscriptions;
   };
   ton?: {
     balance: ApiTonAmount;
-    history: StarsTransactionHistory;
+    history: DiamondsTransactionHistory;
   };
 };
 

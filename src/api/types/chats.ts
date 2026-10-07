@@ -179,7 +179,7 @@ export interface ApiChatFullInfo {
   hasPinnedStories?: boolean;
   isPaidReactionAvailable?: boolean;
   hasScheduledMessages?: boolean;
-  starGiftCount?: number;
+  diamondGiftCount?: number;
   areDiamondGiftsAvailable?: boolean;
   arePaidMessagesAvailable?: true;
 

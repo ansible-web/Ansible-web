@@ -30,10 +30,10 @@ export type OwnProps = {
 };
 
 export type StateProps = {
-  starsCommission?: number;
-  starsResaleAmountMin: number;
-  starsResaleAmountMax?: number;
-  starsUsdWithdrawRate?: number;
+  diamondsCommission?: number;
+  diamondsResaleAmountMin: number;
+  diamondsResaleAmountMax?: number;
+  diamondsUsdWithdrawRate?: number;
   tonCommission?: number;
   tonResaleAmountMin: number;
   tonResaleAmountMax?: number;
@@ -41,8 +41,8 @@ export type StateProps = {
 };
 
 const GiftResalePriceComposerModal = ({
-  modal, starsCommission,
-  starsResaleAmountMin, starsResaleAmountMax, starsUsdWithdrawRate,
+  modal, diamondsCommission,
+  diamondsResaleAmountMin, diamondsResaleAmountMax, diamondsUsdWithdrawRate,
   tonCommission, tonResaleAmountMin, tonResaleAmountMax, tonUsdRate,
 }: OwnProps & StateProps) => {
   const {
@@ -69,7 +69,7 @@ const GiftResalePriceComposerModal = ({
   const handleChangePrice = useLastCallback((e) => {
     const value = e.target.value;
     const number = parseFloat(value);
-    const maxAmount = isPriceInTon ? tonResaleAmountMax : starsResaleAmountMax;
+    const maxAmount = isPriceInTon ? tonResaleAmountMax : diamondsResaleAmountMax;
     const result = value === '' || Number.isNaN(number) ? undefined
       : maxAmount ? Math.min(number, maxAmount) : number;
     setPrice(result);
@@ -102,8 +102,8 @@ const GiftResalePriceComposerModal = ({
       },
     });
   });
-  const commission = isPriceInTon ? tonCommission : starsCommission;
-  const minAmount = isPriceInTon ? tonResaleAmountMin : starsResaleAmountMin;
+  const commission = isPriceInTon ? tonCommission : diamondsCommission;
+  const minAmount = isPriceInTon ? tonResaleAmountMin : diamondsResaleAmountMin;
   const isPriceCorrect = hasPrice && price >= minAmount;
 
   return (
@@ -148,10 +148,10 @@ const GiftResalePriceComposerModal = ({
           })()}
         </span>
 
-        {isPriceCorrect && Boolean(isPriceInTon ? tonUsdRate : starsUsdWithdrawRate) && (
+        {isPriceCorrect && Boolean(isPriceInTon ? tonUsdRate : diamondsUsdWithdrawRate) && (
           <span className={styles.descriptionPrice}>
             {`≈ ${formatCurrencyAsString(
-              isPriceInTon ? convertTonToUsd(price, tonUsdRate!) : price * starsUsdWithdrawRate!,
+              isPriceInTon ? convertTonToUsd(price, tonUsdRate!) : price * diamondsUsdWithdrawRate!,
               'USD',
               lang.code,
             )}`}
@@ -179,12 +179,12 @@ const GiftResalePriceComposerModal = ({
 
 export default memo(withGlobal<OwnProps>(
   (global): Complete<StateProps> => {
-    const starsCommission = selectDiamondsGiftResaleCommission(global);
-    const starsResaleAmountMin = global.appConfig.starsStargiftResaleAmountMin || 0;
-    const starsResaleAmountMax = global.appConfig.starsStargiftResaleAmountMax;
+    const diamondsCommission = selectDiamondsGiftResaleCommission(global);
+    const diamondsResaleAmountMin = global.appConfig.diamondsStargiftResaleAmountMin || 0;
+    const diamondsResaleAmountMax = global.appConfig.diamondsStargiftResaleAmountMax;
 
-    const starsUsdWithdrawRateX1000 = global.appConfig.starsUsdWithdrawRateX1000;
-    const starsUsdWithdrawRate = starsUsdWithdrawRateX1000 ? starsUsdWithdrawRateX1000 / 1000 : 1;
+    const diamondsUsdWithdrawRateX1000 = global.appConfig.diamondsUsdWithdrawRateX1000;
+    const diamondsUsdWithdrawRate = diamondsUsdWithdrawRateX1000 ? diamondsUsdWithdrawRateX1000 / 1000 : 1;
 
     const tonCommission = selectTonGiftResaleCommission(global);
     const tonResaleAmountMin = convertTonFromNanos(global.appConfig.tonStargiftResaleAmountMin || 0);
@@ -194,10 +194,10 @@ export default memo(withGlobal<OwnProps>(
     const tonUsdRate = global.appConfig.tonUsdRate;
 
     return {
-      starsCommission,
-      starsResaleAmountMin,
-      starsResaleAmountMax,
-      starsUsdWithdrawRate,
+      diamondsCommission,
+      diamondsResaleAmountMin,
+      diamondsResaleAmountMax,
+      diamondsUsdWithdrawRate,
       tonCommission,
       tonResaleAmountMin,
       tonResaleAmountMax,

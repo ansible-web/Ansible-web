@@ -331,7 +331,7 @@ export default memo(withGlobal<OwnProps>(
     const { progress } = selectTabState(global).management;
 
     const paidMessagesDiamonds = chat?.paidMessagesDiamonds;
-    const configDiamondsPaidMessageCommissionPermille = global.appConfig.starsPaidMessageCommissionPermille;
+    const configDiamondsPaidMessageCommissionPermille = global.appConfig.diamondsPaidMessageCommissionPermille;
 
     return {
       chat,

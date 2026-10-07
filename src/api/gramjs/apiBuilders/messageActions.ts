@@ -444,7 +444,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       isAuctionAcquired: auctionAcquired,
       gift: starGift,
       message: message && buildApiFormattedText(message),
-      starsToConvert: toJSNumber(convertStars),
+      diamondsToConvert: toJSNumber(convertStars),
       upgradeMsgId,
       giftMsgId,
       alreadyPaidUpgradeDiamonds: toJSNumber(upgradeStars),

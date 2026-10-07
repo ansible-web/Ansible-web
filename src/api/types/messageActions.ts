@@ -267,7 +267,7 @@ export interface ApiMessageActionDiamondGift extends ActionMediaType {
   isAuctionAcquired?: true;
   gift: ApiDiamondGiftRegular;
   message?: ApiFormattedText;
-  starsToConvert?: number;
+  diamondsToConvert?: number;
   upgradeMsgId?: number;
   giftMsgId?: number;
   alreadyPaidUpgradeDiamonds?: number;

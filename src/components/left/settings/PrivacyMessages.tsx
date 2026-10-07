@@ -242,7 +242,7 @@ export default memo(withGlobal<OwnProps>((global): Complete<StateProps> => {
     nonContactPeersPaidDiamonds: nonContactPeersPaidDiamonds || DEFAULT_CHARGE_FOR_MESSAGES,
     isCurrentUserPremium: selectIsCurrentUserPremium(global),
     canLimitNewMessagesWithoutPremium: global.appConfig.canLimitNewMessagesWithoutPremium,
-    canChargeForMessages: global.appConfig.starsPaidMessagesAvailable,
+    canChargeForMessages: global.appConfig.diamondsPaidMessagesAvailable,
     noPaidReactionsForUsersCount,
     privacy,
   };

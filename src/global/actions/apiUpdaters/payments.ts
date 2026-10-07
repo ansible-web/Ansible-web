@@ -126,12 +126,12 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
         if (!inputInvoice.userId) {
           return;
         }
-        const starsModalState = selectTabState(global, tabId).starsGiftModal;
+        const diamondsModalState = selectTabState(global, tabId).diamondsGiftModal;
 
-        if (starsModalState?.isOpen && inputInvoice.userId === starsModalState.forUserId) {
+        if (diamondsModalState?.isOpen && inputInvoice.userId === diamondsModalState.forUserId) {
           global = updateTabState(global, {
-            starsGiftModal: {
-              ...starsModalState,
+            diamondsGiftModal: {
+              ...diamondsModalState,
               isCompleted: true,
             },
           }, tabId);
@@ -143,26 +143,26 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
           return;
         }
 
-        const starGiftModalState = selectTabState(global, tabId).giftModal;
+        const diamondGiftModalState = selectTabState(global, tabId).giftModal;
 
-        if (starGiftModalState && inputInvoice.peerId === starGiftModalState.forPeerId) {
+        if (diamondGiftModalState && inputInvoice.peerId === diamondGiftModalState.forPeerId) {
           actions.showNotification({
             message: {
               key: 'DiamondsGiftCompleted',
             },
             tabId,
           });
-          actions.reloadPeerSavedGifts({ peerId: starGiftModalState.forPeerId });
+          actions.reloadPeerSavedGifts({ peerId: diamondGiftModalState.forPeerId });
           actions.requestConfetti({ withDiamonds: true, tabId });
           actions.closeGiftModal({ tabId });
         }
       }
 
       if (inputInvoice?.type === 'stargiftResale') {
-        const starGiftModalState = selectTabState(global, tabId).giftInfoModal;
+        const diamondGiftModalState = selectTabState(global, tabId).giftInfoModal;
 
-        if (starGiftModalState) {
-          const { craftSlotIndex, gift } = starGiftModalState;
+        if (diamondGiftModalState) {
+          const { craftSlotIndex, gift } = diamondGiftModalState;
           const actualGift = 'gift' in gift ? gift.gift : gift;
           const giftId = actualGift.type === 'starGiftUnique' ? actualGift.id : undefined;
 
@@ -172,8 +172,8 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             },
             tabId,
           });
-          if (starGiftModalState.peerId) {
-            actions.reloadPeerSavedGifts({ peerId: starGiftModalState.peerId });
+          if (diamondGiftModalState.peerId) {
+            actions.reloadPeerSavedGifts({ peerId: diamondGiftModalState.peerId });
           }
           actions.reloadPeerSavedGifts({ peerId: inputInvoice.peerId });
           actions.requestConfetti({ withDiamonds: true, tabId });

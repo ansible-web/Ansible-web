@@ -13,7 +13,7 @@ export interface ApiDiamondGiftRegular {
   availabilityRemains?: number;
   availabilityTotal?: number;
   availabilityResale?: number;
-  starsToConvert: number;
+  diamondsToConvert: number;
   isSoldOut?: true;
   firstSaleDate?: number;
   lastSaleDate?: number;
@@ -138,7 +138,7 @@ export interface ApiSavedDiamondGift {
   savedId?: string;
   message?: ApiFormattedText;
   messageId?: number;
-  starsToConvert?: number;
+  diamondsToConvert?: number;
   canUpgrade?: true;
   alreadyPaidUpgradeDiamonds?: number;
   transferStars?: number;

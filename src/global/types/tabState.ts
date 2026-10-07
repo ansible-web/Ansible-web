@@ -74,6 +74,7 @@ import type {
   ChatMediaSearchParams,
   ChatRequestedTranslations,
   ConfettiStyle,
+  DiamondGiftInfo,
   FocusDirection,
   GiftProfileFilterOptions,
   GlobalSearchContent,
@@ -100,7 +101,6 @@ import type {
   SharedMediaType,
   ShippingOption,
   ShuffleState,
-  StarGiftInfo,
   StoryViewerOrigin,
   TabThread,
   ThreadId,
@@ -518,7 +518,7 @@ export type TabState = {
     url?: string;
     botId?: string;
   };
-  starsPayment: {
+  diamondsPayment: {
     form?: ApiPaymentFormDiamonds;
     subscriptionInfo?: ApiChatInviteInfo;
     inputInvoice?: ApiInputInvoice;
@@ -637,7 +637,7 @@ export type TabState = {
     pendingSendArgs?: {
       peerId: string;
       threadId?: ThreadId;
-      starsForSendMessage?: number;
+      diamondsForSendMessage?: number;
     };
   };
 
@@ -789,21 +789,21 @@ export type TabState = {
 
   isFrozenAccountModalOpen?: boolean;
 
-  starsGiftingPickerModal?: {
+  diamondsGiftingPickerModal?: {
     isOpen?: boolean;
   };
 
-  starsGiftModal?: {
+  diamondsGiftModal?: {
     isCompleted?: boolean;
     isOpen?: boolean;
     forUserId?: string;
-    starsGiftOptions?: ApiDiamondTopupOption[];
+    diamondsGiftOptions?: ApiDiamondTopupOption[];
   };
 
-  starsTransactionModal?: {
+  diamondsTransactionModal?: {
     transaction: ApiDiamondsTransaction;
   };
-  starsSubscriptionModal?: {
+  diamondsSubscriptionModal?: {
     subscription: ApiDiamondsSubscription;
   };
 
@@ -815,7 +815,7 @@ export type TabState = {
   };
   chatRefundModal?: {
     userId: string;
-    starsToRefund: number;
+    diamondsToRefund: number;
   };
 
   disableSharingAboutModal?: {
@@ -936,9 +936,9 @@ export type TabState = {
     peerId: string;
   };
 
-  starsBalanceModal?: {
-    originDiamondsPayment?: TabState['starsPayment'];
-    originGift?: StarGiftInfo;
+  diamondsBalanceModal?: {
+    originDiamondsPayment?: TabState['diamondsPayment'];
+    originGift?: DiamondGiftInfo;
     originReaction?: {
       chatId: string;
       messageId: number;
@@ -1098,7 +1098,7 @@ export type TabState = {
 
   activeGiftAuctionsModal?: true;
 
-  starGiftPriceDecreaseInfoModal?: {
+  diamondGiftPriceDecreaseInfoModal?: {
     prices: ApiDiamondGiftUpgradePrice[];
     currentPrice: number;
     minPrice: number;

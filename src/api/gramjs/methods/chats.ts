@@ -860,7 +860,7 @@ async function getFullChannelInfo(
       botVerification: botVerification && buildApiBotVerification(botVerification),
       isPaidReactionAvailable: paidReactionsAvailable,
       hasScheduledMessages: hasScheduled,
-      starGiftCount: stargiftsCount,
+      diamondGiftCount: stargiftsCount,
       areDiamondGiftsAvailable: Boolean(stargiftsAvailable),
       arePaidMessagesAvailable: paidMessagesAvailable,
       mainTab: mainTab && buildApiProfileTab(mainTab),

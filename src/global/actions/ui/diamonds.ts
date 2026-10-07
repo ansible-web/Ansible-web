@@ -41,7 +41,7 @@ addActionHandler('processOriginDiamondsPayment', (global, actions, payload): Act
   // Re-open previous payment modal
   if (originDiamondsPayment) {
     global = updateTabState(global, {
-      starsPayment: originDiamondsPayment,
+      diamondsPayment: originDiamondsPayment,
     }, tabId);
   }
 
@@ -87,13 +87,13 @@ addActionHandler('openDiamondsGiftingPickerModal', (global, actions, payload): A
   } = payload || {};
 
   return updateTabState(global, {
-    starsGiftingPickerModal: {
+    diamondsGiftingPickerModal: {
       isOpen: true,
     },
   }, tabId);
 });
 
-addTabStateResetterAction('closeDiamondsGiftingPickerModal', 'starsGiftingPickerModal');
+addTabStateResetterAction('closeDiamondsGiftingPickerModal', 'diamondsGiftingPickerModal');
 
 addActionHandler('openPrizeDiamondsTransactionFromGiveaway', (global, actions, payload): ActionReturnType => {
   const {
@@ -144,7 +144,7 @@ addActionHandler('openDiamondsBalanceModal', (global, actions, payload): ActionR
   actions.loadDiamondStatus();
 
   return updateTabState(global, {
-    starsBalanceModal: {
+    diamondsBalanceModal: {
       originDiamondsPayment,
       originReaction,
       originGift,
@@ -154,19 +154,19 @@ addActionHandler('openDiamondsBalanceModal', (global, actions, payload): ActionR
   }, tabId);
 });
 
-addTabStateResetterAction('closeDiamondsBalanceModal', 'starsBalanceModal');
+addTabStateResetterAction('closeDiamondsBalanceModal', 'diamondsBalanceModal');
 
 addActionHandler('closeDiamondsPaymentModal', (global, actions, payload): ActionReturnType => {
   const { tabId = getCurrentTabId() } = payload || {};
 
-  const starsPayment = selectDiamondsPayment(global, tabId);
-  let status = starsPayment?.status;
+  const diamondsPayment = selectDiamondsPayment(global, tabId);
+  let status = diamondsPayment?.status;
   if (!status || status === 'pending') {
     status = 'cancelled';
   }
 
   return updateTabState(global, {
-    starsPayment: {
+    diamondsPayment: {
       status,
     },
   }, tabId);
@@ -193,19 +193,19 @@ addActionHandler('openDiamondsTransactionFromGift', (global, actions, payload): 
   return openDiamondsTransactionModal(global, transaction, tabId);
 });
 
-addTabStateResetterAction('closeDiamondsTransactionModal', 'starsTransactionModal');
+addTabStateResetterAction('closeDiamondsTransactionModal', 'diamondsTransactionModal');
 
 addActionHandler('openDiamondsSubscriptionModal', (global, actions, payload): ActionReturnType => {
   const { subscription, tabId = getCurrentTabId() } = payload;
 
   return updateTabState(global, {
-    starsSubscriptionModal: {
+    diamondsSubscriptionModal: {
       subscription,
     },
   }, tabId);
 });
 
-addTabStateResetterAction('closeDiamondsSubscriptionModal', 'starsSubscriptionModal');
+addTabStateResetterAction('closeDiamondsSubscriptionModal', 'diamondsSubscriptionModal');
 
 addTabStateResetterAction('closeGiftModal', 'giftModal');
 
@@ -248,7 +248,7 @@ addActionHandler('setGiftModalSelectedGift', (global, actions, payload): ActionR
 addActionHandler('closeDiamondsGiftModal', (global, actions, payload): ActionReturnType => {
   const { tabId = getCurrentTabId() } = payload || {};
   return updateTabState(global, {
-    starsGiftModal: { isOpen: false },
+    diamondsGiftModal: { isOpen: false },
   }, tabId);
 });
 
@@ -518,7 +518,7 @@ addActionHandler('openDiamondGiftPriceDecreaseInfoModal', (global, actions, payl
   } = payload;
 
   return updateTabState(global, {
-    starGiftPriceDecreaseInfoModal: {
+    diamondGiftPriceDecreaseInfoModal: {
       prices,
       currentPrice,
       minPrice,
@@ -527,7 +527,7 @@ addActionHandler('openDiamondGiftPriceDecreaseInfoModal', (global, actions, payl
   }, tabId);
 });
 
-addTabStateResetterAction('closeDiamondGiftPriceDecreaseInfoModal', 'starGiftPriceDecreaseInfoModal');
+addTabStateResetterAction('closeDiamondGiftPriceDecreaseInfoModal', 'diamondGiftPriceDecreaseInfoModal');
 
 addActionHandler('openGiftWithdrawModal', (global, actions, payload): ActionReturnType => {
   const { gift, tabId = getCurrentTabId() } = payload || {};

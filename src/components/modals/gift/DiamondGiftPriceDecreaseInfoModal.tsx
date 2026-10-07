@@ -18,7 +18,7 @@ import TableInfoModal, { type TableData } from '../common/TableInfoModal';
 import styles from './DiamondGiftPriceDecreaseInfoModal.module.scss';
 
 export type OwnProps = {
-  modal: TabState['starGiftPriceDecreaseInfoModal'];
+  modal: TabState['diamondGiftPriceDecreaseInfoModal'];
 };
 
 const DiamondGiftPriceDecreaseInfoModal = ({ modal }: OwnProps) => {

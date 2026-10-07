@@ -79,7 +79,7 @@ type StateProps = {
   countrySelectionLimit: number | undefined;
   isChannel?: boolean;
   isDiamondsGiftEnabled?: boolean;
-  starsGiftOptions?: ApiDiamondGiveawayOption[] | undefined;
+  diamondsGiftOptions?: ApiDiamondGiveawayOption[] | undefined;
 };
 
 type GiveawayAction = 'createPremiumGiveaway' | 'createStarsGiveaway';
@@ -119,7 +119,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   countrySelectionLimit = GIVEAWAY_MAX_ADDITIONAL_COUNTRIES,
   userSelectionLimit = GIVEAWAY_MAX_ADDITIONAL_USERS,
   isDiamondsGiftEnabled,
-  starsGiftOptions,
+  diamondsGiftOptions,
 }) => {
   const dialogRef = useRef<HTMLDivElement>();
   const {
@@ -208,10 +208,10 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   }, [gifts, selectedMonthOption, selectedUserCount]);
 
   const selectedDiamondsGift = useMemo(() => {
-    return starsGiftOptions?.find((gift) => {
+    return diamondsGiftOptions?.find((gift) => {
       return isDiamondsPrepaidGiveaway && gift.stars === (dataDiamondsPrepaidGiveaway?.stars);
     });
-  }, [dataDiamondsPrepaidGiveaway, starsGiftOptions, isDiamondsPrepaidGiveaway]);
+  }, [dataDiamondsPrepaidGiveaway, diamondsGiftOptions, isDiamondsPrepaidGiveaway]);
 
   const filteredGifts = useMemo(() => {
     return gifts?.filter((gift) => gift.users === selectedUserCount && gift.currency !== STARS_CURRENCY_CODE);
@@ -241,10 +241,10 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   }, [isOpen, gifts, isDiamondsPrepaidGiveaway]);
 
   useEffect(() => {
-    if (isOpen && starsGiftOptions?.length && !isPremiumPrepaidGiveaway) {
-      setSelectedDiamondOption(starsGiftOptions?.[0]);
+    if (isOpen && diamondsGiftOptions?.length && !isPremiumPrepaidGiveaway) {
+      setSelectedDiamondOption(diamondsGiftOptions?.[0]);
     }
-  }, [isOpen, starsGiftOptions, isPremiumPrepaidGiveaway]);
+  }, [isOpen, diamondsGiftOptions, isPremiumPrepaidGiveaway]);
 
   useEffect(() => {
     if (isOpen && isDiamondsPrepaidGiveaway) {
@@ -519,7 +519,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
     return (
       <DiamondTopupOptionList
         className={styles.diamondOptions}
-        options={starsGiftOptions}
+        options={diamondsGiftOptions}
         selectedDiamondCount={selectedRandomUserCount}
         selectedDiamondOption={selectedDiamondOption}
         onClick={handleDiamondClick}
@@ -916,6 +916,6 @@ export default memo(withGlobal<OwnProps>((global): Complete<StateProps> => {
     countryList: global.countryList.general,
     prepaidGiveaway: giveawayModal?.prepaidGiveaway,
     isChannel,
-    starsGiftOptions: giveawayModal?.diamondOptions,
+    diamondsGiftOptions: giveawayModal?.diamondOptions,
   };
 })(GiveawayModal));

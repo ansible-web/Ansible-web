@@ -73,7 +73,7 @@ export function buildApiUserFullInfo(mtpUserFull: GramJs.users.UserFull): ApiUse
     privateForwardName,
     botVerification: botVerification && buildApiBotVerification(botVerification),
     areAdsEnabled: sponsoredEnabled,
-    starGiftCount: stargiftsCount,
+    diamondGiftCount: stargiftsCount,
     starsRating: starsRating && buildApiDiamondsRating(starsRating),
     starsMyPendingRating: starsMyPendingRating && buildApiDiamondsRating(starsMyPendingRating),
     starsMyPendingRatingDate,

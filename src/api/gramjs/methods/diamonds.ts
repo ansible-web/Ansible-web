@@ -156,9 +156,9 @@ export async function fetchSavedDiamondGifts({
   filter?: GiftProfileFilterOptions;
   collectionId?: number;
 }) {
-  type GetSavedStarGiftsParams = ConstructorParameters<typeof GramJs.payments.GetSavedStarGifts>[0];
+  type GetSavedDiamondGiftsParams = ConstructorParameters<typeof GramJs.payments.GetSavedStarGifts>[0];
 
-  const params: GetSavedStarGiftsParams = {
+  const params: GetSavedDiamondGiftsParams = {
     peer: buildInputPeer(peer.id, peer.accessHash),
     offset,
     limit,
@@ -171,7 +171,7 @@ export async function fetchSavedDiamondGifts({
       excludeUnique: !filter.shouldIncludeUnique || undefined,
       excludeSaved: !filter.shouldIncludeDisplayed || undefined,
       excludeUnsaved: !filter.shouldIncludeHidden || undefined,
-    } satisfies Partial<GetSavedStarGiftsParams>),
+    } satisfies Partial<GetSavedDiamondGiftsParams>),
   };
 
   const result = await invokeRequest(new GramJs.payments.GetSavedStarGifts(params));

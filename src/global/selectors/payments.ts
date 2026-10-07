@@ -30,7 +30,7 @@ export function selectDiamondsPayment<T extends GlobalState>(
   global: T,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ) {
-  return selectTabState(global, tabId).starsPayment;
+  return selectTabState(global, tabId).diamondsPayment;
 }
 
 export function selectPaymentRequestId<T extends GlobalState>(
@@ -108,7 +108,7 @@ export function selectActiveGiftsCollectionId<T extends GlobalState>(
 }
 
 export function selectDiamondsGiftResaleCommission<T extends GlobalState>(global: T) {
-  const permille = global.appConfig?.starsStargiftResaleCommissionPermille;
+  const permille = global.appConfig?.diamondsStargiftResaleCommissionPermille;
   return permille !== undefined ? permille / 1000 : undefined;
 }
 export function selectTonGiftResaleCommission<T extends GlobalState>(global: T) {

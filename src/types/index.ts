@@ -659,12 +659,12 @@ export type IDimensions = {
   height: number;
 };
 
-export type StarsTransactionType = 'all' | 'inbound' | 'outbound';
-export type StarsTransactionHistory = Record<StarsTransactionType, {
+export type DiamondsTransactionType = 'all' | 'inbound' | 'outbound';
+export type DiamondsTransactionHistory = Record<DiamondsTransactionType, {
   transactions: ApiDiamondsTransaction[];
   nextOffset?: string;
 } | undefined>;
-export type StarsSubscriptions = {
+export type DiamondsSubscriptions = {
   list: ApiDiamondsSubscription[];
   nextOffset?: string;
   isLoading?: boolean;
@@ -672,7 +672,7 @@ export type StarsSubscriptions = {
 
 export type ConfettiStyle = 'poppers' | 'top-down';
 
-export type StarGiftInfo = {
+export type DiamondGiftInfo = {
   peerId: string;
   gift: ApiDiamondGiftRegular;
   shouldHideName?: boolean;
@@ -817,7 +817,7 @@ export type WebPageMediaSize = 'large' | 'small';
 
 export type AttachmentCompression = 'compress' | 'original';
 
-export type StarGiftCategory = 'all' | 'myUnique' | 'collectible';
+export type DiamondGiftCategory = 'all' | 'myUnique' | 'collectible';
 
 export type CallSound = (
   'join' | 'allowTalk' | 'leave' | 'connecting' | 'incoming' | 'end' | 'connect' | 'busy' | 'ringing'

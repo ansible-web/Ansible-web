@@ -250,8 +250,8 @@ const ForwardRecipientPicker = ({
     }
 
     if (paidChatsInfo.totalStars > 0) {
-      const starsBalance = getGlobal().stars?.balance?.amount || 0;
-      if (paidChatsInfo.totalStars > starsBalance) {
+      const diamondsBalance = getGlobal().stars?.balance?.amount || 0;
+      if (paidChatsInfo.totalStars > diamondsBalance) {
         openDiamondsBalanceModal({
           topup: {
             balanceNeeded: paidChatsInfo.totalStars,
@@ -305,9 +305,9 @@ const ForwardRecipientPicker = ({
 
   const handlePaymentConfirm = useLastCallback(() => {
     const totalStars = pendingMusicTarget?.stars ?? paidChatsInfo.totalStars;
-    const starsBalance = getGlobal().stars?.balance?.amount || 0;
+    const diamondsBalance = getGlobal().stars?.balance?.amount || 0;
 
-    if (totalStars > starsBalance) {
+    if (totalStars > diamondsBalance) {
       openDiamondsBalanceModal({
         topup: {
           balanceNeeded: totalStars,

@@ -51,7 +51,7 @@ import styles from './DiamondsTransactionModal.module.scss';
 const AVATAR_SPARKLES_CENTER_SHIFT = [0, -50] as const;
 
 export type OwnProps = {
-  modal: TabState['starsTransactionModal'];
+  modal: TabState['diamondsTransactionModal'];
 };
 
 type StateProps = {
@@ -181,7 +181,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
         )}
         {!sticker && !transaction.isPostsSearch && (
           <InteractiveSparkles
-            className={buildClassName(styles.starsBackground)}
+            className={buildClassName(styles.diamondsBackground)}
             color="blue"
             onRequestAnimation={handleRequestAnimation}
             centerShift={AVATAR_SPARKLES_CENTER_SHIFT}
@@ -369,17 +369,17 @@ export default memo(withGlobal<OwnProps>(
   (global, { modal }): Complete<StateProps> => {
     const peerId = modal?.transaction?.peer?.type === 'peer' && modal.transaction.peer.id;
     const peer = peerId ? selectPeer(global, peerId) : undefined;
-    const paidMessageCommission = global.appConfig.starsPaidMessageCommissionPermille;
+    const paidMessageCommission = global.appConfig.diamondsPaidMessageCommissionPermille;
 
     const currencyAmount = modal?.transaction.amount;
-    const starsGiftSticker = modal?.transaction.isGift
+    const diamondsGiftSticker = modal?.transaction.isGift
       ? (currencyAmount?.currency === STARS_CURRENCY_CODE ? selectGiftStickerForDiamonds(global, currencyAmount?.amount)
         : selectGiftStickerForTon(global, currencyAmount?.amount)) : undefined;
 
     return {
       peer,
       canPlayAnimatedEmojis: selectCanPlayAnimatedEmojis(global),
-      topSticker: starsGiftSticker,
+      topSticker: diamondsGiftSticker,
       paidMessageCommission,
     };
   },

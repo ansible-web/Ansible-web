@@ -27,7 +27,7 @@ type OwnProps = {
   options?: ApiDiamondTopupOption[] | ApiDiamondGiveawayOption[];
   selectedDiamondOption?: ApiDiamondTopupOption | ApiDiamondGiveawayOption;
   selectedDiamondCount?: number;
-  starsNeeded?: number;
+  diamondsNeeded?: number;
   className?: string;
   onClick: (option: ApiDiamondTopupOption | ApiDiamondGiveawayOption) => void;
 };
@@ -38,7 +38,7 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
   options,
   selectedDiamondOption,
   selectedDiamondCount,
-  starsNeeded,
+  diamondsNeeded,
   onClick,
 }) => {
   const oldLang = useOldLang();
@@ -58,34 +58,34 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
     const maxOption = options.reduce((max, option) => (
       max.stars > option.stars ? max : option
     ));
-    const forceShowAll = starsNeeded && maxOption.stars < starsNeeded;
+    const forceShowAll = diamondsNeeded && maxOption.stars < diamondsNeeded;
 
     const result: {
-      option: ApiDiamondTopupOption | ApiDiamondGiveawayOption; starsCount: number; isWide: boolean;
+      option: ApiDiamondTopupOption | ApiDiamondGiveawayOption; diamondsCount: number; isWide: boolean;
     }[] = [];
     let currentStackedDiamondsCount = 0;
     let canExtendOptions = false;
     options.forEach((option, index) => {
       if (!option.isExtended) currentStackedDiamondsCount++;
 
-      if (starsNeeded && !forceShowAll && option.stars < starsNeeded) return;
+      if (diamondsNeeded && !forceShowAll && option.stars < diamondsNeeded) return;
       if (!areOptionsExtended && option.isExtended) {
         canExtendOptions = true;
         return;
       }
       result.push({
         option,
-        starsCount: Math.min(currentStackedDiamondsCount, MAX_STARS_COUNT),
+        diamondsCount: Math.min(currentStackedDiamondsCount, MAX_STARS_COUNT),
         isWide: index === options.length - 1,
       });
     });
 
     return [result, canExtendOptions];
-  }, [areOptionsExtended, options, starsNeeded]);
+  }, [areOptionsExtended, options, diamondsNeeded]);
 
   return (
     <div className={buildClassName(styles.options, className)}>
-      {renderingOptions?.map(({ option, starsCount, isWide }) => {
+      {renderingOptions?.map(({ option, diamondsCount, isWide }) => {
         const length = renderingOptions?.length;
         const isOdd = length % 2 === 0;
         const isActiveOption = option === selectedDiamondOption;
@@ -109,7 +109,7 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
               +
               {formatInteger(option.stars)}
               <div className={styles.stackedDiamonds} dir={lang.isRtl ? 'ltr' : 'rtl'}>
-                {Array.from({ length: starsCount }).map(() => (
+                {Array.from({ length: diamondsCount }).map(() => (
                   <DiamondIcon className={styles.stackedDiamond} type="gold" size="big" />
                 ))}
               </div>

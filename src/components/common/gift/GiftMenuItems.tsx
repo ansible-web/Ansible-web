@@ -51,17 +51,18 @@ const GiftMenuItems = ({
   const savedGift = isSavedGift ? typeGift : undefined;
   const gift = isSavedGift ? typeGift.gift : typeGift;
 
-  const starGiftUniqueSlug = gift?.type === 'starGiftUnique' ? gift.slug : undefined;
-  const starGiftUniqueLink = useMemo(() => {
-    if (!starGiftUniqueSlug) return undefined;
-    return `${TME_LINK_PREFIX}nft/${starGiftUniqueSlug}`;
-  }, [starGiftUniqueSlug]);
+  const diamondGiftUniqueSlug = gift?.type === 'starGiftUnique' ? gift.slug : undefined;
+  const diamondGiftUniqueLink = useMemo(() => {
+    if (!diamondGiftUniqueSlug) return undefined;
+    return `${TME_LINK_PREFIX}nft/${diamondGiftUniqueSlug}`;
+  }, [diamondGiftUniqueSlug]);
   const userCollectibleStatus = useMemo(() => {
-    if (!starGiftUniqueSlug) return undefined;
+    if (!diamondGiftUniqueSlug) return undefined;
     return collectibleEmojiStatuses?.find((
       status,
-    ) => status.type === 'collectible' && status.slug === starGiftUniqueSlug) as ApiEmojiStatusCollectible | undefined;
-  }, [starGiftUniqueSlug, collectibleEmojiStatuses]);
+    ) => status.type === 'collectible' && status.slug === diamondGiftUniqueSlug,
+    ) as ApiEmojiStatusCollectible | undefined;
+  }, [diamondGiftUniqueSlug, collectibleEmojiStatuses]);
 
   const currenUniqueEmojiStatusSlug = currentUserEmojiStatus?.type === 'collectible'
     ? currentUserEmojiStatus.slug : undefined;
@@ -79,16 +80,16 @@ const GiftMenuItems = ({
   });
 
   const handleCopyLink = useLastCallback(() => {
-    if (!starGiftUniqueLink) return;
-    copyTextToClipboard(starGiftUniqueLink);
+    if (!diamondGiftUniqueLink) return;
+    copyTextToClipboard(diamondGiftUniqueLink);
     showNotification({
       message: lang('LinkCopied'),
     });
   });
 
   const handleLinkShare = useLastCallback(() => {
-    if (!starGiftUniqueLink) return;
-    openChatWithDraft({ text: { text: starGiftUniqueLink } });
+    if (!diamondGiftUniqueLink) return;
+    openChatWithDraft({ text: { text: diamondGiftUniqueLink } });
   });
 
   const handleTransfer = useLastCallback(() => {

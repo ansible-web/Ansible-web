@@ -8,9 +8,9 @@ import useLastCallback from '../../../../hooks/useLastCallback';
 
 export default function usePaidMessageConfirmation(
   dialogKey: string,
-  starsForAllMessages: number,
+  diamondsForAllMessages: number,
   isDiamondsBalanceModeOpen: boolean,
-  starsBalance: number,
+  diamondsBalance: number,
   shouldDelayConfirmHandler?: boolean,
 ) {
   const {
@@ -38,16 +38,16 @@ export default function usePaidMessageConfirmation(
     if (isWaitingDiamondsTopup && !isDiamondsBalanceModeOpen) {
       setIsWaitingDiamondsTopup(false);
 
-      if (starsBalance > starsForAllMessages) {
+      if (diamondsBalance > diamondsForAllMessages) {
         confirmPaymentHandlerRef?.current?.();
       }
     }
-  }, [isWaitingDiamondsTopup, isDiamondsBalanceModeOpen, starsBalance, starsForAllMessages]);
+  }, [isWaitingDiamondsTopup, isDiamondsBalanceModeOpen, diamondsBalance, diamondsForAllMessages]);
 
   const handleDiamondsTopup = useLastCallback(() => {
     getActions().openDiamondsBalanceModal({
       topup: {
-        balanceNeeded: starsForAllMessages,
+        balanceNeeded: diamondsForAllMessages,
         purpose: PAID_MESSAGES_PURPOSE,
       },
     });
@@ -55,7 +55,7 @@ export default function usePaidMessageConfirmation(
   });
 
   const dialogHandler = useLastCallback(() => {
-    if (starsForAllMessages > starsBalance) {
+    if (diamondsForAllMessages > diamondsBalance) {
       handleDiamondsTopup();
     } else if (shouldDelayConfirmHandler) {
       setTimeout(() => {
@@ -73,14 +73,14 @@ export default function usePaidMessageConfirmation(
     handler: T,
     ...args: Parameters<T>
   ) => {
-    if (starsForAllMessages) {
+    if (diamondsForAllMessages) {
       confirmPaymentHandlerRef.current = () => handler(...args);
       if (!shouldPaidMessageAutoApprove) {
         getActions().openPaymentMessageConfirmDialogOpen({ dialogKey });
         return;
       }
 
-      if (starsForAllMessages > starsBalance) {
+      if (diamondsForAllMessages > diamondsBalance) {
         handleDiamondsTopup();
         return;
       }

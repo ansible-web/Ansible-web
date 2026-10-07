@@ -1658,7 +1658,7 @@ addActionHandler('checkChatInvite', async (global, actions, payload): Promise<vo
 
   if (result.invite.subscriptionFormId) {
     global = updateTabState(global, {
-      starsPayment: {
+      diamondsPayment: {
         inputInvoice: {
           type: 'chatInviteSubscription',
           hash,

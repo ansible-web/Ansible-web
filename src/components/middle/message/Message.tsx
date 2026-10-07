@@ -962,7 +962,7 @@ const Message = ({
   const withAppendix = contentClassName.includes('has-appendix');
   const emojiSize = getCustomEmojiSize(text?.emojiOnlyCount);
 
-  const paidMessageStarsInMeta = !isChatWithUser
+  const paidMessageDiamondsInMeta = !isChatWithUser
     ? (isAlbum && paidMessageStars ? album.messages.length * paidMessageStars : paidMessageStars)
     : undefined;
 
@@ -1218,7 +1218,7 @@ const Message = ({
         onEffectClick={handleEffectClick}
         onTranslationClick={handleTranslationClick}
         onOpenThread={handleOpenThread}
-        paidMessageStars={paidMessageStarsInMeta}
+        paidMessageStars={paidMessageDiamondsInMeta}
       />
     );
 
@@ -2277,7 +2277,7 @@ export default memo(withGlobal<OwnProps>(
     const lastPlaybackTimestamp = selectMessageLastPlaybackTimestamp(global, chatId, message.id);
     const isAccountFrozen = selectIsCurrentUserFrozen(global);
 
-    const minFutureTime = global.appConfig.starsSuggestedPostFutureMin;
+    const minFutureTime = global.appConfig.diamondsSuggestedPostFutureMin;
 
     const isMediaNsfw = selectIsMediaNsfw(global, message);
     const isReplyMediaNsfw = replyMessage && selectIsMediaNsfw(global, replyMessage);

@@ -1533,7 +1533,7 @@ export default memo(withGlobal<OwnProps>(
     const storyByIds = peerStories?.byId;
     const archiveStoryIds = peerStories?.archiveIds;
 
-    const hasGiftsTab = Boolean(peerFullInfo?.starGiftCount) && !isSavedMessages;
+    const hasGiftsTab = Boolean(peerFullInfo?.diamondGiftCount) && !isSavedMessages;
 
     const activeCollectionId = selectActiveGiftsCollectionId(global, chatId);
     const peerGifts = savedGifts.collectionsByPeerId[chatId]?.[activeCollectionId];

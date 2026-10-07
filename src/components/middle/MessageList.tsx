@@ -180,7 +180,7 @@ enum Content {
   // eslint-disable-next-line @typescript-eslint/no-shadow
   Loading,
   Restricted,
-  StarsRequired,
+  DiamondsRequired,
   PremiumRequired,
   AccountInfo,
   // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -1322,7 +1322,7 @@ const MessageList = ({
   const activeKey = isRestricted ? (
     Content.Restricted
   ) : paidMessagesDiamonds && !hasMessages && !hasCustomGreeting ? (
-    Content.StarsRequired
+    Content.DiamondsRequired
   ) : isContactRequirePremium && !hasMessages ? (
     Content.PremiumRequired
   ) : (isBot || isNonContact) && !hasMessages && threadId === MAIN_THREAD_ID ? (
@@ -1347,7 +1347,7 @@ const MessageList = ({
           {restrictionReasons?.[0]?.text || `This is a private ${isChannelChat ? 'channel' : 'chat'}`}
         </span>
       </div>
-    ) : activeKey === Content.StarsRequired ? (
+    ) : activeKey === Content.DiamondsRequired ? (
       <RequirementToContactMessage paidMessagesDiamonds={paidMessagesDiamonds} peerId={monoforumChannelId || chatId} />
     ) : activeKey === Content.PremiumRequired ? (
       <RequirementToContactMessage peerId={chatId} />

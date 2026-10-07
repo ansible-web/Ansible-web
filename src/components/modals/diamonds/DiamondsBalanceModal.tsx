@@ -53,11 +53,11 @@ const TRANSACTION_ITEM_CLASS = 'DiamondsTransactionItem';
 const SUBSCRIPTION_PURPOSE = 'subs';
 
 export type OwnProps = {
-  modal: TabState['starsBalanceModal'];
+  modal: TabState['diamondsBalanceModal'];
 };
 
 type StateProps = {
-  starsBalanceState?: GlobalState['stars'];
+  diamondsBalanceState?: GlobalState['stars'];
   tonBalanceState?: GlobalState['ton'];
   canBuyPremium?: boolean;
   shouldForceHeight?: boolean;
@@ -67,7 +67,8 @@ type StateProps = {
 };
 
 const DiamondsBalanceModal = ({
-  modal, starsBalanceState, tonBalanceState, canBuyPremium, shouldForceHeight, tonUsdRate, tonTopupUrl, animationLevel,
+  modal, diamondsBalanceState, tonBalanceState, canBuyPremium, shouldForceHeight,
+  tonUsdRate, tonTopupUrl, animationLevel,
 }: OwnProps & StateProps) => {
   const {
     closeDiamondsBalanceModal, loadDiamondsTransactions, loadDiamondsSubscriptions,
@@ -76,9 +77,9 @@ const DiamondsBalanceModal = ({
   } = getActions();
 
   const currency = modal?.currency || STARS_CURRENCY_CODE;
-  const currentState = currency === TON_CURRENCY_CODE ? tonBalanceState : starsBalanceState;
+  const currentState = currency === TON_CURRENCY_CODE ? tonBalanceState : diamondsBalanceState;
   const { balance, history } = currentState || {};
-  const { subscriptions } = (currency === STARS_CURRENCY_CODE && starsBalanceState) || {};
+  const { subscriptions } = (currency === STARS_CURRENCY_CODE && diamondsBalanceState) || {};
 
   const oldLang = useOldLang();
   const lang = useLang();
@@ -90,7 +91,7 @@ const DiamondsBalanceModal = ({
 
   const tabsRef = useRef<HTMLDivElement>();
 
-  const isOpen = Boolean(modal && (starsBalanceState || tonBalanceState));
+  const isOpen = Boolean(modal && (diamondsBalanceState || tonBalanceState));
 
   const {
     originDiamondsPayment, originReaction, originGift, topup,
@@ -103,8 +104,8 @@ const DiamondsBalanceModal = ({
     || originReaction?.amount
     || originGift?.gift.stars
     || topup?.balanceNeeded;
-  const starsNeeded = ongoingTransactionAmount ? ongoingTransactionAmount - (balance?.amount || 0) : undefined;
-  const starsNeededText = useMemo(() => {
+  const diamondsNeeded = ongoingTransactionAmount ? ongoingTransactionAmount - (balance?.amount || 0) : undefined;
+  const diamondsNeededText = useMemo(() => {
     const global = getGlobal();
 
     if (originReaction) {
@@ -198,9 +199,9 @@ const DiamondsBalanceModal = ({
         <ParticlesHeader
           model="speeding-diamond"
           color="blue"
-          title={starsNeeded ? oldLang('DiamondsNeededTitle', ongoingTransactionAmount) : oldLang('AnsibleDiamonds')}
+          title={diamondsNeeded ? oldLang('DiamondsNeededTitle', ongoingTransactionAmount) : oldLang('AnsibleDiamonds')}
           description={renderText(
-            starsNeededText || oldLang('AnsibleDiamondsInfo'),
+            diamondsNeededText || oldLang('AnsibleDiamondsInfo'),
             ['simple_markdown', 'emoji'],
           )}
           isDisabled={!isOpen}
@@ -225,10 +226,10 @@ const DiamondsBalanceModal = ({
             {oldLang('AnsibleDiamondsGift')}
           </Button>
         )}
-        {areBuyOptionsShown && starsBalanceState?.topupOptions && (
+        {areBuyOptionsShown && diamondsBalanceState?.topupOptions && (
           <DiamondTopupOptionList
-            starsNeeded={starsNeeded}
-            options={starsBalanceState.topupOptions}
+            diamondsNeeded={diamondsNeeded}
+            options={diamondsBalanceState.topupOptions}
             onClick={handleBuyDiamonds}
           />
         )}
@@ -451,7 +452,7 @@ export default memo(withGlobal<OwnProps>(
 
     return {
       shouldForceHeight,
-      starsBalanceState: global.stars,
+      diamondsBalanceState: global.stars,
       tonBalanceState: global.ton,
       canBuyPremium: !selectIsPremiumPurchaseBlocked(global),
       tonUsdRate: global.appConfig.tonUsdRate,

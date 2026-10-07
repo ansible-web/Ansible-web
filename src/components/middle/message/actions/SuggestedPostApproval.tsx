@@ -144,7 +144,7 @@ export default memo(withGlobal<OwnProps>(
     }
 
     const { appConfig } = global;
-    const ageMinSeconds = appConfig.starsSuggestedPostAgeMin;
+    const ageMinSeconds = appConfig.diamondsSuggestedPostAgeMin;
     const isAdmin = chat ? Boolean(selectIsMonoforumAdmin(global, message.chatId)) : false;
 
     return {

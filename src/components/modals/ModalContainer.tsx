@@ -104,17 +104,17 @@ type ModalKey = keyof Pick<TabState,
   'collectibleInfoModal' |
   'reportAdModal' |
   'reportModal' |
-  'starsBalanceModal' |
-  'starsPayment' |
-  'starsTransactionModal' |
+  'diamondsBalanceModal' |
+  'diamondsPayment' |
+  'diamondsTransactionModal' |
   'paidReactionModal' |
   'pollModal' |
   'suggestMessageModal' |
   'suggestedPostApprovalModal' |
   'browser' |
   'chatInviteModal' |
-  'starsSubscriptionModal' |
-  'starsGiftModal' |
+  'diamondsSubscriptionModal' |
+  'diamondsGiftModal' |
   'giftModal' |
   'isGiftRecipientPickerOpen' |
   'isBrowserCloseConfirmationModalOpen' |
@@ -137,7 +137,7 @@ type ModalKey = keyof Pick<TabState,
   'giftAuctionChangeRecipientModal' |
   'giftAuctionAcquiredModal' |
   'activeGiftAuctionsModal' |
-  'starGiftPriceDecreaseInfoModal' |
+  'diamondGiftPriceDecreaseInfoModal' |
   'aboutDiamondGiftModal' |
   'monetizationVerificationModal' |
   'giftWithdrawModal' |
@@ -248,15 +248,15 @@ const LEGACY_MODALS: LegacyModalRegistry = {
   reportModal: ReportModal,
   browser: BrowserModal,
   collectibleInfoModal: CollectibleInfoModal,
-  starsPayment: DiamondsPaymentModal,
-  starsBalanceModal: DiamondsBalanceModal,
-  starsTransactionModal: DiamondsTransactionInfoModal,
+  diamondsPayment: DiamondsPaymentModal,
+  diamondsBalanceModal: DiamondsBalanceModal,
+  diamondsTransactionModal: DiamondsTransactionInfoModal,
   chatInviteModal: ChatInviteModal,
   paidReactionModal: PaidReactionModal,
   suggestMessageModal: SuggestMessageModal,
   suggestedPostApprovalModal: SuggestedPostApprovalModal,
-  starsSubscriptionModal: DiamondsSubscriptionModal,
-  starsGiftModal: DiamondsGiftModal,
+  diamondsSubscriptionModal: DiamondsSubscriptionModal,
+  diamondsGiftModal: DiamondsGiftModal,
   giftModal: PremiumGiftModal,
   isGiftRecipientPickerOpen: GiftRecipientPicker,
   isBrowserCloseConfirmationModalOpen: BrowserCloseConfirmationModal,
@@ -279,7 +279,7 @@ const LEGACY_MODALS: LegacyModalRegistry = {
   giftAuctionChangeRecipientModal: GiftAuctionChangeRecipientModal,
   giftAuctionAcquiredModal: GiftAuctionAcquiredModal,
   activeGiftAuctionsModal: ActiveGiftAuctionsModal,
-  starGiftPriceDecreaseInfoModal: DiamondGiftPriceDecreaseInfoModal,
+  diamondGiftPriceDecreaseInfoModal: DiamondGiftPriceDecreaseInfoModal,
   aboutDiamondGiftModal: AboutDiamondGiftModal,
   monetizationVerificationModal: VerificationMonetizationModal,
   giftWithdrawModal: GiftWithdrawModal,

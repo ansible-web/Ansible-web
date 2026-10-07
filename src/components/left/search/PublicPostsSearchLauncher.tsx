@@ -36,7 +36,7 @@ type OwnProps = {
 
 type StateProps = {
   isCurrentUserPremium?: boolean;
-  starsBalance: number;
+  diamondsBalance: number;
 };
 
 const WAIT_DELAY = 2;
@@ -48,7 +48,7 @@ const PublicPostsSearchLauncher = ({
   onSearch,
   isLoading,
   isCurrentUserPremium,
-  starsBalance,
+  diamondsBalance,
 }: OwnProps & StateProps) => {
   const {
     checkSearchPostsFlood,
@@ -74,7 +74,7 @@ const PublicPostsSearchLauncher = ({
 
   const handlePaidSearchClick = useLastCallback(() => {
     const starsAmount = searchFlood?.starsAmount || 0;
-    const currentBalance = starsBalance;
+    const currentBalance = diamondsBalance;
 
     if (currentBalance < starsAmount) {
       openDiamondsBalanceModal({
@@ -281,5 +281,5 @@ const PublicPostsSearchLauncher = ({
 
 export default memo(withGlobal<OwnProps>((global): Complete<StateProps> => ({
   isCurrentUserPremium: selectIsCurrentUserPremium(global),
-  starsBalance: global.stars?.balance?.amount || 0,
+  diamondsBalance: global.stars?.balance?.amount || 0,
 }))(PublicPostsSearchLauncher));

@@ -278,7 +278,7 @@ addActionHandler('openChatRefundModal', async (global, actions, payload): Promis
   global = updateTabState(global, {
     chatRefundModal: {
       userId,
-      starsToRefund: starsAmount,
+      diamondsToRefund: starsAmount,
     },
   }, tabId);
 

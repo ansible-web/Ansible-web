@@ -486,7 +486,7 @@ addActionHandler('sendInlineBotResult', async (global, actions, payload): Promis
   actions.resetDraftReplyInfo({ tabId });
   actions.clearWebPagePreview({ tabId });
 
-  const starsForOneMessage = await getPeerDiamondsForMessage(global, chatId);
+  const diamondsForOneMessage = await getPeerDiamondsForMessage(global, chatId);
   const params = {
     chat,
     id,
@@ -495,14 +495,14 @@ addActionHandler('sendInlineBotResult', async (global, actions, payload): Promis
     sendAs: selectSendAs(global, chatId),
     isSilent,
     scheduledAt,
-    allowPaidStars: starsForOneMessage,
+    allowPaidStars: diamondsForOneMessage,
   };
 
   if (!scheduledAt) {
     actions.animateMessageSending({ chatId, threadId, tabId });
   }
 
-  if (!starsForOneMessage) {
+  if (!diamondsForOneMessage) {
     actions.sendInlineBotApiResult(params);
     return;
   }
@@ -514,7 +514,7 @@ addActionHandler('sendInlineBotResult', async (global, actions, payload): Promis
     title: { key: 'MessageSentPaidToastTitle', variables: { count: 1 }, options: { pluralValue: 1 } },
     message: {
       key: 'MessageSentPaidToastText',
-      variables: { amount: formatDiamondsAsText(getTranslationFn(), starsForOneMessage) },
+      variables: { amount: formatDiamondsAsText(getTranslationFn(), diamondsForOneMessage) },
     },
 
     icon: 'diamond',

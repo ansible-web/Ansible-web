@@ -25,15 +25,15 @@ type OwnProps = {
 };
 
 type StateProps = {
-  starsUsdWithdrawRate: number;
-  starsPaidMessageAmountMax: number;
-  starsPaidMessageCommissionPermille: number;
+  diamondsUsdWithdrawRate: number;
+  diamondsPaidMessageAmountMax: number;
+  diamondsPaidMessageCommissionPermille: number;
 };
 
 function PaidMessagePrice({
-  starsUsdWithdrawRate,
-  starsPaidMessageAmountMax,
-  starsPaidMessageCommissionPermille,
+  diamondsUsdWithdrawRate,
+  diamondsPaidMessageAmountMax,
+  diamondsPaidMessageCommissionPermille,
   canChangeChargeForMessages,
   isGroupChat,
   chargeForMessages,
@@ -59,7 +59,7 @@ function PaidMessagePrice({
       <PaidMessageSlider
         defaultValue={chargeForMessages}
         min={MINIMUM_CHARGE_FOR_MESSAGES}
-        max={starsPaidMessageAmountMax}
+        max={diamondsPaidMessageAmountMax}
         value={chargeForMessages}
         onChange={handleChargeForMessagesChange}
         canChangeChargeForMessages={canChangeChargeForMessages}
@@ -82,9 +82,9 @@ function PaidMessagePrice({
       {canChangeChargeForMessages && (
         <p className="settings-item-description-larger" dir={lang.isRtl ? 'rtl' : undefined}>
           {lang(isGroupChat ? 'SetPriceGroupDescription' : 'SectionDescriptionDiamondsForForMessages', {
-            percent: formatPercent(starsPaidMessageCommissionPermille * 100),
+            percent: formatPercent(diamondsPaidMessageCommissionPermille * 100),
             amount: formatCurrencyAsString(
-              chargeForMessages * starsUsdWithdrawRate * starsPaidMessageCommissionPermille,
+              chargeForMessages * diamondsUsdWithdrawRate * diamondsPaidMessageCommissionPermille,
               'USD',
               lang.code,
             ),
@@ -99,16 +99,17 @@ function PaidMessagePrice({
 
 export default memo(withGlobal<OwnProps>(
   (global): Complete<StateProps> => {
-    const starsUsdWithdrawRateX1000 = global.appConfig.starsUsdWithdrawRateX1000;
-    const starsUsdWithdrawRate = starsUsdWithdrawRateX1000 ? starsUsdWithdrawRateX1000 / 1000 : 1;
-    const configDiamondsPaidMessageCommissionPermille = global.appConfig.starsPaidMessageCommissionPermille;
-    const starsPaidMessageCommissionPermille = configDiamondsPaidMessageCommissionPermille
+    const diamondsUsdWithdrawRateX1000 = global.appConfig.diamondsUsdWithdrawRateX1000;
+    const diamondsUsdWithdrawRate = diamondsUsdWithdrawRateX1000 ? diamondsUsdWithdrawRateX1000 / 1000 : 1;
+    const configDiamondsPaidMessageCommissionPermille = global.appConfig.diamondsPaidMessageCommissionPermille;
+    const diamondsPaidMessageCommissionPermille = configDiamondsPaidMessageCommissionPermille
       ? configDiamondsPaidMessageCommissionPermille / 1000 : 100;
 
     return {
-      starsPaidMessageCommissionPermille,
-      starsUsdWithdrawRate,
-      starsPaidMessageAmountMax: global.appConfig.starsPaidMessageAmountMax || DEFAULT_MAXIMUM_CHARGE_FOR_MESSAGES,
+      diamondsPaidMessageCommissionPermille,
+      diamondsUsdWithdrawRate,
+      diamondsPaidMessageAmountMax: global.appConfig.diamondsPaidMessageAmountMax
+        || DEFAULT_MAXIMUM_CHARGE_FOR_MESSAGES,
     };
   },
 )(PaidMessagePrice));

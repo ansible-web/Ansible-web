@@ -30,19 +30,19 @@ export type OwnProps = {
 
 type StateProps = {
   paymentMessageConfirmDialogKey?: string;
-  starsBalance: number;
+  diamondsBalance: number;
   isDiamondsBalanceModalOpen: boolean;
 };
 
 export type SendParams = {
   peerName?: string;
-  starsForSendMessage: number;
+  diamondsForSendMessage: number;
 };
 
 const PAYMENT_DIALOG_KEY = 'sharePreparedMessage';
 
 const SharePreparedMessageModal = ({
-  modal, paymentMessageConfirmDialogKey, isDiamondsBalanceModalOpen, starsBalance,
+  modal, paymentMessageConfirmDialogKey, isDiamondsBalanceModalOpen, diamondsBalance,
 }: OwnProps & StateProps) => {
   const {
     closeSharePreparedMessageModal,
@@ -67,7 +67,7 @@ const SharePreparedMessageModal = ({
   } = modal || {};
 
   const {
-    starsForSendMessage,
+    diamondsForSendMessage,
   } = pendingSendArgs || {};
 
   const {
@@ -77,7 +77,7 @@ const SharePreparedMessageModal = ({
     setAutoApprove: setShouldPaidMessageAutoApprove,
     handleWithConfirmation: handleActionWithPaymentConfirmation,
   } = usePaidMessageConfirmation(
-    PAYMENT_DIALOG_KEY, starsForSendMessage || 0, isDiamondsBalanceModalOpen, starsBalance,
+    PAYMENT_DIALOG_KEY, diamondsForSendMessage || 0, isDiamondsBalanceModalOpen, diamondsBalance,
   );
 
   const handleClose = useLastCallback(() => {
@@ -103,7 +103,7 @@ const SharePreparedMessageModal = ({
         id: message.result.id,
         queryId: message.result.queryId,
       });
-      if (!starsForSendMessage) {
+      if (!diamondsForSendMessage) {
         showNotification({
           message: lang('BotSharedToOne', getPeerTitle(lang, peer!)),
         });
@@ -164,7 +164,7 @@ const SharePreparedMessageModal = ({
         isOpen={paymentMessageConfirmDialogKey === PAYMENT_DIALOG_KEY}
         onClose={handleClosePaymentMessageConfirmDialog}
         userName={peerName}
-        messagePriceInDiamonds={starsForSendMessage || 0}
+        messagePriceInDiamonds={diamondsForSendMessage || 0}
         messagesCount={1}
         shouldAutoApprove={shouldPaidMessageAutoApprove}
         setAutoApprove={setShouldPaidMessageAutoApprove}
@@ -178,11 +178,11 @@ export default memo(withGlobal(
   (global): Complete<StateProps> => {
     const tabState = selectTabState(global);
     const { paymentMessageConfirmDialogKey } = tabState;
-    const starsBalance = global.stars?.balance.amount || 0;
-    const isDiamondsBalanceModalOpen = Boolean(tabState.starsBalanceModal);
+    const diamondsBalance = global.stars?.balance.amount || 0;
+    const isDiamondsBalanceModalOpen = Boolean(tabState.diamondsBalanceModal);
     return {
       paymentMessageConfirmDialogKey,
-      starsBalance,
+      diamondsBalance,
       isDiamondsBalanceModalOpen,
     };
   },

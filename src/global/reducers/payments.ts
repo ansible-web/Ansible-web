@@ -6,10 +6,10 @@ import type {
   ApiTypeCurrencyAmount,
 } from '../../api/types';
 import type {
+  DiamondsSubscriptions,
+  DiamondsTransactionType,
   PaymentStep,
   ShippingOption,
-  StarsSubscriptions,
-  StarsTransactionType,
 } from '../../types';
 import type {
   GlobalState, TabArgs, TabState,
@@ -33,7 +33,7 @@ export function updatePayment<T extends GlobalState>(
 }
 
 export function updateDiamondsPayment<T extends GlobalState>(
-  global: T, update: Partial<TabState['starsPayment']>,
+  global: T, update: Partial<TabState['diamondsPayment']>,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
   const diamondPayment = selectDiamondsPayment(global, tabId);
@@ -42,7 +42,7 @@ export function updateDiamondsPayment<T extends GlobalState>(
   }
 
   return updateTabState(global, {
-    starsPayment: {
+    diamondsPayment: {
       ...diamondPayment,
       ...update,
     },
@@ -115,7 +115,7 @@ export function clearDiamondPayment<T extends GlobalState>(
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
   return updateTabState(global, {
-    starsPayment: {},
+    diamondsPayment: {},
   }, tabId);
 }
 
@@ -159,7 +159,7 @@ export function updateStarsBalance<T extends GlobalState>(
 
 export function appendDiamondsTransactions<T extends GlobalState>(
   global: T,
-  type: StarsTransactionType,
+  type: DiamondsTransactionType,
   transactions: ApiDiamondsTransaction[],
   nextOffset?: string,
   isTon?: boolean,
@@ -221,7 +221,7 @@ export function appendDiamondsSubscriptions<T extends GlobalState>(
   const newObject = {
     list: (global.stars.subscriptions?.list || []).concat(subscriptions),
     nextOffset,
-  } satisfies StarsSubscriptions;
+  } satisfies DiamondsSubscriptions;
 
   return {
     ...global,
@@ -256,7 +256,7 @@ export function openDiamondsTransactionModal<T extends GlobalState>(
   global: T, transaction: ApiDiamondsTransaction, ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
   return updateTabState(global, {
-    starsTransactionModal: {
+    diamondsTransactionModal: {
       transaction,
     },
   }, tabId);

@@ -338,7 +338,7 @@ type StateProps = {
   shouldPaidMessageAutoApprove?: boolean;
   isSilentPosting?: boolean;
   paymentMessageConfirmDialogKey?: string;
-  starsBalance: number;
+  diamondsBalance: number;
   isDiamondsBalanceModalOpen: boolean;
   disallowedGifts?: ApiDisallowedGifts;
   isAccountFrozen?: boolean;
@@ -481,7 +481,7 @@ const Composer = ({
   richMessageMaxTableColumns,
   isSilentPosting,
   paymentMessageConfirmDialogKey,
-  starsBalance,
+  diamondsBalance,
   isDiamondsBalanceModalOpen,
   disallowedGifts,
   isAccountFrozen,
@@ -807,7 +807,7 @@ const Composer = ({
     return forwardedMessagesCount + messagesInInput;
   }, [hasInputContent, hasAttachments, attachments, isForwarding, forwardedMessagesCount]);
   const paymentDialogKey = `composer-${type}-${messageListType}-${chatId}-${threadId}-${storyId}`;
-  const starsForAllMessages = paidMessagesDiamonds ? messagesCount * paidMessagesDiamonds : 0;
+  const diamondsForAllMessages = paidMessagesDiamonds ? messagesCount * paidMessagesDiamonds : 0;
 
   const {
     closeConfirmDialog: closeConfirmModalPayForMessage,
@@ -815,9 +815,9 @@ const Composer = ({
     shouldAutoApprove: shouldPaidMessageAutoApprove,
     setAutoApprove: setShouldPaidMessageAutoApprove,
     handleWithConfirmation: handleActionWithPaymentConfirmation,
-  } = usePaidMessageConfirmation(paymentDialogKey, starsForAllMessages, isDiamondsBalanceModalOpen, starsBalance);
+  } = usePaidMessageConfirmation(paymentDialogKey, diamondsForAllMessages, isDiamondsBalanceModalOpen, diamondsBalance);
 
-  const isPaidSendDeferred = starsForAllMessages > 0 && !shouldPaidMessageAutoApprove;
+  const isPaidSendDeferred = diamondsForAllMessages > 0 && !shouldPaidMessageAutoApprove;
 
   const hasWebPagePreview = !hasAttachments && canAttachEmbedLinks && !noWebPage
     && webPagePreview?.webpageType === 'full';
@@ -2711,17 +2711,17 @@ const Composer = ({
   });
 
   useEffect(() => {
-    const starsEl = paidDiamondsRef.current;
+    const diamondsEl = paidDiamondsRef.current;
     const buttonEl = mainButtonRef.current;
-    if (!starsEl || !buttonEl) return;
+    if (!diamondsEl || !buttonEl) return;
 
     requestMeasure(() => {
-      const width = starsEl.scrollWidth + 1;
+      const width = diamondsEl.scrollWidth + 1;
       requestMutation(() => {
         buttonEl.style.setProperty('--paid-stars-width', `${width}px`);
       });
     });
-  }, [shouldRenderPaidDiamonds, starsForAllMessages, paidDiamondsRef, mainButtonRef]);
+  }, [shouldRenderPaidDiamonds, diamondsForAllMessages, paidDiamondsRef, mainButtonRef]);
 
   return (
     <div ref={composerRef} className={fullClassName}>
@@ -3235,7 +3235,7 @@ const Composer = ({
             <Icon name="diamond" />
             <AnimatedCounter
               ref={counterRef}
-              text={lang.number(starsForAllMessages)}
+              text={lang.number(diamondsForAllMessages)}
             />
           </div>
         )}
@@ -3398,8 +3398,8 @@ export default memo(withGlobal<OwnProps>(
     const isForwarding = chatId === tabState.forwardMessages.toChatId;
     const isReplying = Boolean(draft?.replyInfo);
     const hasSuggestedPost = Boolean(draft?.suggestedPostInfo);
-    const starsBalance = global.stars?.balance.amount || 0;
-    const isDiamondsBalanceModalOpen = Boolean(tabState.starsBalanceModal);
+    const diamondsBalance = global.stars?.balance.amount || 0;
+    const isDiamondsBalanceModalOpen = Boolean(tabState.diamondsBalanceModal);
     const isAccountFrozen = selectIsCurrentUserFrozen(global);
     const isAppConfigLoaded = global.isAppConfigLoaded;
     const insertingPeerIdMention = tabState.insertingPeerIdMention;
@@ -3500,7 +3500,7 @@ export default memo(withGlobal<OwnProps>(
       shouldPaidMessageAutoApprove,
       isSilentPosting,
       paymentMessageConfirmDialogKey: tabState.paymentMessageConfirmDialogKey,
-      starsBalance,
+      diamondsBalance,
       isDiamondsBalanceModalOpen,
       shouldDisplayGiftsButton: userFullInfo?.shouldDisplayGiftsButton,
       disallowedGifts: userFullInfo?.disallowedGifts,

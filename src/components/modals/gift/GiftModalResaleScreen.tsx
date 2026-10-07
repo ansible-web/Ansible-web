@@ -108,7 +108,7 @@ const GiftModalResaleScreen: FC<OwnProps & StateProps> = ({
           />
         )}
         <InfiniteScroll
-          className={buildClassName(styles.resaleStarGiftsContainer)}
+          className={buildClassName(styles.resaleDiamondGiftsContainer)}
           items={viewportIds}
           onLoadMore={onLoadMore}
           itemSelector=".diamondGiftItem"

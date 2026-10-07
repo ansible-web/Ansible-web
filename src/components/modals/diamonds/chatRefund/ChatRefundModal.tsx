@@ -31,7 +31,7 @@ const ChatRefundModal = ({ modal, user }: OwnProps & StateProps) => {
   const renderingModal = useCurrentOrPrev(modal);
   const renderingUser = useCurrentOrPrev(user);
 
-  const { starsToRefund, userId } = renderingModal || {};
+  const { diamondsToRefund, userId } = renderingModal || {};
 
   const lang = useLang();
 
@@ -59,11 +59,11 @@ const ChatRefundModal = ({ modal, user }: OwnProps & StateProps) => {
         withNodes: true,
       })}
       {
-        Boolean(starsToRefund) && (
+        Boolean(diamondsToRefund) && (
           <Checkbox
             className="dialog-checkbox"
             label={lang('ConfirmDialogRemoveFeeRefundDiamonds', {
-              amount: formatDiamondsAsText(lang, starsToRefund),
+              amount: formatDiamondsAsText(lang, diamondsToRefund),
             }, {
               withMarkdown: true,
               withNodes: true,

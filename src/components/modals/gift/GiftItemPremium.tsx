@@ -87,7 +87,7 @@ function GiftItemPremium({
         {formatCurrencyAsString(amount, currency)}
       </Button>
       {optionByDiamonds && (
-        <div className={styles.starsPriceBlock}>
+        <div className={styles.diamondsPriceBlock}>
           {lang('GiftPremiumDiamondsPrice', {
             stars: (formatDiamondsAsIcon(lang, optionByDiamonds.amount)),
           }, { withNodes: true, withMarkdown: true })}

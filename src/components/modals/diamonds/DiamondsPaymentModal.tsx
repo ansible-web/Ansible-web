@@ -33,14 +33,14 @@ import PaidMediaThumb from './transaction/PaidMediaThumb';
 
 import styles from './DiamondsBalanceModal.module.scss';
 
-import StarsBackground from '../../../assets/diamonds-bg.png';
+import DiamondsBackground from '../../../assets/diamonds-bg.png';
 
 export type OwnProps = {
-  modal: TabState['starsPayment'];
+  modal: TabState['diamondsPayment'];
 };
 
 type StateProps = {
-  starsBalanceState?: GlobalState['stars'];
+  diamondsBalanceState?: GlobalState['stars'];
   bot?: ApiUser;
   paidMediaMessage?: ApiMessage;
   paidMediaChat?: ApiChat;
@@ -49,13 +49,13 @@ type StateProps = {
 const DiamondsPaymentModal = ({
   modal,
   bot,
-  starsBalanceState,
+  diamondsBalanceState,
   paidMediaMessage,
   paidMediaChat,
 }: OwnProps & StateProps) => {
   const { closeDiamondsPaymentModal, openDiamondsBalanceModal, sendDiamondPaymentForm } = getActions();
   const [isLoading, markLoading, unmarkLoading] = useFlag();
-  const isOpen = Boolean(modal?.inputInvoice && starsBalanceState);
+  const isOpen = Boolean(modal?.inputInvoice && diamondsBalanceState);
 
   const prevModal = usePrevious(modal);
   const renderingModal = modal || prevModal;
@@ -82,7 +82,7 @@ const DiamondsPaymentModal = ({
     }
 
     const botName = getUserFullName(bot);
-    const starsText = oldLang('Diamonds.Intro.PurchasedText.Diamonds', amount);
+    const diamondsText = oldLang('Diamonds.Intro.PurchasedText.Diamonds', amount);
 
     if (paidMediaMessage) {
       const extendedMedia = paidMediaMessage.content.paidMedia!.extendedMedia as ApiMediaExtendedPreview[];
@@ -94,7 +94,7 @@ const DiamondsPaymentModal = ({
           : oldLang('Media', extendedMedia.length);
 
       const channelTitle = getChatTitle(oldLang, paidMediaChat!);
-      return oldLang('Diamonds.Transfer.UnlockInfo', [mediaText, channelTitle, starsText]);
+      return oldLang('Diamonds.Transfer.UnlockInfo', [mediaText, channelTitle, diamondsText]);
     }
 
     if (subscriptionInfo) {
@@ -118,7 +118,7 @@ const DiamondsPaymentModal = ({
       });
     }
 
-    return oldLang('Diamonds.Transfer.Info', [form!.title, botName, starsText]);
+    return oldLang('Diamonds.Transfer.Info', [form!.title, botName, diamondsText]);
   }, [
     renderingModal?.inputInvoice, bot, oldLang, amount, paidMediaMessage, subscriptionInfo, isBotSubscription, form,
     paidMediaChat, lang,
@@ -145,7 +145,7 @@ const DiamondsPaymentModal = ({
   }, [subscriptionInfo]);
 
   const handlePayment = useLastCallback(() => {
-    const balance = starsBalanceState?.balance;
+    const balance = diamondsBalanceState?.balance;
     if (amount === undefined || balance === undefined) {
       return;
     }
@@ -169,7 +169,7 @@ const DiamondsPaymentModal = ({
       isSlim
       onClose={closeDiamondsPaymentModal}
     >
-      <BalanceBlock balance={starsBalanceState?.balance} className={styles.modalBalance} />
+      <BalanceBlock balance={diamondsBalanceState?.balance} className={styles.modalBalance} />
       <div className={styles.paymentImages} dir={lang.isRtl ? 'ltr' : 'rtl'}>
         {paidMediaMessage ? (
           <PaidMediaThumb media={paidMediaMessage.content.paidMedia!.extendedMedia} />
@@ -189,7 +189,7 @@ const DiamondsPaymentModal = ({
             className={styles.paymentPhoto}
           />
         )}
-        <img className={styles.paymentImageBackground} src={StarsBackground} alt="" draggable={false} />
+        <img className={styles.paymentImageBackground} src={DiamondsBackground} alt="" draggable={false} />
       </div>
       <h2 className={styles.headerText}>
         {inviteCustomPeer ? oldLang('DiamondsSubscribeTitle') : oldLang('DiamondsConfirmPurchaseTitle')}
@@ -226,7 +226,7 @@ export default memo(withGlobal<OwnProps>(
 
     return {
       bot,
-      starsBalanceState: global.stars,
+      diamondsBalanceState: global.stars,
       paidMediaMessage: isPaidMedia ? message : undefined,
       paidMediaChat: isPaidMedia ? chat : undefined,
     };

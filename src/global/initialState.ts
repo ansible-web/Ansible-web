@@ -447,7 +447,7 @@ export const INITIAL_TAB_STATE: TabState = {
   pollResults: {},
 
   payment: {},
-  starsPayment: {},
+  diamondsPayment: {},
 
   notifications: [],
 

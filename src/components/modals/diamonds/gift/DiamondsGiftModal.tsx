@@ -29,11 +29,11 @@ import DiamondTopupOptionList from '../DiamondTopupOptionList';
 
 import styles from './DiamondsGiftModal.module.scss';
 
-import StarsBackground from '../../../../assets/diamonds-bg.png';
+import DiamondsBackground from '../../../../assets/diamonds-bg.png';
 import DiamondLogo from '../../../../assets/icons/diamond/GoldDiamond.svg';
 
 export type OwnProps = {
-  modal: TabState['starsGiftModal'];
+  modal: TabState['diamondsGiftModal'];
 };
 
 type StateProps = {
@@ -168,12 +168,12 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
                 peer={user}
                 className={styles.avatar}
               />
-              <img className={styles.logoBackground} src={StarsBackground} alt="" draggable={false} />
+              <img className={styles.logoBackground} src={DiamondsBackground} alt="" draggable={false} />
             </>
           ) : (
             <>
               <img className={styles.logo} src={DiamondLogo} alt="" draggable={false} />
-              <img className={styles.logoBackground} src={StarsBackground} alt="" draggable={false} />
+              <img className={styles.logoBackground} src={DiamondsBackground} alt="" draggable={false} />
             </>
           )}
         </div>
@@ -187,7 +187,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
         </p>
         <div className={styles.section}>
           <DiamondTopupOptionList
-            options={renderingModal?.starsGiftOptions}
+            options={renderingModal?.diamondsGiftOptions}
             onClick={handleClick}
           />
           <div className={styles.secondaryInfo}>

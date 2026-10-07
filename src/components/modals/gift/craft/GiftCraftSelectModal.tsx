@@ -386,8 +386,8 @@ const GiftCraftSelectModal = ({ modal, craftModal }: OwnProps & StateProps) => {
       {shouldShowMarketSection && (
         <Checkbox
           className={buildClassName(
-            styles.starsOnlyToggle,
-            wasDiamondsOnlyToggleShown && styles.starsOnlyToggleVisible,
+            styles.diamondsOnlyToggle,
+            wasDiamondsOnlyToggleShown && styles.diamondsOnlyToggleVisible,
           )}
           label={lang('GiftResaleDiamondsOnly')}
           checked={isDiamondsOnly}

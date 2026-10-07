@@ -222,11 +222,11 @@ export default memo(withGlobal<OwnProps>(
     const sender = message ? selectSender(global, message) : undefined;
     const isAdmin = modal && selectIsMonoforumAdmin(global, modal.chatId);
     const { appConfig } = global;
-    const commissionPermille = appConfig.starsSuggestedPostCommissionPermille;
+    const commissionPermille = appConfig.diamondsSuggestedPostCommissionPermille;
     const tonCommissionPermille = appConfig.tonSuggestedPostCommissionPermille;
-    const minAge = appConfig.starsSuggestedPostAgeMin;
-    const futureMin = appConfig.starsSuggestedPostFutureMin;
-    const futureMax = appConfig.starsSuggestedPostFutureMax;
+    const minAge = appConfig.diamondsSuggestedPostAgeMin;
+    const futureMin = appConfig.diamondsSuggestedPostFutureMin;
+    const futureMax = appConfig.diamondsSuggestedPostFutureMax;
     const scheduleDate = message?.suggestedPostInfo?.scheduleDate;
 
     return {

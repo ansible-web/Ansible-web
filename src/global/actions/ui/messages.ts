@@ -1235,7 +1235,7 @@ addActionHandler('updateSharePreparedMessageModalSendArgs', async (global, actio
     return;
   }
 
-  const starsForSendMessage = await getPeerDiamondsForMessage(global, args.peerId);
+  const diamondsForSendMessage = await getPeerDiamondsForMessage(global, args.peerId);
 
   global = getGlobal();
   global = updateTabState(global, {
@@ -1244,7 +1244,7 @@ addActionHandler('updateSharePreparedMessageModalSendArgs', async (global, actio
       pendingSendArgs: {
         peerId: args.peerId,
         threadId: args.threadId,
-        starsForSendMessage,
+        diamondsForSendMessage,
       },
     },
   }, tabId);

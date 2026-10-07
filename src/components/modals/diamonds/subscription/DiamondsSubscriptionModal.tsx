@@ -30,7 +30,7 @@ import TableInfoModal, { type TableData } from '../../common/TableInfoModal';
 import styles from './DiamondsSubscriptionModal.module.scss';
 
 export type OwnProps = {
-  modal: TabState['starsSubscriptionModal'];
+  modal: TabState['diamondsSubscriptionModal'];
 };
 
 type StateProps = {
@@ -146,7 +146,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
           <DiamondIcon className={styles.subscriptionDiamond} type="gold" size="adaptive" />
         </div>
         <InteractiveSparkles
-          className={buildClassName(styles.starsBackground)}
+          className={buildClassName(styles.diamondsBackground)}
           color="blue"
           onRequestAnimation={handleRequestAnimation}
           centerShift={AVATAR_SPARKLES_CENTER_SHIFT}

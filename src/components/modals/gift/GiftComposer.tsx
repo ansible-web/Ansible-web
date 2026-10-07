@@ -131,7 +131,7 @@ function GiftComposer({
               text: giftMessage,
             } : undefined,
             isNameHidden: shouldHideName || undefined,
-            starsToConvert: gift.starsToConvert,
+            diamondsToConvert: gift.diamondsToConvert,
             canUpgrade: shouldPayForUpgrade || undefined,
             alreadyPaidUpgradeDiamonds: shouldPayForUpgrade ? gift.upgradeStars : undefined,
             gift,
@@ -469,7 +469,7 @@ export default memo(withGlobal<OwnProps>(
     return {
       diamondBalance: stars?.balance,
       peer,
-      captionLimit: global.appConfig.starGiftMaxMessageLength,
+      captionLimit: global.appConfig.diamondGiftMaxMessageLength,
       currentUserId: global.currentUserId,
       isPaymentFormLoading: tabState.isPaymentFormLoading,
       paidMessagesDiamonds,

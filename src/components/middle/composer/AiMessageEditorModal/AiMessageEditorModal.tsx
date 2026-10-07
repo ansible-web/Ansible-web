@@ -94,7 +94,7 @@ const AiMessageEditorModal = ({
     handleContextMenuHide,
   } = useContextMenuHandlers(mainButtonRef, !modal);
 
-  const starsForMessage = paidMessagesDiamonds || 0;
+  const diamondsForMessage = paidMessagesDiamonds || 0;
   const shouldRenderPaidBadge = Boolean(paidMessagesDiamonds);
 
   useEffect(() => {
@@ -333,7 +333,7 @@ const AiMessageEditorModal = ({
             >
               <div className={styles.paidDiamondsBadgeText}>
                 <Icon name="diamond" />
-                <AnimatedCounter text={lang.number(starsForMessage)} />
+                <AnimatedCounter text={lang.number(diamondsForMessage)} />
               </div>
             </Button>
           </Button>

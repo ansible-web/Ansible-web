@@ -143,7 +143,7 @@ addActionHandler('openInvoice', async (global, actions, payload): Promise<void> 
 
   if (form.type === 'stars') {
     global = updateTabState(global, {
-      starsPayment: {
+      diamondsPayment: {
         inputInvoice,
         form,
         status: 'pending',
@@ -655,16 +655,16 @@ addActionHandler('openDiamondsGiftModal', async (global, actions, payload): Prom
   const chat = forUserId ? selectChat(global, forUserId) : undefined;
   if (forUserId && !chat) return;
 
-  const starsGiftOptions = await callApi('fetchDiamondsGiftOptions', {
+  const diamondsGiftOptions = await callApi('fetchDiamondsGiftOptions', {
     chat,
   });
 
   global = getGlobal();
   global = updateTabState(global, {
-    starsGiftModal: {
+    diamondsGiftModal: {
       isOpen: true,
       forUserId,
-      starsGiftOptions,
+      diamondsGiftOptions,
     },
   }, tabId);
   setGlobal(global);

@@ -44,7 +44,7 @@ type StateProps = {
   canPlayAnimatedEmojis: boolean;
   sender?: ApiPeer;
   recipient?: ApiPeer;
-  starGiftMaxConvertPeriod?: number;
+  diamondGiftMaxConvertPeriod?: number;
 };
 
 const STICKER_SIZE = 120;
@@ -55,7 +55,7 @@ const DiamondGiftAction = ({
   canPlayAnimatedEmojis,
   sender,
   recipient,
-  starGiftMaxConvertPeriod,
+  diamondGiftMaxConvertPeriod,
   onClick,
   observeIntersectionForLoading,
   observeIntersectionForPlaying,
@@ -85,8 +85,8 @@ const DiamondGiftAction = ({
 
   const giftDescription = useMemo(() => {
     const peerLink = renderPeerLink(peer?.id, peerTitle || fallbackPeerTitle);
-    const starsAmount = action.starsToConvert !== undefined
-      ? formatDiamondsAsText(lang, action.starsToConvert) : undefined;
+    const starsAmount = action.diamondsToConvert !== undefined
+      ? formatDiamondsAsText(lang, action.diamondsToConvert) : undefined;
 
     if (isAuction && auctionBid !== undefined) {
       return lang('ActionDiamondGiftAuctionBought', { cost: formatDiamondsAsText(lang, auctionBid) });
@@ -108,7 +108,7 @@ const DiamondGiftAction = ({
       );
     }
 
-    if (starGiftMaxConvertPeriod && getServerTime() < message.date + starGiftMaxConvertPeriod && starsAmount) {
+    if (diamondGiftMaxConvertPeriod && getServerTime() < message.date + diamondGiftMaxConvertPeriod && starsAmount) {
       return translateWithYou(
         lang, 'ActionDiamondGiftConvertText', !isOutgoing || isSelf, { peer: peerLink, amount: starsAmount },
       );
@@ -125,7 +125,7 @@ const DiamondGiftAction = ({
     );
   }, [
     action, auctionBid, fallbackPeerTitle, isAuction, isChannel, isOutgoing, lang, message.date, peer?.id, peerTitle,
-    starGiftMaxConvertPeriod, isSelf,
+    diamondGiftMaxConvertPeriod, isSelf,
   ]);
 
   return (
@@ -207,7 +207,7 @@ export default memo(withGlobal<OwnProps>(
       canPlayAnimatedEmojis,
       sender: giftSender || messageSender,
       recipient: giftRecipient || messageRecipient,
-      starGiftMaxConvertPeriod: global.appConfig.starGiftMaxConvertPeriod,
+      diamondGiftMaxConvertPeriod: global.appConfig.diamondGiftMaxConvertPeriod,
     };
   },
 )(DiamondGiftAction));

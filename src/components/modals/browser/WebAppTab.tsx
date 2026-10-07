@@ -1432,17 +1432,17 @@ export default memo(withGlobal<OwnProps>(
     const theme = selectTheme(global);
     const tabState = selectTabState(global);
     const { isPaymentModalOpen, status: regularPaymentStatus } = tabState.payment;
-    const { status: starsPaymentStatus, inputInvoice: starsInputInvoice } = tabState.starsPayment;
+    const { status: diamondsPaymentStatus, inputInvoice: diamondsInputInvoice } = tabState.diamondsPayment;
     const botAppPermissions = bot ? selectBotAppPermissions(global, bot.id) : undefined;
 
-    const paymentStatus = starsPaymentStatus || regularPaymentStatus;
+    const paymentStatus = diamondsPaymentStatus || regularPaymentStatus;
 
     return {
       attachBot,
       bot,
       currentUser,
       theme,
-      isPaymentModalOpen: isPaymentModalOpen || Boolean(starsInputInvoice),
+      isPaymentModalOpen: isPaymentModalOpen || Boolean(diamondsInputInvoice),
       paymentStatus,
       modalState,
       botAppPermissions,

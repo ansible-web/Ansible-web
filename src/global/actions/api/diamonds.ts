@@ -805,7 +805,7 @@ addActionHandler('openGiftInfoModalFromMessage', async (global, actions, payload
     date: message.date,
     gift: action.gift,
     message: action.message,
-    starsToConvert: starGift?.starsToConvert,
+    diamondsToConvert: starGift?.diamondsToConvert,
     isNameHidden: action.isNameHidden,
     isUnsaved: !action.isSaved,
     fromId,

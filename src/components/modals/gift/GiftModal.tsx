@@ -14,7 +14,7 @@ import type {
   ApiSavedDiamondGift,
 } from '../../../api/types';
 import type { TabState } from '../../../global/types';
-import type { ResaleGiftsFilterOptions, StarGiftCategory } from '../../../types';
+import type { DiamondGiftCategory, ResaleGiftsFilterOptions } from '../../../types';
 
 import { STARS_CURRENCY_CODE } from '../../../config';
 import { getUserFullName } from '../../../global/helpers';
@@ -57,8 +57,8 @@ export type GiftOption = ApiPremiumGiftCodeOption | ApiDiamondGift;
 
 type StateProps = {
   boostPerSentGift?: number;
-  starGiftsById?: Record<string, ApiDiamondGiftRegular>;
-  starGiftIdsByCategory?: Record<StarGiftCategory, string[]>;
+  diamondGiftsById?: Record<string, ApiDiamondGiftRegular>;
+  diamondGiftIdsByCategory?: Record<DiamondGiftCategory, string[]>;
   myUniqueGiftsById?: Record<string, ApiSavedDiamondGift>;
   myUniqueGiftIds?: string[];
   diamondBalance?: ApiDiamondsAmount;
@@ -82,8 +82,8 @@ const runThrottledForScroll = throttle((cb) => cb(), SCROLL_THROTTLE, true);
 
 const GiftModal: FC<OwnProps & StateProps> = ({
   modal,
-  starGiftsById,
-  starGiftIdsByCategory,
+  diamondGiftsById,
+  diamondGiftIdsByCategory,
   myUniqueGiftsById,
   myUniqueGiftIds,
   diamondBalance,
@@ -127,7 +127,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
   const [shouldShowMainScreenHeader, setShouldShowMainScreenHeader] = useState(false);
   const [isMainScreenHeaderForDiamondGifts, setIsMainScreenHeaderForDiamondGifts] = useState(false);
   const [isGiftScreenHeaderForDiamondGifts, setIsGiftScreenHeaderForDiamondGifts] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<StarGiftCategory>('all');
+  const [selectedCategory, setSelectedCategory] = useState<DiamondGiftCategory>('all');
   const [isCategoryListPinned, pinCategoryList, unpinCategoryList] = useFlag(false);
   const [wasDiamondsOnlyToggleShown, markDiamondsOnlyToggleShown, resetDiamondsOnlyToggleShown] = useFlag(false);
   const triggerSparklesRef = useRef<(() => void) | undefined>();
@@ -162,8 +162,8 @@ const GiftModal: FC<OwnProps & StateProps> = ({
 
     filteredGifts.forEach((gift) => {
       const giftByDiamonds = allGifts?.find(
-        (starsGift) => starsGift.currency === STARS_CURRENCY_CODE
-          && starsGift.months === gift.months,
+        (diamondsGift) => diamondsGift.currency === STARS_CURRENCY_CODE
+          && diamondsGift.months === gift.months,
       );
       if (giftByDiamonds) {
         mapGifts.set(gift, giftByDiamonds);
@@ -250,7 +250,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     ),
   }, { withNodes: true });
 
-  const starGiftDescription = useMemo(() => {
+  const diamondGiftDescription = useMemo(() => {
     if (chat) {
       return lang('DiamondGiftDescriptionChannel', { peer: getPeerTitle(lang, chat) }, {
         withNodes: true,
@@ -300,8 +300,8 @@ const GiftModal: FC<OwnProps & StateProps> = ({
 
   function renderDiamondGiftsDescription() {
     return (
-      <p className={buildClassName(styles.description, styles.starGiftsDescription, styles.center)}>
-        {starGiftDescription}
+      <p className={buildClassName(styles.description, styles.diamondGiftsDescription, styles.center)}>
+        {diamondGiftDescription}
       </p>
     );
   }
@@ -341,7 +341,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     if (selectedCategory === 'myUnique') {
       return (
         <InfiniteScroll
-          className={styles.starGiftsContainer}
+          className={styles.diamondGiftsContainer}
           items={myUniqueGiftIds}
           onLoadMore={handleLoadMore}
           scrollContainerClosest={`.${styles.main}`}
@@ -365,8 +365,8 @@ const GiftModal: FC<OwnProps & StateProps> = ({
       );
     }
 
-    const filteredGiftIds = starGiftIdsByCategory?.[selectedCategory]?.filter((giftId) => {
-      const gift = starGiftsById?.[giftId];
+    const filteredGiftIds = diamondGiftIdsByCategory?.[selectedCategory]?.filter((giftId) => {
+      const gift = diamondGiftsById?.[giftId];
       if (!gift) return false;
 
       const { isLimited, availabilityResale } = gift;
@@ -381,9 +381,9 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     });
 
     return (
-      <div className={styles.starGiftsContainer}>
-        {starGiftsById && filteredGiftIds?.flatMap((giftId) => {
-          const gift = starGiftsById[giftId];
+      <div className={styles.diamondGiftsContainer}>
+        {diamondGiftsById && filteredGiftIds?.flatMap((giftId) => {
+          const gift = diamondGiftsById[giftId];
           const shouldShowResale = Boolean(gift.availabilityResale) && !areUniqueDiamondGiftsDisallowed;
           const shouldDuplicateAsResale = shouldShowResale && !gift.isSoldOut && !areLimitedDiamondGiftsDisallowed;
 
@@ -432,7 +432,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
     );
   }
 
-  const onCategoryChanged = useLastCallback((category: StarGiftCategory) => {
+  const onCategoryChanged = useLastCallback((category: DiamondGiftCategory) => {
     setSelectedCategory(category);
   });
 
@@ -525,7 +525,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
             <Transition
               name="zoomFade"
               activeKey={getCategoryKey(selectedCategory)}
-              className={styles.starGiftsTransition}
+              className={styles.diamondGiftsTransition}
             >
               {renderDiamondGifts()}
             </Transition>
@@ -639,8 +639,8 @@ const GiftModal: FC<OwnProps & StateProps> = ({
       {isResaleScreen && (
         <Checkbox
           className={buildClassName(
-            styles.starsOnlyToggle,
-            wasDiamondsOnlyToggleShown && styles.starsOnlyToggleVisible,
+            styles.diamondsOnlyToggle,
+            wasDiamondsOnlyToggleShown && styles.diamondsOnlyToggleVisible,
           )}
           label={lang('GiftResaleDiamondsOnly')}
           checked={isDiamondsOnly}
@@ -669,8 +669,8 @@ export default memo(withGlobal<OwnProps>((global, { modal }): Complete<StateProp
 
   return {
     boostPerSentGift: global.appConfig.boostsPerSentGift,
-    starGiftsById: starGifts?.byId,
-    starGiftIdsByCategory: starGifts?.idsByCategory,
+    diamondGiftsById: starGifts?.byId,
+    diamondGiftIdsByCategory: starGifts?.idsByCategory,
     myUniqueGiftsById: global.myUniqueGifts?.byId,
     myUniqueGiftIds: global.myUniqueGifts?.ids,
     diamondBalance: stars?.balance,
@@ -685,7 +685,7 @@ export default memo(withGlobal<OwnProps>((global, { modal }): Complete<StateProp
   };
 })(GiftModal));
 
-function getCategoryKey(category: StarGiftCategory) {
+function getCategoryKey(category: DiamondGiftCategory) {
   if (category === 'all') return 0;
   if (category === 'myUnique') return 1;
   return 2;
