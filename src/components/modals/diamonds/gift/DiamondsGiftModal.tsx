@@ -29,8 +29,8 @@ import DiamondTopupOptionList from '../DiamondTopupOptionList';
 
 import styles from './DiamondsGiftModal.module.scss';
 
-import DiamondLogo from '../../../../assets/icons/star/GoldStar.svg';
-import StarsBackground from '../../../../assets/stars-bg.png';
+import StarsBackground from '../../../../assets/diamonds-bg.png';
+import DiamondLogo from '../../../../assets/icons/diamond/GoldDiamond.svg';
 
 export type OwnProps = {
   modal: TabState['starsGiftModal'];
@@ -156,7 +156,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
     >
       <div className={buildClassName(styles.main, 'custom-scroll')} onScroll={handleScroll}>
         <div className={buildClassName(styles.header, isHeaderHidden && styles.hiddenHeader)}>
-          <h2 className={styles.starHeaderText}>
+          <h2 className={styles.diamondHeaderText}>
             {user ? oldLang('GiftDiamondsTitle') : oldLang('Diamond.List.GetDiamonds')}
           </h2>
         </div>

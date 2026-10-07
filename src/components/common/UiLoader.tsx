@@ -22,8 +22,8 @@ import useShowTransitionDeprecated from '../../hooks/useShowTransitionDeprecated
 import appStyles from '../App.module.scss';
 import styles from './UiLoader.module.scss';
 
-import telegramLogoPath from '../../assets/ansible-logo.svg';
-import starIconPath from '../../assets/icons/star/star.webp';
+import ansibleLogoPath from '../../assets/ansible-logo.svg';
+import diamondIconPath from '../../assets/icons/diamond/diamond.webp';
 import lockPreviewPath from '../../assets/lock.png';
 import monkeyPath from '../../assets/monkey.svg';
 import spoilerMaskPath from '../../assets/spoilers/mask.svg';
@@ -93,14 +93,14 @@ const preloadTasks = {
     preloadFonts(),
     preloadAvatars(),
     preloadImage(spoilerMaskPath),
-    preloadImage(starIconPath),
+    preloadImage(diamondIconPath),
     preloadImage(playPreviewPath),
     preloadImage(pausePreviewPath),
     localizationReadyPromise,
   ]),
   authPhoneNumber: () => Promise.all([
     preloadFonts(),
-    preloadImage(telegramLogoPath),
+    preloadImage(ansibleLogoPath),
   ]),
   authCode: () => preloadImage(monkeyPath),
   authPassword: () => preloadImage(monkeyPath),

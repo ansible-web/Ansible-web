@@ -517,7 +517,7 @@ addActionHandler('sendInlineBotResult', async (global, actions, payload): Promis
       variables: { amount: formatDiamondsAsText(getTranslationFn(), starsForOneMessage) },
     },
 
-    icon: 'star',
+    icon: 'diamond',
     shouldUseCustomIcon: true,
     type: 'paidMessage',
     tabId,

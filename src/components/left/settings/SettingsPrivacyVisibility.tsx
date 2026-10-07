@@ -71,7 +71,7 @@ const SettingsPrivacyVisibility = ({
           payload: {},
         },
         actionText: { key: 'Open' },
-        icon: 'star',
+        icon: 'diamond',
       });
       return;
     }

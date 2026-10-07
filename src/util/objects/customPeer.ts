@@ -5,7 +5,7 @@ export const CUSTOM_PEER_PREMIUM: UniqueCustomPeer = {
   type: 'premium',
   titleKey: 'PrivacyPremium',
   subtitleKey: 'PrivacyPremiumText',
-  avatarIcon: 'star',
+  avatarIcon: 'diamond',
   isAvatarSquare: true,
   withPremiumGradient: true,
 };

@@ -11,7 +11,7 @@ import useLastCallback from '../../../hooks/useLastCallback.ts';
 import InteractiveSparkles from '../../common/InteractiveSparkles';
 import StickerView from '../../common/StickerView';
 import SpeedingDiamond from './SpeedingDiamond.tsx';
-import SwayingDiamond from './SwayingStar.tsx';
+import SwayingDiamond from './SwayingDiamond.tsx';
 
 import styles from './ParticlesHeader.module.scss';
 

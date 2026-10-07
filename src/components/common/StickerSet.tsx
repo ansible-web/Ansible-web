@@ -344,7 +344,7 @@ const StickerSet = ({
             color="translucent"
             onClick={handleDefaultStatusIconClick}
             key="default-status-icon"
-            iconName="star"
+            iconName="diamond"
           />
         )}
         {shouldRender && stickerSet.reactions?.map((reaction) => {

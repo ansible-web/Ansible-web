@@ -2854,7 +2854,7 @@ const Composer = ({
                   onActivate={handleActivateBotCommandMenu}
                   ariaLabel="Open bot command keyboard"
                 >
-                  <Icon name="hamburger" />
+                  <Icon name="menu" />
                 </ResponsiveHoverButton>
               )}
               {canShowSendAs && sendAsPeer && (

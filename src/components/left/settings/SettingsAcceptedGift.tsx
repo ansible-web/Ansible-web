@@ -24,7 +24,7 @@ const SettingsAcceptedGift = ({
 
   const lang = useLang();
 
-  const handleOpenTelegramPremiumModal = useLastCallback(() => {
+  const handleOpenAnsiblePremiumModal = useLastCallback(() => {
     showNotification({
       message: lang('PrivacySubscribeToAnsiblePremium'),
       action: {
@@ -32,13 +32,13 @@ const SettingsAcceptedGift = ({
         payload: {},
       },
       actionText: { key: 'Open' },
-      icon: 'star',
+      icon: 'diamond',
     });
   });
 
   const handleLimitedEditionChange = useLastCallback(() => {
     if (!isCurrentUserPremium) {
-      handleOpenTelegramPremiumModal();
+      handleOpenAnsiblePremiumModal();
       return;
     }
 
@@ -52,7 +52,7 @@ const SettingsAcceptedGift = ({
 
   const handleUnlimitedEditionChange = useLastCallback(() => {
     if (!isCurrentUserPremium) {
-      handleOpenTelegramPremiumModal();
+      handleOpenAnsiblePremiumModal();
       return;
     }
     updateGlobalPrivacySettings({
@@ -65,7 +65,7 @@ const SettingsAcceptedGift = ({
 
   const handleUniqueChange = useLastCallback(() => {
     if (!isCurrentUserPremium) {
-      handleOpenTelegramPremiumModal();
+      handleOpenAnsiblePremiumModal();
       return;
     }
     updateGlobalPrivacySettings({
@@ -78,7 +78,7 @@ const SettingsAcceptedGift = ({
 
   const handlePremiumSubscriptionChange = useLastCallback(() => {
     if (!isCurrentUserPremium) {
-      handleOpenTelegramPremiumModal();
+      handleOpenAnsiblePremiumModal();
       return;
     }
     updateGlobalPrivacySettings({

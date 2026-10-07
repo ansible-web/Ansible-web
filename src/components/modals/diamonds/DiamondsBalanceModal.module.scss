@@ -143,7 +143,7 @@
   transition: 0.25s ease-out transform, 0.25s ease-out border-bottom-color;
 }
 
-.starHeaderText {
+.diamondHeaderText {
   unicode-bidi: plaintext;
   margin: 0 0 0 3rem;
   font-size: 1.25rem;
@@ -227,7 +227,7 @@
 }
 
 .topUpButton,
-.starButton {
+.diamondButton {
   grid-column: 1/-1;
   gap: 0.5rem;
   align-self: stretch;

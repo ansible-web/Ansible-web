@@ -18,13 +18,13 @@ export type OwnProps = {
 };
 
 type StateProps = {
-  starBalance?: ApiDiamondsAmount;
+  diamondBalance?: ApiDiamondsAmount;
   tonBalance?: number;
 };
 
 const PriceConfirmModal: FC<OwnProps & StateProps> = ({
   modal,
-  starBalance,
+  diamondBalance,
   tonBalance,
 }) => {
   const actions = getActions();
@@ -39,7 +39,7 @@ const PriceConfirmModal: FC<OwnProps & StateProps> = ({
 
     const { currency, newAmount } = modal;
     const isTon = currency === 'TON';
-    const currentBalance = isTon ? tonBalance : starBalance?.amount;
+    const currentBalance = isTon ? tonBalance : diamondBalance?.amount;
 
     if (currentBalance === undefined) {
       actions.closePriceConfirmModal();
@@ -60,7 +60,7 @@ const PriceConfirmModal: FC<OwnProps & StateProps> = ({
       tabId: getCurrentTabId(),
     });
     actions.closePriceConfirmModal();
-  }, [modal, starBalance, tonBalance, actions]);
+  }, [modal, diamondBalance, tonBalance, actions]);
 
   const handleClose = useCallback(() => {
     actions.closePriceConfirmModal();
@@ -111,11 +111,11 @@ const PriceConfirmModal: FC<OwnProps & StateProps> = ({
 };
 
 export default memo(withGlobal<OwnProps>((global): Complete<StateProps> => {
-  const starBalance = global.stars?.balance;
+  const diamondBalance = global.stars?.balance;
   const tonBalance = global.ton?.balance?.amount;
 
   return {
-    starBalance,
+    diamondBalance,
     tonBalance,
   };
 },

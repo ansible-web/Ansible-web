@@ -1,6 +1,7 @@
 import type { CallbackAction } from '../../global/types';
 import type { IconName } from '../../types/icons';
 import type { LangFnParameters, RegularLangFnParameters } from '../../util/localization';
+import type { ApiDiamondsSubscriptionPricing } from './diamonds';
 import type {
   ApiContact,
   ApiDocument,
@@ -12,7 +13,6 @@ import type {
 } from './messages';
 import type { ApiPremiumSection } from './payments';
 import type { ApiBotVerification } from './peers';
-import type { ApiDiamondsSubscriptionPricing } from './stars';
 import type { ApiUser } from './users';
 
 export interface ApiInitialArgs {
@@ -320,7 +320,7 @@ export interface ApiAppConfig {
   isDiamondsGiftEnabled?: boolean;
   starGiftMaxMessageLength?: number;
   starGiftMaxConvertPeriod?: number;
-  starRefStartPrefixes?: string[];
+  diamondRefStartPrefixes?: string[];
   tonExplorerUrl?: string;
   savedGiftPinLimit?: number;
   freezeSinceDate?: number;

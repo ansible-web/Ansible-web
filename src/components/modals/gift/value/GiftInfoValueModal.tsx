@@ -43,7 +43,7 @@ const GiftInfoValueModal: FC<OwnProps> = ({
     }
   });
 
-  const handleOpenTelegramMarket = useLastCallback(() => {
+  const handleOpenAnsibleMarket = useLastCallback(() => {
     if (modal?.gift) {
       openGiftInMarket({ gift: modal.gift });
     }
@@ -97,7 +97,7 @@ const GiftInfoValueModal: FC<OwnProps> = ({
     tableData.push([
       lang('GiftValueTitleInitialPrice'),
       <span className={styles.initialPrice}>
-        {formatDiamondsAsIcon(lang, valueInfo.initialSaleStars, { className: styles.starIcon })}
+        {formatDiamondsAsIcon(lang, valueInfo.initialSaleStars, { className: styles.diamondIcon })}
         {!isCrystals && (
           <>
             {' (~ '}
@@ -137,8 +137,8 @@ const GiftInfoValueModal: FC<OwnProps> = ({
     }
 
     const canBuyOnFragment = Boolean(valueInfo.fragmentListedUrl && valueInfo.fragmentListedCount);
-    const canBuyOnTelegram = Boolean(valueInfo.listedCount && valueInfo.listedCount);
-    const hasFooter = canBuyOnFragment || canBuyOnTelegram;
+    const canBuyOnAnsible = Boolean(valueInfo.listedCount && valueInfo.listedCount);
+    const hasFooter = canBuyOnFragment || canBuyOnAnsible;
 
     const footer = hasFooter && (
       <div className={styles.footer}>
@@ -159,12 +159,12 @@ const GiftInfoValueModal: FC<OwnProps> = ({
           </Button>
         )}
 
-        {canBuyOnTelegram && (
+        {canBuyOnAnsible && (
           <Button
             isText
             noForcedUpperCase
             size="tiny"
-            onClick={handleOpenTelegramMarket}
+            onClick={handleOpenAnsibleMarket}
           >
             {lang.number(valueInfo.listedCount!)}
             <AnimatedIconFromSticker
@@ -183,7 +183,7 @@ const GiftInfoValueModal: FC<OwnProps> = ({
       tableData,
       footer,
     };
-  }, [lang, renderingModal, handleOpenFragment, handleOpenTelegramMarket]);
+  }, [lang, renderingModal, handleOpenFragment, handleOpenAnsibleMarket]);
 
   if (!modalData) return undefined;
 

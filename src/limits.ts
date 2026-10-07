@@ -116,7 +116,7 @@ export const DEFAULT_APP_CONFIG: ApiAppConfig = {
   maxUniqueReactions: 11,
   starGiftMaxConvertPeriod: 7776000,
   starGiftMaxMessageLength: 255,
-  starRefStartPrefixes: [
+  diamondRefStartPrefixes: [
     '_tgr_',
   ],
   isDiamondsGiftEnabled: true,

@@ -137,7 +137,7 @@ const WebAppTab = ({
     closeBrowserTab,
     sendWebViewData,
     toggleAttachBot,
-    openTelegramLink,
+    openAnsibleLink,
     setWebAppPaymentSlug,
     switchBotInline,
     sharePhoneWithBot,
@@ -681,7 +681,7 @@ const WebAppTab = ({
       changeBrowserModalState({ state: 'minimized' });
 
       const linkUrl = TME_LINK_PREFIX + eventData.path_full;
-      openTelegramLink({ url: linkUrl, shouldIgnoreCache: eventData.force_request });
+      openAnsibleLink({ url: linkUrl, shouldIgnoreCache: eventData.force_request });
     }
 
     if (eventType === 'web_app_setup_back_button') {

@@ -152,7 +152,7 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
 }) => {
   const dialogRef = useRef<HTMLDivElement>();
   const {
-    closePremiumModal, openInvoice, requestConfetti, openTelegramLink, loadStickers, openStickerSet,
+    closePremiumModal, openInvoice, requestConfetti, openAnsibleLink, loadStickers, openStickerSet,
   } = getActions();
 
   const oldLang = useOldLang();
@@ -194,7 +194,7 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
         slug: premiumSlug,
       });
     } else if (premiumBotUsername) {
-      openTelegramLink({
+      openAnsibleLink({
         url: `${TME_LINK_PREFIX}${premiumBotUsername}?start=${startParam || 'promo'}`,
       });
       closePremiumModal();
@@ -374,7 +374,7 @@ const PremiumMainModal: FC<OwnProps & StateProps> = ({
           color="purple"
           title={getHeaderText()}
           description={renderText(getHeaderDescription(), ['simple_markdown', 'emoji'])}
-          className={styles.starParticlesHeader}
+          className={styles.diamondParticlesHeader}
         />
       );
     }

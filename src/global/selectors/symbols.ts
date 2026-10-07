@@ -220,15 +220,15 @@ export function selectGiftStickerForDuration<T extends GlobalState>(global: T, d
   return stickers.find((sticker) => sticker.emoji === emoji) || stickers[0];
 }
 
-export function selectGiftStickerForDiamonds<T extends GlobalState>(global: T, starCount?: number) {
+export function selectGiftStickerForDiamonds<T extends GlobalState>(global: T, diamondCount?: number) {
   const stickers = global.premiumGifts?.stickers;
 
-  if (!stickers || !starCount) return undefined;
+  if (!stickers || !diamondCount) return undefined;
 
   let emoji;
-  if (starCount <= 1000) {
+  if (diamondCount <= 1000) {
     emoji = STAR_EMOTICON[1000];
-  } else if (starCount < 2500) {
+  } else if (diamondCount < 2500) {
     emoji = STAR_EMOTICON[2500];
   } else {
     emoji = STAR_EMOTICON[5000];

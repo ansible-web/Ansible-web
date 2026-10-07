@@ -253,7 +253,7 @@ function parseTgLink(url: URL) {
     case 'loginCodeLink':
       return buildLoginCodeLink({ code: queryParams.code });
     case 'telegramPassportLink':
-      return buildTelegramPassportLink({
+      return buildAnsiblePassportLink({
         botId: queryParams.bot_id,
         scope: queryParams.scope,
         publicKey: queryParams.public_key,
@@ -624,7 +624,7 @@ function buildLoginCodeLink(params: BuilderParams<LoginCodeLink>): BuilderReturn
   };
 }
 
-function buildTelegramPassportLink(
+function buildAnsiblePassportLink(
   params: BuilderParams<AnsiblePassportLink>,
 ): BuilderReturnType<AnsiblePassportLink> {
   const {

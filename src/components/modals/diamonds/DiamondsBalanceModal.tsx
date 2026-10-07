@@ -207,7 +207,7 @@ const DiamondsBalanceModal = ({
         />
         {canBuyPremium && !areBuyOptionsShown && (
           <Button
-            className={styles.starButton}
+            className={styles.diamondButton}
             onClick={showBuyOptions}
             fluid
           >
@@ -218,7 +218,7 @@ const DiamondsBalanceModal = ({
           <Button
             isText
             noForcedUpperCase
-            className={styles.starButton}
+            className={styles.diamondButton}
             fluid
             onClick={openDiamondsGiftingPickerModalHandler}
           >
@@ -361,7 +361,7 @@ const DiamondsBalanceModal = ({
             styles.header, isHeaderHidden && styles.hiddenHeader, areTabsPinned && styles.noSeparator,
           )}
         >
-          <h2 className={styles.starHeaderText}>
+          <h2 className={styles.diamondHeaderText}>
             {oldLang('AnsibleDiamonds')}
           </h2>
         </div>

@@ -3,13 +3,13 @@ import type { PayloadType } from './types';
 
 /// NOTE: telegram returns sign source, while webrtc uses unsign source internally
 /// unsign => sign
-export function toTelegramSource(source: number) {
+export function toAnsibleSource(source: number) {
   return source << 0;
 }
 
 /// NOTE: telegram returns sign source, while webrtc uses unsign source internally
 /// sign => unsign
-export function fromTelegramSource(source: number) {
+export function fromAnsibleSource(source: number) {
   return source >>> 0;
 }
 

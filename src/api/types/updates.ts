@@ -20,6 +20,7 @@ import type {
   ApiDraft,
   ApiTypingStatus,
 } from './chats';
+import type { ApiDiamondGiftAuctionUserState, ApiTypeCurrencyAmount, ApiTypeDiamondGiftAuctionState } from './diamonds';
 import type {
   ApiFormattedText,
   ApiMediaExtendedPreview,
@@ -46,7 +47,6 @@ import type {
 import type { ApiEmojiStatusType, ApiPeerSettings } from './peers';
 import type { ApiRichMessage } from './richMessage';
 import type { ApiPrivacyKey, LangPackStringValue, PrivacyVisibility } from './settings';
-import type { ApiDiamondGiftAuctionUserState, ApiTypeCurrencyAmount, ApiTypeDiamondGiftAuctionState } from './stars';
 import type { ApiStealthMode, ApiStory, ApiStorySkipped } from './stories';
 import type {
   ApiUser, ApiUserFullInfo, ApiUserStatus,

@@ -323,7 +323,7 @@ export function buildDiamondsTransactionCustomPeer(
 
   if (peer.type === 'appStore') {
     return {
-      avatarIcon: 'star',
+      avatarIcon: 'diamond',
       isCustomPeer: true,
       titleKey: 'Stars.Intro.Transaction.AppleTopUp.Title',
       subtitleKey: 'Stars.Intro.Transaction.AppleTopUp.Subtitle',
@@ -333,7 +333,7 @@ export function buildDiamondsTransactionCustomPeer(
 
   if (peer.type === 'playMarket') {
     return {
-      avatarIcon: 'star',
+      avatarIcon: 'diamond',
       isCustomPeer: true,
       titleKey: 'Stars.Intro.Transaction.GoogleTopUp.Title',
       subtitleKey: 'Stars.Intro.Transaction.GoogleTopUp.Subtitle',
@@ -362,7 +362,7 @@ export function buildDiamondsTransactionCustomPeer(
 
   if (peer.type === 'premiumBot') {
     return {
-      avatarIcon: 'star',
+      avatarIcon: 'diamond',
       isCustomPeer: true,
       titleKey: 'Stars.Intro.Transaction.PremiumBotTopUp.Title',
       subtitleKey: 'Stars.Intro.Transaction.PremiumBotTopUp.Subtitle',
@@ -373,7 +373,7 @@ export function buildDiamondsTransactionCustomPeer(
 
   if (peer.type === 'ads') {
     return {
-      avatarIcon: 'star',
+      avatarIcon: 'diamond',
       isCustomPeer: true,
       titleKey: 'Stars.Intro.Transaction.TelegramAds.Title',
       subtitleKey: 'Stars.Intro.Transaction.TelegramAds.Subtitle',
@@ -392,7 +392,7 @@ export function buildDiamondsTransactionCustomPeer(
   }
 
   return {
-    avatarIcon: 'star',
+    avatarIcon: 'diamond',
     isCustomPeer: true,
     titleKey: 'Stars.Intro.Transaction.Unsupported.Title',
     subtitleKey: 'Stars.Intro.Transaction.Unsupported.Title',

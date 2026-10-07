@@ -42,7 +42,7 @@ export type OwnProps = {
 };
 
 type StateProps = {
-  starBalance?: ApiDiamondsAmount;
+  diamondBalance?: ApiDiamondsAmount;
   tonBalance?: number;
   peer?: ApiPeer;
   currentDraft?: ApiDraft;
@@ -61,7 +61,7 @@ const FUTURE_TIME_ADJUSTMENT = 1 * 60;
 
 const SuggestMessageModal = ({
   modal,
-  starBalance,
+  diamondBalance,
   tonBalance,
   peer,
   currentDraft,
@@ -147,7 +147,7 @@ const SuggestMessageModal = ({
 
     if (!isMonoforumAdmin) {
       if (isCurrencyDiamonds) {
-        const currentBalance = starBalance?.amount || 0;
+        const currentBalance = diamondBalance?.amount || 0;
 
         if (neededAmount > currentBalance) {
           openDiamondsBalanceModal({
@@ -301,7 +301,7 @@ const SuggestMessageModal = ({
 
 export default memo(withGlobal<OwnProps>(
   (global, { modal }): Complete<StateProps> => {
-    const starBalance = global.stars?.balance;
+    const diamondBalance = global.stars?.balance;
     const peer = modal ? selectPeer(global, modal.chatId) : undefined;
     const currentDraft = modal ? selectDraft(global, modal.chatId, MAIN_THREAD_ID) : undefined;
 
@@ -319,7 +319,7 @@ export default memo(withGlobal<OwnProps>(
 
     return {
       peer,
-      starBalance,
+      diamondBalance,
       tonBalance: global.ton?.balance?.amount,
       currentDraft,
       maxDiamondsAmount,

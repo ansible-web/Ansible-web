@@ -694,7 +694,7 @@ const PollModal = ({
                     ref={handleProps?.ref}
                   >
                     <Icon
-                      name={isAddOptionRow ? 'add' : 'hamburger'}
+                      name={isAddOptionRow ? 'add' : 'menu'}
                       className={styles.optionLeadingIconGlyph}
                     />
                   </div>

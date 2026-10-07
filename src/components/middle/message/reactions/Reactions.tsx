@@ -166,7 +166,7 @@ const Reactions = ({
       duration: PAID_SEND_DELAY,
       shouldShowTimer: true,
       disableClickDismiss: true,
-      icon: 'star',
+      icon: 'diamond',
     });
   }, [lang, message, paidLocalCount]);
 

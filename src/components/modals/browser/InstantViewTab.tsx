@@ -42,7 +42,7 @@ const InstantViewTab = ({
   isActive,
 }: OwnProps & StateProps) => {
   const {
-    changeBrowserModalState, closeBrowserTab, loadWebPage, openChatByUsername, openTelegramLink,
+    changeBrowserModalState, closeBrowserTab, loadWebPage, openChatByUsername, openAnsibleLink,
   } = getActions();
   const lang = useLang();
   const { isMobile } = useAppLayout();
@@ -68,13 +68,13 @@ const InstantViewTab = ({
     }
   });
 
-  const handleOpenTelegramLink = useLastCallback((url: string) => {
+  const handleOpenAnsibleLink = useLastCallback((url: string) => {
     closeOrMinimizeInstantView();
-    openTelegramLink({ url });
+    openAnsibleLink({ url });
   });
 
-  const handleTelegramChannelClick = useLastCallback((channelUsername: string) => {
-    handleOpenTelegramLink(`${TME_LINK_PREFIX}${channelUsername}`);
+  const handleAnsibleChannelClick = useLastCallback((channelUsername: string) => {
+    handleOpenAnsibleLink(`${TME_LINK_PREFIX}${channelUsername}`);
   });
 
   const handleWrongLayoutClick = useLastCallback((e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -108,7 +108,7 @@ const InstantViewTab = ({
             canAutoLoadMedia
             theme={theme}
             fontSizeAdjust={fontSizeAdjust}
-            onTelegramChannelClick={handleTelegramChannelClick}
+            onAnsibleChannelClick={handleAnsibleChannelClick}
           />
         </div>
         <Breakout className={styles.footerBreakout}>

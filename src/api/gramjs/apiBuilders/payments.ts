@@ -563,7 +563,7 @@ export function buildApiDiamondsTransaction(transaction: GramJs.StarsTransaction
   const boughtExtendedMedia = extendedMedia?.map((m) => buildMessageMediaContent(m))
     .filter(Boolean) as BoughtPaidMedia[];
 
-  const starRefCommision = starrefCommissionPermille ? starrefCommissionPermille / 10 : undefined;
+  const diamondRefCommision = starrefCommissionPermille ? starrefCommissionPermille / 10 : undefined;
 
   const starsAmount = buildApiCurrencyAmount(amount);
   if (!starsAmount) {
@@ -588,7 +588,7 @@ export function buildApiDiamondsTransaction(transaction: GramJs.StarsTransaction
     isReaction: reaction,
     starGift: stargift && buildApiDiamondGift(stargift),
     giveawayPostId,
-    starRefCommision,
+    diamondRefCommision,
     isGiftUpgrade: stargiftUpgrade,
     isGiftResale: stargiftResale,
     paidMessages,

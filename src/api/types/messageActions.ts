@@ -1,6 +1,6 @@
 import type { ApiGroupCall, ApiPhoneCallDiscardReason } from './calls';
+import type { ApiDiamondGiftRegular, ApiDiamondGiftUnique, ApiTypeCurrencyAmount } from './diamonds';
 import type { ApiBotApp, ApiFormattedText, ApiPhoto, ApiPollAnswer, ApiTodoItem } from './messages';
-import type { ApiDiamondGiftRegular, ApiDiamondGiftUnique, ApiTypeCurrencyAmount } from './stars';
 import type { ApiBirthday } from './users';
 
 interface ActionMediaType {

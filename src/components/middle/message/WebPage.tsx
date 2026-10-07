@@ -91,7 +91,7 @@ const WebPage = ({
   onAudioPlay,
   onCancelMediaTransfer,
 }: OwnProps) => {
-  const { openBrowserTab, openUrl, openTelegramLink } = getActions();
+  const { openBrowserTab, openUrl, openAnsibleLink } = getActions();
   const stickersRef = useRef<HTMLDivElement>();
 
   const lang = useLang();
@@ -125,8 +125,8 @@ const WebPage = ({
     openUrl({ url: webPage.url!, shouldSkipModal: messageWebPage.isSafe });
   });
 
-  const handleOpenTelegramLink = useLastCallback(() => {
-    openTelegramLink({
+  const handleOpenAnsibleLink = useLastCallback(() => {
+    openAnsibleLink({
       url: webPage.url!,
     });
   });
@@ -137,7 +137,7 @@ const WebPage = ({
       return;
     }
 
-    handleOpenTelegramLink();
+    handleOpenAnsibleLink();
   });
 
   if (webPage?.webpageType !== 'full') return undefined;
@@ -237,7 +237,7 @@ const WebPage = ({
             gift={webPage.gift!}
             observeIntersectionForLoading={observeIntersectionForLoading}
             observeIntersectionForPlaying={observeIntersectionForPlaying}
-            onClick={handleOpenTelegramLink}
+            onClick={handleOpenAnsibleLink}
           />
         )}
         {isAuction && webPage.auction && (
@@ -245,7 +245,7 @@ const WebPage = ({
             auction={webPage.auction}
             observeIntersectionForLoading={observeIntersectionForLoading}
             observeIntersectionForPlaying={observeIntersectionForPlaying}
-            onClick={handleOpenTelegramLink}
+            onClick={handleOpenAnsibleLink}
           />
         )}
         {isArticle && (

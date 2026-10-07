@@ -58,7 +58,7 @@ const PaidMediaThumb = ({
       })}
       {isLocked && (
         <div className={styles.count}>
-          <Icon name="stars-lock" />
+          <Icon name="diamonds-lock" />
           {media.length > 1 ? media.length : ''}
         </div>
       )}

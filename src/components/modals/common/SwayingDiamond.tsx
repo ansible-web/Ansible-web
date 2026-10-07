@@ -5,7 +5,7 @@ import buildClassName from '../../../util/buildClassName.ts';
 
 import useLastCallback from '../../../hooks/useLastCallback.ts';
 
-import styles from './SwayingStar.module.scss';
+import styles from './SwayingDiamond.module.scss';
 
 interface OwnProps {
   className?: string;
@@ -22,7 +22,7 @@ function SwayingDiamond({
   centerShift,
   onMouseMove,
 }: OwnProps) {
-  const starRef = useRef<HTMLDivElement>();
+  const diamondRef = useRef<HTMLDivElement>();
 
   const handleMouseMove = useLastCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -36,7 +36,7 @@ function SwayingDiamond({
     const rotateX = -normalizedY * 40;
 
     requestMutation(() => {
-      starRef.current!.style.transform = `scale(1.1) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      diamondRef.current!.style.transform = `scale(1.1) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
 
     onMouseMove();
@@ -44,7 +44,7 @@ function SwayingDiamond({
 
   const handleMouseLeave = useLastCallback(() => {
     requestMutation(() => {
-      starRef.current!.style.transform = '';
+      diamondRef.current!.style.transform = '';
     });
   });
 
@@ -55,7 +55,7 @@ function SwayingDiamond({
       onMouseLeave={handleMouseLeave}
     >
       <div
-        ref={starRef}
+        ref={diamondRef}
         className={buildClassName(styles.diamond, styles[`star_${color}`])}
         role="img"
         aria-label="Ansible Diamonds"

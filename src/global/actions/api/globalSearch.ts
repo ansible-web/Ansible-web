@@ -352,7 +352,7 @@ async function searchMessagesGlobal<T extends GlobalState>(global: T, params: {
     && previousSearchFlood?.remains === 0) {
     const lang = getTranslationFn();
     getActions().showNotification({
-      icon: 'star',
+      icon: 'diamond',
       message: {
         key: 'NotificationPaidExtraSearch',
         variables: {

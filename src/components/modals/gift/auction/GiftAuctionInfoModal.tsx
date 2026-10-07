@@ -74,7 +74,7 @@ const GiftAuctionInfoModal = ({
         lang('GiftAuctionInfoTopBiddersSubtitle', { count }, { pluralValue: count })],
       ['auction-next-round', lang('GiftAuctionInfoBidCarryoverTitle'),
         lang('GiftAuctionInfoBidCarryoverSubtitle', { count })],
-      ['stars-refund', lang('GiftAuctionInfoMissedBiddersTitle'),
+      ['diamonds-refund', lang('GiftAuctionInfoMissedBiddersTitle'),
         lang('GiftAuctionInfoMissedBiddersSubtitle')],
     ] satisfies TableAboutData;
   }, [lang, giftAuction]);

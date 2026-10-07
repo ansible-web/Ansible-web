@@ -142,7 +142,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
     }
   });
 
-  const handleOpenTelegramMarket = useLastCallback(() => {
+  const handleOpenAnsibleMarket = useLastCallback(() => {
     if (!gift) return;
     handleClose();
     openGiftInMarket({ gift });
@@ -251,7 +251,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
     if (isFinished) {
       tableData.push([
         lang('GiftAuctionAveragePrice'),
-        formatDiamondsAsIcon(lang, state.averagePrice, { className: styles.starIcon }),
+        formatDiamondsAsIcon(lang, state.averagePrice, { className: styles.diamondIcon }),
       ]);
     }
 
@@ -262,7 +262,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
 
     const canBuyOnFragment = state.type === 'finished'
       && Boolean(state.fragmentListedUrl && state.fragmentListedCount);
-    const canBuyOnTelegram = state.type === 'finished' && Boolean(state.listedCount);
+    const canBuyOnAnsible = state.type === 'finished' && Boolean(state.listedCount);
 
     const footer = (
       <div className={styles.footer}>
@@ -298,8 +298,8 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
             }, { withNodes: true })}
           </Link>
         )}
-        {canBuyOnTelegram && (
-          <Link className={styles.itemsBoughtLink} isPrimary onClick={handleOpenTelegramMarket}>
+        {canBuyOnAnsible && (
+          <Link className={styles.itemsBoughtLink} isPrimary onClick={handleOpenAnsibleMarket}>
             {lang('GiftAuctionForSaleOnAnsible', {
               count: giftSticker ? (
                 <>
@@ -345,7 +345,7 @@ const GiftAuctionModal = ({ modal, auctionState }: OwnProps & StateProps) => {
       footer,
     };
   }, [gift, state, userState, isFinished, lang, handleJoinClick, handleItemsBoughtClick, handleClose,
-    handleOpenFragment, handleOpenTelegramMarket]);
+    handleOpenFragment, handleOpenAnsibleMarket]);
 
   const moreMenuItems = useMemo(() => {
     if (!shouldUseUniqueHeader) return undefined;

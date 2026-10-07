@@ -381,7 +381,7 @@ const ToDoListModal = ({
                   ref={handleProps?.ref}
                 >
                   <Icon
-                    name={isAddItemRow ? 'add' : 'hamburger'}
+                    name={isAddItemRow ? 'add' : 'menu'}
                     className={styles.itemLeadingIconGlyph}
                   />
                 </div>

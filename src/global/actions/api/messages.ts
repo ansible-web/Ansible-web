@@ -2601,7 +2601,7 @@ async function sendMessagesWithNotification<T extends GlobalState>(
       key: 'MessageSentPaidToastText',
       variables: { amount: formatDiamondsAsText(getTranslationFn(), starsForOneMessage * messagesCount) },
     },
-    icon: 'star',
+    icon: 'diamond',
     shouldUseCustomIcon: true,
     type: 'paidMessage',
   });
@@ -3073,7 +3073,7 @@ addActionHandler('openUrl', async (global, actions, payload): Promise<void> => {
     actions.closeStoryViewer({ tabId });
     actions.closePaymentModal({ tabId });
 
-    actions.openTelegramLink({ url, linkContext, tabId });
+    actions.openAnsibleLink({ url, linkContext, tabId });
     return;
   }
 

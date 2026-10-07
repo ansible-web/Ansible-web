@@ -14,12 +14,12 @@ import buildSdp from '../sdp/buildSdp';
 import { summarizeSdp } from '../sdp/common';
 import parseSdp from '../sdp/groupSdp';
 import {
-  fromTelegramSource,
+  fromAnsibleSource,
   getAmplitude,
   IS_ECHO_CANCELLATION_SUPPORTED,
   IS_NOISE_SUPPRESSION_SUPPORTED,
   THRESHOLD,
-  toTelegramSource,
+  toAnsibleSource,
 } from '../utils';
 
 const DEFAULT_MID = 3;
@@ -215,7 +215,7 @@ function getPresentationSourceFromVideoGroups(ssrcGroups: JoinGroupCallPayload['
     return undefined;
   }
 
-  return toTelegramSource(fromTelegramSource(firstVideoSource) - 1);
+  return toAnsibleSource(fromAnsibleSource(firstVideoSource) - 1);
 }
 
 function buildPayloadTypeLines(payloadType: PayloadType) {

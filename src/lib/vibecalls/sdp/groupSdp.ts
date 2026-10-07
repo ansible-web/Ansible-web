@@ -1,7 +1,7 @@
 import type { JoinGroupCallPayload, P2pParsedSdp, SsrcGroup } from '../types';
 import type { SdpSection } from './common';
 
-import { toTelegramSource } from '../utils';
+import { toAnsibleSource } from '../utils';
 import {
   findSdpLineValue,
   parseExtmaps as parseSectionExtmaps,
@@ -75,7 +75,7 @@ export default (
   };
 
   if (sourceAudio) {
-    payload.ssrc = toTelegramSource(sourceAudio);
+    payload.ssrc = toAnsibleSource(sourceAudio);
   }
 
   const ssrcGroups = parseSourceGroups(rawSourceVideo);
@@ -119,7 +119,7 @@ function parseSourceGroups(rawGroups: string[][]): SsrcGroup[] {
 
     result.push({
       semantics,
-      sources: sources.map(Number).map(toTelegramSource),
+      sources: sources.map(Number).map(toAnsibleSource),
     });
   });
 

@@ -36,14 +36,14 @@ export function updateDiamondsPayment<T extends GlobalState>(
   global: T, update: Partial<TabState['starsPayment']>,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
-  const starPayment = selectDiamondsPayment(global, tabId);
-  if (!starPayment) {
+  const diamondPayment = selectDiamondsPayment(global, tabId);
+  if (!diamondPayment) {
     return global;
   }
 
   return updateTabState(global, {
     starsPayment: {
-      ...starPayment,
+      ...diamondPayment,
       ...update,
     },
   }, tabId);

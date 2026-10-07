@@ -338,8 +338,8 @@ addActionHandler('sendPaymentForm', async (global, actions, payload): Promise<vo
 
 addActionHandler('sendDiamondPaymentForm', async (global, actions, payload): Promise<void> => {
   const { directInfo, tabId = getCurrentTabId() } = payload;
-  const starPayment = selectDiamondsPayment(global, tabId);
-  const inputInvoice = starPayment?.inputInvoice || directInfo?.inputInvoice;
+  const diamondPayment = selectDiamondsPayment(global, tabId);
+  const inputInvoice = diamondPayment?.inputInvoice || directInfo?.inputInvoice;
   if (!inputInvoice) return;
 
   const requestInputInvoice = getRequestInputInvoice(global, inputInvoice);
@@ -347,7 +347,8 @@ addActionHandler('sendDiamondPaymentForm', async (global, actions, payload): Pro
     return;
   }
 
-  const formId = (starPayment.form?.formId || starPayment.subscriptionInfo?.subscriptionFormId || directInfo?.formId)!;
+  const formId = (diamondPayment.form?.formId
+    || diamondPayment.subscriptionInfo?.subscriptionFormId || directInfo?.formId)!;
 
   global = updateDiamondsPayment(global, { status: 'pending' }, tabId);
   setGlobal(global);
@@ -377,7 +378,7 @@ addActionHandler('sendDiamondPaymentForm', async (global, actions, payload): Pro
 
   actions.apiUpdate({
     '@type': 'updateStarPaymentStateCompleted',
-    paymentState: directInfo ? { inputInvoice } : starPayment,
+    paymentState: directInfo ? { inputInvoice } : diamondPayment,
     tabId,
   });
   actions.loadDiamondStatus();
@@ -568,9 +569,9 @@ addActionHandler('openGiveawayModal', async (global, actions, payload): Promise<
     chat,
   });
 
-  const starOptions = await callApi('fetchDiamondsGiveawayOptions');
+  const diamondOptions = await callApi('fetchDiamondsGiveawayOptions');
 
-  if (!result || !starOptions) {
+  if (!result || !diamondOptions) {
     return;
   }
 
@@ -582,7 +583,7 @@ addActionHandler('openGiveawayModal', async (global, actions, payload): Promise<
       gifts: result,
       isOpen: true,
       prepaidGiveaway,
-      starOptions,
+      diamondOptions,
     },
   }, tabId);
   setGlobal(global);

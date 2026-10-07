@@ -33,7 +33,7 @@ import PaidMediaThumb from './transaction/PaidMediaThumb';
 
 import styles from './DiamondsBalanceModal.module.scss';
 
-import StarsBackground from '../../../assets/stars-bg.png';
+import StarsBackground from '../../../assets/diamonds-bg.png';
 
 export type OwnProps = {
   modal: TabState['starsPayment'];
@@ -183,7 +183,7 @@ const DiamondsPaymentModal = ({
             peer={!photo ? bot : undefined}
             avatarWebPhoto={photo}
             avatarSize="giant"
-            badgeIcon="star"
+            badgeIcon="diamond"
             badgeText={formatInteger(amount!)}
             badgeClassName={styles.amountBadge}
             className={styles.paymentPhoto}

@@ -40,7 +40,7 @@ import MenuItem from '../../ui/MenuItem';
 import Modal from '../../ui/Modal';
 import Separator from '../../ui/Separator';
 import BalanceBlock from '../diamonds/BalanceBlock';
-import DiamondSlider from './StarSlider';
+import DiamondSlider from './DiamondSlider';
 
 import styles from './PaidReactionModal.module.scss';
 
@@ -52,7 +52,7 @@ type StateProps = {
   message?: ApiMessage;
   chat?: ApiChat;
   maxAmount: number;
-  starBalance?: ApiDiamondsAmount;
+  diamondBalance?: ApiDiamondsAmount;
   defaultPrivacy?: ApiPaidReactionPrivacyType;
   sendPaidReactionsAsPeerIds?: ApiSendAsPeerId[];
   currentUserId: string;
@@ -82,7 +82,7 @@ const PaidReactionModal = ({
   chat,
   message,
   maxAmount,
-  starBalance,
+  diamondBalance,
   defaultPrivacy,
   sendPaidReactionsAsPeerIds,
   currentUserId,
@@ -304,7 +304,7 @@ const PaidReactionModal = ({
         {sendAsPeersMenu}
       </div>
       <div className={styles.headerControlPanel}>
-        <BalanceBlock balance={starBalance} className={styles.modalBalance} withAddButton />
+        <BalanceBlock balance={diamondBalance} className={styles.modalBalance} withAddButton />
       </div>
 
       <DiamondSlider
@@ -375,7 +375,7 @@ export default memo(withGlobal<OwnProps>(
   (global, { modal }): Complete<StateProps> => {
     const chat = modal && selectChat(global, modal.chatId);
     const message = modal && selectChatMessage(global, modal.chatId, modal.messageId);
-    const starBalance = global.stars?.balance;
+    const diamondBalance = global.stars?.balance;
     const maxAmount = global.appConfig.paidReactionMaxAmount || MAX_REACTION_AMOUNT;
     const defaultPrivacy = global.settings.paidReactionPrivacy;
     const sendPaidReactionsAsPeerIds = chat?.sendPaidReactionsAsPeerIds;
@@ -385,7 +385,7 @@ export default memo(withGlobal<OwnProps>(
     return {
       chat,
       message,
-      starBalance,
+      diamondBalance,
       maxAmount,
       defaultPrivacy,
       sendPaidReactionsAsPeerIds,

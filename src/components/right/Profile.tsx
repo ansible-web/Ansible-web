@@ -39,7 +39,7 @@ import {
   isUserBot,
   isUserRightBanned,
 } from '../../global/helpers';
-import { getSavedGiftKey } from '../../global/helpers/stars';
+import { getSavedGiftKey } from '../../global/helpers/diamonds';
 import {
   selectActiveDownloads,
   selectCanBanUsers,
@@ -1243,7 +1243,7 @@ const Profile = ({
                 <Button
                   className={styles.showMoreChannels}
                   onClick={() => openPremiumModal()}
-                  iconName="unlock-filled"
+                  iconName="unlock-badge"
                   iconAlignment="end"
                 >
                   {oldLang('UnlockSimilar')}
@@ -1275,7 +1275,7 @@ const Profile = ({
             ))}
             {!isCurrentUserPremium && (
               <>
-                <Button className={styles.showMoreBots} onClick={() => openPremiumModal()} iconName="unlock-filled">
+                <Button className={styles.showMoreBots} onClick={() => openPremiumModal()} iconName="unlock-badge">
                   {lang('UnlockMoreSimilarBots')}
                 </Button>
                 <div className={styles.moreSimilar}>

@@ -75,7 +75,7 @@ const GiftAuctionAcquiredModal = ({ modal, acquiredGifts, giftTitle, giftSticker
         [lang('GiftAuctionDate'), formatDateTimeToString(gift.date * 1000, lang.code, true)],
         [lang('GiftAuctionAcceptedBid'), (
           <span className={styles.bidValue}>
-            {formatDiamondsAsIcon(lang, gift.bidAmount, { className: styles.starIcon })}
+            {formatDiamondsAsIcon(lang, gift.bidAmount, { className: styles.diamondIcon })}
             <BadgeButton className={styles.badge}>
               {lang('GiftAuctionTopPosition', { position: gift.position })}
             </BadgeButton>

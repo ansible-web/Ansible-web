@@ -11,7 +11,7 @@ import styles from './DiamondIcon.module.scss';
 // instead of a yellow TG star. SVG paths (PremiumDiamondIcon /
 // RegularDiamondIcon below) still use the star outline — they're 14×15
 // inline glyphs and need their own vector art for a clean swap.
-import DiamondWebp from '../../../assets/icons/star/diamond.webp';
+import DiamondWebp from '../../../assets/icons/diamond/diamond.webp';
 
 type OwnProps = {
   type?: 'gold' | 'premium' | 'regular';

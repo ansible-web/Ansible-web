@@ -2,7 +2,7 @@ import type {
   Candidate, GroupCallTransport, PayloadType, RTPExtension, SsrcGroup,
 } from '../types';
 
-import { fromTelegramSource } from '../utils';
+import { fromAnsibleSource } from '../utils';
 
 export type Conference = {
   sessionId: number;
@@ -152,10 +152,10 @@ export default (conference: Conference, isAnswer = false, isPresentation = false
 
     entry.sourceGroups.forEach((sourceGroup) => {
       if (sourceGroup.semantics) {
-        add(`a=ssrc-group:${sourceGroup.semantics} ${sourceGroup.sources.map(fromTelegramSource).join(' ')}`);
+        add(`a=ssrc-group:${sourceGroup.semantics} ${sourceGroup.sources.map(fromAnsibleSource).join(' ')}`);
       }
-      sourceGroup.sources.forEach((ssrcTelegram) => {
-        const ssrc = fromTelegramSource(ssrcTelegram);
+      sourceGroup.sources.forEach((ssrcAnsible) => {
+        const ssrc = fromAnsibleSource(ssrcAnsible);
         add(`a=ssrc:${ssrc} cname:${entry.endpoint}`);
         add(`a=ssrc:${ssrc} msid:${entry.endpoint} ${entry.endpoint}`);
         add(`a=ssrc:${ssrc} mslabel:${entry.endpoint}`);

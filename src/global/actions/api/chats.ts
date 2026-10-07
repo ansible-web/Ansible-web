@@ -1710,7 +1710,7 @@ addActionHandler('openChatByPhoneNumber', async (global, actions, payload): Prom
   }
 });
 
-addActionHandler('openTelegramLink', async (global, actions, payload): Promise<void> => {
+addActionHandler('openAnsibleLink', async (global, actions, payload): Promise<void> => {
   const {
     url,
     shouldIgnoreCache,
@@ -4063,10 +4063,10 @@ async function openChatByUsername<T extends GlobalState>(
     actions.openChat({ id: TMP_CHAT_ID, tabId });
   }
 
-  const starRefStartPrefixes = global.appConfig.starRefStartPrefixes;
+  const diamondRefStartPrefixes = global.appConfig.diamondRefStartPrefixes;
   let referrer = ref;
-  if (startParam && starRefStartPrefixes?.length) {
-    const prefix = starRefStartPrefixes.find((p) => startParam.startsWith(p));
+  if (startParam && diamondRefStartPrefixes?.length) {
+    const prefix = diamondRefStartPrefixes.find((p) => startParam.startsWith(p));
     if (prefix) {
       referrer = startParam.slice(prefix.length);
     }

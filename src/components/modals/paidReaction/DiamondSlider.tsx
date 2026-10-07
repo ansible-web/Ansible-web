@@ -16,7 +16,7 @@ import AnimatedCounter from '../../common/AnimatedCounter';
 import Icon from '../../common/icons/Icon';
 import Sparkles from '../../common/Sparkles';
 
-import styles from './StarSlider.module.scss';
+import styles from './DiamondSlider.module.scss';
 
 type OwnProps = {
   maxValue: number;

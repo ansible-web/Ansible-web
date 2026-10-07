@@ -1,6 +1,7 @@
 import type { API_CHAT_TYPES } from '../../config';
 import type { ApiBotInfo } from './bots';
 import type { ApiBusinessIntro, ApiBusinessLocation, ApiBusinessWorkHours } from './business';
+import type { ApiDiamondsRating, ApiSavedDiamondGift } from './diamonds';
 import type { ApiAudio, ApiDocument, ApiFormattedText, ApiPhoto } from './messages';
 import type {
   ApiBotVerification,
@@ -10,7 +11,6 @@ import type {
   ApiProfileTab,
   ApiTypePeerColor,
 } from './peers';
-import type { ApiDiamondsRating, ApiSavedDiamondGift } from './stars';
 
 export interface ApiUser {
   id: string;

@@ -405,7 +405,7 @@ const AudioPlaylistModal = ({
               onTouchStart={handleProps.onTouchStart}
               onKeyDown={handleProps.onKeyDown}
             >
-              <Icon name="hamburger" className={styles.dragHandleIcon} />
+              <Icon name="menu" className={styles.dragHandleIcon} />
             </div>
           </div>
         </div>

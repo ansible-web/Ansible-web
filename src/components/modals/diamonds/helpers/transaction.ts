@@ -43,8 +43,8 @@ export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transactio
       : lang('DiamondGiftAuctionBidRefundedTransaction');
   }
 
-  if (transaction.starRefCommision) {
-    return oldLang('DiamondTransactionCommission', formatPercent(transaction.starRefCommision));
+  if (transaction.diamondRefCommision) {
+    return oldLang('DiamondTransactionCommission', formatPercent(transaction.diamondRefCommision));
   }
   if (transaction.isGiftUpgrade) return oldLang('Gift2TransactionUpgraded');
   if (transaction.extendedMedia) return oldLang('DiamondMediaPurchase');

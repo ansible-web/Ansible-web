@@ -34,11 +34,11 @@ const InlineButtons = ({ className, inlineButtons, isEphemeral, isReceipt, onCli
     switch (type) {
       case 'url': {
         const { url } = button.action;
-        const isTelegramLink = RE_TME_LINK.test(url);
+        const isAnsibleLink = RE_TME_LINK.test(url);
 
-        if (isTelegramLink && url.includes('?startapp')) {
+        if (isAnsibleLink && url.includes('?startapp')) {
           return <Icon className={styles.cornerIcon} name="webapp" />;
-        } else if (!isTelegramLink) {
+        } else if (!isAnsibleLink) {
           return <Icon className={styles.cornerIcon} name="arrow-right" />;
         }
 

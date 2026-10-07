@@ -7,7 +7,7 @@ import type { ApiDiamondGift, ApiDiamondGiftUnique, ApiSavedDiamondGift } from '
 import type { TabState } from '../../../../global/types';
 import type { ObserveFn } from '../../../../hooks/useIntersectionObserver';
 
-import { getSavedGiftKey } from '../../../../global/helpers/stars';
+import { getSavedGiftKey } from '../../../../global/helpers/diamonds';
 import { selectTabState } from '../../../../global/selectors';
 import buildClassName from '../../../../util/buildClassName';
 import { throttle } from '../../../../util/schedulers';

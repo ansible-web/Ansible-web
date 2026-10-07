@@ -1,8 +1,8 @@
 import type { LovelyChartParams } from 'lovely-chart';
 
 import type { ApiChat } from './chats';
+import type { ApiTypeCurrencyAmount } from './diamonds';
 import type { ApiTypePrepaidGiveaway } from './payments';
-import type { ApiTypeCurrencyAmount } from './stars';
 
 export interface ApiChannelStatistics {
   type: 'channel';

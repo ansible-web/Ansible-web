@@ -46,7 +46,7 @@ export type StateProps = {
   peer?: ApiPeer;
   currentUserId?: string;
   isPaymentFormLoading?: boolean;
-  starBalance?: ApiDiamondsAmount;
+  diamondBalance?: ApiDiamondsAmount;
   paidMessagesDiamonds?: number;
   areUniqueDiamondGiftsDisallowed?: boolean;
   shouldDisallowLimitedDiamondGifts?: boolean;
@@ -64,7 +64,7 @@ function GiftComposer({
   captionLimit,
   currentUserId,
   isPaymentFormLoading,
-  starBalance,
+  diamondBalance,
   paidMessagesDiamonds,
   areUniqueDiamondGiftsDisallowed,
   shouldDisallowLimitedDiamondGifts,
@@ -235,7 +235,8 @@ function GiftComposer({
     }
   });
 
-  const canUseDiamondsPayment = hasPremiumByDiamonds && starBalance && (starBalance.amount > giftByDiamonds.amount);
+  const canUseDiamondsPayment = hasPremiumByDiamonds && diamondBalance
+    && (diamondBalance.amount > giftByDiamonds.amount);
   function renderOptionsSection() {
     const symbolsLeft = captionLimit ? captionLimit - giftMessage.length : undefined;
 
@@ -271,10 +272,10 @@ function GiftComposer({
           </ListItem>
         )}
 
-        {hasPremiumByDiamonds && starBalance && (
+        {hasPremiumByDiamonds && diamondBalance && (
           <div className={styles.description}>
             {lang('GiftPremiumDescriptionYourBalance', {
-              stars: formatDiamondsAsIcon(lang, starBalance.amount, { className: styles.switcherDiamondIcon }),
+              stars: formatDiamondsAsIcon(lang, diamondBalance.amount, { className: styles.switcherDiamondIcon }),
               link: (
                 <Link isPrimary onClick={handleGetMoreDiamonds}>
                   {lang('GetMoreDiamondsLinkText', undefined, {
@@ -466,7 +467,7 @@ export default memo(withGlobal<OwnProps>(
       ? global.giftAuctionByGiftId?.[auctionGiftId] : undefined;
 
     return {
-      starBalance: stars?.balance,
+      diamondBalance: stars?.balance,
       peer,
       captionLimit: global.appConfig.starGiftMaxMessageLength,
       currentUserId: global.currentUserId,

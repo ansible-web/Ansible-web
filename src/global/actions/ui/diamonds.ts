@@ -122,9 +122,9 @@ addActionHandler('openDiamondsBalanceModal', (global, actions, payload): ActionR
     tabId = getCurrentTabId(),
   } = payload || {};
 
-  const starBalance = global.stars?.balance;
+  const diamondBalance = global.stars?.balance;
 
-  if (!shouldIgnoreBalance && starBalance && topup && topup.balanceNeeded <= starBalance.amount) {
+  if (!shouldIgnoreBalance && diamondBalance && topup && topup.balanceNeeded <= diamondBalance.amount) {
     actions.showNotification({
       message: langProvider.oldTranslate('StarsTopupLinkEnough'),
       actionText: langProvider.oldTranslate('StarsTopupLinkTopupAnyway'),
@@ -132,7 +132,7 @@ addActionHandler('openDiamondsBalanceModal', (global, actions, payload): ActionR
         action: 'openDiamondsBalanceModal',
         payload: { topup, shouldIgnoreBalance: true, tabId },
       },
-      icon: 'star',
+      icon: 'diamond',
       tabId,
     });
     return undefined;

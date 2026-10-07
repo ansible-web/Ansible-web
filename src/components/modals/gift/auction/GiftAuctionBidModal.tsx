@@ -31,7 +31,7 @@ import Modal from '../../../ui/Modal';
 import TextTimer from '../../../ui/TextTimer';
 import Transition from '../../../ui/Transition';
 import BalanceBlock from '../../diamonds/BalanceBlock';
-import DiamondSlider from '../../paidReaction/StarSlider';
+import DiamondSlider from '../../paidReaction/DiamondSlider';
 
 import styles from './GiftAuctionBidModal.module.scss';
 
@@ -41,7 +41,7 @@ export type OwnProps = {
 
 type StateProps = {
   auctionState?: ApiDiamondGiftAuctionState;
-  starBalance?: ApiDiamondsAmount;
+  diamondBalance?: ApiDiamondsAmount;
   currentUserPeer?: ApiPeer;
   topBidderIds?: string[];
 };
@@ -57,7 +57,7 @@ const DEFAULT_TOP_BIDDERS_COUNT = 3;
 const GiftAuctionBidModal = ({
   modal,
   auctionState,
-  starBalance,
+  diamondBalance,
   currentUserPeer,
   topBidderIds,
 }: OwnProps & StateProps) => {
@@ -336,7 +336,7 @@ const GiftAuctionBidModal = ({
       isLowStackPriority
     >
       <div className={styles.headerControlPanel}>
-        <BalanceBlock balance={starBalance} className={styles.modalBalance} withAddButton />
+        <BalanceBlock balance={diamondBalance} className={styles.modalBalance} withAddButton />
       </div>
 
       <DiamondSlider
@@ -406,7 +406,7 @@ export default memo(withGlobal<OwnProps>(
 
     return {
       auctionState: giftAuction,
-      starBalance: stars?.balance,
+      diamondBalance: stars?.balance,
       currentUserPeer,
       topBidderIds,
     };

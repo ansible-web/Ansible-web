@@ -160,7 +160,7 @@ export function getRichInputAsFormatted(
     (result, part, index) => appendFormattedText(result, part, index > 0),
     { text: '' },
   );
-  const normalized = prepareTelegramEntities(formatted.text, formatted.entities);
+  const normalized = prepareAnsibleEntities(formatted.text, formatted.entities);
 
   return normalized.isValid || isApproximate ? {
     text: formatted.text,
@@ -195,7 +195,7 @@ export function buildRichMessageFromFormatted(value?: ApiFormattedText): ApiInpu
     return EMPTY_RICH_MESSAGE;
   }
 
-  const { entities } = prepareTelegramEntities(value.text, value.entities);
+  const { entities } = prepareAnsibleEntities(value.text, value.entities);
   const structuralEntities = getOuterStructuralEntities(entities);
   if (!structuralEntities.length) {
     return {
@@ -1875,13 +1875,13 @@ function appendFormattedTextWithSeparator(
   };
 }
 
-function prepareTelegramEntities(
+function prepareAnsibleEntities(
   text: string,
   entities: ApiMessageEntity[] = [],
 ) {
   let isValid = true;
   const sorted = entities.reduce<ApiMessageEntity[]>((result, entity) => {
-    const normalized = trimTelegramEntity(text, entity);
+    const normalized = trimAnsibleEntity(text, entity);
     if (!normalized) {
       isValid &&= entity.offset >= 0 && entity.offset + entity.length <= text.length;
       return result;
@@ -1889,7 +1889,7 @@ function prepareTelegramEntities(
 
     result.push(normalized);
     return result;
-  }, []).sort(compareTelegramEntities);
+  }, []).sort(compareAnsibleEntities);
   const structural: StructuralEntity[] = [];
 
   sorted.filter((entity) => entity.type === ApiMessageEntityTypes.Blockquote).forEach((entity) => {
@@ -1927,7 +1927,7 @@ function prepareTelegramEntities(
   };
 }
 
-function trimTelegramEntity(text: string, entity: ApiMessageEntity): ApiMessageEntity | undefined {
+function trimAnsibleEntity(text: string, entity: ApiMessageEntity): ApiMessageEntity | undefined {
   if (entity.offset < 0 || entity.length <= 0 || getEntityEnd(entity) > text.length) {
     return undefined;
   }
@@ -1966,13 +1966,13 @@ function hasValidInlineEntityRelations(
   ));
 }
 
-function compareTelegramEntities(first: ApiMessageEntity, second: ApiMessageEntity) {
+function compareAnsibleEntities(first: ApiMessageEntity, second: ApiMessageEntity) {
   return first.offset - second.offset
     || second.length - first.length
-    || getTelegramEntityPriority(first) - getTelegramEntityPriority(second);
+    || getAnsibleEntityPriority(first) - getAnsibleEntityPriority(second);
 }
 
-function getTelegramEntityPriority(entity: ApiMessageEntity) {
+function getAnsibleEntityPriority(entity: ApiMessageEntity) {
   return entity.type === ApiMessageEntityTypes.Pre
     ? entity.language ? 10 : 11
     : ENTITY_PRIORITY_BY_TYPE[entity.type] ?? 50;
@@ -2119,7 +2119,7 @@ function buildEntityTree(entities: ApiMessageEntity[]): EntityNode[] {
   const roots: EntityNode[] = [];
   const stack: EntityNode[] = [];
 
-  entities.sort(compareTelegramEntities).forEach((entity) => {
+  entities.sort(compareAnsibleEntities).forEach((entity) => {
     while (stack.length && entity.offset >= getEntityEnd(stack[stack.length - 1].entity)) {
       stack.pop();
     }

@@ -209,13 +209,13 @@ const ProfileRatingModal = ({
         {lang('RatingGiftsFromAnsibleDesc')}
       </span>
     )],
-    ['user-stars', lang('RatingGiftsAndPostsFromUsers'), (
+    ['user-diamonds', lang('RatingGiftsAndPostsFromUsers'), (
       <span>
         {renderBadge('added')}
         {lang('RatingGiftsAndPostsFromUsersDesc')}
       </span>
     )],
-    ['stars-refund', lang('RatingRefundsAndConversions'), (
+    ['diamonds-refund', lang('RatingRefundsAndConversions'), (
       <span>
         {renderBadge('deducted')}
         {lang('RatingRefundsAndConversionsDesc')}

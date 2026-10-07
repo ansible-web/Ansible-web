@@ -15,7 +15,7 @@ import { areDeepEqual } from '../../util/areDeepEqual';
 import { getCurrentTabId } from '../../util/establishMultitabRole';
 import { omit, omitUndefined, unique } from '../../util/iteratees';
 import { MEMO_EMPTY_ARRAY } from '../../util/memo';
-import { getSavedGiftKey } from '../helpers/stars';
+import { getSavedGiftKey } from '../helpers/diamonds';
 import { selectActiveGiftsCollectionId, selectTabState } from '../selectors';
 import { updateTabState } from './tabs';
 

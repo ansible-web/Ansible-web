@@ -4,6 +4,7 @@ import type {
   ApiBotInlineResult,
   ApiWebDocument,
 } from './bots';
+import type { ApiDiamondGiftRegular, ApiDiamondGiftUnique, ApiTypeCurrencyAmount } from './diamonds';
 import type { ApiInstantViewPage } from './instantView';
 import type { ApiMessageAction } from './messageActions';
 import type { ApiAttachment, ApiPeerNotifySettings, ApiRestrictionReason } from './misc';
@@ -12,7 +13,6 @@ import type {
 } from './payments';
 import type { ApiTypePeerColor } from './peers';
 import type { ApiRichMessage } from './richMessage';
-import type { ApiDiamondGiftRegular, ApiDiamondGiftUnique, ApiTypeCurrencyAmount } from './stars';
 import type {
   ApiMessageStoryData, ApiStory, ApiWebPageStickerData, ApiWebPageStoryData,
 } from './stories';

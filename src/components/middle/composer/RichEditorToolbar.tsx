@@ -506,7 +506,7 @@ const RichEditorToolbar = ({ editor, isEnabled, onOpenAiEditor }: OwnProps) => {
                   {lang('RichEditorListNumberingType')}
                 </NestedMenuItem>
                 <MenuItem
-                  icon={currentList?.isReversed ? 'check' : 'hamburger'}
+                  icon={currentList?.isReversed ? 'check' : 'menu'}
                   disabled={currentList?.type !== 'orderedList'}
                   onClick={handleToggleCurrentOrderedListReversed}
                 >

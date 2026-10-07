@@ -85,7 +85,7 @@ const ActionMessageText = ({
   asPreview,
 }: OwnProps & StateProps) => {
   const {
-    openTelegramLink,
+    openAnsibleLink,
     openUrl,
   } = getActions();
   const { chatId, isOutgoing } = message;
@@ -410,7 +410,7 @@ const ActionMessageText = ({
           const senderUsername = sender && getMainUsername(sender);
           const link = senderUsername && `${TME_LINK_PREFIX + senderUsername}/${app.shortName}`;
           const appLink = link
-            ? <Link onClick={() => openTelegramLink({ url: link })}>{app.title}</Link>
+            ? <Link onClick={() => openAnsibleLink({ url: link })}>{app.title}</Link>
             : lang('ActionBotAppPlaceholder');
           return lang('ActionBotAllowedFromApp', { app: appLink }, { withNodes: true });
         }

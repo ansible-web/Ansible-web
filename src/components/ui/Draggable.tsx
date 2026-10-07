@@ -163,7 +163,7 @@ const Draggable = ({
           onTouchStart={handleMouseDown}
           style={knobStyle}
         >
-          <Icon name="hamburger" className={styles.icon} />
+          <Icon name="menu" className={styles.icon} />
         </div>
       )}
     </div>

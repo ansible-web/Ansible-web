@@ -631,7 +631,7 @@ const GiftInfoModal = ({
       tableData.push([
         lang('GiftInfoValue'),
         <div className={styles.giftValue}>
-          {formatDiamondsAsIcon(lang, starsValue, { className: styles.starAmountIcon, withWrapper: true })}
+          {formatDiamondsAsIcon(lang, starsValue, { className: styles.diamondAmountIcon, withWrapper: true })}
           {canManage && hasConvertOption && Boolean(starsToConvert) && (
             <BadgeButton onClick={openConvertConfirm}>
               {lang('GiftInfoConvert', { amount: starsToConvert }, { pluralValue: starsToConvert })}

@@ -38,7 +38,7 @@ const DiamondGiftPriceDecreaseInfoModal = ({ modal }: OwnProps) => {
     const { prices } = renderingModal;
     return prices.map((price): TableData[number] => [
       formatDateTimeToString(price.date * 1000, lang.code, true, undefined, true),
-      formatDiamondsAsIcon(lang, price.upgradeStars, { containerClassName: styles.starIconContainer }),
+      formatDiamondsAsIcon(lang, price.upgradeStars, { containerClassName: styles.diamondIconContainer }),
     ]);
   }, [lang, renderingModal]);
 
@@ -69,7 +69,7 @@ const DiamondGiftPriceDecreaseInfoModal = ({ modal }: OwnProps) => {
         leftText={formatDiamondsAsText(lang, maxPrice)}
         rightText={formatDiamondsAsText(lang, minPrice)}
         floatingBadgeText={formatDiamondsAsText(lang, currentPrice)}
-        floatingBadgeIcon="star"
+        floatingBadgeIcon="diamond"
         progress={progress}
         isInverted
         shouldSkipGradient

@@ -281,7 +281,7 @@ export interface ApiDiamondsTransaction {
   photo?: ApiWebDocument;
   extendedMedia?: BoughtPaidMedia[];
   subscriptionPeriod?: number;
-  starRefCommision?: number;
+  diamondRefCommision?: number;
   isGiftUpgrade?: true;
   isGiftResale?: true;
   paidMessages?: number;

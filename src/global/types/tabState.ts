@@ -765,7 +765,7 @@ export type TabState = {
     selectedMemberIds?: string[];
     selectedChannelIds?: string[];
     prepaidGiveaway?: ApiTypePrepaidGiveaway;
-    starOptions?: ApiDiamondGiveawayOption[];
+    diamondOptions?: ApiDiamondGiveawayOption[];
   };
 
   deleteMessageModal?: {

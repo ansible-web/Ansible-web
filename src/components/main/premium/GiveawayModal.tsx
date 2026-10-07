@@ -57,10 +57,10 @@ import PremiumSubscriptionOption from './PremiumSubscriptionOption';
 import styles from './GiveawayModal.module.scss';
 
 import GiftBlueRound from '../../../assets/premium/GiftBlueRound.svg';
+import GiftDiamond from '../../../assets/premium/GiftDiamond.svg';
 import GiftGreenRound from '../../../assets/premium/GiftGreenRound.svg';
 import GiftRedRound from '../../../assets/premium/GiftRedRound.svg';
-import GiftDiamond from '../../../assets/premium/GiftStar.svg';
-import PremiumLogo from '../../../assets/premium/PremiumStar.svg';
+import PremiumLogo from '../../../assets/premium/PremiumDiamond.svg';
 
 export type OwnProps = {
   isOpen?: boolean;
@@ -518,7 +518,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   function renderDiamondOptionList() {
     return (
       <DiamondTopupOptionList
-        className={styles.starOptions}
+        className={styles.diamondOptions}
         options={starsGiftOptions}
         selectedDiamondCount={selectedRandomUserCount}
         selectedDiamondOption={selectedDiamondOption}
@@ -796,7 +796,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
                   {renderDiamondOptionList()}
                 </div>
 
-                <div className={buildClassName(styles.subscription, styles.starSubscription)}>
+                <div className={buildClassName(styles.subscription, styles.diamondSubscription)}>
                   {renderText(lang('BoostGift.Diamonds.Info'))}
                 </div>
 
@@ -916,6 +916,6 @@ export default memo(withGlobal<OwnProps>((global): Complete<StateProps> => {
     countryList: global.countryList.general,
     prepaidGiveaway: giveawayModal?.prepaidGiveaway,
     isChannel,
-    starsGiftOptions: giveawayModal?.starOptions,
+    starsGiftOptions: giveawayModal?.diamondOptions,
   };
 })(GiveawayModal));

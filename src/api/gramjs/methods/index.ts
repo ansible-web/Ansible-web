@@ -48,7 +48,7 @@ export * from './payments';
 
 export * from './fragment';
 
-export * from './stars';
+export * from './diamonds';
 
 export * from './forum';
 

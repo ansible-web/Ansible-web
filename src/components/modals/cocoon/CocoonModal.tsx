@@ -19,7 +19,7 @@ export type OwnProps = {
 };
 
 const CocoonModal = ({ modal }: OwnProps) => {
-  const { closeCocoonModal, openTelegramLink } = getActions();
+  const { closeCocoonModal, openAnsibleLink } = getActions();
   const isOpen = Boolean(modal);
 
   const lang = useLang();
@@ -29,7 +29,7 @@ const CocoonModal = ({ modal }: OwnProps) => {
   });
 
   const openLinkAndClose = useLastCallback((url: string) => {
-    openTelegramLink({ url });
+    openAnsibleLink({ url });
     handleClose();
   });
 

@@ -93,14 +93,14 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     triggerSparklesRef.current = animate;
   });
 
-  const starModalData = useMemo(() => {
+  const diamondModalData = useMemo(() => {
     if (!transaction) {
       return undefined;
     }
 
     const {
       giveawayPostId, photo, amount, isGiftUpgrade, isDropOriginalDetails, starGift, isGiftResale,
-      starRefCommision,
+      diamondRefCommision,
     } = transaction;
 
     const gift = transaction?.starGift;
@@ -202,7 +202,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
             <p className={styles.refunded}>{lang('Refunded')}</p>
           )}
         </span>
-        {Boolean(transaction.paidMessages && transaction.starRefCommision && paidMessageCommission) && (
+        {Boolean(transaction.paidMessages && transaction.diamondRefCommision && paidMessageCommission) && (
           <p className={styles.description}>
             {lang(
               'PaidMessageTransactionDescription',
@@ -219,7 +219,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
 
     const tableData: TableData = [];
 
-    if (transaction && starRefCommision && !transaction.paidMessages && !isGiftResale) {
+    if (transaction && diamondRefCommision && !transaction.paidMessages && !isGiftResale) {
       tableData.push([
         oldLang('DiamondsTransaction.DiamondRefReason.Title'),
         oldLang('DiamondsTransaction.DiamondRefReason.Program'),
@@ -254,7 +254,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       peerLabel = oldLang('Diamonds.Transaction.GiftFrom');
     } else if (isNegativeAmount(amount) || transaction.isMyGift) {
       peerLabel = oldLang('Diamonds.Transaction.To');
-    } else if (transaction.starRefCommision && !transaction.paidMessages && !isGiftResale) {
+    } else if (transaction.diamondRefCommision && !transaction.paidMessages && !isGiftResale) {
       peerLabel = oldLang('DiamondsTransaction.DiamondRefReason.Miniapp');
     } else if (peerId) {
       peerLabel = oldLang('Diamond.Transaction.From');
@@ -269,12 +269,12 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       ]);
     }
 
-    if (transaction.starRefCommision && transaction.paidMessages) {
+    if (transaction.diamondRefCommision && transaction.paidMessages) {
       tableData.push([
         lang('PaidMessageTransactionTotal'),
         formatDiamondsAsIcon(lang,
-          transaction.amount.amount / ((100 - transaction.starRefCommision) / 100),
-          { asFont: false, className: styles.starIcon, withWrapper: true }),
+          transaction.amount.amount / ((100 - transaction.diamondRefCommision) / 100),
+          { asFont: false, className: styles.diamondIcon, withWrapper: true }),
       ]);
     }
 
@@ -348,8 +348,8 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
   }, [transaction, oldLang, lang, peer, canPlayAnimatedEmojis, topSticker,
     paidMessageCommission, handleRequestAnimation]);
 
-  const prevModalData = usePrevious(starModalData);
-  const renderingModalData = prevModalData || starModalData;
+  const prevModalData = usePrevious(diamondModalData);
+  const renderingModalData = prevModalData || diamondModalData;
 
   return (
     <TableInfoModal

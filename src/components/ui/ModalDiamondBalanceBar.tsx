@@ -15,7 +15,7 @@ import useShowTransition from '../../hooks/useShowTransition';
 
 import Link from './Link';
 
-import styles from './ModalStarBalanceBar.module.scss';
+import styles from './ModalDiamondBalanceBar.module.scss';
 
 export type OwnProps = {
   isModalOpen?: true;
@@ -24,13 +24,13 @@ export type OwnProps = {
 };
 
 export type StateProps = {
-  starBalance?: ApiDiamondsAmount;
+  diamondBalance?: ApiDiamondsAmount;
   tonBalance?: ApiTonAmount;
   tonUsdRate?: number;
 };
 
 function ModalDiamondBalanceBar({
-  starBalance,
+  diamondBalance,
   tonBalance,
   tonUsdRate,
   isModalOpen,
@@ -43,7 +43,7 @@ function ModalDiamondBalanceBar({
 
   const lang = useLang();
   const isTonMode = currency === 'TON';
-  const currentBalance = isTonMode ? tonBalance : starBalance;
+  const currentBalance = isTonMode ? tonBalance : diamondBalance;
   const isOpen = isModalOpen ? Boolean(currentBalance) : false;
 
   const {
@@ -118,7 +118,7 @@ export default memo(withGlobal(
     } = global;
 
     return {
-      starBalance: stars?.balance,
+      diamondBalance: stars?.balance,
       tonBalance: ton?.balance,
       tonUsdRate: global.appConfig.tonUsdRate,
     };

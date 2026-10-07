@@ -33,9 +33,9 @@ import StatisticsOverview from './StatisticsOverview';
 import styles from './BoostStatistics.module.scss';
 
 import GiftBlueRound from '../../../assets/premium/GiftBlueRound.svg';
+import GiftDiamond from '../../../assets/premium/GiftDiamond.svg';
 import GiftGreenRound from '../../../assets/premium/GiftGreenRound.svg';
 import GiftRedRound from '../../../assets/premium/GiftRedRound.svg';
-import GiftDiamond from '../../../assets/premium/GiftStar.svg';
 
 type StateProps = {
   boostStatistics: TabState['boostStatistics'];
@@ -54,7 +54,7 @@ const GIVEAWAY_IMG_LIST: Partial<Record<number, string>> = {
 
 const CUSTOM_PEER_STAR_TEMPLATE: Omit<CustomPeer, 'title' | 'titleKey'> = {
   isCustomPeer: true,
-  avatarIcon: 'star',
+  avatarIcon: 'diamond',
   peerColorId: 1,
 };
 

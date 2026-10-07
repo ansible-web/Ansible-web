@@ -27,7 +27,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
         actions.showNotification({
           message: langProvider.oldTranslate('DiamondsAcquiredInfo', inputInvoice.stars),
           title: langProvider.oldTranslate('StarsAcquired'),
-          icon: 'star',
+          icon: 'diamond',
           tabId,
         });
         actions.requestConfetti({ withDiamonds: true, tabId });
@@ -72,7 +72,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             amount,
             subscriptionInfo.title,
           ], undefined, amount),
-          icon: 'star',
+          icon: 'diamond',
         });
       }
 
@@ -85,7 +85,7 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
             amount,
             form.title,
           ], undefined, amount),
-          icon: 'star',
+          icon: 'diamond',
         });
       }
 

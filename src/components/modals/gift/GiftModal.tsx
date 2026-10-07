@@ -61,7 +61,7 @@ type StateProps = {
   starGiftIdsByCategory?: Record<StarGiftCategory, string[]>;
   myUniqueGiftsById?: Record<string, ApiSavedDiamondGift>;
   myUniqueGiftIds?: string[];
-  starBalance?: ApiDiamondsAmount;
+  diamondBalance?: ApiDiamondsAmount;
   peer?: ApiPeer;
   currentUserId?: string;
   disallowedGifts?: ApiDisallowedGifts;
@@ -86,7 +86,7 @@ const GiftModal: FC<OwnProps & StateProps> = ({
   starGiftIdsByCategory,
   myUniqueGiftsById,
   myUniqueGiftIds,
-  starBalance,
+  diamondBalance,
   peer,
   currentUserId,
   disallowedGifts,
@@ -673,7 +673,7 @@ export default memo(withGlobal<OwnProps>((global, { modal }): Complete<StateProp
     starGiftIdsByCategory: starGifts?.idsByCategory,
     myUniqueGiftsById: global.myUniqueGifts?.byId,
     myUniqueGiftIds: global.myUniqueGifts?.ids,
-    starBalance: stars?.balance,
+    diamondBalance: stars?.balance,
     peer,
     currentUserId,
     disallowedGifts: userFullInfo?.disallowedGifts,

@@ -2,15 +2,15 @@ import type { PREMIUM_FEATURE_SECTIONS, STARS_CURRENCY_CODE, TON_CURRENCY_CODE }
 import type { ApiWebDocument } from './bots';
 import type { ApiChat, ApiPeer } from './chats';
 import type {
+  ApiDiamondsGiveawayWinnerOption,
+  ApiInputSavedDiamondGift, ApiRequestInputSavedDiamondGift } from './diamonds';
+import type {
   ApiDocument,
   ApiFormattedText,
   ApiInvoice,
   ApiMessageEntity,
   ApiPaymentCredentials,
 } from './messages';
-import type {
-  ApiDiamondsGiveawayWinnerOption,
-  ApiInputSavedDiamondGift, ApiRequestInputSavedDiamondGift } from './stars';
 import type { StatisticsOverviewPercentage } from './statistics';
 import type { ApiUser } from './users';
 

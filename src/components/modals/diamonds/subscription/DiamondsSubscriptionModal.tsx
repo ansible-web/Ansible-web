@@ -123,7 +123,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
     closeDiamondsSubscriptionModal();
   });
 
-  const starModalData = useMemo(() => {
+  const diamondModalData = useMemo(() => {
     if (!subscription || !peer) {
       return undefined;
     }
@@ -239,8 +239,8 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
     };
   }, [buttonState, lang, oldLang, peer, subscription]);
 
-  const prevModalData = usePrevious(starModalData);
-  const renderingModalData = prevModalData || starModalData;
+  const prevModalData = usePrevious(diamondModalData);
+  const renderingModalData = prevModalData || diamondModalData;
 
   return (
     <TableInfoModal

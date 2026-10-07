@@ -66,7 +66,7 @@ function RequirementToContactMessage({
                   paidMessagesDiamonds,
                   {
                     asFont: true,
-                    containerClassName: styles.starIconContainer,
+                    containerClassName: styles.diamondIconContainer,
                   }),
               }, {
                 withNodes: true,

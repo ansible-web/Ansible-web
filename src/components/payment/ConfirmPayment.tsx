@@ -38,7 +38,7 @@ type IframeCallbackEvent = PaymentFormSubmitEvent | WebAppOpenTgLinkEvent;
 const ConfirmPayment = ({
   url, noRedirect, onClose, onPaymentFormSubmit,
 }: OwnProps) => {
-  const { openTelegramLink } = getActions();
+  const { openAnsibleLink } = getActions();
 
   const lang = useOldLang();
   const frameRef = useRef<HTMLIFrameElement>();
@@ -55,7 +55,7 @@ const ConfirmPayment = ({
         case 'web_app_open_tg_link':
           if (!noRedirect) {
             const linkUrl = TME_LINK_PREFIX + eventData.path_full!;
-            openTelegramLink({ url: linkUrl });
+            openAnsibleLink({ url: linkUrl });
           }
           onClose();
           break;
@@ -71,7 +71,7 @@ const ConfirmPayment = ({
     } catch (err) {
       // Ignore other messages
     }
-  }, [onClose, noRedirect, openTelegramLink, onPaymentFormSubmit]);
+  }, [onClose, noRedirect, openAnsibleLink, onPaymentFormSubmit]);
 
   useEffect(() => {
     window.addEventListener('message', handleMessage);

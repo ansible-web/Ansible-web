@@ -105,7 +105,7 @@ type OwnProps = {
   observeIntersectionForPlaying?: ObserveFn;
   sharedCanvasRef?: ElementRef<HTMLCanvasElement>;
   sharedCanvasHqRef?: ElementRef<HTMLCanvasElement>;
-  onTelegramChannelClick?: (channelUsername: string) => void;
+  onAnsibleChannelClick?: (channelUsername: string) => void;
 };
 
 type RichTextContext = {
@@ -145,7 +145,7 @@ const RichContent = ({
   observeIntersectionForPlaying,
   sharedCanvasRef,
   sharedCanvasHqRef,
-  onTelegramChannelClick,
+  onAnsibleChannelClick,
 }: OwnProps) => {
   const {
     openMapModal, openMediaViewer, openUrl,
@@ -245,7 +245,7 @@ const RichContent = ({
     observeIntersectionForLoading,
     observeIntersectionForPlaying,
     lang,
-    onTelegramChannelClick,
+    onAnsibleChannelClick,
   };
   function renderTopLevelBlock(block: ApiPageBlock, index: number) {
     const sourceKey = String(index);
@@ -410,7 +410,7 @@ const RichContent = ({
           <ChannelBlock
             channelUsername={block.channelUsername}
             title={block.title}
-            onTelegramChannelClick={renderContext.onTelegramChannelClick}
+            onAnsibleChannelClick={renderContext.onAnsibleChannelClick}
           />
         );
       case 'embedPost':
@@ -498,7 +498,7 @@ type RenderBlockContext = {
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;
   lang: LangFn;
-  onTelegramChannelClick?: (channelUsername: string) => void;
+  onAnsibleChannelClick?: (channelUsername: string) => void;
 };
 
 type RenderBlockFn = (block: ApiPageBlock, sourceKey: string) => TeactNode;
@@ -1119,25 +1119,25 @@ function renderUnsupportedBlock(unsupportedText: string, blockType?: ApiPageBloc
 type ChannelBlockOwnProps = {
   channelUsername: string;
   title: string;
-  onTelegramChannelClick?: (channelUsername: string) => void;
+  onAnsibleChannelClick?: (channelUsername: string) => void;
 };
 
 const ChannelBlock = ({
   channelUsername,
   title,
-  onTelegramChannelClick,
+  onAnsibleChannelClick,
 }: ChannelBlockOwnProps) => {
-  const { openTelegramLink } = getActions();
+  const { openAnsibleLink } = getActions();
   const lang = useLang();
   const url = `${TME_LINK_PREFIX}${channelUsername}`;
 
   const handleClick = useLastCallback(() => {
-    if (onTelegramChannelClick) {
-      onTelegramChannelClick(channelUsername);
+    if (onAnsibleChannelClick) {
+      onAnsibleChannelClick(channelUsername);
       return;
     }
 
-    openTelegramLink({ url });
+    openAnsibleLink({ url });
   });
 
   return (

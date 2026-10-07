@@ -256,7 +256,7 @@ export function buildAppConfig(json: GramJs.TypeJSONValue, hash: number): ApiApp
     isDiamondsGiftEnabled: appConfig.stars_gifts_enabled,
     starGiftMaxMessageLength: appConfig.stargifts_message_length_max,
     starGiftMaxConvertPeriod: appConfig.stargifts_convert_period_max,
-    starRefStartPrefixes: appConfig.starref_start_param_prefixes,
+    diamondRefStartPrefixes: appConfig.starref_start_param_prefixes,
     tonExplorerUrl: appConfig.ton_blockchain_explorer_url,
     savedGiftPinLimit: appConfig.stargifts_pinned_to_top_limit,
     freezeSinceDate: appConfig.freeze_since_date,

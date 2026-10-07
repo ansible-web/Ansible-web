@@ -744,7 +744,7 @@ export interface ActionPayloads {
     chatId: string;
     messageId: number;
   };
-  openTelegramLink: {
+  openAnsibleLink: {
     url: string;
     shouldIgnoreCache?: boolean;
     linkContext?: LinkContext;

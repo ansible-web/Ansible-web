@@ -195,7 +195,7 @@ const Notification = ({
     }
 
     if (shouldUseCustomIcon) {
-      if (icon === 'star') {
+      if (icon === 'diamond') {
         return (
           <DiamondIcon type="gold" className={buildClassName('notification-icon')} size="adaptive" />
         );

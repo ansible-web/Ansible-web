@@ -20,7 +20,7 @@ import useShowTransition from '../../hooks/useShowTransition';
 
 import Button, { type OwnProps as ButtonProps } from './Button';
 import Menu from './Menu';
-import ModalDiamondBalanceBar from './ModalStarBalanceBar';
+import ModalDiamondBalanceBar from './ModalDiamondBalanceBar';
 import Portal from './Portal';
 
 import './Modal.scss';
