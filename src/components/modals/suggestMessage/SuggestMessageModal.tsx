@@ -29,7 +29,6 @@ import useLastCallback from '../../../hooks/useLastCallback';
 import useOldLang from '../../../hooks/useOldLang';
 
 import CalendarModal from '../../common/CalendarModal';
-import GramIcon from '../../common/icons/GramIcon';
 import Icon from '../../common/icons/Icon';
 import Button from '../../ui/Button';
 import InputText from '../../ui/InputText';
@@ -191,32 +190,10 @@ const SuggestMessageModal = ({
     >
       <div className={styles.form}>
         <div className={styles.section}>
-          <div className={styles.currencySelector}>
-            <Button
-              className={styles.currencyButton}
-              color={isCurrencyDiamonds ? 'primary' : 'translucent'}
-              pill
-              fluid
-              size="tiny"
-              noFastClick
-              onClick={() => setSelectedCurrency(STARS_CURRENCY_CODE)}
-            >
-              <Icon name="diamond" className={styles.currencyIcon} />
-              {lang('CurrencyDiamonds')}
-            </Button>
-            <Button
-              className={styles.currencyButton}
-              fluid
-              color={!isCurrencyDiamonds ? 'primary' : 'translucent'}
-              pill
-              size="tiny"
-              noFastClick
-              onClick={() => setSelectedCurrency(TON_CURRENCY_CODE)}
-            >
-              <GramIcon className={styles.currencyIcon} />
-              {lang('CurrencyGram')}
-            </Button>
-          </div>
+          {/* Ansible: переключателя валют нет — у нас одни алмазы. Вторая
+              валюта (Gram, в девичестве TON) из продукта убрана, а кнопка с её
+              иконкой оставалась единственным местом, где она ещё попадалась на
+              глаза. */}
           <InputText
             label={lang('InputPlaceholderPrice')}
             className={buildClassName(styles.input)}

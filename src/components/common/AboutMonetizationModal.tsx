@@ -9,7 +9,6 @@ import useLang from '../../hooks/useLang';
 import useOldLang from '../../hooks/useOldLang';
 
 import TableAboutModal from '../modals/common/TableAboutModal';
-import GramIcon from './icons/GramIcon';
 import Icon from './icons/Icon';
 import SafeLink from './SafeLink';
 
@@ -51,7 +50,8 @@ const AboutMonetizationModal: FC<OwnProps> = ({
       undefined,
       {
         withNodes: true,
-        specialReplacement: { '💎': <GramIcon className={styles.toncoin} /> },
+        // Ansible: в заголовке стоит алмаз, а не монета второй валюты.
+        specialReplacement: { '💎': <Icon name="diamond" className={styles.toncoin} /> },
       },
     );
   }, [lang]);

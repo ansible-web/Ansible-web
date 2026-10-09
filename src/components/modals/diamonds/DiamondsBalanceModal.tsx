@@ -16,7 +16,6 @@ import { getPeerTitle } from '../../../global/helpers/peers';
 import { selectChat, selectIsPremiumPurchaseBlocked, selectUser } from '../../../global/selectors';
 import { selectSharedSettings } from '../../../global/selectors/sharedState.ts';
 import buildClassName from '../../../util/buildClassName';
-import { convertCurrencyFromBaseUnit, convertTonToUsd, formatCurrencyAsString } from '../../../util/formatCurrency';
 import { resolveTransitionName } from '../../../util/resolveTransitionName.ts';
 import { REM } from '../../common/helpers/mediaDimensions';
 import renderText from '../../common/helpers/renderText';
@@ -26,7 +25,6 @@ import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
 import useOldLang from '../../../hooks/useOldLang';
 
-import GramIcon from '../../common/icons/GramIcon';
 import Icon from '../../common/icons/Icon';
 import SafeLink from '../../common/SafeLink';
 import Button from '../../ui/Button';
@@ -237,48 +235,9 @@ const DiamondsBalanceModal = ({
     );
   };
 
-  const renderTonHeaderSection = () => {
-    const tonAmount = convertCurrencyFromBaseUnit(balance?.amount || 0, TON_CURRENCY_CODE);
-    return (
-      <>
-        <ParticlesHeader
-          model="speeding-diamond"
-          color="blue"
-          title={lang('CurrencyGram')}
-          description={lang('DescriptionAboutGram')}
-          isDisabled={!isOpen}
-        />
-        <div className={styles.tonBalanceContainer}>
-          <div className={styles.tonBalance}>
-            <GramIcon className={styles.tonIconBalance} />
-            {tonAmount}
-          </div>
-          {Boolean(tonUsdRate) && (
-            <span className={styles.tonInUsd}>
-              {`≈ ${formatCurrencyAsString(
-                convertTonToUsd(balance?.amount || 0, tonUsdRate, true),
-                'USD',
-                lang.code,
-              )}`}
-            </span>
-          )}
-        </div>
-        <Button
-          className={styles.topUpButton}
-          onClick={handleTonTopUp}
-          fluid
-        >
-          {lang('ButtonTopUpViaFragment')}
-        </Button>
-
-        {currency === TON_CURRENCY_CODE && (
-          <div className={styles.hint}>
-            {lang('GramModalHint')}
-          </div>
-        )}
-      </>
-    );
-  };
+  /* Ansible: раздел второй валюты (Gram, в девичестве TON) убран вместе с
+     кнопкой «Пополнить через Fragment» — ни валюты, ни стороннего маркета
+     пополнения у нас нет. */
 
   function handleScroll(e: React.UIEvent<HTMLDivElement>) {
     const { scrollTop } = e.currentTarget;
@@ -367,7 +326,7 @@ const DiamondsBalanceModal = ({
           </h2>
         </div>
         <div className={styles.section}>
-          {currency === TON_CURRENCY_CODE ? renderTonHeaderSection() : renderDiamondsHeaderSection()}
+          {renderDiamondsHeaderSection()}
         </div>
         {areBuyOptionsShown && (
           <div className={styles.tos}>
