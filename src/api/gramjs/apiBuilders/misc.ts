@@ -21,6 +21,7 @@ import type {
   LangPackStringValue,
 } from '../../types';
 
+import { FRAGMENT_COUNTRY_ISO } from '../../../config';
 import {
   omit, omitUndefined, pick,
 } from '../../../util/iteratees';
@@ -176,6 +177,7 @@ export function buildApiCountryList(countries: GramJs.help.Country[]) {
     ));
 
   const generalList = nonHiddenCountries
+    .filter((country) => country.iso2 !== FRAGMENT_COUNTRY_ISO)
     .map((country) => buildApiCountry(country, country.countryCodes[0]))
     .sort((a, b) => (
       a.name ? a.name.localeCompare(b.name!) : a.defaultName.localeCompare(b.defaultName)

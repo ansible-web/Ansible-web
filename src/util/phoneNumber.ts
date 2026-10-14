@@ -1,7 +1,10 @@
 import type { ApiCountryCode } from '../api/types';
 
+import { FRAGMENT_COUNTRY_ISO, FRAGMENT_MAX_SUBSCRIBER_LENGTH } from '../config';
+
 const PATTERN_PLACEHOLDER = 'X';
 const DEFAULT_PATTERN = 'XXX XXX XXX XXX';
+const ANONYMOUS_PATTERN = 'XXXX XXXX';
 
 export function getCountryCodeByIso(phoneCodeList: ApiCountryCode[], iso: string) {
   return phoneCodeList.find((country) => country.iso2 === iso);
@@ -31,6 +34,15 @@ export function getCountryFromPhoneNumber(phoneCodeList: ApiCountryCode[], input
   return bestMatches[bestMatches.length - 1]?.country;
 }
 
+export function isFragmentPhoneNumber(phoneNumber: string, fragmentPrefixes: string[]) {
+  const digits = phoneNumber.replace(/[^\d]+/g, '');
+  return fragmentPrefixes.some((prefix) => {
+    if (!prefix || !digits.startsWith(prefix)) return false;
+    const subscriberLength = digits.length - prefix.length;
+    return subscriberLength >= 1 && subscriberLength <= FRAGMENT_MAX_SUBSCRIBER_LENGTH;
+  });
+}
+
 export function formatPhoneNumber(input: string, country?: ApiCountryCode) {
   if (!input) {
     return '';
@@ -42,7 +54,9 @@ export function formatPhoneNumber(input: string, country?: ApiCountryCode) {
   } else if (input.startsWith('+')) {
     return input;
   }
-  const pattern = getBestPattern(phoneNumber, country?.patterns);
+  const pattern = country?.iso2 === FRAGMENT_COUNTRY_ISO
+    ? ANONYMOUS_PATTERN
+    : getBestPattern(phoneNumber, country?.patterns);
 
   const result: string[] = []; // Result character array
   let j = 0; // Position inside pattern

@@ -6,6 +6,7 @@ import { getActions, withGlobal } from '../../global';
 import type { ApiCountryCode } from '../../api/types';
 import type { GlobalState } from '../../global/types';
 
+import { FRAGMENT_COUNTRY_ISO } from '../../config';
 import { requestMeasure } from '../../lib/fasterdom/fasterdom';
 import { IS_SAFARI, IS_TOUCH_ENV } from '../../util/browser/windowEnvironment';
 import { preloadImage } from '../../util/files';
@@ -95,7 +96,11 @@ const AuthPhoneNumber = ({
   ), [accountsInfo, isTestServer]);
 
   const fullNumber = country ? `+${country.countryCode} ${phoneNumber || ''}` : phoneNumber;
-  const canSubmit = fullNumber && fullNumber.replace(/[^\d]+/g, '').length >= MIN_NUMBER_LENGTH;
+  const digitsCount = fullNumber ? fullNumber.replace(/[^\d]+/g, '').length : 0;
+  const minDigitsCount = country?.iso2 === FRAGMENT_COUNTRY_ISO
+    ? country.countryCode.length + 1
+    : MIN_NUMBER_LENGTH;
+  const canSubmit = fullNumber && digitsCount >= minDigitsCount;
 
   useEffect(() => {
     if (!IS_TOUCH_ENV) {

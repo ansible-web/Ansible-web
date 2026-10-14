@@ -158,6 +158,7 @@ export const DEFAULT_APP_CONFIG: ApiAppConfig = {
     'ansible.su',
     'web.ansible.su',
   ],
+  fragmentPrefixes: ['777'],
   typingDraftTtl: 10,
   isMessagePrimaryEditedDateEnabled: false,
   arePasskeysAvailable: true,

@@ -15,7 +15,7 @@ import { MAIN_THREAD_ID } from '../../../api/types';
 import { type BotAppPermissions, ManagementScreens } from '../../../types';
 
 import {
-  FRAGMENT_PHONE_CODE, FRAGMENT_PHONE_LENGTH, MUTE_INDEFINITE_TIMESTAMP, UNMUTE_TIMESTAMP,
+  MUTE_INDEFINITE_TIMESTAMP, UNMUTE_TIMESTAMP,
 } from '../../../config';
 import {
   getChatLink,
@@ -41,7 +41,7 @@ import {
 import { VTT_PROFILE_NOTE_COLLAPSE, VTT_PROFILE_NOTE_EXPAND } from '../../../util/animations/viewTransitionTypes';
 import buildClassName from '../../../util/buildClassName';
 import { copyTextToClipboard } from '../../../util/clipboard';
-import { formatPhoneNumberWithCode } from '../../../util/phoneNumber';
+import { formatPhoneNumberWithCode, isFragmentPhoneNumber } from '../../../util/phoneNumber';
 import stopEvent from '../../../util/stopEvent';
 import { extractCurrentThemeParams } from '../../../util/themeStyle';
 import { ChatAnimationTypes } from '../../left/main/hooks';
@@ -88,6 +88,7 @@ type StateProps = {
   canInviteUsers?: boolean;
   isMuted?: boolean;
   phoneCodeList: ApiCountryCode[];
+  fragmentPrefixes: string[];
   topicId?: number;
   description?: string;
   chatInviteLink?: string;
@@ -119,6 +120,7 @@ const ChatExtra = ({
   canInviteUsers,
   isMuted,
   phoneCodeList,
+  fragmentPrefixes,
   topicId,
   description,
   chatInviteLink,
@@ -290,7 +292,7 @@ const ChatExtra = ({
   const formattedNumber = phoneNumber && formatPhoneNumberWithCode(phoneCodeList, phoneNumber);
 
   const handlePhoneClick = useLastCallback(() => {
-    if (phoneNumber?.length === FRAGMENT_PHONE_LENGTH && phoneNumber.startsWith(FRAGMENT_PHONE_CODE)) {
+    if (phoneNumber && isFragmentPhoneNumber(phoneNumber, fragmentPrefixes)) {
       requestCollectibleInfo({ collectible: phoneNumber, peerId: peerId!, type: 'phone' });
       return;
     }
@@ -714,6 +716,7 @@ export default memo(withGlobal<OwnProps>(
 
     return {
       phoneCodeList,
+      fragmentPrefixes: global.appConfig.fragmentPrefixes,
       chat,
       user,
       userFullInfo,

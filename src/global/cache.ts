@@ -365,6 +365,10 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
     cached.appConfig.webAppAllowedProtocols = initialState.appConfig.webAppAllowedProtocols;
   }
 
+  if (cached.appConfig.fragmentPrefixes === undefined) {
+    cached.appConfig.fragmentPrefixes = initialState.appConfig.fragmentPrefixes;
+  }
+
   if (cached.appConfig.isMessagePrimaryEditedDateEnabled === undefined) {
     cached.appConfig.isMessagePrimaryEditedDateEnabled = initialState.appConfig.isMessagePrimaryEditedDateEnabled;
   }
