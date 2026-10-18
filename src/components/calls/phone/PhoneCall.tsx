@@ -53,6 +53,7 @@ const PhoneCall = ({
   const lang = useOldLang();
   const {
     hangUp, requestMasterAndAcceptCall, playGroupCallSound, toggleGroupCallPanel, connectToActivePhoneCall,
+    loadFullUser,
   } = getActions();
   const containerRef = useRef<HTMLDivElement>();
 
@@ -60,6 +61,13 @@ const PhoneCall = ({
   const { isMobile } = useAppLayout();
 
   const isOpen = Boolean(phoneCall && phoneCall.state !== 'discarded' && !isCallPanelVisible);
+
+  // Load the peer's full user so the call avatar shows their photo. A fresh incoming/outgoing
+  // call may only have the peer's minimal user (name, no photo) in state, which renders as initials.
+  const peerId = phoneCall && (isOutgoing ? phoneCall.participantId : phoneCall.adminId);
+  useEffect(() => {
+    if (peerId) loadFullUser({ userId: peerId });
+  }, [peerId, loadFullUser]);
 
   const exitFullscreenIfNeeded = useCallback(() => {
     if (document.fullscreenElement === containerRef.current) {
