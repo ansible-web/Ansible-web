@@ -6,11 +6,14 @@ export default function readStrings(data: string): Record<string, string> {
   for (const line of lines) {
     if (!line.startsWith('"')) continue;
     const [key, value] = parseLine(line) || [];
-    if (!key || !value) {
+    if (typeof key !== 'string' || !key || typeof value !== 'string') {
       // eslint-disable-next-line no-console
       console.warn('Bad formatting in line:', line);
       continue;
     }
+    // Empty translations are intentional exclusions. Keep the existing
+    // fallback behavior without reporting a valid .strings entry as malformed.
+    if (!value) continue;
     if (result[key]) {
       // eslint-disable-next-line no-console
       console.warn('Duplicate key:', key);
