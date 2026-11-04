@@ -42,6 +42,8 @@ const TOPIC_ICON_SIZE = 2.5 * REM;
 
 type OwnProps = {
   chatId: string;
+  // A monoforum header displays its parent channel but loads the direct's history.
+  messagesChatId?: string;
   threadId?: ThreadId;
   className?: string;
   statusIcon?: IconName;
@@ -287,13 +289,13 @@ const GroupChatInfo = ({
 };
 
 export default memo(withGlobal<OwnProps>(
-  (global, { chatId, threadId, isSavedDialog }): Complete<StateProps> => {
+  (global, { chatId, messagesChatId = chatId, threadId, isSavedDialog }): Complete<StateProps> => {
     const chat = selectChat(global, chatId);
     const onlineCount = chat ? selectChatOnlineCount(global, chat) : undefined;
     const areMessagesLoaded = Boolean(
       isSavedDialog
         ? selectChatMessages(global, global.currentUserId!)
-        : selectChatMessages(global, chatId),
+        : selectChatMessages(global, messagesChatId),
     );
     const topic = threadId ? selectTopic(global, chatId, threadId) : undefined;
     const messagesCount = topic && selectThreadMessagesCount(global, chatId, threadId!);

@@ -123,6 +123,7 @@ const QuickPreviewModalHeader = ({
             <GroupChatInfo
               key={displayChatId}
               chatId={displayChatId}
+              messagesChatId={realChatId}
               threadId={!isSavedDialog ? threadId : undefined}
               typingStatusByPeerId={typingStatusByPeerId}
               withMonoforumStatus={chat?.isMonoforum}
