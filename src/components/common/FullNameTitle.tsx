@@ -105,7 +105,7 @@ const FullNameTitle = ({
 
   const specialTitle = useMemo(() => {
     if (customPeer) {
-      return renderText(customPeer.title || oldLang(customPeer.titleKey!));
+      return renderText(customPeer.title || lang(customPeer.titleKey!));
     }
 
     if (isSavedMessages) {
@@ -125,7 +125,7 @@ const FullNameTitle = ({
     }
 
     return undefined;
-  }, [customPeer, isSavedDialog, isSavedMessages, oldLang, realPeer]);
+  }, [customPeer, isSavedDialog, isSavedMessages, lang, oldLang, realPeer]);
   const botVerificationIconId = !isSavedMessages && !isSavedDialog ? realPeer?.botVerificationIconId : undefined;
   const renderedTitle = useMemo(() => specialTitle || renderText(title || ''), [specialTitle, title]);
 

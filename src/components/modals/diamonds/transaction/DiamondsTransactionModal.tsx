@@ -1,4 +1,3 @@
-import type { FC } from '../../../../lib/teact/teact';
 import { memo, useMemo, useRef } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
@@ -24,7 +23,7 @@ import {
 } from '../../../../global/selectors';
 import buildClassName from '../../../../util/buildClassName';
 import { copyTextToClipboard } from '../../../../util/clipboard';
-import { formatDateTimeToString } from '../../../../util/dates/oldDateFormat';
+import { formatDateTime, secondsToDate } from '../../../../util/localization/dateFormat';
 import { formatDiamondsAsIcon } from '../../../../util/localization/format';
 import { formatPercent } from '../../../../util/textFormat';
 import { getGiftAttributes, getStickerFromGift } from '../../../common/helpers/gifts';
@@ -32,7 +31,6 @@ import { getTransactionTitle, isNegativeAmount } from '../helpers/transaction';
 
 import useLang from '../../../../hooks/useLang';
 import useLastCallback from '../../../../hooks/useLastCallback';
-import useOldLang from '../../../../hooks/useOldLang';
 import usePrevious from '../../../../hooks/usePrevious';
 
 import AnimatedIconFromSticker from '../../../common/AnimatedIconFromSticker';
@@ -61,17 +59,17 @@ type StateProps = {
   paidMessageCommission?: number;
 };
 
-const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
+const DiamondsTransactionModal = ({
   modal,
   peer,
   canPlayAnimatedEmojis,
   topSticker,
   paidMessageCommission,
-}) => {
+}: OwnProps & StateProps) => {
   const { showNotification, openMediaViewer, closeDiamondsTransactionModal } = getActions();
 
   const lang = useLang();
-  const oldLang = useOldLang();
+
   const { transaction } = modal || {};
   const triggerSparklesRef = useRef<(() => void) | undefined>();
 
@@ -113,9 +111,9 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       && buildDiamondsTransactionCustomPeer(transaction)) || undefined;
 
     const peerId = transaction.peer?.type === 'peer' ? transaction.peer.id : undefined;
-    const toName = transaction.peer && oldLang(getDiamondsPeerTitleKey(transaction.peer));
+    const toName = transaction.peer && lang(getDiamondsPeerTitleKey(transaction.peer));
 
-    const title = getTransactionTitle(oldLang, lang, transaction);
+    const title = getTransactionTitle(lang, transaction);
 
     const messageLink = peer && transaction.messageId && !isGiftUpgrade && !isDropOriginalDetails
       ? getMessageLink(peer, undefined, transaction.messageId) : undefined;
@@ -127,9 +125,10 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     const areAllPhotos = media?.every((m) => !m.video);
     const areAllVideos = media?.every((m) => !m.photo);
 
-    const mediaText = areAllPhotos ? oldLang('Diamonds.Transfer.Photos', mediaAmount)
-      : areAllVideos ? oldLang('Diamonds.Transfer.Videos', mediaAmount)
-        : oldLang('Media', mediaAmount);
+    const mediaText = areAllPhotos
+      ? lang('DiamondsTransferPhotos', { count: mediaAmount }, { pluralValue: mediaAmount })
+      : areAllVideos ? lang('DiamondsTransferVideos', { count: mediaAmount }, { pluralValue: mediaAmount })
+        : lang('Media', { count: mediaAmount }, { pluralValue: mediaAmount });
 
     const description = transaction.description
       || ((isGiftUpgrade || isDropOriginalDetails) && starGift?.type === 'starGiftUnique' ? starGift.title : undefined)
@@ -221,28 +220,28 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
 
     if (transaction && diamondRefCommision && !transaction.paidMessages && !isGiftResale) {
       tableData.push([
-        oldLang('DiamondsTransaction.DiamondRefReason.Title'),
-        oldLang('DiamondsTransaction.DiamondRefReason.Program'),
+        lang('DiamondsTransactionDiamondRefReasonTitle'),
+        lang('DiamondsTransactionDiamondRefReasonProgram'),
       ]);
     }
 
     if (isGiftUpgrade) {
       tableData.push([
-        oldLang('DiamondGiftReason'),
-        oldLang('DiamondGiftReasonUpgrade'),
+        lang('DiamondGiftReason'),
+        lang('DiamondGiftReasonUpgrade'),
       ]);
     }
 
     if (isDropOriginalDetails) {
       tableData.push([
-        oldLang('DiamondGiftReason'),
+        lang('DiamondGiftReason'),
         lang('DiamondGiftReasonDropOriginalDetails'),
       ]);
     }
 
     if (isGiftResale) {
       tableData.push([
-        oldLang('DiamondGiftReason'),
+        lang('DiamondGiftReason'),
         isNegativeAmount(transaction.amount)
           ? lang('DiamondGiftSaleTransaction')
           : lang('DiamondGiftPurchaseTransaction'),
@@ -251,15 +250,15 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
 
     let peerLabel;
     if (isGiftUpgrade) {
-      peerLabel = oldLang('Diamonds.Transaction.GiftFrom');
+      peerLabel = lang('DiamondsTransactionGiftFrom');
     } else if (isNegativeAmount(amount) || transaction.isMyGift) {
-      peerLabel = oldLang('Diamonds.Transaction.To');
+      peerLabel = lang('DiamondsTransactionTo');
     } else if (transaction.diamondRefCommision && !transaction.paidMessages && !isGiftResale) {
-      peerLabel = oldLang('DiamondsTransaction.DiamondRefReason.Miniapp');
+      peerLabel = lang('DiamondsTransactionDiamondRefReasonMiniapp');
     } else if (peerId) {
-      peerLabel = oldLang('Diamond.Transaction.From');
+      peerLabel = lang('DiamondTransactionFrom');
     } else {
-      peerLabel = oldLang('Diamonds.Transaction.Via');
+      peerLabel = lang('DiamondsTransactionVia');
     }
 
     if (!transaction.isPostsSearch && !isDropOriginalDetails && !transaction.isDiamondGiftAuctionBid) {
@@ -280,19 +279,22 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
 
     if (messageLink) {
       tableData.push([
-        oldLang('Diamonds.Transaction.Reaction.Post'),
+        lang('DiamondsTransactionReactionPost'),
         <SafeLink url={messageLink} text={messageLink} />,
       ]);
     }
 
     if (giveawayMessageLink && transaction.amount.currency === STARS_CURRENCY_CODE) {
-      tableData.push([oldLang('BoostReason'), <SafeLink url={giveawayMessageLink} text={oldLang('Giveaway')} />]);
-      tableData.push([oldLang('Gift'), oldLang('Diamonds', transaction.amount, 'i')]);
+      tableData.push([lang('BoostReason'), <SafeLink url={giveawayMessageLink} text={lang('AttachGiveaway')} />]);
+      tableData.push([
+        lang('GiftInfoTitle'),
+        lang('StarsAmountText', { amount: transaction.amount.amount }, { pluralValue: transaction.amount.amount }),
+      ]);
     }
 
     if (transaction.id) {
       tableData.push([
-        oldLang('Diamonds.Transaction.Id'),
+        lang('DiamondsTransactionId'),
         (
           <>
             <div
@@ -300,7 +302,10 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
               onClick={() => {
                 copyTextToClipboard(transaction.id!);
                 showNotification({
-                  message: oldLang('DiamondsTransactionIDCopied'),
+                  message: {
+                    key: 'DiamondsTransactionIDCopied',
+                    options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+                  },
                 });
               }}
             >
@@ -313,8 +318,8 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
     }
 
     tableData.push([
-      oldLang('Diamonds.Transaction.Date'),
-      formatDateTimeToString(transaction.date * 1000, oldLang.code, true),
+      lang('DiamondsTransactionDate'),
+      formatDateTime(lang, secondsToDate(transaction.date), { date: 'short', time: 'short' }),
     ]);
 
     if (transaction.isDiamondGiftAuctionBid && gift?.type === 'starGift' && gift.availabilityTotal) {
@@ -329,14 +334,11 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       ]);
     }
 
-    const footerText = oldLang('lng_credits_box_out_about');
-    const footerTextParts = footerText.split('{link}');
-
     const footer = (
       <span className={styles.footer}>
-        {footerTextParts[0]}
-        <SafeLink url={oldLang('DiamondsTOSLink')} text={oldLang('lng_credits_summary_options_about_link')} />
-        {footerTextParts[1]}
+        {lang('DiamondsTransactionTOS', {
+          link: <SafeLink url={lang('DiamondsTOSLink')} text={lang('CreditsSummaryOptionsAboutLink')} />,
+        }, { withNodes: true })}
       </span>
     );
 
@@ -345,7 +347,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       tableData,
       footer,
     };
-  }, [transaction, oldLang, lang, peer, canPlayAnimatedEmojis, topSticker,
+  }, [transaction, lang, peer, canPlayAnimatedEmojis, topSticker,
     paidMessageCommission, handleRequestAnimation]);
 
   const prevModalData = usePrevious(diamondModalData);
@@ -359,7 +361,7 @@ const DiamondsTransactionModal: FC<OwnProps & StateProps> = ({
       header={renderingModalData?.header}
       tableData={renderingModalData?.tableData}
       footer={renderingModalData?.footer}
-      buttonText={oldLang('OK')}
+      buttonText={lang('OK')}
       onClose={closeDiamondsTransactionModal}
     />
   );
@@ -394,12 +396,12 @@ function getDiamondsPeerTitleKey(peer: ApiDiamondsTransactionPeer) {
     case 'fragment':
       return 'Fragment';
     case 'premiumBot':
-      return 'StarsTransactionBot';
+      return 'DiamondsTransactionBot';
     case 'ads':
-      return 'StarsTransactionAds';
+      return 'DiamondsTransactionAds';
     case 'api':
-      return 'Diamonds.Intro.Transaction.AnsibleBotApi.Subtitle';
+      return 'DiamondsIntroTransactionAnsibleBotApiSubtitle';
     default:
-      return 'Stars.Transaction.Unsupported.Title';
+      return 'DiamondsTransactionUnsupportedTitle';
   }
 }

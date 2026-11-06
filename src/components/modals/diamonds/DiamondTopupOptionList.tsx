@@ -1,4 +1,3 @@
-import type { FC } from '../../../lib/teact/teact';
 import {
   memo, useEffect, useMemo,
 } from '../../../lib/teact/teact';
@@ -12,7 +11,6 @@ import renderText from '../../common/helpers/renderText';
 
 import useFlag from '../../../hooks/useFlag';
 import useLang from '../../../hooks/useLang';
-import useOldLang from '../../../hooks/useOldLang';
 
 import DiamondIcon from '../../common/icons/DiamondIcon';
 import Icon from '../../common/icons/Icon';
@@ -32,7 +30,7 @@ type OwnProps = {
   onClick: (option: ApiDiamondTopupOption | ApiDiamondGiveawayOption) => void;
 };
 
-const DiamondTopupOptionList: FC<OwnProps> = ({
+const DiamondTopupOptionList = ({
   isActive,
   className,
   options,
@@ -40,8 +38,7 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
   selectedDiamondCount,
   diamondsNeeded,
   onClick,
-}) => {
-  const oldLang = useOldLang();
+}: OwnProps) => {
   const lang = useLang();
 
   const [areOptionsExtended, markOptionsExtended, unmarkOptionsExtended] = useFlag();
@@ -121,7 +118,7 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
               && Boolean(perUserDiamondCount) && (
               <div className={styles.optionBottom}>
                 <div className={styles.perUserStars}>
-                  {renderText(oldLang('BoostGift.Diamonds.PerUser', formatInteger(perUserDiamondCount)))}
+                  {renderText(lang('BoostGiftDiamondsPerUser', { count: formatInteger(perUserDiamondCount) }))}
                 </div>
               </div>
             )}
@@ -130,7 +127,7 @@ const DiamondTopupOptionList: FC<OwnProps> = ({
       })}
       {!areOptionsExtended && canExtend && (
         <Button className={styles.moreOptions} isText noForcedUpperCase onClick={markOptionsExtended}>
-          {oldLang('Diamonds.Purchase.ShowMore')}
+          {lang('DiamondsPurchaseShowMore')}
           <Icon className={styles.iconDown} name="down" />
         </Button>
       )}

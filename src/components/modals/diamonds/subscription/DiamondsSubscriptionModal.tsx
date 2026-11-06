@@ -1,4 +1,3 @@
-import type { FC } from '../../../../lib/teact/teact';
 import { memo, useMemo, useRef } from '../../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../../global';
 
@@ -13,11 +12,10 @@ import {
   selectPeer,
 } from '../../../../global/selectors';
 import buildClassName from '../../../../util/buildClassName';
-import { formatDateTimeToString } from '../../../../util/dates/oldDateFormat';
+import { formatDateTime, secondsToDate } from '../../../../util/localization/dateFormat';
 
 import useLang from '../../../../hooks/useLang';
 import useLastCallback from '../../../../hooks/useLastCallback';
-import useOldLang from '../../../../hooks/useOldLang';
 import usePrevious from '../../../../hooks/usePrevious';
 
 import Avatar from '../../../common/Avatar';
@@ -39,9 +37,9 @@ type StateProps = {
 
 const AVATAR_SPARKLES_CENTER_SHIFT = [0, -50] as const;
 
-const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
+const DiamondsSubscriptionModal = ({
   modal, peer,
-}) => {
+}: OwnProps & StateProps) => {
   const {
     closeDiamondsSubscriptionModal,
     fulfillStarsSubscription,
@@ -50,7 +48,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
     loadDiamondStatus,
     openInvoice,
   } = getActions();
-  const oldLang = useOldLang();
+
   const lang = useLang();
   const { subscription } = modal || {};
   const triggerSparklesRef = useRef<(() => void) | undefined>();
@@ -151,7 +149,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
           onRequestAnimation={handleRequestAnimation}
           centerShift={AVATAR_SPARKLES_CENTER_SHIFT}
         />
-        <h1 className={styles.title}>{title || oldLang('DiamondsSubscriptionTitle')}</h1>
+        <h1 className={styles.title}>{title || lang('DiamondsSubscriptionTitle')}</h1>
         <span className={styles.amount}>
           {lang('DiamondsPerMonth', {
             amount: pricing.amount,
@@ -168,22 +166,22 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
     const tableData: TableData = [];
 
     tableData.push([
-      oldLang(isBotSubscription ? 'StarsSubscriptionBot' : 'StarsSubscriptionChannel'),
+      lang(isBotSubscription ? 'Bot' : 'DiamondsSubscriptionChannel'),
       { chatId: peer.id },
     ]);
 
     if (title) {
       tableData.push([
-        oldLang('DiamondsSubscriptionBotProduct'),
+        lang('DiamondsSubscriptionBotProduct'),
         title,
       ]);
     }
 
     const hasExpired = until < Date.now() / 1000;
     tableData.push([
-      oldLang(hasExpired ? 'StarsSubscriptionUntilExpired'
-        : isCancelled ? 'StarsSubscriptionUntilExpires' : 'StarsSubscriptionUntilRenews'),
-      formatDateTimeToString(until * 1000, oldLang.code, true),
+      lang(hasExpired ? 'InviteLinkExpired'
+        : isCancelled ? 'DiamondsSubscriptionUntilExpires' : 'DiamondsSubscriptionUntilRenews'),
+      formatDateTime(lang, secondsToDate(until), { date: 'short', time: 'short' }),
     ]);
 
     const footerTos = lang('DiamondsTransactionTOS', {
@@ -197,22 +195,28 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
         <p className={styles.secondary}>{footerTos}</p>
         {isCancelled && (
           <p className={styles.danger}>
-            {oldLang(hasBotCancelled ? 'StarsSubscriptionBotCancelledText' : 'StarsSubscriptionCancelledText')}
+            {lang(hasBotCancelled ? 'DiamondsSubscriptionBotCancelledText' : 'DiamondsSubscriptionCancelledText')}
           </p>
         )}
         {canRefulfill && (
           <p className={styles.secondary}>
-            {oldLang('DiamondsSubscriptionRefulfillInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
+            {lang('DiamondsSubscriptionRefulfillInfo', {
+              date: formatDateTime(lang, secondsToDate(until), { date: 'short', time: 'short' }),
+            })}
           </p>
         )}
         {!isCancelled && !canRefulfill && hasExpired && (
           <p className={styles.secondary}>
-            {oldLang('DiamondsSubscriptionExpiredInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
+            {lang('DiamondsSubscriptionExpiredInfo', {
+              date: formatDateTime(lang, secondsToDate(until), { date: 'short', time: 'short' }),
+            })}
           </p>
         )}
         {!isCancelled && !canRefulfill && !hasExpired && (
           <p className={styles.secondary}>
-            {oldLang('DiamondsSubscriptionCancelInfo', formatDateTimeToString(until * 1000, oldLang.code, true))}
+            {lang('DiamondsSubscriptionCancelInfo', {
+              date: formatDateTime(lang, secondsToDate(until), { date: 'short', time: 'short' }),
+            })}
           </p>
         )}
         {buttonState !== 'hidden' && (
@@ -221,11 +225,11 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
             isText={buttonState === 'cancel'}
             onClick={handleButtonClick}
           >
-            {oldLang(
-              buttonState === 'cancel' ? 'StarsSubscriptionCancel'
-                : buttonState === 'refulfill' ? 'StarsSubscriptionRefulfill'
-                  : buttonState === 'restart' ? 'StarsSubscriptionAgain'
-                    : buttonState === 'renew' ? 'StarsSubscriptionRenew' : 'OK',
+            {lang(
+              buttonState === 'cancel' ? 'DiamondsSubscriptionCancel'
+                : buttonState === 'refulfill' ? 'ProfileJoinChannel'
+                  : buttonState === 'restart' ? 'DiamondsSubscriptionAgain'
+                    : buttonState === 'renew' ? 'DiamondsSubscriptionRenew' : 'OK',
             )}
           </Button>
         )}
@@ -237,7 +241,7 @@ const DiamondsSubscriptionModal: FC<OwnProps & StateProps> = ({
       tableData,
       footer,
     };
-  }, [buttonState, lang, oldLang, peer, subscription]);
+  }, [buttonState, lang, peer, subscription]);
 
   const prevModalData = usePrevious(diamondModalData);
   const renderingModalData = prevModalData || diamondModalData;

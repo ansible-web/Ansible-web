@@ -1,14 +1,11 @@
 import type { ApiDiamondsTransaction, ApiTypeCurrencyAmount } from '../../../../api/types';
-import type { OldLangFn } from '../../../../hooks/useOldLang';
+import type { LangFn } from '../../../../util/localization';
 
 import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../../config';
 import { buildDiamondsTransactionCustomPeer, shouldUseCustomPeer } from '../../../../global/helpers/payments';
-import {
-  type LangFn,
-} from '../../../../util/localization';
 import { formatPercent } from '../../../../util/textFormat';
 
-export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transaction: ApiDiamondsTransaction) {
+export function getTransactionTitle(lang: LangFn, transaction: ApiDiamondsTransaction) {
   if (transaction.paidMessages) {
     return lang(
       'PaidMessageTransaction',
@@ -44,28 +41,28 @@ export function getTransactionTitle(oldLang: OldLangFn, lang: LangFn, transactio
   }
 
   if (transaction.diamondRefCommision) {
-    return oldLang('DiamondTransactionCommission', formatPercent(transaction.diamondRefCommision));
+    return lang('DiamondTransactionCommission', { percent: formatPercent(transaction.diamondRefCommision) });
   }
-  if (transaction.isGiftUpgrade) return oldLang('Gift2TransactionUpgraded');
-  if (transaction.extendedMedia) return oldLang('DiamondMediaPurchase');
-  if (transaction.subscriptionPeriod) return transaction.title || oldLang('DiamondSubscriptionPurchase');
-  if (transaction.isReaction) return oldLang('DiamondsReactionsSent');
-  if (transaction.giveawayPostId) return oldLang('DiamondsGiveawayPrizeReceived');
-  if (transaction.isMyGift) return oldLang('DiamondsGiftSent');
+  if (transaction.isGiftUpgrade) return lang('Gift2TransactionUpgraded');
+  if (transaction.extendedMedia) return lang('DiamondMediaPurchase');
+  if (transaction.subscriptionPeriod) return transaction.title || lang('DiamondSubscriptionPurchase');
+  if (transaction.isReaction) return lang('DiamondsReactionsSent');
+  if (transaction.giveawayPostId) return lang('DiamondsGiveawayPrizeReceived');
+  if (transaction.isMyGift) return lang('SentGift');
   if (transaction.isGift) {
     if (transaction.amount.currency === TON_CURRENCY_CODE) {
       return lang('GramGiftReceived');
     }
-    return oldLang('DiamondsGiftReceived');
+    return lang('DiamondsGiftReceived');
   }
   if (transaction.starGift) {
-    return isNegativeAmount(transaction.amount) ? oldLang('Gift2TransactionSent') : oldLang('Gift2ConvertedTitle');
+    return isNegativeAmount(transaction.amount) ? lang('Gift2TransactionSent') : lang('Gift2ConvertedTitle');
   }
 
   const customPeer = (transaction.peer && shouldUseCustomPeer(transaction)
     && buildDiamondsTransactionCustomPeer(transaction)) || undefined;
 
-  if (customPeer) return customPeer.title || oldLang(customPeer.titleKey!);
+  if (customPeer) return customPeer.title || lang(customPeer.titleKey!);
 
   return transaction.title;
 }

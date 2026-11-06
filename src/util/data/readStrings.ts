@@ -1,6 +1,6 @@
 const IS_DEBUG = import.meta.env?.TG_APP_ENV !== 'production';
 
-export default function readStrings(data: string): Record<string, string> {
+export default function readStrings(data: string, shouldIncludeEmpty = false): Record<string, string> {
   const lines = data.split(/;\r?\n?/);
   const result: Record<string, string> = {};
   for (const line of lines) {
@@ -13,7 +13,7 @@ export default function readStrings(data: string): Record<string, string> {
     }
     // Empty translations are intentional exclusions. Keep the existing
     // fallback behavior without reporting a valid .strings entry as malformed.
-    if (!value) continue;
+    if (!value && !shouldIncludeEmpty) continue;
     if (result[key]) {
       // eslint-disable-next-line no-console
       console.warn('Duplicate key:', key);

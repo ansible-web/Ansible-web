@@ -15,7 +15,7 @@ import { buildDiamondsTransactionCustomPeer,
 import { getPeerTitle } from '../../../../global/helpers/peers';
 import { selectPeer } from '../../../../global/selectors';
 import buildClassName from '../../../../util/buildClassName';
-import { formatDateTimeToString } from '../../../../util/dates/oldDateFormat';
+import { formatDateTime, secondsToDate } from '../../../../util/localization/dateFormat';
 import { CUSTOM_PEER_PREMIUM } from '../../../../util/objects/customPeer';
 import { getGiftAttributes, getStickerFromGift } from '../../../common/helpers/gifts';
 import renderText from '../../../common/helpers/renderText';
@@ -24,7 +24,6 @@ import { getTransactionTitle, isNegativeAmount } from '../helpers/transaction';
 import useSelector from '../../../../hooks/data/useSelector';
 import useLang from '../../../../hooks/useLang';
 import useLastCallback from '../../../../hooks/useLastCallback';
-import useOldLang from '../../../../hooks/useOldLang';
 
 import AnimatedIconFromSticker from '../../../common/AnimatedIconFromSticker';
 import Avatar from '../../../common/Avatar';
@@ -54,7 +53,6 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
     subscriptionPeriod,
   } = transaction;
   const lang = useLang();
-  const oldLang = useOldLang();
 
   const peerId = transactionPeer.type === 'peer' ? transactionPeer.id : undefined;
 
@@ -67,18 +65,18 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
   const giftSticker = starGift && getStickerFromGift(starGift);
 
   const data = useMemo(() => {
-    let title = getTransactionTitle(oldLang, lang, transaction);
+    let title = getTransactionTitle(lang, transaction);
     let description;
     let status: string | undefined;
     let avatarPeer: ApiPeer | CustomPeer | undefined;
 
     if (!shouldUseCustomPeer(transaction)) {
-      description = peer && getPeerTitle(oldLang, peer);
+      description = peer && getPeerTitle(lang, peer);
       avatarPeer = peer || CUSTOM_PEER_PREMIUM;
     } else {
       const customPeer = buildDiamondsTransactionCustomPeer(transaction);
-      title = customPeer.title || oldLang(customPeer.titleKey!);
-      description = oldLang(customPeer.subtitleKey!);
+      title = customPeer.title || lang(customPeer.titleKey!);
+      description = lang(customPeer.subtitleKey!);
       avatarPeer = customPeer;
     }
 
@@ -92,7 +90,7 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
     }
 
     if (transaction.isPostsSearch) {
-      title = getTransactionTitle(oldLang, lang, transaction);
+      title = getTransactionTitle(lang, transaction);
       description = undefined;
     }
 
@@ -101,15 +99,15 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
     }
 
     if (transaction.isRefund) {
-      status = oldLang('DiamondsRefunded');
+      status = lang('Refunded');
     }
 
     if (transaction.hasFailed) {
-      status = oldLang('DiamondsFailed');
+      status = lang('DiamondsFailed');
     }
 
     if (transaction.isPending) {
-      status = oldLang('DiamondsPending');
+      status = lang('DiamondsPending');
     }
 
     return {
@@ -118,7 +116,7 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
       avatarPeer,
       status,
     };
-  }, [oldLang, lang, peer, transaction]);
+  }, [lang, peer, transaction]);
 
   const previewContent = useMemo(() => {
     if (isUniqueGift) {
@@ -183,7 +181,7 @@ const DiamondsTransactionItem = ({ transaction, className }: OwnProps) => {
           <p className={styles.description}>{renderText(data.description)}</p>
         )}
         <p className={styles.date}>
-          {formatDateTimeToString(date * 1000, oldLang.code, true)}
+          {formatDateTime(lang, secondsToDate(date), { date: 'short', time: 'short' })}
           {data.status && ` — (${data.status})`}
         </p>
       </div>

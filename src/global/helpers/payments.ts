@@ -325,8 +325,8 @@ export function buildDiamondsTransactionCustomPeer(
     return {
       avatarIcon: 'diamond',
       isCustomPeer: true,
-      titleKey: 'Stars.Intro.Transaction.AppleTopUp.Title',
-      subtitleKey: 'Stars.Intro.Transaction.AppleTopUp.Subtitle',
+      titleKey: 'DiamondsIntroTransactionAppleTopUpTitle',
+      subtitleKey: 'DiamondsIntroTransactionAppleTopUpSubtitle',
       peerColorId: 5,
     };
   }
@@ -335,8 +335,8 @@ export function buildDiamondsTransactionCustomPeer(
     return {
       avatarIcon: 'diamond',
       isCustomPeer: true,
-      titleKey: 'Stars.Intro.Transaction.GoogleTopUp.Title',
-      subtitleKey: 'Stars.Intro.Transaction.GoogleTopUp.Subtitle',
+      titleKey: 'DiamondsIntroTransactionGoogleTopUpTitle',
+      subtitleKey: 'DiamondsIntroTransactionGoogleTopUpSubtitle',
       peerColorId: 3,
     };
   }
@@ -346,16 +346,16 @@ export function buildDiamondsTransactionCustomPeer(
       return {
         avatarIcon: 'fragment',
         isCustomPeer: true,
-        titleKey: 'Stars.Gift.Received.Title',
-        subtitleKey: 'Stars.Intro.Transaction.Gift.UnknownUser',
+        titleKey: 'DiamondsGiftReceivedTitle',
+        subtitleKey: 'DiamondsIntroTransactionGiftUnknownUser',
         customPeerAvatarColor: '#000000',
       };
     }
     return {
       avatarIcon: 'fragment',
       isCustomPeer: true,
-      titleKey: 'Stars.Intro.Transaction.FragmentTopUp.Title',
-      subtitleKey: 'Stars.Intro.Transaction.FragmentTopUp.Subtitle',
+      titleKey: 'DiamondsIntroTransactionFragmentTopUpTitle',
+      subtitleKey: 'DiamondsIntroTransactionFragmentTopUpSubtitle',
       customPeerAvatarColor: '#000000',
     };
   }
@@ -364,8 +364,8 @@ export function buildDiamondsTransactionCustomPeer(
     return {
       avatarIcon: 'diamond',
       isCustomPeer: true,
-      titleKey: 'Stars.Intro.Transaction.PremiumBotTopUp.Title',
-      subtitleKey: 'Stars.Intro.Transaction.PremiumBotTopUp.Subtitle',
+      titleKey: 'DiamondsIntroTransactionPremiumBotTopUpTitle',
+      subtitleKey: 'DiamondsIntroTransactionPremiumBotTopUpSubtitle',
       peerColorId: 1,
       withPremiumGradient: true,
     };
@@ -375,8 +375,8 @@ export function buildDiamondsTransactionCustomPeer(
     return {
       avatarIcon: 'diamond',
       isCustomPeer: true,
-      titleKey: 'Stars.Intro.Transaction.TelegramAds.Title',
-      subtitleKey: 'Stars.Intro.Transaction.TelegramAds.Subtitle',
+      titleKey: 'DiamondsIntroTransactionAnsibleAdsTitle',
+      subtitleKey: 'DiamondsIntroTransactionAnsibleAdsSubtitle',
       peerColorId: 2,
     };
   }
@@ -385,8 +385,8 @@ export function buildDiamondsTransactionCustomPeer(
     return {
       avatarIcon: 'bots',
       isCustomPeer: true,
-      titleKey: 'Diamonds.Intro.Transaction.AnsibleBotApi.Title',
-      subtitleKey: 'Diamonds.Intro.Transaction.AnsibleBotApi.Subtitle',
+      titleKey: 'DiamondsIntroTransactionAnsibleBotApiTitle',
+      subtitleKey: 'DiamondsIntroTransactionAnsibleBotApiSubtitle',
       peerColorId: 4,
     };
   }
@@ -394,8 +394,8 @@ export function buildDiamondsTransactionCustomPeer(
   return {
     avatarIcon: 'diamond',
     isCustomPeer: true,
-    titleKey: 'Stars.Intro.Transaction.Unsupported.Title',
-    subtitleKey: 'Stars.Intro.Transaction.Unsupported.Title',
+    titleKey: 'DiamondsIntroTransactionUnsupportedTitle',
+    subtitleKey: 'DiamondsIntroTransactionUnsupportedTitle',
     peerColorId: 0,
   };
 }

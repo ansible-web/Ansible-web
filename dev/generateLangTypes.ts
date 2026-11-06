@@ -14,7 +14,15 @@ type LangVariable = string | number | undefined;
 
 const data = readFileSync('./src/assets/localization/fallback.strings', 'utf8');
 
-const parsed = readStrings(data);
+const parsed = readStrings(data, true);
+// Empty runtime strings retain their call signatures in a separate build-time contract
+const excludedContracts = readStrings(readFileSync('./src/assets/localization/excluded.strings', 'utf8'));
+Object.entries(excludedContracts).forEach(([key, value]) => {
+  if (parsed[key] !== '') {
+    throw new Error(`Excluded localization contract must reference an empty fallback: ${key}`);
+  }
+  parsed[key] = value;
+});
 const regularKeysWithVars: Record<string, string[]> = {};
 const pluralKeysWithVars: Record<string, string[]> = {};
 Object.entries(parsed).forEach(([keyWithSuffix, value]) => {

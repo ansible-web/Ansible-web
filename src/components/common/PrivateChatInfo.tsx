@@ -197,7 +197,7 @@ const PrivateChatInfo = ({
     if (customPeer?.subtitleKey) {
       return (
         <span className="status" dir="auto">
-          <span className="user-status" dir="auto">{oldLang(customPeer.subtitleKey)}</span>
+          <span className="user-status" dir="auto">{lang(customPeer.subtitleKey)}</span>
         </span>
       );
     }

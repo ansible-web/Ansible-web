@@ -1597,6 +1597,7 @@ export interface LangPair {
   'GiftInfoUnlist': undefined;
   'GiftTransferTitle': undefined;
   'GiftTransferTON': undefined;
+  'GiftTransferTONBlocked': undefined;
   'GiftTransferConfirmButtonFree': undefined;
   'RemoveGiftDescriptionTitle': undefined;
   'RemoveGiftDescriptionConfirmText': undefined;
@@ -2479,6 +2480,83 @@ export interface LangPair {
   'AiMessageEditorStyleBiblical': undefined;
   'AiMessageEditorStyleViking': undefined;
   'AiMessageEditorStyleZen': undefined;
+  'AnsibleDiamonds': undefined;
+  'AnsibleDiamondsGift': undefined;
+  'AnsibleDiamondsInfo': undefined;
+  'AppStore': undefined;
+  'BoostReason': undefined;
+  'CreditsSummaryOptionsAboutLink': undefined;
+  'DiamondGiftReason': undefined;
+  'DiamondGiftReasonUpgrade': undefined;
+  'DiamondListBuyMoreDiamonds': undefined;
+  'DiamondListGetDiamonds': undefined;
+  'DiamondMediaPurchase': undefined;
+  'DiamondMySubscriptions': undefined;
+  'DiamondSubscriptionPurchase': undefined;
+  'DiamondTransactionFrom': undefined;
+  'DiamondsConfirmPurchaseTitle': undefined;
+  'DiamondsFailed': undefined;
+  'DiamondsGiftReceived': undefined;
+  'DiamondsGiftReceivedTitle': undefined;
+  'DiamondsGiveawayPrizeReceived': undefined;
+  'DiamondsIntroTransactionAnsibleAdsSubtitle': undefined;
+  'DiamondsIntroTransactionAnsibleAdsTitle': undefined;
+  'DiamondsIntroTransactionAnsibleBotApiSubtitle': undefined;
+  'DiamondsIntroTransactionAnsibleBotApiTitle': undefined;
+  'DiamondsIntroTransactionAppleTopUpSubtitle': undefined;
+  'DiamondsIntroTransactionAppleTopUpTitle': undefined;
+  'DiamondsIntroTransactionFragmentTopUpSubtitle': undefined;
+  'DiamondsIntroTransactionFragmentTopUpTitle': undefined;
+  'DiamondsIntroTransactionGiftUnknownUser': undefined;
+  'DiamondsIntroTransactionGoogleTopUpSubtitle': undefined;
+  'DiamondsIntroTransactionGoogleTopUpTitle': undefined;
+  'DiamondsIntroTransactionPremiumBotTopUpSubtitle': undefined;
+  'DiamondsIntroTransactionPremiumBotTopUpTitle': undefined;
+  'DiamondsIntroTransactionUnsupportedTitle': undefined;
+  'DiamondsNeededTextLink': undefined;
+  'DiamondsParticipantSubscriptionPerMonth': undefined;
+  'DiamondsPending': undefined;
+  'DiamondsPurchaseGetDiamondsInfo': undefined;
+  'DiamondsPurchaseShowMore': undefined;
+  'DiamondsReactionsSent': undefined;
+  'DiamondsSubscribeTitle': undefined;
+  'DiamondsSubscriptionAgain': undefined;
+  'DiamondsSubscriptionBotCancelledText': undefined;
+  'DiamondsSubscriptionBotProduct': undefined;
+  'DiamondsSubscriptionCancel': undefined;
+  'DiamondsSubscriptionCancelledText': undefined;
+  'DiamondsSubscriptionChannel': undefined;
+  'DiamondsSubscriptionRenew': undefined;
+  'DiamondsSubscriptionStatusCancelled': undefined;
+  'DiamondsSubscriptionTitle': undefined;
+  'DiamondsSubscriptionUntilExpires': undefined;
+  'DiamondsSubscriptionUntilRenews': undefined;
+  'DiamondsTOSLink': undefined;
+  'DiamondsTransactionAds': undefined;
+  'DiamondsTransactionBot': undefined;
+  'DiamondsTransactionDate': undefined;
+  'DiamondsTransactionDiamondRefReasonMiniapp': undefined;
+  'DiamondsTransactionDiamondRefReasonProgram': undefined;
+  'DiamondsTransactionDiamondRefReasonTitle': undefined;
+  'DiamondsTransactionGiftFrom': undefined;
+  'DiamondsTransactionId': undefined;
+  'DiamondsTransactionReactionPost': undefined;
+  'DiamondsTransactionTo': undefined;
+  'DiamondsTransactionUnsupportedTitle': undefined;
+  'DiamondsTransactionVia': undefined;
+  'Fragment': undefined;
+  'Gift2ConvertedTitle': undefined;
+  'Gift2TransactionSent': undefined;
+  'Gift2TransactionUpgraded': undefined;
+  'GiftDiamondsTitle': undefined;
+  'PlayMarket': undefined;
+  'ShowMore': undefined;
+  'DiamondsTransactionIDCopied': undefined;
+  'PrivacyPremiumText': undefined;
+  'StarsTransactionHidden': undefined;
+  'StarsReactionAnonymous': undefined;
+  'BoostingToBeDistributed': undefined;
+  'SearchPublicPosts': undefined;
 }
 
 export interface LangPairWithVariables<V = LangVariable> {
@@ -3093,9 +3171,6 @@ export interface LangPairWithVariables<V = LangVariable> {
   };
   'GiftCraftDescription': {
     'giftLine': V;
-  };
-  'GiftTransferTONBlocked': {
-    'time': V;
   };
   'GiftTransferConfirmDescription': {
     'gift': V;
@@ -4246,6 +4321,58 @@ export interface LangPairWithVariables<V = LangVariable> {
   'DiamondsBuyNotEnough': {
     'count': V;
   };
+  'ActionGiftDiamondsSubtitle': {
+    'peer': V;
+  };
+  'BoostGiftDiamondsPerUser': {
+    'count': V;
+  };
+  'CreditsSummaryOptionsAbout': {
+    'link': V;
+  };
+  'DiamondTransactionCommission': {
+    'percent': V;
+  };
+  'DiamondsNeededText': {
+    'user': V;
+  };
+  'DiamondsNeededTextGift': {
+    'peer': V;
+  };
+  'DiamondsNeededTextReactions': {
+    'chat': V;
+  };
+  'DiamondsSubscriptionCancelInfo': {
+    'date': V;
+  };
+  'DiamondsSubscriptionExpired': {
+    'date': V;
+  };
+  'DiamondsSubscriptionExpiredInfo': {
+    'date': V;
+  };
+  'DiamondsSubscriptionExpires': {
+    'date': V;
+  };
+  'DiamondsSubscriptionRefulfillInfo': {
+    'date': V;
+  };
+  'DiamondsSubscriptionRenews': {
+    'date': V;
+  };
+  'DiamondsTransferInfo': {
+    'title': V;
+    'bot': V;
+    'amount': V;
+  };
+  'DiamondsTransferUnlockInfo': {
+    'media': V;
+    'chat': V;
+    'amount': V;
+  };
+  'NotificationDiamondsGiftSentYou': {
+    'amount': V;
+  };
 }
 
 export interface LangPairPlural {
@@ -4530,7 +4657,7 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'ChatGroups': {
     'count': V;
   };
-  'DiamondsAmountText': {
+  'StarsAmountText': {
     'amount': V;
   };
   'BrowserMoreTabs': {
@@ -4540,11 +4667,11 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'PrizeCredits2': {
     'count': V;
   };
-  'DiamondsSubscribeText': {
+  'StarsSubscribeText': {
     'chat': V;
     'amount': V;
   };
-  'DiamondsSubscribeBotText': {
+  'StarsSubscribeBotText': {
     'name': V;
     'bot': V;
     'amount': V;
@@ -4586,7 +4713,7 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'ActionGiveawayResults': {
     'count': V;
   };
-  'ActionGiveawayResultsDiamonds': {
+  'ActionGiveawayResultsStars': {
     'count': V;
   };
   'ActionGiveawayResultPremiumText': {
@@ -4597,7 +4724,7 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
     'channel': V;
     'months': V;
   };
-  'ActionGiveawayResultDiamondsText': {
+  'ActionGiveawayResultStarsText': {
     'channel': V;
     'amount': V;
   };
@@ -4612,7 +4739,7 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   'ActionGiftPremiumTitle': {
     'months': V;
   };
-  'ActionGiftDiamondsTitle': {
+  'ActionGiftStarsTitle': {
     'amount': V;
   };
   'GramAmountText': {
@@ -4800,6 +4927,43 @@ export interface LangPairPluralWithVariables<V = LangVariable> {
   };
   'TonAmountText': {
     'amount': V;
+  };
+  'DiamondsAcquiredInfo': {
+    'count': V;
+  };
+  'DiamondsNeededTitle': {
+    'count': V;
+  };
+  'DiamondsSubscribeBotText': {
+    'name': V;
+    'bot': V;
+    'amount': V;
+  };
+  'DiamondsSubscribeText': {
+    'chat': V;
+    'amount': V;
+  };
+  'DiamondsTransferPhotos': {
+    'count': V;
+  };
+  'DiamondsTransferVideos': {
+    'count': V;
+  };
+  'Media': {
+    'count': V;
+  };
+  'DiamondsAmountText': {
+    'amount': V;
+  };
+  'ActionGiftDiamondsTitle': {
+    'amount': V;
+  };
+  'ActionGiveawayResultDiamondsText': {
+    'channel': V;
+    'amount': V;
+  };
+  'ActionGiveawayResultsDiamonds': {
+    'count': V;
   };
 }
 export type RegularLangKey = keyof LangPair;

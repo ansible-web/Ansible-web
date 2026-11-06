@@ -1,4 +1,3 @@
-import type { FC } from '../../../../lib/teact/teact';
 import {
   memo, useEffect, useMemo, useRef,
   useState,
@@ -19,8 +18,8 @@ import { formatCurrencyAsString } from '../../../../util/formatCurrency';
 import renderText from '../../../common/helpers/renderText';
 
 import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
+import useLang from '../../../../hooks/useLang';
 import useLastCallback from '../../../../hooks/useLastCallback';
-import useOldLang from '../../../../hooks/useOldLang';
 
 import Avatar from '../../../common/Avatar';
 import SafeLink from '../../../common/SafeLink';
@@ -42,10 +41,10 @@ type StateProps = {
 
 const AVATAR_SIZE = 100;
 
-const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
+const DiamondsGiftModal = ({
   modal,
   user,
-}) => {
+}: OwnProps & StateProps) => {
   const {
     closeDiamondsGiftModal, openInvoice, requestConfetti,
   } = getActions();
@@ -55,7 +54,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
 
   const renderingModal = useCurrentOrPrev(modal);
 
-  const oldLang = useOldLang();
+  const lang = useLang();
 
   const [selectedOption, setSelectedOption] = useState<ApiDiamondTopupOption | undefined>();
   const [isHeaderHidden, setIsHeaderHidden] = useState(true);
@@ -123,26 +122,27 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
 
   function renderGiftTitle() {
     if (renderingModal?.isCompleted) {
-      return user ? renderText(oldLang('Notification.DiamondsGift.SentYou',
-        formatCurrencyAsString(selectedOption!.amount, selectedOption!.currency, oldLang.code)), ['simple_markdown'])
-        : renderText(oldLang('DiamondsAcquiredInfo', selectedOption?.stars), ['simple_markdown']);
+      return user ? renderText(
+        lang(
+          'NotificationDiamondsGiftSentYou',
+          { amount: formatCurrencyAsString(selectedOption!.amount, selectedOption!.currency, lang.code) },
+        ),
+        ['simple_markdown'],
+      )
+        : renderText(
+          lang('DiamondsAcquiredInfo', { count: selectedOption!.stars }, { pluralValue: selectedOption!.stars }),
+          ['simple_markdown'],
+        );
     }
 
-    return user ? oldLang('GiftDiamondsTitle') : oldLang('Diamond.List.GetDiamonds');
+    return user ? lang('GiftDiamondsTitle') : lang('DiamondListGetDiamonds');
   }
 
   const bottomText = useMemo(() => {
-    const text = oldLang('lng_credits_summary_options_about');
-    const parts = text.split('{link}');
-    return [
-      parts[0],
-      <SafeLink
-        url={oldLang('DiamondsTOSLink')}
-        text={oldLang('lng_credits_summary_options_about_link')}
-      />,
-      parts[1],
-    ];
-  }, [oldLang]);
+    return lang('CreditsSummaryOptionsAbout', {
+      link: <SafeLink url={lang('DiamondsTOSLink')} text={lang('CreditsSummaryOptionsAboutLink')} />,
+    }, { withNodes: true });
+  }, [lang]);
 
   return (
     <Modal
@@ -157,7 +157,7 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
       <div className={buildClassName(styles.main, 'custom-scroll')} onScroll={handleScroll}>
         <div className={buildClassName(styles.header, isHeaderHidden && styles.hiddenHeader)}>
           <h2 className={styles.diamondHeaderText}>
-            {user ? oldLang('GiftDiamondsTitle') : oldLang('Diamond.List.GetDiamonds')}
+            {user ? lang('GiftDiamondsTitle') : lang('DiamondListGetDiamonds')}
           </h2>
         </div>
         <div className={styles.headerInfo}>
@@ -182,8 +182,8 @@ const DiamondsGiftModal: FC<OwnProps & StateProps> = ({
         </h2>
         <p className={styles.description}>
           {user ? renderText(
-            oldLang('ActionGiftDiamondsSubtitle', getPeerTitle(oldLang, user)), ['simple_markdown'],
-          ) : oldLang('Diamonds.Purchase.GetDiamondsInfo')}
+            lang('ActionGiftDiamondsSubtitle', { peer: getPeerTitle(lang, user) }), ['simple_markdown'],
+          ) : lang('DiamondsPurchaseGetDiamondsInfo')}
         </p>
         <div className={styles.section}>
           <DiamondTopupOptionList

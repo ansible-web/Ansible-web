@@ -33,6 +33,7 @@ import { REM } from './helpers/mediaDimensions';
 import renderText from './helpers/renderText';
 
 import { useFastClick } from '../../hooks/useFastClick';
+import useLang from '../../hooks/useLang';
 import useLastCallback from '../../hooks/useLastCallback';
 import useMedia from '../../hooks/useMedia';
 import useMediaTransition from '../../hooks/useMediaTransition';
@@ -216,6 +217,7 @@ const Avatar = ({
   });
 
   const lang = useOldLang();
+  const webLang = useLang();
 
   let content: TeactNode | undefined;
   const author = user ? getUserFullName(user) : (chat ? getChatTitle(lang, chat) : text);
@@ -264,7 +266,7 @@ const Avatar = ({
     const title = getChatTitle(lang, chat);
     content = title && getFirstLetters(title, isUserId(chat.id) ? 2 : 1);
   } else if (isCustomPeer) {
-    const title = peer.title || lang(peer.titleKey!);
+    const title = peer.title || webLang(peer.titleKey!);
     content = title && getFirstLetters(title, 1);
   } else if (text) {
     content = getFirstLetters(text, 2);

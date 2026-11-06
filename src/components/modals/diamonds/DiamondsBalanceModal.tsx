@@ -23,7 +23,6 @@ import renderText from '../../common/helpers/renderText';
 import useFlag from '../../../hooks/useFlag';
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 
 import Icon from '../../common/icons/Icon';
 import SafeLink from '../../common/SafeLink';
@@ -59,19 +58,16 @@ type StateProps = {
   tonBalanceState?: GlobalState['ton'];
   canBuyPremium?: boolean;
   shouldForceHeight?: boolean;
-  tonUsdRate?: number;
-  tonTopupUrl: string;
   animationLevel: AnimationLevel;
 };
 
 const DiamondsBalanceModal = ({
   modal, diamondsBalanceState, tonBalanceState, canBuyPremium, shouldForceHeight,
-  tonUsdRate, tonTopupUrl, animationLevel,
+  animationLevel,
 }: OwnProps & StateProps) => {
   const {
     closeDiamondsBalanceModal, loadDiamondsTransactions, loadDiamondsSubscriptions,
     openDiamondsGiftingPickerModal, openInvoice,
-    openUrl,
   } = getActions();
 
   const currency = modal?.currency || STARS_CURRENCY_CODE;
@@ -79,7 +75,6 @@ const DiamondsBalanceModal = ({
   const { balance, history } = currentState || {};
   const { subscriptions } = (currency === STARS_CURRENCY_CODE && diamondsBalanceState) || {};
 
-  const oldLang = useOldLang();
   const lang = useLang();
 
   const [isHeaderHidden, setIsHeaderHidden] = useState(true);
@@ -109,23 +104,23 @@ const DiamondsBalanceModal = ({
     if (originReaction) {
       const channel = selectChat(global, originReaction.chatId);
       if (!channel) return undefined;
-      return oldLang('DiamondsNeededTextReactions', getChatTitle(oldLang, channel));
+      return lang('DiamondsNeededTextReactions', { chat: getChatTitle(lang, channel) });
     }
 
     if (originDiamondsPayment) {
       const bot = originDiamondsPayment.form?.botId ? selectUser(global, originDiamondsPayment.form.botId) : undefined;
       if (!bot) return undefined;
-      return oldLang('DiamondsNeededText', getUserFullName(bot));
+      return lang('DiamondsNeededText', { user: getUserFullName(bot) });
     }
 
     if (originGift) {
       const peer = selectUser(global, originGift.peerId);
       if (!peer) return undefined;
-      return oldLang('DiamondsNeededTextGift', getPeerTitle(lang, peer));
+      return lang('DiamondsNeededTextGift', { peer: getPeerTitle(lang, peer) });
     }
 
     if (topup?.purpose === SUBSCRIPTION_PURPOSE) {
-      return oldLang('DiamondsNeededTextLink');
+      return lang('DiamondsNeededTextLink');
     }
 
     if (topup?.purpose === PAID_MESSAGES_PURPOSE) {
@@ -136,7 +131,7 @@ const DiamondsBalanceModal = ({
     }
 
     return undefined;
-  }, [originReaction, originDiamondsPayment, originGift, topup?.purpose, lang, oldLang]);
+  }, [originReaction, originDiamondsPayment, originGift, topup?.purpose, lang]);
 
   const shouldShowItems = Boolean(history?.all?.transactions.length && !shouldOpenOnBuy);
   const shouldSuggestGifting = !shouldOpenOnBuy;
@@ -182,14 +177,10 @@ const DiamondsBalanceModal = ({
   const tosText = useMemo(() => {
     if (!isOpen) return undefined;
 
-    const text = oldLang('lng_credits_summary_options_about');
-    const parts = text.split('{link}');
-    return [
-      parts[0],
-      <SafeLink url={oldLang('DiamondsTOSLink')} text={oldLang('lng_credits_summary_options_about_link')} />,
-      parts[1],
-    ];
-  }, [isOpen, oldLang]);
+    return lang('CreditsSummaryOptionsAbout', {
+      link: <SafeLink url={lang('DiamondsTOSLink')} text={lang('CreditsSummaryOptionsAboutLink')} />,
+    }, { withNodes: true });
+  }, [isOpen, lang]);
 
   const renderDiamondsHeaderSection = () => {
     return (
@@ -197,9 +188,13 @@ const DiamondsBalanceModal = ({
         <ParticlesHeader
           model="speeding-diamond"
           color="blue"
-          title={diamondsNeeded ? oldLang('DiamondsNeededTitle', ongoingTransactionAmount) : oldLang('AnsibleDiamonds')}
+          title={diamondsNeeded
+            ? lang('DiamondsNeededTitle', { count: ongoingTransactionAmount }, {
+              pluralValue: ongoingTransactionAmount!,
+            })
+            : lang('AnsibleDiamonds')}
           description={renderText(
-            diamondsNeededText || oldLang('AnsibleDiamondsInfo'),
+            diamondsNeededText || lang('AnsibleDiamondsInfo'),
             ['simple_markdown', 'emoji'],
           )}
           isDisabled={!isOpen}
@@ -210,7 +205,7 @@ const DiamondsBalanceModal = ({
             onClick={showBuyOptions}
             fluid
           >
-            {oldLang('Diamond.List.BuyMoreDiamonds')}
+            {lang('DiamondListBuyMoreDiamonds')}
           </Button>
         )}
         {canBuyPremium && !areBuyOptionsShown && shouldSuggestGifting && (
@@ -221,7 +216,7 @@ const DiamondsBalanceModal = ({
             fluid
             onClick={openDiamondsGiftingPickerModalHandler}
           >
-            {oldLang('AnsibleDiamondsGift')}
+            {lang('AnsibleDiamondsGift')}
           </Button>
         )}
         {areBuyOptionsShown && diamondsBalanceState?.topupOptions && (
@@ -302,10 +297,6 @@ const DiamondsBalanceModal = ({
     });
   });
 
-  const handleTonTopUp = useLastCallback(() => {
-    openUrl({ url: tonTopupUrl });
-  });
-
   return (
     <Modal
       className={buildClassName(styles.root, !shouldForceHeight && !areBuyOptionsShown && styles.minimal)}
@@ -322,7 +313,7 @@ const DiamondsBalanceModal = ({
           )}
         >
           <h2 className={styles.diamondHeaderText}>
-            {oldLang('AnsibleDiamonds')}
+            {lang('AnsibleDiamonds')}
           </h2>
         </div>
         <div className={styles.section}>
@@ -335,7 +326,7 @@ const DiamondsBalanceModal = ({
         )}
         {shouldShowItems && Boolean(subscriptions?.list.length) && (
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>{oldLang('DiamondMySubscriptions')}</h3>
+            <h3 className={styles.sectionTitle}>{lang('DiamondMySubscriptions')}</h3>
             <div className={styles.subscriptions}>
               {subscriptions?.list.map((subscription) => (
                 <DiamondsSubscriptionItem
@@ -353,7 +344,7 @@ const DiamondsBalanceModal = ({
                   onClick={handleLoadMoreSubscriptions}
                 >
                   <Icon name="down" className={styles.loadMoreIcon} />
-                  {oldLang('DiamondMySubscriptionsExpand')}
+                  {lang('ShowMore')}
                 </Button>
               )}
             </div>
@@ -414,8 +405,6 @@ export default memo(withGlobal<OwnProps>(
       diamondsBalanceState: global.stars,
       tonBalanceState: global.ton,
       canBuyPremium: !selectIsPremiumPurchaseBlocked(global),
-      tonUsdRate: global.appConfig.tonUsdRate,
-      tonTopupUrl: global.appConfig.tonTopupUrl,
       animationLevel: selectSharedSettings(global).animationLevel,
     };
   },

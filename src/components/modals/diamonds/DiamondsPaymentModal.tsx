@@ -18,7 +18,6 @@ import renderText from '../../common/helpers/renderText';
 import useFlag from '../../../hooks/useFlag';
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 import usePrevious from '../../../hooks/usePrevious';
 
 import Avatar from '../../common/Avatar';
@@ -67,7 +66,6 @@ const DiamondsPaymentModal = ({
 
   const photo = form?.photo;
 
-  const oldLang = useOldLang();
   const lang = useLang();
 
   useEffect(() => {
@@ -82,19 +80,27 @@ const DiamondsPaymentModal = ({
     }
 
     const botName = getUserFullName(bot);
-    const diamondsText = oldLang('Diamonds.Intro.PurchasedText.Diamonds', amount);
+    const diamondsText = lang('StarsAmountText', { amount }, { pluralValue: amount! });
 
     if (paidMediaMessage) {
       const extendedMedia = paidMediaMessage.content.paidMedia!.extendedMedia as ApiMediaExtendedPreview[];
       const areAllPhotos = extendedMedia.every((media) => !media.duration);
       const areAllVideos = extendedMedia.every((media) => Boolean(media.duration));
 
-      const mediaText = areAllPhotos ? oldLang('Diamonds.Transfer.Photos', extendedMedia.length)
-        : areAllVideos ? oldLang('Diamonds.Transfer.Videos', extendedMedia.length)
-          : oldLang('Media', extendedMedia.length);
+      const mediaText = areAllPhotos ? lang(
+        'DiamondsTransferPhotos',
+        { count: extendedMedia.length },
+        { pluralValue: extendedMedia.length },
+      )
+        : areAllVideos ? lang(
+          'DiamondsTransferVideos',
+          { count: extendedMedia.length },
+          { pluralValue: extendedMedia.length },
+        )
+          : lang('Media', { count: extendedMedia.length }, { pluralValue: extendedMedia.length });
 
-      const channelTitle = getChatTitle(oldLang, paidMediaChat!);
-      return oldLang('Diamonds.Transfer.UnlockInfo', [mediaText, channelTitle, diamondsText]);
+      const channelTitle = getChatTitle(lang, paidMediaChat!);
+      return lang('DiamondsTransferUnlockInfo', { media: mediaText, chat: channelTitle, amount: diamondsText });
     }
 
     if (subscriptionInfo) {
@@ -118,10 +124,10 @@ const DiamondsPaymentModal = ({
       });
     }
 
-    return oldLang('Diamonds.Transfer.Info', [form!.title, botName, diamondsText]);
+    return lang('DiamondsTransferInfo', { title: form!.title, bot: botName, amount: diamondsText });
   }, [
-    renderingModal?.inputInvoice, bot, oldLang, amount, paidMediaMessage, subscriptionInfo, isBotSubscription, form,
-    paidMediaChat, lang,
+    renderingModal?.inputInvoice, bot, lang, amount, paidMediaMessage, subscriptionInfo, isBotSubscription, form,
+    paidMediaChat,
   ]);
 
   const disclaimerText = useMemo(() => {
@@ -192,7 +198,7 @@ const DiamondsPaymentModal = ({
         <img className={styles.paymentImageBackground} src={DiamondsBackground} alt="" draggable={false} />
       </div>
       <h2 className={styles.headerText}>
-        {inviteCustomPeer ? oldLang('DiamondsSubscribeTitle') : oldLang('DiamondsConfirmPurchaseTitle')}
+        {inviteCustomPeer ? lang('DiamondsSubscribeTitle') : lang('DiamondsConfirmPurchaseTitle')}
       </h2>
       {canShowPeerItem && <PeerChip className={styles.botItem} peerId={form?.botId} />}
       <div className={styles.description}>
