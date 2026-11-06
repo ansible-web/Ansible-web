@@ -10,6 +10,17 @@ Authors.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.6] - 2026-11-07
+
+### Changed
+- Port the Stars balance form redesign from Telegram Web A 12.0.48: rounded
+  subscription/history cards, pill tabs and the collapsing header. Keep Ansible
+  Diamonds and omit TON/Gram wallet entry points.
+
+### Fixed
+- Show existing subscriptions on opening the balance form with the corrected
+  server status response, including cancelled and expired subscriptions.
+
 ## [0.3.5] - 2026-10-08
 
 Versions 0.3.2 – 0.3.4 were not published as separate releases; this entry covers

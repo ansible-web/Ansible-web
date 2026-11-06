@@ -26,6 +26,7 @@ interface OwnProps {
   isDisabled?: boolean;
   className?: string;
   modelClassName?: string;
+  titleClassName?: string;
 }
 
 const GIFT_STICKER_SIZE = 8 * REM;
@@ -43,6 +44,7 @@ function ParticlesHeader({
   isDisabled,
   className,
   modelClassName,
+  titleClassName,
 }: OwnProps) {
   const stickerRef = useRef<HTMLDivElement>();
   const triggerSparklesRef = useRef<(() => void) | undefined>();
@@ -101,7 +103,7 @@ function ParticlesHeader({
         </div>
       )}
 
-      <h2 className={styles.title}>
+      <h2 className={buildClassName(styles.title, titleClassName)}>
         {title}
       </h2>
 

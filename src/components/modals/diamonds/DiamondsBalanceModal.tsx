@@ -1,4 +1,5 @@
 import { memo, useEffect, useMemo, useRef, useState } from '@teact';
+import { setExtraStyles, toggleExtraClass } from '@teact/teact-dom';
 import { getActions, getGlobal, withGlobal } from '../../../global';
 
 import type { ApiDiamondTopupOption } from '../../../api/types';
@@ -8,14 +9,14 @@ import type { RegularLangKey } from '../../../types/language';
 
 import {
   PAID_MESSAGES_PURPOSE,
-  STARS_CURRENCY_CODE,
-  TON_CURRENCY_CODE,
 } from '../../../config';
+import { requestMutation } from '../../../lib/fasterdom/fasterdom';
 import { getChatTitle, getUserFullName } from '../../../global/helpers';
 import { getPeerTitle } from '../../../global/helpers/peers';
 import { selectChat, selectIsPremiumPurchaseBlocked, selectUser } from '../../../global/selectors';
 import { selectSharedSettings } from '../../../global/selectors/sharedState.ts';
 import buildClassName from '../../../util/buildClassName';
+import { clamp } from '../../../util/math';
 import { resolveTransitionName } from '../../../util/resolveTransitionName.ts';
 import { REM } from '../../common/helpers/mediaDimensions';
 import renderText from '../../common/helpers/renderText';
@@ -28,18 +29,19 @@ import Icon from '../../common/icons/Icon';
 import SafeLink from '../../common/SafeLink';
 import Button from '../../ui/Button';
 import InfiniteScroll from '../../ui/InfiniteScroll';
-import Modal from '../../ui/Modal';
-import SquareTabList, { type TabWithProperties } from '../../ui/SquareTabList';
+import TabList, { type TabWithProperties } from '../../ui/TabList';
 import Transition from '../../ui/Transition';
 import ParticlesHeader from '../common/ParticlesHeader.tsx';
 import BalanceBlock from './BalanceBlock';
 import DiamondTopupOptionList from './DiamondTopupOptionList';
 import DiamondsSubscriptionItem from './subscription/DiamondsSubscriptionItem';
 import DiamondsTransactionItem from './transaction/DiamondsTransactionItem';
+import Island, { IslandDescription, IslandTitle } from '@gili/layout/Island';
+import Modal, { ModalCloseButton, ModalHeader, ModalHeaderAction, ModalTitle } from '@gili/modal/Modal';
 
 import styles from './DiamondsBalanceModal.module.scss';
 
-const HEADER_HEIGHT = 3.5 * REM;
+const HEADER_STRIP_FADE_DISTANCE = 1.5 * REM;
 const TRANSACTION_TYPES = ['all', 'inbound', 'outbound'] as const;
 const TRANSACTION_TABS_KEYS: RegularLangKey[] = [
   'DiamondsTransactionsAll',
@@ -55,36 +57,29 @@ export type OwnProps = {
 
 type StateProps = {
   diamondsBalanceState?: GlobalState['stars'];
-  tonBalanceState?: GlobalState['ton'];
   canBuyPremium?: boolean;
-  shouldForceHeight?: boolean;
   animationLevel: AnimationLevel;
 };
 
 const DiamondsBalanceModal = ({
-  modal, diamondsBalanceState, tonBalanceState, canBuyPremium, shouldForceHeight,
-  animationLevel,
+  modal, diamondsBalanceState, canBuyPremium, animationLevel,
 }: OwnProps & StateProps) => {
   const {
     closeDiamondsBalanceModal, loadDiamondsTransactions, loadDiamondsSubscriptions,
     openDiamondsGiftingPickerModal, openInvoice,
   } = getActions();
 
-  const currency = modal?.currency || STARS_CURRENCY_CODE;
-  const currentState = currency === TON_CURRENCY_CODE ? tonBalanceState : diamondsBalanceState;
-  const { balance, history } = currentState || {};
-  const { subscriptions } = (currency === STARS_CURRENCY_CODE && diamondsBalanceState) || {};
+  const { balance, history, subscriptions } = diamondsBalanceState || {};
 
   const lang = useLang();
 
-  const [isHeaderHidden, setIsHeaderHidden] = useState(true);
-  const [areTabsPinned, pinTabs, unpinTabs] = useFlag(false);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [areBuyOptionsShown, showBuyOptions, hideBuyOptions] = useFlag();
 
-  const tabsRef = useRef<HTMLDivElement>();
+  const headerRef = useRef<HTMLDivElement>();
+  const historyRef = useRef<HTMLDivElement>();
 
-  const isOpen = Boolean(modal && (diamondsBalanceState || tonBalanceState));
+  const isOpen = Boolean(modal && diamondsBalanceState);
 
   const {
     originDiamondsPayment, originReaction, originGift, topup,
@@ -133,22 +128,9 @@ const DiamondsBalanceModal = ({
     return undefined;
   }, [originReaction, originDiamondsPayment, originGift, topup?.purpose, lang]);
 
-  const shouldShowItems = Boolean(history?.all?.transactions.length && !shouldOpenOnBuy);
+  const hasHistory = Boolean(history?.all?.transactions.length);
+  const shouldShowItems = hasHistory && !shouldOpenOnBuy;
   const shouldSuggestGifting = !shouldOpenOnBuy;
-
-  const modalHeight = useMemo(() => {
-    const transactionCount = history?.all?.transactions.length || 0;
-    if (transactionCount === 1) {
-      return '35.5rem';
-    }
-    if (transactionCount === 2) {
-      return '39.25rem';
-    }
-    if (transactionCount === 3) {
-      return '43rem';
-    }
-    return '45rem';
-  }, [history?.all?.transactions.length]);
 
   const transactionTabs: TabWithProperties[] = useMemo(() => {
     return TRANSACTION_TABS_KEYS.map((key) => ({
@@ -158,10 +140,8 @@ const DiamondsBalanceModal = ({
 
   useEffect(() => {
     if (!isOpen) {
-      setIsHeaderHidden(true);
       setSelectedTabIndex(0);
       hideBuyOptions();
-      unpinTabs();
     }
   }, [isOpen]);
 
@@ -198,12 +178,13 @@ const DiamondsBalanceModal = ({
             ['simple_markdown', 'emoji'],
           )}
           isDisabled={!isOpen}
+          className={styles.particlesHeader}
+          titleClassName={styles.heroTitle}
         />
         {canBuyPremium && !areBuyOptionsShown && (
           <Button
-            className={styles.diamondButton}
             onClick={showBuyOptions}
-            fluid
+            pill
           >
             {lang('DiamondListBuyMoreDiamonds')}
           </Button>
@@ -212,49 +193,60 @@ const DiamondsBalanceModal = ({
           <Button
             isText
             noForcedUpperCase
-            className={styles.diamondButton}
-            fluid
+            className={styles.giftButton}
+            pill
             onClick={openDiamondsGiftingPickerModalHandler}
           >
             {lang('AnsibleDiamondsGift')}
           </Button>
         )}
         {areBuyOptionsShown && diamondsBalanceState?.topupOptions && (
-          <DiamondTopupOptionList
-            diamondsNeeded={diamondsNeeded}
-            options={diamondsBalanceState.topupOptions}
-            onClick={handleBuyDiamonds}
-          />
+          <Island>
+            <DiamondTopupOptionList
+              diamondsNeeded={diamondsNeeded}
+              options={diamondsBalanceState.topupOptions}
+              onClick={handleBuyDiamonds}
+            />
+          </Island>
         )}
+        {areBuyOptionsShown && <IslandDescription>{tosText}</IslandDescription>}
       </>
     );
   };
 
-  /* Ansible: раздел второй валюты (Gram, в девичестве TON) убран вместе с
-     кнопкой «Пополнить через Fragment» — ни валюты, ни стороннего маркета
-     пополнения у нас нет. */
+  const handleScroll = useLastCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const scroller = e.currentTarget;
+    const { scrollTop } = scroller;
+    const heroTitleElement = scroller.querySelector<HTMLElement>(`.${styles.heroTitle}`)!;
+    const headerElement = headerRef.current!;
+    const distance = getCenterY(heroTitleElement) - getCenterY(headerElement);
+    const progress = clamp(scrollTop / (scrollTop + distance), 0, 1);
+    const stripOpacity = clamp(-distance / HEADER_STRIP_FADE_DISTANCE, 0, 1);
+    const isCollapsed = distance <= 0;
 
-  function handleScroll(e: React.UIEvent<HTMLDivElement>) {
-    const { scrollTop } = e.currentTarget;
+    requestMutation(() => {
+      setExtraStyles(heroTitleElement, { '--hero-title-progress': String(progress) });
+      setExtraStyles(headerElement, { '--header-strip-opacity': String(stripOpacity) });
+      toggleExtraClass(heroTitleElement, styles.heroTitleHidden, isCollapsed);
+      toggleExtraClass(headerElement, styles.headerCollapsed, isCollapsed);
+    });
+  });
 
-    setIsHeaderHidden(scrollTop <= 150);
+  const handleSwitchTab = useLastCallback((index: number) => {
+    setSelectedTabIndex(index);
 
-    if (tabsRef.current) {
-      const { top: tabsTop } = tabsRef.current.getBoundingClientRect();
-      const { top: scrollerTop } = e.currentTarget.getBoundingClientRect();
-      const isPinned = tabsTop - scrollerTop <= HEADER_HEIGHT;
-      if (isPinned) {
-        pinTabs();
-      } else {
-        unpinTabs();
-      }
-    }
-  }
+    const historyElement = historyRef.current!;
+    const offset = historyElement.getBoundingClientRect().top - headerRef.current!.getBoundingClientRect().bottom;
+    if (offset >= 0) return;
+
+    requestMutation(() => {
+      historyElement.closest(`.${styles.main}`)!.scrollBy({ top: offset, behavior: 'smooth' });
+    });
+  });
 
   const handleLoadMoreTransactions = useLastCallback(() => {
     loadDiamondsTransactions({
       type: TRANSACTION_TYPES[selectedTabIndex],
-      isTon: currency === TON_CURRENCY_CODE,
     });
   });
 
@@ -297,113 +289,125 @@ const DiamondsBalanceModal = ({
     });
   });
 
+  const handleClose = useLastCallback(() => {
+    closeDiamondsBalanceModal();
+  });
+
+  const header = (
+    <ModalHeader ref={headerRef} className={styles.header} noMask>
+      <ModalCloseButton />
+      <ModalTitle>
+        <span className={styles.headerTitle}>{lang('AnsibleDiamonds')}</span>
+      </ModalTitle>
+      <ModalHeaderAction>
+        <BalanceBlock balance={balance} className={styles.headerBalance} />
+      </ModalHeaderAction>
+    </ModalHeader>
+  );
+
   return (
     <Modal
-      className={buildClassName(styles.root, !shouldForceHeight && !areBuyOptionsShown && styles.minimal)}
       isOpen={isOpen}
-      onClose={closeDiamondsBalanceModal}
-      dialogStyle={`--modal-height: ${modalHeight}`}
-      hasAbsoluteCloseButton
+      header={header}
+      width="slim"
+      height="auto"
+      dialogClassName={styles.dialog}
+      noContentInlinePadding
+      noScrollable
+      onClose={handleClose}
     >
-      <div className={buildClassName(styles.main, 'custom-scroll')} onScroll={handleScroll}>
-        {currency !== TON_CURRENCY_CODE && <BalanceBlock balance={balance} className={styles.modalBalance} />}
-        <div
-          className={buildClassName(
-            styles.header, isHeaderHidden && styles.hiddenHeader, areTabsPinned && styles.noSeparator,
+      <div
+        className={buildClassName(
+          styles.main, 'custom-scroll', (hasHistory || areBuyOptionsShown) && styles.fixedHeight,
+        )}
+        onScroll={handleScroll}
+      >
+        <div className={styles.content}>
+          <div className={styles.intro}>
+            {renderDiamondsHeaderSection()}
+          </div>
+          {shouldShowItems && Boolean(subscriptions?.list.length) && (
+            <div>
+              <IslandTitle>{lang('DiamondMySubscriptions')}</IslandTitle>
+              <Island>
+                {subscriptions?.list.map((subscription) => (
+                  <DiamondsSubscriptionItem
+                    key={subscription.id}
+                    subscription={subscription}
+                  />
+                ))}
+                {subscriptions?.nextOffset && (
+                  <Button
+                    isText
+                    disabled={subscriptions.isLoading}
+                    size="smaller"
+                    noForcedUpperCase
+                    className={styles.loadMore}
+                    onClick={handleLoadMoreSubscriptions}
+                  >
+                    <Icon name="down" className={styles.loadMoreIcon} />
+                    {lang('ShowMore')}
+                  </Button>
+                )}
+              </Island>
+            </div>
           )}
-        >
-          <h2 className={styles.diamondHeaderText}>
-            {lang('AnsibleDiamonds')}
-          </h2>
-        </div>
-        <div className={styles.section}>
-          {renderDiamondsHeaderSection()}
-        </div>
-        {areBuyOptionsShown && (
-          <div className={styles.tos}>
-            {tosText}
-          </div>
-        )}
-        {shouldShowItems && Boolean(subscriptions?.list.length) && (
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>{lang('DiamondMySubscriptions')}</h3>
-            <div className={styles.subscriptions}>
-              {subscriptions?.list.map((subscription) => (
-                <DiamondsSubscriptionItem
-                  key={subscription.id}
-                  subscription={subscription}
-                />
-              ))}
-              {subscriptions?.nextOffset && (
-                <Button
-                  isText
-                  disabled={subscriptions.isLoading}
-                  size="smaller"
-                  noForcedUpperCase
-                  className={styles.loadMore}
-                  onClick={handleLoadMoreSubscriptions}
+          {shouldShowItems && (
+            <div ref={historyRef} className={styles.history}>
+              <TabList
+                className={styles.tabList}
+                fadeMaskClassName={styles.tabs}
+                activeTab={selectedTabIndex}
+                tabs={transactionTabs}
+                stretched
+                withFadeMask
+                onSwitchTab={handleSwitchTab}
+              />
+              <Island className={styles.historyIsland}>
+                <Transition
+                  name={resolveTransitionName('slideOptimized', animationLevel, undefined, lang.isRtl)}
+                  activeKey={selectedTabIndex}
+                  renderCount={TRANSACTION_TABS_KEYS.length}
+                  shouldRestoreHeight
+                  className={styles.transition}
                 >
-                  <Icon name="down" className={styles.loadMoreIcon} />
-                  {lang('ShowMore')}
-                </Button>
-              )}
+                  <InfiniteScroll
+                    onLoadMore={handleLoadMoreTransactions}
+                    items={history?.[TRANSACTION_TYPES[selectedTabIndex]]?.transactions}
+                    scrollContainerClosest={`.${styles.main}`}
+                    itemSelector={`.${TRANSACTION_ITEM_CLASS}`}
+                    className={styles.transactions}
+                    noFastList
+                    noScrollRestore
+                  >
+                    {history?.[TRANSACTION_TYPES[selectedTabIndex]]?.transactions.map((transaction) => (
+                      <DiamondsTransactionItem
+                        key={`${transaction.id}-${transaction.isRefund}`}
+                        transaction={transaction}
+                        className={buildClassName(TRANSACTION_ITEM_CLASS, styles.transactionItem)}
+                      />
+                    ))}
+                  </InfiniteScroll>
+                </Transition>
+              </Island>
             </div>
-          </div>
-        )}
-        {shouldShowItems && (
-          <div className={styles.container}>
-            <div className={styles.lastSection}>
-              <Transition
-                name={resolveTransitionName('slideOptimized', animationLevel, undefined, lang.isRtl)}
-                activeKey={selectedTabIndex}
-                renderCount={TRANSACTION_TABS_KEYS.length}
-                shouldRestoreHeight
-                className={styles.transition}
-              >
-                <InfiniteScroll
-                  onLoadMore={handleLoadMoreTransactions}
-                  items={history?.[TRANSACTION_TYPES[selectedTabIndex]]?.transactions}
-                  scrollContainerClosest={`.${styles.main}`}
-                  itemSelector={`.${TRANSACTION_ITEM_CLASS}`}
-                  className={styles.transactions}
-                  noFastList
-                  noScrollRestoreOnTop
-                >
-                  {history?.[TRANSACTION_TYPES[selectedTabIndex]]?.transactions.map((transaction) => (
-                    <DiamondsTransactionItem
-                      key={`${transaction.id}-${transaction.isRefund}`}
-                      transaction={transaction}
-                      className={TRANSACTION_ITEM_CLASS}
-                    />
-                  ))}
-                </InfiniteScroll>
-              </Transition>
-            </div>
-            <SquareTabList
-              ref={tabsRef}
-              className={buildClassName(styles.tabs, areTabsPinned && styles.pinned)}
-              tabClassName={styles.tab}
-              activeTab={selectedTabIndex}
-              tabs={transactionTabs}
-              onSwitchTab={setSelectedTabIndex}
-            />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </Modal>
   );
 };
 
-export default memo(withGlobal<OwnProps>(
-  (global, { modal }): Complete<StateProps> => {
-    const shouldForceHeight = modal?.currency === TON_CURRENCY_CODE
-      ? Boolean(global.ton?.history?.all?.transactions.length)
-      : Boolean(global.stars?.history?.all?.transactions.length);
+function getCenterY(element: HTMLElement) {
+  const { top, height } = element.getBoundingClientRect();
 
+  return top + height / 2;
+}
+
+export default memo(withGlobal<OwnProps>(
+  (global): Complete<StateProps> => {
     return {
-      shouldForceHeight,
       diamondsBalanceState: global.stars,
-      tonBalanceState: global.ton,
       canBuyPremium: !selectIsPremiumPurchaseBlocked(global),
       animationLevel: selectSharedSettings(global).animationLevel,
     };
