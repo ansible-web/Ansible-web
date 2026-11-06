@@ -355,6 +355,7 @@ const DiamondsTransactionModal = ({
 
   return (
     <TableInfoModal
+      isNativeDialog
       isOpen={Boolean(transaction)}
       className={styles.modal}
       hasBackdrop={transaction?.starGift?.type === 'starGiftUnique'}

@@ -13,8 +13,8 @@ import { filterPeersByQuery } from '../../../global/helpers/peers';
 import { unique } from '../../../util/iteratees';
 import sortChatIds from '../../common/helpers/sortChatIds';
 
+import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 
 import PeerPicker from '../../common/pickers/PeerPicker';
 import PickerModal from '../../common/pickers/PickerModal';
@@ -41,7 +41,7 @@ const DiamondsGiftingPickerModal: FC<OwnProps & StateProps> = ({
 }) => {
   const { closeDiamondsGiftingPickerModal, openDiamondsGiftModal } = getActions();
 
-  const oldLang = useOldLang();
+  const lang = useLang();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -79,21 +79,22 @@ const DiamondsGiftingPickerModal: FC<OwnProps & StateProps> = ({
 
   return (
     <PickerModal
+      isNativeDialog
       className={styles.root}
       isOpen={isOpen}
       onClose={closeDiamondsGiftingPickerModal}
-      title={oldLang('GiftDiamondsTitle')}
+      title={lang('GiftDiamondsTitle')}
       hasCloseButton
       shouldAdaptToSearch
       withFixedHeight
-      confirmButtonText={oldLang('Continue')}
+      confirmButtonText={lang('Continue')}
       onEnter={closeDiamondsGiftingPickerModal}
     >
       <PeerPicker
         className={styles.picker}
         itemIds={displayedUserIds}
         filterValue={searchQuery}
-        filterPlaceholder={oldLang('Search')}
+        filterPlaceholder={lang('Search')}
         onFilterChange={setSearchQuery}
         isSearchable
         withDefaultPadding

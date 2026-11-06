@@ -38,6 +38,7 @@ type OwnProps = {
   withBalanceBar?: boolean;
   currencyInBalanceBar?: 'TON' | 'XTR';
   isLowStackPriority?: true;
+  isNativeDialog?: boolean;
 };
 
 const TableInfoModal = ({
@@ -60,6 +61,7 @@ const TableInfoModal = ({
   onButtonClick,
   withBalanceBar,
   isLowStackPriority,
+  isNativeDialog,
   currencyInBalanceBar,
 }: OwnProps) => {
   const { openChat } = getActions();
@@ -71,6 +73,7 @@ const TableInfoModal = ({
 
   return (
     <Modal
+      isNativeDialog={isNativeDialog}
       isOpen={isOpen}
       hasCloseButton={Boolean(title)}
       hasAbsoluteCloseButton={!title}

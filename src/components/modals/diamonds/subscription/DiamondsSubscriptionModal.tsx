@@ -248,6 +248,7 @@ const DiamondsSubscriptionModal = ({
 
   return (
     <TableInfoModal
+      isNativeDialog
       isOpen={Boolean(subscription)}
       className={styles.modal}
       header={renderingModalData?.header}

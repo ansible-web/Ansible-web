@@ -169,6 +169,7 @@ const DiamondsPaymentModal = ({
 
   return (
     <Modal
+      isNativeDialog
       contentClassName={styles.paymentContent}
       isOpen={isOpen}
       hasAbsoluteCloseButton

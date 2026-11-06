@@ -146,6 +146,7 @@ const DiamondsGiftModal = ({
 
   return (
     <Modal
+      isNativeDialog
       className={buildClassName(styles.modalDialog)}
       contentClassName={styles.content}
       dialogRef={dialogRef}
