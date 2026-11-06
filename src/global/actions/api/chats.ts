@@ -3772,6 +3772,26 @@ async function loadChats(
       if (result.threadReadStatesById) {
         chunkGlobal = updateMainThreadReadStates(chunkGlobal, result.threadReadStatesById);
       }
+    } else {
+      result.threadInfos.forEach((threadInfo) => {
+        const { chatId, threadId, lastMessageId } = threadInfo;
+        if (!threadId) return;
+        if (selectThread(chunkGlobal, chatId, threadId)) return;
+
+        chunkGlobal = updateThreadInfo(chunkGlobal, threadInfo);
+        const readState = threadId === MAIN_THREAD_ID ? result.threadReadStatesById?.[chatId] : undefined;
+        if (!readState) return;
+
+        // Include live messages received after the dialog snapshot
+        const pendingUnreadCount = Object.values(selectChatMessages(chunkGlobal, chatId) || {})
+          .filter((message) => !message.isOutgoing && !isLocalMessageId(message.id)
+            && message.id > (lastMessageId || 0)
+            && message.id > (readState.lastReadInboxMessageId || 0)).length;
+        chunkGlobal = updateThreadReadState(chunkGlobal, chatId, threadId, {
+          ...readState,
+          unreadCount: (readState.unreadCount || 0) + pendingUnreadCount,
+        });
+      });
     }
 
     if (listType === 'active' || listType === 'archived') {
