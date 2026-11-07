@@ -153,7 +153,7 @@ export async function editExportedChatInvite({
     link,
     peer: buildInputPeer(peer.id, peer.accessHash),
     expireDate,
-    usageLimit: !isRequestNeeded ? usageLimit : undefined,
+    usageLimit: isRequestNeeded ? 0 : usageLimit,
     requestNeeded: isRequestNeeded,
     title,
     revoked: isRevoked || undefined,
