@@ -123,7 +123,8 @@ const ManageInvite: FC<OwnProps & StateProps> = ({
 
   const handleSaveClick = useCallback(() => {
     setIsSubmitBlocked(true);
-    const usageLimit = selectedUsageOption === 'custom' ? customUsageLimit : Number(selectedUsageOption);
+    const usageLimit = effectiveIsRequestNeeded ? 0
+      : selectedUsageOption === 'custom' ? customUsageLimit : Number(selectedUsageOption);
     let expireDate;
     switch (selectedExpireOption) {
       case 'custom':

@@ -4,7 +4,7 @@ import type { LangFn } from '../localization';
 
 import { getServerTime } from '../serverTime';
 import withCache from '../withCache';
-import { getDays, getHours, getMinutes } from './units';
+import { DAY, getDays, getHours, getMinutes } from './units';
 
 const WEEKDAYS_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTHS_FULL = [
@@ -98,7 +98,7 @@ export function formatCountdown(
     return 0;
   }
 
-  if (days < 1) {
+  if (secondsLeft < DAY) {
     return formatMediaDuration(secondsLeft);
   }
 

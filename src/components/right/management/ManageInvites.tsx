@@ -138,8 +138,9 @@ const ManageInvites: FC<OwnProps & StateProps> = ({
   }, [closeRevokeDialog, revokeInvite, revokingInvite]);
 
   const handleCreateNewClick = useCallback(() => {
+    setEditingExportedInvite({ chatId, invite: undefined });
     onScreenSelect(ManagementScreens.EditInvite);
-  }, [onScreenSelect]);
+  }, [chatId, onScreenSelect, setEditingExportedInvite]);
 
   const handlePrimaryRevoke = useCallback(() => {
     if (primaryInvite) {
