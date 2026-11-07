@@ -20,7 +20,9 @@ vi.mock('./client', () => ({ invokeRequest, dispatchErrorUpdate: vi.fn() }));
 
 const peer = { id: '-1', type: 'chatTypeBasicGroup', title: 'Fixture' } as ApiChat;
 
-beforeEach(() => { invokeRequest.mockReset(); });
+beforeEach(() => {
+  invokeRequest.mockReset();
+});
 
 describe('invite edit request contract', () => {
   it('clears a stored member cap when approval is enabled', async () => {
