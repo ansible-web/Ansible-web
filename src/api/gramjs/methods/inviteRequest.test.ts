@@ -42,6 +42,8 @@ describe('invite edit request contract', () => {
 
   it('does not invent omitted settings during a title-only edit', async () => {
     await editExportedChatInvite({ peer, link: 'fixture', title: 'Renamed' });
-    expect(invokeRequest.mock.calls[0][0]).toMatchObject({ usageLimit: undefined, requestNeeded: undefined });
+    expect(invokeRequest.mock.calls[0][0]).toMatchObject({
+      usageLimit: undefined, requestNeeded: undefined, expireDate: undefined,
+    });
   });
 });

@@ -64,6 +64,7 @@ const ManageInvite: FC<OwnProps & StateProps> = ({
   const [title, setTitle] = useState('');
   const [customExpireDate, setCustomExpireDate] = useState<number>(() => Date.now() + DEFAULT_CUSTOM_EXPIRE_DATE);
   const [selectedExpireOption, setSelectedExpireOption] = useState('unlimited');
+  const [hasExpireDateChanged, setHasExpireDateChanged] = useState(false);
   const [customUsageLimit, setCustomUsageLimit] = useState<number | undefined>(10);
   const [selectedUsageOption, setSelectedUsageOption] = useState('0');
   const [isSubmitBlocked, setIsSubmitBlocked] = useState(false);
@@ -77,11 +78,12 @@ const ManageInvite: FC<OwnProps & StateProps> = ({
 
   useSyncEffect(([oldEditingInvite]) => {
     if (oldEditingInvite === editingInvite) return;
+    setHasExpireDateChanged(false);
     if (!editingInvite) {
       setTitle('');
       setSelectedExpireOption('unlimited');
       setSelectedUsageOption('0');
-      setCustomExpireDate(getServerTime() * 1000 + DEFAULT_CUSTOM_EXPIRE_DATE);
+      setCustomExpireDate(Date.now() + DEFAULT_CUSTOM_EXPIRE_DATE);
       setCustomUsageLimit(10);
       setIsRequestNeeded(false);
     } else {
@@ -94,9 +96,8 @@ const ManageInvite: FC<OwnProps & StateProps> = ({
         setCustomUsageLimit(usageLimit);
       }
       if (expireDate) {
-        const minSafeDate = getServerTime() + DEFAULT_CUSTOM_EXPIRE_DATE;
         setSelectedExpireOption('custom');
-        setCustomExpireDate(Math.max(expireDate, minSafeDate) * 1000);
+        setCustomExpireDate(Date.now() + (expireDate - getServerTime()) * 1000);
       }
       if (editingIsRequestNeeded) {
         setIsRequestNeeded(true);
@@ -116,7 +117,13 @@ const ManageInvite: FC<OwnProps & StateProps> = ({
     setCustomUsageLimit(Number.parseInt(e.target.value, 10));
   }, []);
 
+  const handleExpireOptionChange = useCallback((value: string) => {
+    setSelectedExpireOption(value);
+    setHasExpireDateChanged(true);
+  }, []);
+
   const handleExpireDateChange = useCallback((date: Date) => {
+    setHasExpireDateChanged(true);
     setCustomExpireDate(date.getTime());
     closeCalendar();
   }, [closeCalendar]);
@@ -126,14 +133,15 @@ const ManageInvite: FC<OwnProps & StateProps> = ({
     const usageLimit = effectiveIsRequestNeeded ? 0
       : selectedUsageOption === 'custom' ? customUsageLimit : Number(selectedUsageOption);
     let expireDate;
-    switch (selectedExpireOption) {
+    const effectiveExpireOption = editingInvite && !hasExpireDateChanged ? undefined : selectedExpireOption;
+    switch (effectiveExpireOption) {
       case 'custom':
         expireDate = getServerTime() + (customExpireDate - Date.now()) / 1000;
         break;
       case 'hour':
       case 'day':
       case 'week':
-        expireDate = getServerTime() + DEFAULT_EXPIRE_DATE[selectedExpireOption] / 1000;
+        expireDate = getServerTime() + DEFAULT_EXPIRE_DATE[effectiveExpireOption] / 1000;
         break;
       case 'unlimited':
         expireDate = 0;
@@ -163,7 +171,8 @@ const ManageInvite: FC<OwnProps & StateProps> = ({
     onScreenSelect(ManagementScreens.Invites);
   }, [
     chatId, customExpireDate, customUsageLimit, editExportedChatInvite, editingInvite,
-    exportChatInvite, effectiveIsRequestNeeded, selectedExpireOption, selectedUsageOption, title, onScreenSelect,
+    exportChatInvite, effectiveIsRequestNeeded, hasExpireDateChanged, selectedExpireOption, selectedUsageOption, title,
+    onScreenSelect,
   ]);
 
   return (
@@ -221,7 +230,7 @@ const ManageInvite: FC<OwnProps & StateProps> = ({
                 label: oldLang('lng_group_invite_expire_custom'),
               },
             ]}
-            onChange={setSelectedExpireOption}
+            onChange={handleExpireOptionChange}
             selected={selectedExpireOption}
           />
           {selectedExpireOption === 'custom' && (
