@@ -36,7 +36,6 @@ import {
   selectCanAnimateInterface, selectCanAnimateRightColumn,
   selectChat,
   selectChatFullInfo,
-  selectCurrentChatThemeValues,
   selectCurrentMessageList,
   selectCurrentMiddleSearch,
   selectIsChatBotNotStarted,
@@ -51,6 +50,7 @@ import {
   selectPinnedIds,
   selectTabState,
   selectTheme,
+  selectThemeValues,
   selectTopic,
   selectTopics,
   selectUserFullInfo,
@@ -719,7 +719,7 @@ export default memo(withGlobal<OwnProps>(
     const theme = selectTheme(global);
     const {
       isBlurred: isBackgroundBlurred, background: customBackground, backgroundColor, patternColor,
-    } = selectCurrentChatThemeValues(global, theme) || {};
+    } = selectThemeValues(global, theme) || {};
 
     const {
       messageLists, isLeftColumnShown, activeEmojiInteractions,

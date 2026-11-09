@@ -249,7 +249,6 @@ export function buildThemeSettingsFromWallpaper(wallpaper: ApiWallpaper): Partia
     thirdBackgroundColor,
     fourthBackgroundColor,
     backgroundRotation: wallpaper.settings?.rotation,
-    isBlurred: wallpaper.settings?.isBlurred,
     isPattern,
     patternColor,
     // The sign is preserved: negative intensity switches `Main` into masked rendering (dark patterns)

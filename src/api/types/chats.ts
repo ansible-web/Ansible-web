@@ -2,7 +2,7 @@ import type { ApiBotCommand } from './bots';
 import type {
   ApiChatReactions, ApiFormattedText, ApiInputDraftReplyInfo, ApiInputSuggestedPostInfo, ApiPhoto, ApiStickerSet,
 } from './messages';
-import type { ApiChatInviteImporter, ApiRestrictionReason, ApiWallpaper } from './misc';
+import type { ApiChatInviteImporter, ApiRestrictionReason } from './misc';
 import type {
   ApiBotVerification,
   ApiEmojiStatusType,
@@ -138,7 +138,6 @@ export interface ApiCommunityLinkedPeer {
 }
 
 export interface ApiChatFullInfo {
-  wallpaper?: ApiWallpaper;
   about?: string;
   ttlPeriod?: number;
   onlineCount?: number;
