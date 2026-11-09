@@ -124,27 +124,33 @@ export function updateNotifyDefaults<T extends GlobalState>(
 }
 
 export function addBlockedUser<T extends GlobalState>(global: T, contactId: string): T {
+  const wasBlocked = global.blocked.ids.includes(contactId)
+    || global.users.fullInfoById[contactId]?.isBlocked;
   global = updateUserBlockedState(global, contactId, true);
+  const ids = [contactId, ...global.blocked.ids.filter((id) => id !== contactId)];
 
   return {
     ...global,
     blocked: {
       ...global.blocked,
-      ids: [contactId, ...global.blocked.ids],
-      totalCount: global.blocked.totalCount + 1,
+      ids,
+      totalCount: Math.max(ids.length, global.blocked.totalCount + (wasBlocked ? 0 : 1)),
     },
   };
 }
 
 export function removeBlockedUser<T extends GlobalState>(global: T, contactId: string): T {
+  const wasBlocked = global.blocked.ids.includes(contactId)
+    || global.users.fullInfoById[contactId]?.isBlocked;
   global = updateUserBlockedState(global, contactId, false);
+  const ids = global.blocked.ids.filter((id) => id !== contactId);
 
   return {
     ...global,
     blocked: {
       ...global.blocked,
-      ids: global.blocked.ids.filter((id) => id !== contactId),
-      totalCount: global.blocked.totalCount - 1,
+      ids,
+      totalCount: Math.max(ids.length, global.blocked.totalCount - (wasBlocked ? 1 : 0)),
     },
   };
 }
