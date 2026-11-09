@@ -19,6 +19,7 @@ import {
   selectCanAnimateInterface,
   selectChatFolder,
   selectChatMessage,
+  selectCurrentChatThemeValues,
   selectCurrentMessageList,
   selectIsCurrentUserFrozen,
   selectIsCurrentUserPremium,
@@ -31,7 +32,6 @@ import {
   selectTabSelectedGiftAuction,
   selectTabState,
   selectTheme,
-  selectThemeValues,
   selectUser,
 } from '../../global/selectors';
 import { selectSharedSettings } from '../../global/selectors/sharedState';
@@ -623,6 +623,7 @@ const Main = ({
 
   return (
     <Wallpaper
+      useCurrentChat
       containerRef={containerRef}
       id="Main"
       className={className}
@@ -736,7 +737,7 @@ export default memo(withGlobal<OwnProps>(
     const deleteFolderDialog = deleteFolderDialogModal ? selectChatFolder(global, deleteFolderDialogModal) : undefined;
     const isAccountFrozen = selectIsCurrentUserFrozen(global);
     const theme = selectTheme(global);
-    const themeValues = selectThemeValues(global, theme);
+    const themeValues = selectCurrentChatThemeValues(global, theme);
 
     return {
       currentUserId,

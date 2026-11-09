@@ -1,11 +1,13 @@
 import { useRef } from '../lib/teact/teact';
 
+import type { ApiWallpaper } from '../api/types';
 import type { IThemeSettings, ThemeKey } from '../types';
 import type { WallpaperStorageSource } from '../util/wallpaperStorage';
 
 import buildClassName from '../util/buildClassName';
 import buildStyle from '../util/buildStyle';
 import { buildWallpaperRenderModel } from '../util/wallpaper';
+import useChatWallpaperMedia from './useChatWallpaperMedia';
 import useCustomBackground from './useCustomBackground';
 import useGradientBackground from './useGradientBackground';
 
@@ -17,6 +19,7 @@ type ChatBackgroundParams = {
   // Previews don't animate: draw the same gradient once on a 2D canvas instead of a live WebGL renderer.
   isStatic?: boolean;
   source?: WallpaperStorageSource;
+  peerWallpaper?: ApiWallpaper;
 };
 
 // Shared chat-background rendering: resolves the active wallpaper (custom image, color, gradient or
@@ -27,11 +30,14 @@ export default function useChatBackground({
   wallpaper,
   isStatic,
   source,
+  peerWallpaper,
 }: ChatBackgroundParams) {
   const selectedModel = buildWallpaperRenderModel(theme, wallpaper);
-  const customBackgroundValue = useCustomBackground(
-    theme, selectedModel.customBackground, selectedModel.isPattern, source,
+  const storedBackgroundValue = useCustomBackground(
+    theme, peerWallpaper ? undefined : selectedModel.customBackground, selectedModel.isPattern, source,
   );
+  const peerBackgroundValue = useChatWallpaperMedia(peerWallpaper);
+  const customBackgroundValue = peerWallpaper ? peerBackgroundValue : storedBackgroundValue;
   const model = source === 'lockScreen' && selectedModel.customBackground && !customBackgroundValue
     ? buildWallpaperRenderModel(theme, {})
     : selectedModel;

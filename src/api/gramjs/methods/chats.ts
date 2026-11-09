@@ -56,6 +56,7 @@ import {
 } from '../apiBuilders/chats';
 import { buildApiPhoto } from '../apiBuilders/common';
 import { buildApiMessage, buildMessageDraft } from '../apiBuilders/messages';
+import { buildApiWallpaper } from '../apiBuilders/misc';
 import {
   buildApiBotVerification,
   buildApiPeerId,
@@ -85,6 +86,7 @@ import {
   getEntityTypeById,
 } from '../gramjsBuilders';
 import {
+  addDocumentToLocalDb,
   addPhotoToLocalDb,
 } from '../helpers/localDb';
 import {
@@ -751,6 +753,7 @@ async function getFullChannelInfo(
     storiesPinnedAvailable,
     viewForumAsMessages,
     emojiset,
+    wallpaper,
     boostsApplied,
     boostsUnrestrict,
     botVerification,
@@ -767,6 +770,10 @@ async function getFullChannelInfo(
 
   if (chatPhoto) {
     addPhotoToLocalDb(chatPhoto);
+  }
+
+  if (wallpaper instanceof GramJs.WallPaper) {
+    addDocumentToLocalDb(wallpaper.document);
   }
 
   const inviteLink = exportedInvite instanceof GramJs.ChatInviteExported
@@ -852,6 +859,7 @@ async function getFullChannelInfo(
       statisticsDcId: statsDc,
       stickerSet: stickerset ? buildStickerSet(stickerset) : undefined,
       emojiSet: emojiset ? buildStickerSet(emojiset) : undefined,
+      wallpaper: wallpaper ? buildApiWallpaper(wallpaper) : undefined,
       areParticipantsHidden: participantsHidden,
       isTranslationDisabled: translationsDisabled,
       hasPinnedStories: Boolean(storiesPinnedAvailable),

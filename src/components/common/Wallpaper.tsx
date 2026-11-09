@@ -1,9 +1,13 @@
 import type { ElementRef, TeactNode } from '../../lib/teact/teact';
 import { withGlobal } from '../../global';
 
+import type { ApiWallpaper } from '../../api/types';
 import type { IThemeSettings, ThemeKey } from '../../types';
 
-import { selectPerformanceSettingsValue, selectTheme, selectThemeValues } from '../../global/selectors';
+import {
+  selectCurrentChatThemeValues, selectCurrentChatWallpaper, selectPerformanceSettingsValue,
+  selectTheme, selectThemeValues,
+} from '../../global/selectors';
 import buildClassName from '../../util/buildClassName';
 import buildStyle from '../../util/buildStyle';
 
@@ -24,6 +28,7 @@ type OwnProps = {
   // Previews don't animate: draw the same gradient once on a 2D canvas instead of a live WebGL renderer.
   isStatic?: boolean;
   backgroundMode?: 'default' | 'lockScreen';
+  useCurrentChat?: boolean;
   onClick?: NoneToVoidFunction;
 };
 
@@ -31,6 +36,7 @@ type StateProps = {
   theme: ThemeKey;
   canAnimateGradient?: boolean;
   themeSettings?: IThemeSettings;
+  peerWallpaper?: ApiWallpaper;
 };
 
 const EMPTY_THEME_SETTINGS: IThemeSettings = {};
@@ -52,6 +58,7 @@ const Wallpaper = ({
   theme,
   canAnimateGradient,
   themeSettings,
+  peerWallpaper,
 }: OwnProps & StateProps) => {
   // With the send animation disabled the gradient never moves, so the 2D render is identical
   // and no WebGL context is spent
@@ -62,6 +69,7 @@ const Wallpaper = ({
     wallpaper: themeSettings || EMPTY_THEME_SETTINGS,
     isStatic: isStaticGradient,
     source: backgroundMode === 'lockScreen' ? 'lockScreen' : undefined,
+    peerWallpaper,
   });
 
   return (
@@ -91,13 +99,15 @@ const Wallpaper = ({
 
 // No `memo`: `children` change on nearly every parent render, so memoization would never apply
 export default withGlobal<OwnProps>(
-  (global, { backgroundMode }): Complete<StateProps> => {
+  (global, { backgroundMode, useCurrentChat }): Complete<StateProps> => {
     const theme = selectTheme(global);
 
     return {
       theme,
       canAnimateGradient: selectPerformanceSettingsValue(global, 'messageSendingAnimations'),
-      themeSettings: backgroundMode === 'default' ? EMPTY_THEME_SETTINGS : selectThemeValues(global, theme),
+      themeSettings: backgroundMode === 'default' ? EMPTY_THEME_SETTINGS
+        : useCurrentChat ? selectCurrentChatThemeValues(global, theme) : selectThemeValues(global, theme),
+      peerWallpaper: useCurrentChat ? selectCurrentChatWallpaper(global) : undefined,
     };
   },
 )(Wallpaper);

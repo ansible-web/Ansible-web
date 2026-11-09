@@ -6,16 +6,18 @@ import { NewChatMembersProgress, RightColumnContent } from '../../types';
 import { IS_SNAP_EFFECT_SUPPORTED } from '../../util/browser/windowEnvironment';
 import { getCurrentTabId } from '../../util/establishMultitabRole';
 import memoized from '../../util/memoized';
-import { getActionMessageBg } from '../../util/wallpaper';
+import { buildThemeSettingsFromWallpaper, getActionMessageBg } from '../../util/wallpaper';
 import { selectTabBrowserState } from '../helpers/browser';
 import { getMessageVideo, getWebPageVideo } from '../helpers/messageMedia';
+import { selectChatFullInfo } from './chats';
 import { selectCurrentManagement } from './management';
-import { selectWebPageFromMessage } from './messages';
+import { selectCurrentMessageList, selectWebPageFromMessage } from './messages';
 import { selectSharedSettings } from './sharedState';
 import { selectIsStatisticsShown } from './statistics';
 import { selectTabState } from './tabs';
 
 const getActionMessageBgMemo = memoized(getActionMessageBg);
+const buildChatWallpaperSettings = memoized(buildThemeSettingsFromWallpaper);
 
 export function selectIsMediaViewerOpen<T extends GlobalState>(
   global: T,
@@ -84,7 +86,17 @@ export function selectThemeValues<T extends GlobalState>(global: T, themeKey: Th
 
 export function selectActionMessageBg<T extends GlobalState>(global: T) {
   const theme = selectTheme(global);
-  return getActionMessageBgMemo(theme, selectThemeValues(global, theme));
+  return getActionMessageBgMemo(theme, selectCurrentChatThemeValues(global, theme));
+}
+
+export function selectCurrentChatWallpaper(global: GlobalState) {
+  const { chatId } = selectCurrentMessageList(global) || {};
+  return chatId ? selectChatFullInfo(global, chatId)?.wallpaper : undefined;
+}
+
+export function selectCurrentChatThemeValues<T extends GlobalState>(global: T, theme: ThemeKey) {
+  const wallpaper = selectCurrentChatWallpaper(global);
+  return wallpaper ? buildChatWallpaperSettings(wallpaper) : selectThemeValues(global, theme);
 }
 
 export function selectIsForumPanelOpen<T extends GlobalState>(
