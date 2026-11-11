@@ -11,11 +11,8 @@ export default defineConfig((configEnv) => mergeConfig(
     },
     test: {
       environment: 'jsdom',
-      exclude: [
-        ...configDefaults.exclude,
-        'tests/playwright/**',
-      ],
-      setupFiles: ['./tests/init.ts'],
+      // Agent worktrees under `.claude/` hold stale copies of the tests
+      exclude: [...configDefaults.exclude, '.claude/**'],
     },
   },
 ));

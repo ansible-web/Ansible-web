@@ -12,6 +12,7 @@ import type {
   ApiUrlAuthResult,
   ApiUser,
 } from '../../types';
+import type { InlineBotRepairInfo } from '../localDb';
 
 import { WEB_APP_PLATFORM } from '../../../config';
 import { buildCollectionByKey } from '../../../util/iteratees';
@@ -38,12 +39,16 @@ import {
 } from '../gramjsBuilders';
 import {
   addDocumentToLocalDb,
+  addInlineBotRepairInfo,
   addPhotoToLocalDb,
+  addUserToLocalDb,
   addWebDocumentToLocalDb,
 } from '../helpers/localDb';
-import { deserializeBytes } from '../helpers/misc';
+import { checkErrorType, deserializeBytes, wrapError } from '../helpers/misc';
 import { sendApiUpdate } from '../updates/apiUpdateEmitter';
 import { invokeRequest } from './client';
+
+const BOT_USERNAME_ERRORS = new Set(['USERNAME_OCCUPIED', 'USERNAME_INVALID', 'USERNAME_SUFFIX_MISSING']);
 
 export async function answerCallbackButton({
   chatId, accessHash, messageId, data, isGame,
@@ -96,7 +101,13 @@ export async function fetchInlineBotResults({
     nextOffset: getInlineBotResultsNextOffset(bot.usernames![0].username, result.nextOffset),
     switchPm: buildBotSwitchPm(result.switchPm),
     switchWebview: buildBotSwitchWebview(result.switchWebview),
-    results: processInlineBotResult(String(result.queryId), result.results),
+    results: processInlineBotResult(String(result.queryId), result.results, {
+      type: 'inlineBot',
+      botId: bot.id,
+      peerId: chat.id,
+      query,
+      offset,
+    }),
     cacheTime: result.cacheTime,
   };
 }
@@ -143,6 +154,26 @@ export async function startBot({
     peer: buildInputPeer(peer.id, peer.accessHash),
     randomId,
     startParam: startParam ?? DEFAULT_PRIMITIVES.STRING,
+  }), {
+    shouldReturnTrue: true,
+  });
+}
+
+export function sendBotRequestedPeer({
+  chat, messageId, buttonId, requestedPeers,
+}: {
+  chat: ApiChat;
+  messageId: number;
+  buttonId: number;
+  requestedPeers: ApiPeer[];
+}) {
+  return invokeRequest(new GramJs.messages.SendBotRequestedPeer({
+    peer: buildInputPeer(chat.id, chat.accessHash),
+    msgId: messageId,
+    buttonId,
+    requestedPeers: requestedPeers.map((requestedPeer) => (
+      buildInputPeer(requestedPeer.id, requestedPeer.accessHash)
+    )),
   }), {
     shouldReturnTrue: true,
   });
@@ -594,11 +625,13 @@ export function toggleUserEmojiStatusPermission({ bot, isEnabled }: { bot: ApiUs
   });
 }
 
-function processInlineBotResult(queryId: string, results: GramJs.TypeBotInlineResult[]) {
+function processInlineBotResult(
+  queryId: string, results: GramJs.TypeBotInlineResult[], repairInfo: InlineBotRepairInfo,
+) {
   return results.map((result) => {
     if (result instanceof GramJs.BotInlineMediaResult) {
       if (result.document instanceof GramJs.Document) {
-        addDocumentToLocalDb(result.document);
+        addDocumentToLocalDb(addInlineBotRepairInfo(result.document, repairInfo));
       }
 
       if (result.photo instanceof GramJs.Photo) {
@@ -684,6 +717,51 @@ export async function fetchBotsRecommendations({ user }: { user: ApiChat }) {
     similarBots,
     count: result instanceof GramJs.users.UsersSlice ? result.count : similarBots.length,
   };
+}
+
+export async function checkBotUsername({ username }: { username: string }) {
+  try {
+    const result = await invokeRequest(new GramJs.bots.CheckUsername({ username }), {
+      shouldThrow: true,
+    });
+
+    return { result, error: undefined };
+  } catch (err: unknown) {
+    if (err instanceof RPCError && BOT_USERNAME_ERRORS.has(err.errorMessage)) {
+      return { result: false, error: err.errorMessage };
+    }
+
+    throw err;
+  }
+}
+
+export async function createBot({
+  manager, name, username, isViaDeepLink,
+}: {
+  manager: ApiUser;
+  name: string;
+  username: string;
+  isViaDeepLink?: true;
+}) {
+  try {
+    const result = await invokeRequest(new GramJs.bots.CreateBot({
+      managerId: buildInputUser(manager.id, manager.accessHash),
+      name,
+      username,
+      viaDeeplink: isViaDeepLink,
+    }), {
+      shouldThrow: true,
+    });
+
+    if (!(result instanceof GramJs.User)) return undefined;
+
+    addUserToLocalDb(result);
+
+    return buildApiUser(result);
+  } catch (err) {
+    if (!checkErrorType(err)) return undefined;
+    return wrapError(err);
+  }
 }
 
 async function invokeUrlAuthRequest(

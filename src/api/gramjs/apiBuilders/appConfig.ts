@@ -29,7 +29,8 @@ type Limit =
   | 'recommended_channels_limit'
   | 'saved_dialogs_pinned_limit'
   | 'reactions_user_max'
-  | 'aicompose_tone_saved_limit';
+  | 'aicompose_tone_saved_limit'
+  | 'bots_create_limit';
 type LimitKey = `${Limit}_${LimitType}`;
 type LimitsConfig = Record<LimitKey, number>;
 
@@ -130,6 +131,7 @@ export interface GramJsAppConfig extends LimitsConfig {
   ignore_restriction_reasons?: string[];
   need_age_video_verification?: boolean;
   verify_age_bot_username?: string;
+  music_search_username?: string;
   verify_age_country?: string;
   verify_age_min?: number;
   message_typing_draft_ttl?: number;
@@ -146,6 +148,7 @@ export interface GramJsAppConfig extends LimitsConfig {
   aicompose_tone_examples_num?: number;
   aicompose_tone_title_length_max?: number;
   aicompose_tone_prompt_length_max?: number;
+  bot_allowed_suffixes?: string[];
 }
 
 function buildEmojiSounds(appConfig: GramJsAppConfig) {
@@ -181,6 +184,11 @@ function getLimit(appConfig: GramJsAppConfig, key: Limit, fallbackKey: ApiLimitT
   const defaultLimit = appConfig[`${key}_default`] || DEFAULT_LIMITS[fallbackKey][0];
   const premiumLimit = appConfig[`${key}_premium`] || DEFAULT_LIMITS[fallbackKey][1];
   return [defaultLimit, premiumLimit] as const;
+}
+
+// The config is JSON, so nanotons arrive as doubles and only whole values are taken
+function buildNanotons(value?: number) {
+  return value !== undefined && Number.isInteger(value) ? BigInt(value) : undefined;
 }
 
 export function buildAppConfig(json: GramJs.TypeJSONValue, hash: number): ApiAppConfig {
@@ -229,6 +237,7 @@ export function buildAppConfig(json: GramJs.TypeJSONValue, hash: number): ApiApp
       maxReactions: getLimit(appConfig, 'reactions_user_max', 'maxReactions'),
       moreAccounts: DEFAULT_LIMITS.moreAccounts,
       aiComposeToneSaved: getLimit(appConfig, 'aicompose_tone_saved_limit', 'aiComposeToneSaved'),
+      botsCreate: getLimit(appConfig, 'bots_create_limit', 'botsCreate'),
     },
     richMessageLengthLimit: appConfig.rich_message_length_limit ?? DEFAULT_APP_CONFIG.richMessageLengthLimit,
     richMessageMaxBlocks: appConfig.rich_message_max_blocks ?? DEFAULT_APP_CONFIG.richMessageMaxBlocks,
@@ -268,8 +277,8 @@ export function buildAppConfig(json: GramJs.TypeJSONValue, hash: number): ApiApp
     diamondsStargiftResaleAmountMax: appConfig.stars_stargift_resale_amount_max,
     diamondsStargiftResaleCommissionPermille: appConfig.stars_stargift_resale_commission_permille,
     stargiftsCraftAttributePermilles: appConfig.stargifts_craft_attribute_permilles,
-    tonStargiftResaleAmountMin: appConfig.ton_stargift_resale_amount_min,
-    tonStargiftResaleAmountMax: appConfig.ton_stargift_resale_amount_max,
+    tonStargiftResaleAmountMin: buildNanotons(appConfig.ton_stargift_resale_amount_min),
+    tonStargiftResaleAmountMax: buildNanotons(appConfig.ton_stargift_resale_amount_max),
     tonStargiftResaleCommissionPermille: appConfig.ton_stargift_resale_commission_permille,
     diamondsSuggestedPostAmountMax: appConfig.stars_suggested_post_amount_max,
     diamondsSuggestedPostAmountMin: appConfig.stars_suggested_post_amount_min,
@@ -279,8 +288,8 @@ export function buildAppConfig(json: GramJs.TypeJSONValue, hash: number): ApiApp
     diamondsSuggestedPostFutureMin: appConfig.stars_suggested_post_future_min,
     noForwardsRequestExpirePeriod: appConfig.no_forwards_request_expire_period,
     tonSuggestedPostCommissionPermille: appConfig.ton_suggested_post_commission_permille,
-    tonSuggestedPostAmountMax: appConfig.ton_suggested_post_amount_max,
-    tonSuggestedPostAmountMin: appConfig.ton_suggested_post_amount_min,
+    tonSuggestedPostAmountMax: buildNanotons(appConfig.ton_suggested_post_amount_max),
+    tonSuggestedPostAmountMin: buildNanotons(appConfig.ton_suggested_post_amount_min),
     tonUsdRate: appConfig.ton_usd_rate,
     tonTopupUrl: appConfig.ton_topup_url,
     pollMaxAnswers: appConfig.poll_answers_max,
@@ -293,6 +302,7 @@ export function buildAppConfig(json: GramJs.TypeJSONValue, hash: number): ApiApp
     ignoreRestrictionReasons: appConfig.ignore_restriction_reasons,
     needAgeVideoVerification: appConfig.need_age_video_verification,
     verifyAgeBotUsername: appConfig.verify_age_bot_username,
+    musicSearchUsername: appConfig.music_search_username,
     verifyAgeCountry: appConfig.verify_age_country,
     verifyAgeMin: appConfig.verify_age_min,
     typingDraftTtl: appConfig.message_typing_draft_ttl,
@@ -305,6 +315,7 @@ export function buildAppConfig(json: GramJs.TypeJSONValue, hash: number): ApiApp
     aiComposeToneExamplesNum: appConfig.aicompose_tone_examples_num,
     aiComposeToneTitleLengthMax: appConfig.aicompose_tone_title_length_max,
     aiComposeTonePromptLengthMax: appConfig.aicompose_tone_prompt_length_max,
+    botAllowedSuffixes: appConfig.bot_allowed_suffixes,
   };
 
   return {

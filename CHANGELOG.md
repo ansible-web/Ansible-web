@@ -10,6 +10,22 @@ Authors.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.2] - Unreleased
+
+### Changed
+- Update the complete client base to Telegram Web A 12.0.48 (API layer 232).
+- Preserve Ansible branding, blue Diamonds, rich messages, Bot Manager, custom
+  links, calls and existing account/session behavior.
+- Keep the existing Diamonds balance and gift picker design while importing
+  upstream navigation, localization, media and message improvements.
+- Update build dependencies and regenerate protocol, localization and icon assets.
+
+### Fixed
+- Keep the existing cache migrations and apply the upstream amount migration
+  as version 10, after the Ansible migrations at versions 8 and 9.
+- Restore mock browser startup and align its connection and response contracts
+  with the updated client for local interface checks.
+
 ## [0.3.6] - 2026-11-07
 
 ### Changed

@@ -6,8 +6,8 @@ import type { PrivacyVisibility } from '../../../api/types';
 import { selectIsCurrentUserPremium, selectShouldHideReadMarks } from '../../../global/selectors';
 import renderText from '../../common/helpers/renderText';
 
+import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 
 import DiamondIcon from '../../common/icons/DiamondIcon';
 import Island, { IslandDescription } from '../../gili/layout/Island';
@@ -27,7 +27,7 @@ const SettingsPrivacyLastSeen = ({
   isCurrentUserPremium, shouldHideReadMarks, visibility,
 }: OwnProps & StateProps) => {
   const { updateGlobalPrivacySettings, openPremiumModal } = getActions();
-  const lang = useOldLang();
+  const lang = useLang();
   const canShowHideReadTime = visibility === 'nobody' || visibility === 'contacts';
 
   const handleChangeShouldHideReadMarks = useLastCallback(

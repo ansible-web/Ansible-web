@@ -28,7 +28,6 @@ import useFlag from '../../../hooks/useFlag';
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
 import useMouseInside from '../../../hooks/useMouseInside';
-import useOldLang from '../../../hooks/useOldLang';
 
 import Icon from '../../common/icons/Icon';
 import Menu from '../../ui/Menu';
@@ -107,6 +106,7 @@ const AttachMenu = ({
 }: OwnProps) => {
   const {
     openPollModal,
+    openMusicPicker,
     updateAttachmentSettings,
   } = getActions();
   const [isAttachMenuOpen, openAttachMenu, closeAttachMenu] = useFlag();
@@ -183,6 +183,7 @@ const AttachMenu = ({
     return attachBots
       ? Object.values(attachBots).filter((bot) => {
         if (!peerType || !bot.isForAttachMenu) return false;
+
         if (peerType === 'bots' && bot.id === chatId
           && bot.attachMenuPeerTypes && bot.attachMenuPeerTypes.includes('self')) {
           return true;
@@ -192,12 +193,18 @@ const AttachMenu = ({
       : undefined;
   }, [attachBots, chatId, peerType]);
 
-  const oldLang = useOldLang();
   const lang = useLang();
 
   const handleDateMenuClick = useLastCallback(() => {
     closeAttachMenu();
     openDateModal();
+  });
+
+  const handleMusicSelect = useLastCallback(() => {
+    closeAttachMenu();
+    openMusicPicker({
+      chatId, threadId, messageListType, shouldInsertToRichInput: isRichInputExpanded,
+    });
   });
 
   const handlePollCreate = useLastCallback(() => {
@@ -221,7 +228,7 @@ const AttachMenu = ({
                 round
                 color="translucent"
                 onActivate={handleToggleAttachMenu}
-                ariaLabel="Replace an attachment"
+                ariaLabel={lang('AriaReplaceAttachment')}
                 ariaControls="replace-menu-controls"
                 hasPopup
               >
@@ -235,7 +242,7 @@ const AttachMenu = ({
                 round
                 color="translucent"
                 onActivate={handleToggleAttachMenu}
-                ariaLabel="Add an attachment"
+                ariaLabel={lang('AriaAddAttachment')}
                 ariaControls="attach-menu-controls"
                 hasPopup
               >
@@ -272,19 +279,22 @@ const AttachMenu = ({
               <>
                 {canSendVideoOrPhoto && !isFile && (
                   <MenuItem icon="media" onClick={handleQuickSelect}>
-                    {oldLang(canSendVideoAndPhoto ? 'AttachmentMenu.PhotoOrVideo'
-                      : (canSendPhotos ? 'InputAttach.Popover.Photo' : 'InputAttach.Popover.Video'))}
+                    {lang(canSendVideoAndPhoto ? 'AttachmentMenuPhotoOrVideo'
+                      : (canSendPhotos ? 'AttachPhoto' : 'AttachVideo'))}
                   </MenuItem>
                 )}
                 {((canSendDocuments || canSendAudios) && !isPhotoOrVideo)
                   && (
                     <MenuItem icon="document" onClick={handleDocumentSelect}>
-                      {oldLang(!canSendDocuments && canSendAudios ? 'InputAttach.Popover.Music' : 'AttachDocument')}
+                      {lang(!canSendDocuments && canSendAudios ? 'InputAttachPopoverMusic' : 'AttachDocument')}
                     </MenuItem>
                   )}
+                {canSendAudios && !editingMessage && (
+                  <MenuItem icon="music" onClick={handleMusicSelect}>{lang('AttachMusic')}</MenuItem>
+                )}
                 {canSendDocuments && shouldCollectDebugLogs && (
                   <MenuItem icon="bug" onClick={handleSendLogs}>
-                    {oldLang('DebugSendLogs')}
+                    {lang('DebugSendLogs')}
                   </MenuItem>
                 )}
               </>

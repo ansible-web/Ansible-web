@@ -3,6 +3,7 @@ import { memo, useRef } from '@teact';
 import { requestMutation } from '../../../lib/fasterdom/fasterdom.ts';
 import buildClassName from '../../../util/buildClassName.ts';
 
+import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback.ts';
 
 import styles from './SwayingDiamond.module.scss';
@@ -22,6 +23,8 @@ function SwayingDiamond({
   centerShift,
   onMouseMove,
 }: OwnProps) {
+  const lang = useLang();
+
   const diamondRef = useRef<HTMLDivElement>();
 
   const handleMouseMove = useLastCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -58,7 +61,7 @@ function SwayingDiamond({
         ref={diamondRef}
         className={buildClassName(styles.diamond, styles[`star_${color}`])}
         role="img"
-        aria-label="Ansible Diamonds"
+        aria-label={lang('AnsibleDiamonds')}
       />
     </div>
   );

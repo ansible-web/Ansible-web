@@ -119,7 +119,7 @@ export const INITIAL_SHARED_STATE: SharedState = {
 };
 
 export const INITIAL_GLOBAL_STATE: GlobalState = {
-  cacheVersion: 9,
+  cacheVersion: 10,
   isInited: true,
   attachMenu: { bots: {} },
   passcode: {},
@@ -288,6 +288,10 @@ export const INITIAL_GLOBAL_STATE: GlobalState = {
 
   gifs: {
     saved: {},
+  },
+
+  musicSearch: {
+    audiosById: {},
   },
 
   topPeerCategories: {},

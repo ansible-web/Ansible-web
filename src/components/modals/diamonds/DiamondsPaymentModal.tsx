@@ -79,7 +79,7 @@ const DiamondsPaymentModal = ({
       return '';
     }
 
-    const botName = getUserFullName(bot);
+    const botName = getUserFullName(lang, bot);
     const diamondsText = lang('StarsAmountText', { amount }, { pluralValue: amount! });
 
     if (paidMediaMessage) {

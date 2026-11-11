@@ -4,6 +4,13 @@ import {
 } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
+import type {
+  ApiKeyboardButton,
+  ApiMessage,
+  ApiPeer,
+  KeyboardButtonGiftOffer,
+  KeyboardButtonNoForwardsRequest,
+} from '../../../api/types';
 import type { ApiMessageAction } from '../../../api/types/messageActions';
 import type {
   FocusDirection,
@@ -11,14 +18,7 @@ import type {
   ThreadId,
 } from '../../../types';
 import type { Signal } from '../../../util/signals';
-import {
-  type ApiKeyboardButton,
-  type ApiMessage,
-  type ApiPeer,
-  type KeyboardButtonGiftOffer,
-  type KeyboardButtonNoForwardsRequest,
-  MAIN_THREAD_ID,
-} from '../../../api/types';
+import { MAIN_THREAD_ID } from '../../../api/types';
 import { MediaViewerOrigin } from '../../../types';
 
 import { MESSAGE_APPEARANCE_DELAY } from '../../../config';

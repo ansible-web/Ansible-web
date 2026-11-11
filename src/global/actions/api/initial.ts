@@ -2,8 +2,8 @@ import type { ActionReturnType } from '../../types';
 import { ManagementProgress } from '../../../types';
 
 import {
+  IS_MOCKED_CLIENT,
   IS_SCREEN_LOCKED_CACHE_KEY,
-  LANG_CACHE_NAME,
   MEDIA_CACHE_NAME,
   MEDIA_CACHE_NAME_AVATARS,
   MEDIA_PROGRESSIVE_CACHE_NAME,
@@ -17,13 +17,12 @@ import {
 } from '../../../util/browser/windowEnvironment';
 import * as cacheApi from '../../../util/cacheApi';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
+import { Bundles, loadModule } from '../../../util/moduleLoader';
 import {
   ACCOUNT_SLOT, getAccountsInfo, getAccountSlotUrl, getFirstLoggedInAccountSlot,
 } from '../../../util/multiaccount';
 import { unsubscribe } from '../../../util/notifications';
-import {
-  clearPasscodeStore, removeGlobalsVaultForSlot, requestPasscodeStateLock,
-} from '../../../util/passcode';
+import { clearPasscodeStore, removeGlobalsVaultForSlot, requestPasscodeStateLock } from '../../../util/passcode';
 import { broadcastPasscodeReset } from '../../../util/passcode/channel';
 import {
   consumeInvalidWebLogin, getPendingWebLogin, parseInitialLocationHash, resetInitialLocationHash, resetLocationHash,
@@ -66,6 +65,8 @@ addActionHandler('initApi', async (global, actions): Promise<void> => {
   isInitializingApi = true;
   try {
     if (global.passcode.isScreenLocked || checkSessionLocked()) return;
+    // Mock authentication completes immediately, before the main bundle can register sync handlers.
+    if (IS_MOCKED_CLIENT) await loadModule(Bundles.Main);
     if (!await webLoginHandoffPromise) rejectWebLogin();
     if (consumeInvalidWebLogin()) rejectWebLogin(true);
     interruptWebLogin();
@@ -78,7 +79,6 @@ addActionHandler('initApi', async (global, actions): Promise<void> => {
     // Clearing the token marks it as dispatched so `interruptWebLogin()` rejects interrupted logins and prevents replay
     if (token) request!.token = undefined;
 
-    const initialLocationHash = parseInitialLocationHash();
     const {
       shouldAllowHttpTransport,
       shouldForceHttpTransport,
@@ -105,7 +105,7 @@ addActionHandler('initApi', async (global, actions): Promise<void> => {
       webAuthToken: token,
       webAuthUserId: token ? request!.userId : undefined,
       dcId: token ? request!.dcId : undefined,
-      mockScenario: initialLocationHash?.mockScenario,
+      mockScenario: parseInitialLocationHash()?.mockScenario,
       shouldAllowHttpTransport,
       shouldForceHttpTransport,
       shouldDebugExportedSenders,
@@ -285,12 +285,6 @@ addActionHandler('reset', async (global, actions): Promise<void> => {
     await clearPasscodeStore();
     localStorage.removeItem(IS_SCREEN_LOCKED_CACHE_KEY);
     await clearWallpaperBlobs();
-  }
-
-  const langCachePrefix = LANG_CACHE_NAME.replace(/\d+$/, '');
-  const langCacheVersion = Number((LANG_CACHE_NAME.match(/\d+$/) || ['0'])[0]);
-  for (let i = 0; i < langCacheVersion; i++) {
-    void cacheApi.clear(`${langCachePrefix}${i === 0 ? '' : i}`);
   }
 
   updateAppBadge(0);

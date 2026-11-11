@@ -5,15 +5,15 @@ import { getActions, withGlobal } from '../../../../global';
 
 import type { TabState } from '../../../../global/types';
 
+import { TON_CURRENCY_CODE } from '../../../../config';
+import { buildStarsAmount } from '../../../../global/helpers/payments';
+import { selectDiamondsGiftResaleCommission } from '../../../../global/selectors';
 import {
-  selectDiamondsGiftResaleCommission,
-  selectTonGiftResaleCommission,
-} from '../../../../global/selectors';
-import {
-  convertTonFromNanos, convertTonToNanos, convertTonToUsd, formatCurrencyAsString,
+  convertTonToUsd, formatCurrencyAsString, formatTonFromNanos, parseTonPrefixToNanos,
 } from '../../../../util/formatCurrency';
 import { formatDiamondsAsIcon, formatDiamondsAsText, formatTonAsIcon,
   formatTonAsText } from '../../../../util/localization/format';
+import { multiplyBigIntByPermille } from '../../../../util/numbers';
 
 import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
 import useLang from '../../../../hooks/useLang';
@@ -34,16 +34,16 @@ export type StateProps = {
   diamondsResaleAmountMin: number;
   diamondsResaleAmountMax?: number;
   diamondsUsdWithdrawRate?: number;
-  tonCommission?: number;
-  tonResaleAmountMin: number;
-  tonResaleAmountMax?: number;
+  tonCommissionPermille?: number;
+  tonResaleAmountMin: bigint;
+  tonResaleAmountMax?: bigint;
   tonUsdRate?: number;
 };
 
 const GiftResalePriceComposerModal = ({
   modal, diamondsCommission,
   diamondsResaleAmountMin, diamondsResaleAmountMax, diamondsUsdWithdrawRate,
-  tonCommission, tonResaleAmountMin, tonResaleAmountMax, tonUsdRate,
+  tonCommissionPermille, tonResaleAmountMin, tonResaleAmountMax, tonUsdRate,
 }: OwnProps & StateProps) => {
   const {
     closeGiftResalePriceComposerModal,
@@ -52,27 +52,32 @@ const GiftResalePriceComposerModal = ({
     showNotification,
   } = getActions();
   const isOpen = Boolean(modal);
-  const [price, setPrice] = useState<number | undefined>(undefined);
-  // own-TON: у нас только кристаллы (XTR), поэтому валюта зафиксирована. Тумблер
-  // «Принимать только TON» убран (см. маркер ниже). Если появится свой TON —
-  // вернуть setIsPriceInTon и Checkbox, и вся ветвистость по isPriceInTon оживёт.
+  const [priceText, setPriceText] = useState('');
   const [isPriceInTon] = useState(false);
 
   const renderingModal = useCurrentOrPrev(modal);
   const { gift: typeGift } = renderingModal || {};
   const isSavedGift = typeGift && 'gift' in typeGift;
   const savedGift = isSavedGift ? typeGift : undefined;
-  const hasPrice = Boolean(price);
+  const tonPrice = parseTonPrefixToNanos(priceText);
+  const starsPrice = Number(priceText) || 0;
+  const hasPrice = isPriceInTon ? tonPrice > 0n : starsPrice > 0;
 
   const lang = useLang();
 
   const handleChangePrice = useLastCallback((e) => {
-    const value = e.target.value;
+    const value: string = e.target.value;
+
+    if (isPriceInTon) {
+      const isAboveMax = tonResaleAmountMax !== undefined && parseTonPrefixToNanos(value) > tonResaleAmountMax;
+      setPriceText(isAboveMax ? formatTonFromNanos(tonResaleAmountMax) : value);
+      return;
+    }
+
     const number = parseFloat(value);
-    const maxAmount = isPriceInTon ? tonResaleAmountMax : diamondsResaleAmountMax;
     const result = value === '' || Number.isNaN(number) ? undefined
-      : maxAmount ? Math.min(number, maxAmount) : number;
-    setPrice(result);
+      : diamondsResaleAmountMax ? Math.min(number, diamondsResaleAmountMax) : number;
+    setPriceText(result?.toString() ?? '');
   });
 
   const handleClose = useLastCallback(() => {
@@ -80,17 +85,15 @@ const GiftResalePriceComposerModal = ({
   });
 
   const handleSellGift = useLastCallback(() => {
-    if (!savedGift || savedGift.gift.type !== 'starGiftUnique' || !savedGift.inputGift || !price) return;
+    if (!savedGift || savedGift.gift.type !== 'starGiftUnique' || !savedGift.inputGift || !hasPrice) return;
     closeGiftResalePriceComposerModal();
     closeGiftInfoModal();
     updateStarGiftPrice(
       {
         gift: savedGift.inputGift,
-        price: {
-          currency: isPriceInTon ? 'TON' : 'XTR',
-          amount: isPriceInTon ? convertTonToNanos(price) : price,
-          nanos: 0,
-        },
+        price: isPriceInTon
+          ? { currency: TON_CURRENCY_CODE, amount: tonPrice }
+          : buildStarsAmount(starsPrice),
       });
     showNotification({
       icon: 'sell-outline',
@@ -102,9 +105,9 @@ const GiftResalePriceComposerModal = ({
       },
     });
   });
-  const commission = isPriceInTon ? tonCommission : diamondsCommission;
-  const minAmount = isPriceInTon ? tonResaleAmountMin : diamondsResaleAmountMin;
-  const isPriceCorrect = hasPrice && price >= minAmount;
+  const hasCommission = Boolean(isPriceInTon ? tonCommissionPermille : diamondsCommission);
+  const isPriceCorrect = hasPrice
+    && (isPriceInTon ? tonPrice >= tonResaleAmountMin : starsPrice >= diamondsResaleAmountMin);
 
   return (
     <Modal
@@ -118,7 +121,7 @@ const GiftResalePriceComposerModal = ({
         <InputText
           label={isPriceInTon ? lang('EnterPriceInGram') : lang('EnterPriceInDiamonds')}
           onChange={handleChangePrice}
-          value={price?.toString()}
+          value={priceText}
           inputMode="numeric"
           tabIndex={0}
           teactExperimentControlled={!isPriceInTon}
@@ -127,31 +130,34 @@ const GiftResalePriceComposerModal = ({
 
       <div className={styles.inputPriceDescription}>
         <span>
-          {!isPriceCorrect && Boolean(commission) && lang('DescriptionComposerGiftMinimumPrice', {
-            stars: isPriceInTon ? formatTonAsText(lang, minAmount) : formatDiamondsAsText(lang, minAmount),
+          {!isPriceCorrect && hasCommission && lang('DescriptionComposerGiftMinimumPrice', {
+            diamonds: isPriceInTon
+              ? formatTonAsText(lang, tonResaleAmountMin)
+              : formatDiamondsAsText(lang, diamondsResaleAmountMin),
           }, {
             withMarkdown: true,
             withNodes: true,
           })}
-          {isPriceCorrect && (() => {
-            const priceWithCommission = commission ? Number((price * commission).toFixed()) : price;
-            return lang('DescriptionComposerGiftResalePrice',
-              {
-                stars: isPriceInTon
-                  ? formatTonAsText(lang, priceWithCommission)
-                  : formatDiamondsAsText(lang, priceWithCommission),
-              },
-              {
-                withMarkdown: true,
-                withNodes: true,
-              });
-          })()}
+          {isPriceCorrect && lang('DescriptionComposerGiftResalePrice',
+            {
+              diamonds: isPriceInTon
+                ? formatTonAsText(lang, tonCommissionPermille
+                  ? multiplyBigIntByPermille(tonPrice, tonCommissionPermille)
+                  : tonPrice)
+                : formatDiamondsAsText(lang, diamondsCommission
+                  ? Number((starsPrice * diamondsCommission).toFixed())
+                  : starsPrice),
+            },
+            {
+              withMarkdown: true,
+              withNodes: true,
+            })}
         </span>
 
         {isPriceCorrect && Boolean(isPriceInTon ? tonUsdRate : diamondsUsdWithdrawRate) && (
           <span className={styles.descriptionPrice}>
             {`≈ ${formatCurrencyAsString(
-              isPriceInTon ? convertTonToUsd(price, tonUsdRate!) : price * diamondsUsdWithdrawRate!,
+              isPriceInTon ? convertTonToUsd(tonPrice, tonUsdRate!) : starsPrice * diamondsUsdWithdrawRate!,
               'USD',
               lang.code,
             )}`}
@@ -168,8 +174,8 @@ const GiftResalePriceComposerModal = ({
 
       <Button inline noForcedUpperCase disabled={!isPriceCorrect} onClick={handleSellGift}>
         {isPriceCorrect && lang('ButtonSellGift', {
-          stars: isPriceInTon ? formatTonAsIcon(lang, price)
-            : formatDiamondsAsIcon(lang, price),
+          diamonds: isPriceInTon ? formatTonAsIcon(lang, tonPrice)
+            : formatDiamondsAsIcon(lang, starsPrice),
         }, { withNodes: true })}
         {!isPriceCorrect && lang('Sell')}
       </Button>
@@ -186,10 +192,9 @@ export default memo(withGlobal<OwnProps>(
     const diamondsUsdWithdrawRateX1000 = global.appConfig.diamondsUsdWithdrawRateX1000;
     const diamondsUsdWithdrawRate = diamondsUsdWithdrawRateX1000 ? diamondsUsdWithdrawRateX1000 / 1000 : 1;
 
-    const tonCommission = selectTonGiftResaleCommission(global);
-    const tonResaleAmountMin = convertTonFromNanos(global.appConfig.tonStargiftResaleAmountMin || 0);
-    const maxTonFromConfig = global.appConfig.tonStargiftResaleAmountMax;
-    const tonResaleAmountMax = maxTonFromConfig ? convertTonFromNanos(maxTonFromConfig) : undefined;
+    const tonCommissionPermille = global.appConfig.tonStargiftResaleCommissionPermille;
+    const tonResaleAmountMin = global.appConfig.tonStargiftResaleAmountMin || 0n;
+    const tonResaleAmountMax = global.appConfig.tonStargiftResaleAmountMax;
 
     const tonUsdRate = global.appConfig.tonUsdRate;
 
@@ -198,7 +203,7 @@ export default memo(withGlobal<OwnProps>(
       diamondsResaleAmountMin,
       diamondsResaleAmountMax,
       diamondsUsdWithdrawRate,
-      tonCommission,
+      tonCommissionPermille,
       tonResaleAmountMin,
       tonResaleAmountMax,
       tonUsdRate,

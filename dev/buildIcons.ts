@@ -134,7 +134,7 @@ async function buildFontHash(iconDefinitions: IconDefinition[]) {
   };
 
   hash.update(FONT_NAME);
-  hash.update('fontHeight:1000');
+  hash.update('fontHeight:1024');
   hash.update('normalize:true');
   hash.update(svgtofontPackage.version || '');
 
@@ -200,8 +200,9 @@ async function buildIcons() {
         previewPath: 'icons/preview.html',
       },
     },
-    dist: STYLES_DIR,
-    excludeFormat: ['eot', 'svg', 'ttf', 'symbol.svg'],
+    // SVG and TTF intermediates stay in the ignored build directory
+    dist: TEMP_DIR,
+    excludeFormat: ['eot', 'woff', 'svg', 'ttf', 'symbol.svg'],
     fontName: FONT_NAME,
     getIconUnicode(name) {
       const iconDefinition = iconDefinitionsByName.get(name);
@@ -215,12 +216,15 @@ async function buildIcons() {
     src: TEMP_INPUT_DIR,
     startUnicode: iconDefinitions[0]?.codepoint ?? DEFAULT_START_CODEPOINT,
     styleTemplates: STYLE_TEMPLATES_DIR,
+    svg2ttf: { ts: 0 },
     svgicons2svgfont: {
       fontHeight: 1024,
       normalize: true,
     },
   });
 
+  const fileName = `${FONT_NAME}.woff2`;
+  await fs.copyFile(path.join(TEMP_DIR, fileName), path.join(STYLES_DIR, fileName));
   await writeFontTypes(iconDefinitions);
 }
 

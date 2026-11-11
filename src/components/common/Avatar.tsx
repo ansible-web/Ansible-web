@@ -1,4 +1,3 @@
-import type { MouseEvent as ReactMouseEvent } from 'react';
 import type { ElementRef, TeactNode } from '../../lib/teact/teact';
 import { memo, useMemo, useRef } from '../../lib/teact/teact';
 import { getActions } from '../../global';
@@ -37,7 +36,6 @@ import useLang from '../../hooks/useLang';
 import useLastCallback from '../../hooks/useLastCallback';
 import useMedia from '../../hooks/useMedia';
 import useMediaTransition from '../../hooks/useMediaTransition';
-import useOldLang from '../../hooks/useOldLang';
 import { getPeerColorClass } from '../../hooks/usePeerColor';
 
 import OptimizedVideo from '../ui/OptimizedVideo';
@@ -94,7 +92,7 @@ type OwnProps = {
   asMessageBubble?: boolean;
   storyCircleStyle?: string;
   observeIntersection?: ObserveFn;
-  onClick?: (e: ReactMouseEvent<HTMLDivElement, MouseEvent>, hasMedia: boolean) => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, hasMedia: boolean) => void;
   onContextMenu?: (e: React.MouseEvent) => void;
   onMouseMove?: (e: React.MouseEvent) => void;
   onLoad?: NoneToVoidFunction;
@@ -216,11 +214,10 @@ const Avatar = ({
     }
   });
 
-  const lang = useOldLang();
-  const webLang = useLang();
+  const lang = useLang();
 
   let content: TeactNode | undefined;
-  const author = user ? getUserFullName(user) : (chat ? getChatTitle(lang, chat) : text);
+  const author = user ? getUserFullName(lang, user) : (chat ? getChatTitle(lang, chat) : text);
 
   if (specialIcon) {
     content = (
@@ -260,13 +257,13 @@ const Avatar = ({
       </>
     );
   } else if (user) {
-    const userFullName = getUserFullName(user);
+    const userFullName = getUserFullName(lang, user);
     content = userFullName ? getFirstLetters(userFullName, 2) : undefined;
   } else if (chat) {
     const title = getChatTitle(lang, chat);
     content = title && getFirstLetters(title, isUserId(chat.id) ? 2 : 1);
   } else if (isCustomPeer) {
-    const title = peer.title || webLang(peer.titleKey!);
+    const title = peer.title || lang(peer.titleKey!);
     content = title && getFirstLetters(title, 1);
   } else if (text) {
     content = getFirstLetters(text, 2);
@@ -309,7 +306,7 @@ const Avatar = ({
 
   const hasMedia = Boolean(isSavedMessages || imgUrl);
 
-  const { handleClick, handleMouseDown } = useFastClick((e: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
+  const { handleClick, handleMouseDown } = useFastClick((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (isStoryClickable) {
       e.stopPropagation();
 

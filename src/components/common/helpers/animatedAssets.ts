@@ -66,6 +66,7 @@ export const LOCAL_TGS_PREVIEW_URLS = {
 };
 
 export const LOCAL_TGS_URLS = {
+  Diamond,
   MonkeyIdle,
   MonkeyTracking,
   MonkeyClose,
@@ -103,7 +104,6 @@ export const LOCAL_TGS_URLS = {
   BannedDuck,
   BrokenGift,
   CraftProgress,
-  Diamond,
   Search,
   DuckNothingFound,
   Passkeys,

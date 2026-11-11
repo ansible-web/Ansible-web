@@ -30,6 +30,7 @@ type OwnProps = {
   contentClassName?: string;
   tableClassName?: string;
   hasBackdrop?: boolean;
+  isNativeDialog?: boolean;
   closeButtonColor?: 'translucent' | 'translucent-white';
   moreMenuItems?: TeactNode;
   headerRightToolBar?: TeactNode;
@@ -38,7 +39,6 @@ type OwnProps = {
   withBalanceBar?: boolean;
   currencyInBalanceBar?: 'TON' | 'XTR';
   isLowStackPriority?: true;
-  isNativeDialog?: boolean;
 };
 
 const TableInfoModal = ({
@@ -54,6 +54,7 @@ const TableInfoModal = ({
   contentClassName,
   tableClassName,
   hasBackdrop,
+  isNativeDialog,
   closeButtonColor,
   moreMenuItems,
   headerRightToolBar,
@@ -61,7 +62,6 @@ const TableInfoModal = ({
   onButtonClick,
   withBalanceBar,
   isLowStackPriority,
-  isNativeDialog,
   currencyInBalanceBar,
 }: OwnProps) => {
   const { openChat } = getActions();

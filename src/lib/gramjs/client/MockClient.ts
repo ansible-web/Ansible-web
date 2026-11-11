@@ -97,12 +97,13 @@ class AnsibleClient {
     return this.mockData.dialogs[type].map((dialog) => createMockedDialog(dialog.id, this.mockData));
   }
 
-  start({
+  async start({
     mockScenario,
   }: {
-    mockScenario: string;
-  }) {
-    return this.loadScenario(mockScenario);
+    mockScenario?: string;
+  }, onConnected?: NoneToVoidFunction) {
+    await this.loadScenario(mockScenario);
+    onConnected?.();
   }
 
   async invoke<A, R>(request: Api.Request<A, R>) {
@@ -196,17 +197,46 @@ class AnsibleClient {
     }
 
     if (request instanceof Api.users.GetFullUser) {
+      const userId = request.id instanceof Api.InputUser ? request.id.userId : undefined;
+      const user = this.getUsers().find((item) => (userId === undefined ? item.self : item.id === userId));
+      if (!user) return undefined;
+
       return new Api.users.UserFull({
         fullUser: new Api.UserFull({
           about: 'lol',
           settings: new Api.PeerSettings({}),
           notifySettings: new Api.PeerNotifySettings({}),
-          id: 1n,
+          id: user.id,
           commonChatsCount: 0,
         }),
         chats: [],
+        users: [user],
+      });
+    }
+
+    if (request instanceof Api.payments.GetStarsStatus
+      || request instanceof Api.payments.GetStarsTransactions
+      || request instanceof Api.payments.GetStarsSubscriptions) {
+      if ('ton' in request && request.ton) return undefined;
+      return new Api.payments.StarsStatus({
+        balance: new Api.StarsAmount({ amount: 0n, nanos: 0 }),
+        history: [],
+        subscriptions: [],
+        chats: [],
         users: [],
       });
+    }
+
+    if (request instanceof Api.payments.GetStarsTopupOptions) {
+      return [];
+    }
+
+    if (request instanceof Api.updates.GetState) {
+      return new Api.updates.State({ pts: 0, qts: 0, date: 1, seq: 0, unreadCount: 0 });
+    }
+
+    if (request instanceof Api.updates.GetDifference) {
+      return new Api.updates.DifferenceEmpty({ date: 1, seq: 0 });
     }
 
     if (request instanceof Api.messages.GetAvailableReactions) {
@@ -242,11 +272,13 @@ class AnsibleClient {
     }
 
     if (request instanceof Api.messages.GetDialogFilters) {
-      return [
-        new Api.DialogFilterDefault(),
-        ...this.mockData.dialogFilters
-          .map((dialogFilter) => createMockedDialogFilter(dialogFilter.id, this.mockData)),
-      ];
+      return new Api.messages.DialogFilters({
+        filters: [
+          new Api.DialogFilterDefault(),
+          ...this.mockData.dialogFilters
+            .map((dialogFilter) => createMockedDialogFilter(dialogFilter.id, this.mockData)),
+        ],
+      });
     }
 
     if (request instanceof Api.messages.GetPinnedDialogs) {
@@ -412,6 +444,8 @@ class AnsibleClient {
     }
     return undefined;
   }
+
+  public setIsPremium(_isPremium: boolean) {}
 
   public setPingCallback() {}
 

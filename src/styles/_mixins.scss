@@ -9,14 +9,15 @@
   padding-inline-end: calc(max($padding - var(--scrollbar-width), $forceSpace));
 }
 
+@mixin adapt-margin-to-scrollbar($margin, $forceSpace: 0px) {
+  margin-inline-end: calc(max($margin - var(--scrollbar-width), $forceSpace));
+}
+
+// The inline-end side gives up whatever width the scrollbar takes
 @mixin scrollable-padding($top, $side: 1rem, $bottom: $side) {
   padding: $top $side $bottom;
 
   @include adapt-padding-to-scrollbar($side);
-}
-
-@mixin adapt-margin-to-scrollbar($margin, $forceSpace: 0px) {
-  margin-inline-end: calc(max($margin - var(--scrollbar-width), $forceSpace));
 }
 
 @mixin filter-outline($width: 0.125rem, $color) {

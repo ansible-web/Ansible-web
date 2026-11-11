@@ -3,8 +3,7 @@ import {
 } from '../../../lib/teact/teact';
 import { getActions, getGlobal, withGlobal } from '../../../global';
 
-import type {
-  ApiAvailableReaction,
+import type { ApiAvailableReaction,
   ApiChat,
   ApiChatReactions,
   ApiMessage,
@@ -14,8 +13,8 @@ import type {
   ApiStickerSetInfo,
   ApiThreadInfo,
   ApiTypeStory,
-  ApiWebPage,
-} from '../../../api/types';
+  ApiUser,
+  ApiWebPage } from '../../../api/types';
 import type {
   ActiveDownloads,
   IAlbum,
@@ -88,7 +87,6 @@ import { isSelectionRangeInsideMessage } from './helpers/isSelectionRangeInsideM
 import useFlag from '../../../hooks/useFlag';
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 import useSchedule from '../../../hooks/useSchedule';
 import useShowTransition from '../../../hooks/useShowTransition';
 
@@ -168,13 +166,14 @@ type StateProps = {
   isChannel?: boolean;
   canReplyInChat?: boolean;
   isWithPaidReaction?: boolean;
-  userFullName?: string;
+  user?: ApiUser;
   canGift?: boolean;
   savedDialogId?: string;
   noForwardsMyEnabled?: boolean;
   noForwardsPeerEnabled?: boolean;
   savedMusicById?: Record<string, true>;
   isSavedMusicLoading?: boolean;
+  isMessageProtected: boolean;
 };
 
 const selection = window.getSelection();
@@ -244,7 +243,7 @@ const ContextMenuContainer = ({
   isInSavedMessages,
   canReplyInChat,
   isWithPaidReaction,
-  userFullName,
+  user,
   canGift,
   className,
   savedDialogId,
@@ -252,6 +251,7 @@ const ContextMenuContainer = ({
   noForwardsPeerEnabled,
   savedMusicById,
   isSavedMusicLoading,
+  isMessageProtected,
   onClose,
   onCloseAnimationEnd,
 }: OwnProps & StateProps) => {
@@ -300,8 +300,8 @@ const ContextMenuContainer = ({
     toggleMusicInProfile,
   } = getActions();
 
-  const oldLang = useOldLang();
   const lang = useLang();
+  const userFullName = getUserFullName(lang, user);
 
   const noForwardsNotice = noForwardsPeerEnabled
     ? lang('ContextMenuNoForwardsPeer', { name: userFullName })
@@ -328,7 +328,7 @@ const ContextMenuContainer = ({
     && (customEmojiSetsInfo === undefined || Boolean(customEmojiSetsInfo.length));
   const audio = getMessageAudio(message);
   const isLocalMessage = isMessageLocal(message);
-  const canManageMusicInProfile = Boolean(audio && !isLocalMessage);
+  const canManageMusicInProfile = Boolean(audio && !isLocalMessage && !isMessageProtected);
   const isMusicProfileStatusLoaded = Boolean(savedMusicById);
   const isMusicSaved = Boolean(audio && savedMusicById?.[audio.id]);
 
@@ -540,7 +540,7 @@ const ContextMenuContainer = ({
           action: 'openPremiumModal',
           payload: { initialSection: 'todo' },
         },
-        actionText: oldLang('PremiumMore'),
+        actionText: lang('PremiumMore'),
       });
     } else {
       openTodoListModal({
@@ -883,8 +883,8 @@ const ContextMenuContainer = ({
       <ConfirmDialog
         isOpen={isClosePollDialogOpen}
         onClose={closeClosePollDialog}
-        text={oldLang('lng_polls_stop_warning')}
-        confirmLabel={oldLang('lng_polls_stop_sure')}
+        text={lang('PollsStopWarning')}
+        confirmLabel={lang('PollsStopSure')}
         confirmHandler={handlePollClose}
       />
       {canReschedule && calendar}
@@ -901,7 +901,6 @@ export default memo(withGlobal<OwnProps>(
     const isPrivate = chat && isUserId(chat.id);
     const chatFullInfo = !isPrivate ? selectChatFullInfo(global, message.chatId) : undefined;
     const user = selectUser(global, message.chatId);
-    const userFullName = user && getUserFullName(user);
     const userFullInfo = isPrivate ? selectUserFullInfo(global, message.chatId) : undefined;
 
     const {
@@ -1046,6 +1045,7 @@ export default memo(withGlobal<OwnProps>(
       canFaveSticker: !message.isEphemeral && !isScheduled && canFaveSticker,
       canUnfaveSticker: !message.isEphemeral && !isScheduled && canUnfaveSticker,
       canCopy: (canCopyNumber || (!isProtected && canCopy)),
+      isMessageProtected: isProtected,
       canCopyLink: !message.isEphemeral && !isScheduled && canCopyLink,
       canSelect: !message.isEphemeral && canSelect,
       canDownload: !isProtected && canDownload,
@@ -1082,7 +1082,7 @@ export default memo(withGlobal<OwnProps>(
       isWithPaidReaction: !message.isEphemeral && chatFullInfo?.isPaidReactionAvailable,
       poll,
       story,
-      userFullName,
+      user,
       canGift: !message.isEphemeral && canGift,
       savedDialogId,
       webPage,

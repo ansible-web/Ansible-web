@@ -1,7 +1,7 @@
 import type { MediaWorkerApi } from '../lib/mediaWorker/index.worker';
 import type { Connector } from './PostMessageConnector';
 
-import { IS_TEST } from '../config';
+import { IS_MOCKED_CLIENT, IS_TEST } from '../config';
 
 import { createConnector } from './PostMessageConnector';
 
@@ -13,7 +13,7 @@ let instances: {
 }[] | undefined;
 
 export default function launchMediaWorkers() {
-  if (IS_TEST) return [];
+  if (IS_TEST && !IS_MOCKED_CLIENT) return [];
   if (!instances) {
     instances = new Array(MAX_WORKERS).fill(undefined).map(
       () => {

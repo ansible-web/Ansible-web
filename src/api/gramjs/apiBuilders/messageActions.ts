@@ -200,6 +200,20 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       app: app && buildApiBotApp(app),
     };
   }
+  if (action instanceof GramJs.MessageActionRequestedPeer) {
+    return {
+      mediaType: 'action',
+      type: 'requestedPeer',
+      peerIds: action.peers.map(getApiChatIdFromMtpPeer),
+    };
+  }
+  if (action instanceof GramJs.MessageActionManagedBotCreated) {
+    return {
+      mediaType: 'action',
+      type: 'managedBotCreated',
+      botId: buildApiPeerId(action.botId, 'user'),
+    };
+  }
   if (action instanceof GramJs.MessageActionBoostApply) {
     const { boosts } = action;
     return {
@@ -284,7 +298,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       amount: toJSNumber(amount),
       days,
       cryptoCurrency,
-      cryptoAmount: toJSNumber(cryptoAmount),
+      cryptoAmount,
       message: message && buildApiFormattedText(message),
     };
   }
@@ -344,7 +358,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       currency,
       amount: toJSNumber(amount),
       cryptoCurrency,
-      cryptoAmount: toJSNumber(cryptoAmount),
+      cryptoAmount,
       message: message && buildApiFormattedText(message),
     };
   }
@@ -389,7 +403,7 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       amount: toJSNumber(amount),
       stars: toJSNumber(stars),
       cryptoCurrency,
-      cryptoAmount: toJSNumber(cryptoAmount),
+      cryptoAmount,
       transactionId,
     };
   }
@@ -403,10 +417,11 @@ export function buildApiMessageAction(action: GramJs.TypeMessageAction): ApiMess
       currency,
       amount: toJSNumber(amount),
       cryptoCurrency,
-      cryptoAmount: toJSNumber(cryptoAmount),
+      cryptoAmount,
       transactionId,
     };
   }
+
   if (action instanceof GramJs.MessageActionPrizeStars) {
     const {
       unclaimed, stars, transactionId, boostPeer, giveawayMsgId,

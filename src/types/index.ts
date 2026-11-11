@@ -37,6 +37,7 @@ import type {
   ApiReaction,
   ApiReactionWithPaid,
   ApiRichMessage,
+  ApiSessionData,
   ApiSticker,
   ApiStickerSet,
   ApiStory,
@@ -72,6 +73,8 @@ export type SessionUserInfo = {
 export type SharedSessionData = {
   date?: number;
   dcId: number;
+  authKeyCreatedAt?: ApiSessionData['authKeyCreatedAt'];
+  tempAuthKey?: ApiSessionData['tempAuthKey'];
   isTest?: true;
 } & Partial<Record<`dc${DcId}_${'auth_key' | 'server_salt'}`, string>> & SessionUserInfo;
 
@@ -205,8 +208,14 @@ export interface ShippingOption {
   prices: ApiLabeledPrice[];
 }
 
+export type SettingsHighlight = {
+  langKey: RegularLangKey;
+  isInHeaderMenu?: boolean;
+};
+
 export enum SettingsScreens {
   Main,
+  Search,
   EditProfile,
   Notifications,
   DataStorage,
@@ -399,15 +408,19 @@ export type PlaybackSource =
   | { type: 'richMessage'; chatId: string; threadId: ThreadId; messageId: number }
   | { type: 'single' };
 
-export type PlaybackContextType = 'message' | 'savedMusic' | 'instantView';
+export type PlaybackContextType = 'message' | 'savedMusic' | 'instantView' | 'musicSearch';
 
 export type PlaybackMedia = ApiAudio | ApiVoice | ApiVideo;
 
 export type PlaybackItemRef =
   // `documentId` targets an audio block inside a rich message
-  | { type: 'message'; chatId: string; threadId: ThreadId; messageId: number; documentId?: string }
+  | {
+    type: 'message'; chatId: string; threadId: ThreadId; messageId: number;
+    documentId?: string; isScheduled?: boolean;
+  }
   | { type: 'savedMusic'; peerId: string; audioId: string }
-  | { type: 'instantView'; webPageId: string; documentId: string };
+  | { type: 'instantView'; webPageId: string; documentId: string }
+  | { type: 'musicSearch'; audioId: string };
 
 export type PlaybackCapabilities = {
   canSeek: boolean;

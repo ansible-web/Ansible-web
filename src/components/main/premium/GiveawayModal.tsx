@@ -1,5 +1,3 @@
-import type { ChangeEvent } from 'react';
-import type { FC } from '../../../lib/teact/teact';
 import {
   memo, useEffect, useMemo, useRef, useState,
 } from '../../../lib/teact/teact';
@@ -13,6 +11,8 @@ import type {
   ApiPrepaidGiveaway,
   ApiTypePrepaidGiveaway,
 } from '../../../api/types';
+import type { RegularLangKey } from '../../../types/language';
+import type { IconBackdropColor } from '../../gili/primitives/IconBackdrop';
 
 import {
   GIVEAWAY_BOOST_PER_PREMIUM,
@@ -27,14 +27,15 @@ import {
   selectTabState,
 } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
-import { formatDateTimeToString } from '../../../util/dates/oldDateFormat';
 import { unique } from '../../../util/iteratees';
+import { formatDateTime } from '../../../util/localization/dateFormat';
 import renderText from '../../common/helpers/renderText';
 
 import useFlag from '../../../hooks/useFlag';
+import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 
+import BadgeButton from '../../common/BadgeButton';
 import CalendarModal from '../../common/CalendarModal';
 import CountryPickerModal from '../../common/CountryPickerModal.async';
 import GroupChatInfo from '../../common/GroupChatInfo';
@@ -56,10 +57,6 @@ import PremiumSubscriptionOption from './PremiumSubscriptionOption';
 
 import styles from './GiveawayModal.module.scss';
 
-import GiftBlueRound from '../../../assets/premium/GiftBlueRound.svg';
-import GiftDiamond from '../../../assets/premium/GiftDiamond.svg';
-import GiftGreenRound from '../../../assets/premium/GiftGreenRound.svg';
-import GiftRedRound from '../../../assets/premium/GiftRedRound.svg';
 import PremiumLogo from '../../../assets/premium/PremiumDiamond.svg';
 
 export type OwnProps = {
@@ -87,10 +84,9 @@ type ApiGiveawayType = 'premium_giveaway' | 'stars_giveaway';
 type SubscribersType = 'all' | 'new';
 
 interface TypeOption {
-  name: string;
-  text: string;
+  name: RegularLangKey;
+  text: RegularLangKey;
   value: ApiGiveawayType;
-  img: string;
   actions?: GiveawayAction;
   isLink: boolean;
   onClickAction?: () => void;
@@ -100,13 +96,13 @@ const DEFAULT_CUSTOM_EXPIRE_DATE = 86400 * 3 * 1000; // 3 days
 const MAX_ADDITIONAL_CHANNELS = 9;
 const DEFAULT_BOOST_COUNT = 5;
 
-const GIVEAWAY_IMG_LIST: Partial<Record<number, string>> = {
-  3: GiftGreenRound,
-  6: GiftBlueRound,
-  12: GiftRedRound,
+const GIVEAWAY_COLOR_BY_MONTH: Partial<Record<number, IconBackdropColor>> = {
+  3: 'green',
+  6: 'blue',
+  12: 'red',
 };
 
-const GiveawayModal: FC<OwnProps & StateProps> = ({
+const GiveawayModal = ({
   chatId,
   gifts,
   isOpen,
@@ -120,14 +116,14 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   userSelectionLimit = GIVEAWAY_MAX_ADDITIONAL_USERS,
   isDiamondsGiftEnabled,
   diamondsGiftOptions,
-}) => {
-  const dialogRef = useRef<HTMLDivElement>();
+}: OwnProps & StateProps) => {
   const {
     closeGiveawayModal, openInvoice, openPremiumModal,
     launchPrepaidGiveaway, launchPrepaidDiamondsGiveaway, showNotification,
   } = getActions();
 
-  const lang = useOldLang();
+  const lang = useLang();
+  const dialogRef = useRef<HTMLDivElement>();
   const [isCalendarOpened, openCalendar, closeCalendar] = useFlag();
   const [isCountryPickerModalOpen, openCountryPickerModal, closeCountryPickerModal] = useFlag();
   const [isConfirmModalOpen, openConfirmModal, closeConfirmModal] = useFlag();
@@ -135,10 +131,9 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   const [isChannelPickerModalOpen, openChannelPickerModal, closeChannelPickerModal] = useFlag();
 
   const TYPE_OPTIONS: TypeOption[] = [{
-    name: 'Premium.Title',
+    name: 'AnsiblePremium',
     text: 'BoostingWinnersRandomly',
     value: 'premium_giveaway',
-    img: GiftBlueRound,
     actions: 'createPremiumGiveaway',
     isLink: true,
     onClickAction: () => {
@@ -151,7 +146,6 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
       name: 'AnsibleDiamonds',
       text: 'BoostingWinnersRandomly',
       value: 'stars_giveaway',
-      img: GiftDiamond,
       actions: 'createStarsGiveaway',
       isLink: false,
     });
@@ -187,19 +181,28 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
       value: 'all',
       label: lang(isChannel ? 'BoostingAllSubscribers' : 'BoostingAllMembers'),
       subLabel: selectedCountryIds && selectedCountryIds.length > 0
-        ? lang('Giveaway.ReceiverType.Countries', selectedCountryIds.length)
+        ? lang(
+          'GiveawayReceiverTypeCountries',
+          { count: selectedCountryIds.length },
+          { pluralValue: selectedCountryIds.length },
+        )
         : lang('BoostingFromAllCountries'),
     },
     {
       value: 'new',
       label: lang(isChannel ? 'BoostingNewSubscribers' : 'BoostingNewMembers'),
       subLabel: selectedCountryIds && selectedCountryIds.length > 0
-        ? lang('Giveaway.ReceiverType.Countries', selectedCountryIds.length)
+        ? lang(
+          'GiveawayReceiverTypeCountries',
+          { count: selectedCountryIds.length },
+          { pluralValue: selectedCountryIds.length },
+        )
         : lang('BoostingFromAllCountries'),
     },
   ], [isChannel, lang, selectedCountryIds]);
 
-  const monthQuantity = lang('Months', selectedMonthOption);
+  const monthQuantity = selectedMonthOption === undefined
+    ? '' : lang('Months', { count: selectedMonthOption }, { pluralValue: selectedMonthOption });
   const isDiamondsPrepaidGiveaway = prepaidGiveaway?.type === 'starsGiveaway';
   const isPremiumPrepaidGiveaway = prepaidGiveaway?.type === 'giveaway';
 
@@ -377,14 +380,14 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
     setSelectedRandomUserCount(newValue);
   });
 
-  const handlePrizeDescriptionChange = useLastCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const handlePrizeDescriptionChange = useLastCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setPrizeDescription(e.target.value);
   });
 
   const userNames = useMemo(() => {
     const usersById = getGlobal().users.byId;
-    return selectedUserIds?.map((userId) => getUserFullName(usersById[userId])).join(', ');
-  }, [selectedUserIds]);
+    return selectedUserIds?.map((userId) => getUserFullName(lang, usersById[userId])).join(', ');
+  }, [selectedUserIds, lang]);
 
   function handleScroll(e: React.UIEvent<HTMLDivElement>) {
     const { scrollTop } = e.currentTarget;
@@ -413,7 +416,16 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
 
   const handleCountrySelectionLimit = useLastCallback((selectionLimit: number) => {
     showNotification({
-      message: lang('BoostingSelectUpToWarningCountries', selectionLimit),
+      message: {
+        key: 'GiveawayCountryLimit',
+        variables: { count: selectionLimit },
+        options: {
+          pluralValue: selectionLimit,
+          withNodes: true,
+          withMarkdown: true,
+          renderTextFilters: ['br', 'links'],
+        },
+      },
     });
   });
 
@@ -446,7 +458,6 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
               name={option.name}
               text={option.text}
               option={option.value}
-              img={option.img}
               onChange={handleChangeTypeOption}
               checked={selectedGiveawayOption === option.value}
               isLink={option.isLink}
@@ -494,18 +505,11 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
   }
 
   function renderPremiumFeaturesLink() {
-    const info = lang('GiftPremiumListFeaturesAndTerms');
-    const parts = info.match(/([^*]*)\*([^*]+)\*(.*)/);
-
-    if (!parts || parts.length < 4) {
-      return undefined;
-    }
-
     return (
       <p className={styles.premiumFeatures}>
-        {parts[1]}
-        <Link isPrimary onClick={handlePremiumClick}>{parts[2]}</Link>
-        {parts[3]}
+        {lang('GiftPremiumFeaturesTerms', {
+          link: <Link isPrimary onClick={handlePremiumClick}>{lang('GiftPremiumFeaturesTermsLink')}</Link>,
+        }, { withNodes: true })}
       </p>
     );
   }
@@ -541,8 +545,9 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
           >
             <GroupChatInfo
               chatId={chatId!}
-              status={lang(isChannel ? 'BoostingChannelWillReceiveBoost'
-                : 'BoostingGroupWillReceiveBoost', boostQuantity || boostDiamondsQuantity, 'i')}
+              status={lang(isChannel ? 'BoostingChannelWillReceiveBoost' : 'BoostingGroupWillReceiveBoost', {
+                count: boostQuantity || boostDiamondsQuantity || 0,
+              }, { pluralValue: boostQuantity || boostDiamondsQuantity || 0 })}
             />
           </ListItem>
 
@@ -585,7 +590,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
         </div>
 
         <div className={styles.subscription}>
-          {renderText(lang(isChannel ? 'BoostGift.LimitSubscribersInfo' : 'lng_giveaway_users_about_group'))}
+          {renderText(lang(isChannel ? 'BoostGiftLimitSubscribersInfo' : 'GiveawayUsersAboutGroup'))}
         </div>
 
         <div className={styles.section}>
@@ -619,17 +624,15 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
         {shouldShowPrizes ? (
           !isDiamondsGiveaway && !isDiamondsPrepaidGiveaway ? (
             <div className={styles.subscription}>
-              {prizeDescription?.length ? renderText(lang('BoostingGiveawayAdditionPrizeCountNameHint',
-                dataPrepaidGiveaway
-                  ? [dataPrepaidGiveaway.quantity, prizeDescription, monthQuantity]
-                  : [selectedUserCount, prizeDescription, monthQuantity],
-                undefined,
-                selectedMonthOption), ['simple_markdown']) : renderText(lang('BoostingGiveawayAdditionPrizeCountHint',
-                dataPrepaidGiveaway
-                  ? [dataPrepaidGiveaway.quantity, monthQuantity]
-                  : [selectedUserCount, monthQuantity],
-                undefined,
-                selectedMonthOption), ['simple_markdown'])}
+              {prizeDescription?.length ? lang('BoostingGiveawayAdditionPrizeCountNameHint', {
+                count: dataPrepaidGiveaway?.quantity ?? selectedUserCount,
+                prize: prizeDescription,
+                duration: monthQuantity,
+              }, { pluralValue: selectedMonthOption ?? 0, withNodes: true, withMarkdown: true })
+                : lang('BoostingGiveawayAdditionPrizeCountHint', {
+                  count: dataPrepaidGiveaway?.quantity ?? selectedUserCount,
+                  duration: monthQuantity,
+                }, { pluralValue: selectedMonthOption ?? 0, withNodes: true, withMarkdown: true })}
             </div>
           ) : undefined
         ) : (
@@ -664,15 +667,15 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
           </h2>
 
           <Button
-            ariaLabel={lang('BoostGift.DateEnds')}
+            ariaLabel={lang('BoostGiftDateEnds')}
             className={buildClassName(styles.dateButton, 'expire-limit')}
             isText
             onClick={openCalendar}
           >
             <h3 className={styles.title}>
-              {lang('BoostGift.DateEnds')}
+              {lang('BoostGiftDateEnds')}
             </h3>
-            {formatDateTimeToString(customExpireDate, lang.code)}
+            {formatDateTime(lang, new Date(customExpireDate), { date: 'short', time: 'long' })}
           </Button>
         </div>
       </>
@@ -702,40 +705,45 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
           </h2>
         </div>
         {(dataPrepaidGiveaway || dataDiamondsPrepaidGiveaway) ? (
-          <div className={styles.status}>
-            <div>
+          <ListItem
+            className={styles.prepaidGiveaway}
+            icon={dataDiamondsPrepaidGiveaway ? 'diamond' : 'gift-filled'}
+            iconClassName={styles.prepaidIcon}
+            iconBg={dataDiamondsPrepaidGiveaway ? 'blue'
+              : GIVEAWAY_COLOR_BY_MONTH[dataPrepaidGiveaway!.months] || 'green'}
+            multiline
+            isStatic
+            rightElement={(
+              <BadgeButton className={styles.boostBadge}>
+                <Icon name="boost" className="in-text-icon" />
+                {dataDiamondsPrepaidGiveaway ? dataDiamondsPrepaidGiveaway.boosts
+                  : dataPrepaidGiveaway!.quantity * giveawayBoostPerPremiumLimit}
+              </BadgeButton>
+            )}
+          >
+            <span className="title list-item-ellipsis">
               {dataDiamondsPrepaidGiveaway ? (
-                <img className={styles.prepaidImg} src={GiftDiamond} alt="" />
-              ) : (
-                <img
-                  className={styles.prepaidImg}
-                  src={GIVEAWAY_IMG_LIST[dataPrepaidGiveaway!.months] || GIVEAWAY_IMG_LIST[3]}
-                  alt=""
-                />
-              )}
-            </div>
-            <div className={styles.info}>
-              <h3 className={styles.title}>
-                {dataDiamondsPrepaidGiveaway
-                  ? lang('Giveaway.Diamonds.Prepaid.Title', dataDiamondsPrepaidGiveaway?.stars)
-                  : lang('BoostingAnsiblePremiumCountPlural', dataPrepaidGiveaway!.quantity)}
-              </h3>
-              <p className={styles.month}>
-                {dataDiamondsPrepaidGiveaway
-                  ? lang('Giveaway.Diamonds.Prepaid.Desc', dataDiamondsPrepaidGiveaway?.quantity)
-                  : lang('PrepaidGiveawayMonths', dataPrepaidGiveaway?.months)}
-              </p>
-            </div>
-            <div className={styles.quantity}>
-              <div className={buildClassName(styles.floatingBadge, styles.floatingBadgeColor)}>
-                <Icon name="boost" className={styles.floatingBadgeIcon} />
-                <div className={styles.floatingBadgeValue} dir={lang.isRtl ? 'rtl' : undefined}>
-                  {dataDiamondsPrepaidGiveaway ? dataDiamondsPrepaidGiveaway?.boosts
-                    : dataPrepaidGiveaway!.quantity * (giveawayBoostPerPremiumLimit ?? GIVEAWAY_BOOST_PER_PREMIUM)}
-                </div>
-              </div>
-            </div>
-          </div>
+                lang('GiveawayStarsPrepaidTitle', { count: dataDiamondsPrepaidGiveaway.stars })
+              )
+                : lang(
+                  'BoostingTelegramPremiumCountPlural',
+                  { count: dataPrepaidGiveaway!.quantity },
+                  { pluralValue: dataPrepaidGiveaway!.quantity },
+                )}
+            </span>
+            <span className="subtitle">
+              {dataDiamondsPrepaidGiveaway ? lang(
+                'GiveawayStarsPrepaidDesc',
+                { count: dataDiamondsPrepaidGiveaway.quantity },
+                { pluralValue: dataDiamondsPrepaidGiveaway.quantity },
+              )
+                : lang(
+                  'PrepaidGiveawayMonths',
+                  { count: dataPrepaidGiveaway!.months },
+                  { pluralValue: dataPrepaidGiveaway!.months },
+                )}
+            </span>
+          </ListItem>
         ) : (
           <div className={buildClassName(styles.section, styles.types)}>
             {renderTypeOptions()}
@@ -797,7 +805,7 @@ const GiveawayModal: FC<OwnProps & StateProps> = ({
                 </div>
 
                 <div className={buildClassName(styles.subscription, styles.diamondSubscription)}>
-                  {renderText(lang('BoostGift.Diamonds.Info'))}
+                  {renderText(lang('BoostGiftStarsInfo'))}
                 </div>
 
                 <div className={styles.section}>

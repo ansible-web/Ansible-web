@@ -7,12 +7,11 @@ import type {
 
 import { DEFAULT_STATUS_ICON_ID, STARS_CURRENCY_CODE, TME_LINK_PREFIX } from '../../../config';
 import { copyTextToClipboard } from '../../../util/clipboard';
-import { formatDateAtTime } from '../../../util/dates/oldDateFormat';
+import { formatCalendarDate, secondsToDate } from '../../../util/localization/dateFormat';
 import { getServerTime } from '../../../util/serverTime';
 
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 
 import MenuItem from '../../ui/MenuItem';
 
@@ -22,6 +21,7 @@ type OwnProps = {
   gift: ApiSavedDiamondGift | ApiDiamondGift;
   currentUserEmojiStatus?: ApiEmojiStatusType;
   collectibleEmojiStatuses?: ApiEmojiStatusType[];
+  onDelete?: NoneToVoidFunction;
 };
 
 const GiftMenuItems = ({
@@ -30,6 +30,7 @@ const GiftMenuItems = ({
   gift: typeGift,
   currentUserEmojiStatus,
   collectibleEmojiStatuses,
+  onDelete,
 }: OwnProps) => {
   const {
     showNotification,
@@ -45,7 +46,6 @@ const GiftMenuItems = ({
   } = getActions();
 
   const lang = useLang();
-  const oldLang = useOldLang();
 
   const isSavedGift = typeGift && 'gift' in typeGift;
   const savedGift = isSavedGift ? typeGift : undefined;
@@ -99,7 +99,11 @@ const GiftMenuItems = ({
       showNotification({
         message: {
           key: 'NotificationGiftCanTransferAt',
-          variables: { date: formatDateAtTime(oldLang, savedGift.canTransferAt * 1000) },
+          variables: {
+            date: formatCalendarDate(lang, secondsToDate(savedGift.canTransferAt), {
+              variant: 'date', isShort: true, withTime: true,
+            }),
+          },
         },
       });
       return;
@@ -114,7 +118,11 @@ const GiftMenuItems = ({
       showNotification({
         message: {
           key: 'NotificationGiftCanResellAt',
-          variables: { date: formatDateAtTime(oldLang, savedGift.canResellAt * 1000) },
+          variables: {
+            date: formatCalendarDate(lang, secondsToDate(savedGift.canResellAt), {
+              variant: 'date', isShort: true, withTime: true,
+            }),
+          },
         },
       });
       return;
@@ -195,6 +203,11 @@ const GiftMenuItems = ({
       {canTakeOff && (
         <MenuItem icon="crown-take-off-outline" onClick={handleTakeOff}>
           {lang('GiftInfoTakeOff')}
+        </MenuItem>
+      )}
+      {onDelete && (
+        <MenuItem icon="delete" destructive onClick={onDelete}>
+          {lang('GiftInfoDelete')}
         </MenuItem>
       )}
     </>

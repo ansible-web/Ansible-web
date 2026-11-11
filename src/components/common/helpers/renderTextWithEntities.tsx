@@ -594,6 +594,8 @@ function processEntity({
           {renderNestedMessagePart()}
         </a>
       );
+    case ApiMessageEntityTypes.TonAddress:
+      return renderNestedMessagePart();
     case ApiMessageEntityTypes.Pre:
       return <CodeBlock text={entityText} language={entity.language} noCopy={isProtected} />;
     case ApiMessageEntityTypes.Strike:

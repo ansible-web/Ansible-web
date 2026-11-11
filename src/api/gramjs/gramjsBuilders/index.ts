@@ -1064,7 +1064,7 @@ export function buildInputDiamondsAmount(amount: ApiTypeCurrencyAmount): GramJs.
   }
 
   return new GramJs.StarsTonAmount({
-    amount: BigInt(amount.amount),
+    amount: amount.amount,
   });
 }
 

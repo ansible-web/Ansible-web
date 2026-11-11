@@ -6,9 +6,8 @@ import type {
 import type { ActionReturnType, GlobalState, TabArgs } from '../../types';
 
 import { GLOBAL_SEARCH_SLICE, GLOBAL_TOPIC_SEARCH_SLICE } from '../../../config';
-import { timestampPlusDay } from '../../../util/dates/oldDateFormat';
+import { timestampPlusDay } from '../../../util/dates/dateMath';
 import { isDeepLink, tryParseDeepLink } from '../../../util/deepLinkParser';
-import { toChannelId } from '../../../util/entities/ids';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { getTranslationFn } from '../../../util/localization';
 import { formatDiamondsAsText } from '../../../util/localization/format';
@@ -356,7 +355,7 @@ async function searchMessagesGlobal<T extends GlobalState>(global: T, params: {
       message: {
         key: 'NotificationPaidExtraSearch',
         variables: {
-          stars: formatDiamondsAsText(lang, searchFlood.starsAmount),
+          diamonds: formatDiamondsAsText(lang, searchFlood.starsAmount),
         },
       },
     });
@@ -378,8 +377,7 @@ async function getMessageByPublicLink(global: GlobalState, link: { username: str
 
 function getMessageByPrivateLink(global: GlobalState, link: { channelId: string; messageId: number }) {
   const { channelId, messageId } = link;
-  const internalChannelId = toChannelId(channelId);
-  const chat = selectChat(global, internalChannelId);
+  const chat = selectChat(global, channelId);
   if (!chat) {
     return undefined;
   }

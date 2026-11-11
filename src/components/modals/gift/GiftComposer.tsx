@@ -14,7 +14,7 @@ import {
   selectPeer, selectPeerPaidMessagesDiamonds, selectTabState, selectUserFullInfo,
 } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
-import { formatCountdown } from '../../../util/dates/oldDateFormat';
+import { formatCountdown } from '../../../util/dates/duration';
 import { HOUR } from '../../../util/dates/units';
 import { formatCurrency } from '../../../util/formatCurrency';
 import { formatDiamondsAsIcon, NEXT_ARROW_REPLACEMENT } from '../../../util/localization/format';
@@ -261,7 +261,7 @@ function GiftComposer({
           <ListItem className={styles.switcher} narrow ripple onClick={toggleShouldPayByDiamonds}>
             <span>
               {lang('GiftPremiumPayWithDiamonds', {
-                stars: formatDiamondsAsIcon(lang, giftByDiamonds.amount, { className: styles.switcherDiamondIcon }),
+                diamonds: formatDiamondsAsIcon(lang, giftByDiamonds.amount, { className: styles.switcherDiamondIcon }),
               }, { withNodes: true })}
             </span>
             <Switcher
@@ -275,7 +275,7 @@ function GiftComposer({
         {hasPremiumByDiamonds && diamondBalance && (
           <div className={styles.description}>
             {lang('GiftPremiumDescriptionYourBalance', {
-              stars: formatDiamondsAsIcon(lang, diamondBalance.amount, { className: styles.switcherDiamondIcon }),
+              diamonds: formatDiamondsAsIcon(lang, diamondBalance.amount, { className: styles.switcherDiamondIcon }),
               link: (
                 <Link isPrimary onClick={handleGetMoreDiamonds}>
                   {lang('GetMoreDiamondsLinkText', undefined, {
@@ -301,7 +301,7 @@ function GiftComposer({
           >
             <span>
               {lang('GiftMakeUnique', {
-                stars: formatDiamondsAsIcon(lang, gift.upgradeStars, { className: styles.switcherDiamondIcon }),
+                diamonds: formatDiamondsAsIcon(lang, gift.upgradeStars, { className: styles.switcherDiamondIcon }),
               }, { withNodes: true })}
             </span>
             <Switcher

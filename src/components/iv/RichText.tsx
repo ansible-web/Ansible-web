@@ -31,6 +31,7 @@ export type RichTextProps = {
   chatId?: string;
   messageId?: number;
   threadId?: ThreadId;
+  isProtected?: boolean;
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;
   sharedCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -46,6 +47,7 @@ const RichText = ({
   chatId,
   messageId,
   threadId,
+  isProtected,
   observeIntersectionForLoading,
   observeIntersectionForPlaying,
   sharedCanvasRef,
@@ -85,6 +87,7 @@ const RichText = ({
           chatId={chatId}
           messageId={messageId}
           threadId={threadId}
+          isProtected={isProtected}
           observeIntersectionForLoading={observeIntersectionForLoading}
           observeIntersectionForPlaying={observeIntersectionForPlaying}
           sharedCanvasRef={sharedCanvasRef}
@@ -228,6 +231,8 @@ const RichText = ({
           {renderNestedText()}
         </FormattedDate>
       );
+    case 'tonAddress':
+      return renderNestedText();
     case 'hashtag':
     case 'botCommand':
     case 'cashtag':
@@ -258,6 +263,7 @@ const RichText = ({
         chatId={chatId}
         messageId={messageId}
         threadId={threadId}
+        isProtected={isProtected}
         observeIntersectionForLoading={observeIntersectionForLoading}
         observeIntersectionForPlaying={observeIntersectionForPlaying}
         sharedCanvasRef={sharedCanvasRef}

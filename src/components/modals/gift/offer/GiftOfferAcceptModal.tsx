@@ -4,18 +4,17 @@ import { getActions, withGlobal } from '../../../../global';
 import type { ApiPeer } from '../../../../api/types';
 import type { TabState } from '../../../../global/types';
 
-import { TON_CURRENCY_CODE } from '../../../../config';
+import { STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../../config';
 import { getPeerTitle } from '../../../../global/helpers/peers';
 import {
-  selectDiamondsGiftResaleCommission,
-  selectPeer,
-  selectTonGiftResaleCommission,
+  selectDiamondsGiftResaleCommission, selectPeer,
 } from '../../../../global/selectors';
 import { convertTonToUsd, formatCurrencyAsString } from '../../../../util/formatCurrency';
 import {
   formatCurrencyAmountAsText, formatDiamondsAsIcon, formatDiamondsAsText, formatTonAsIcon, formatTonAsText,
 } from '../../../../util/localization/format';
 import { round } from '../../../../util/math';
+import { multiplyBigIntByPermille } from '../../../../util/numbers';
 import { formatPercent } from '../../../../util/textFormat';
 import { getGiftAttributes } from '../../../common/helpers/gifts';
 
@@ -39,13 +38,13 @@ export type OwnProps = {
 type StateProps = {
   recipientPeer?: ApiPeer;
   diamondsCommission?: number;
-  tonCommission?: number;
+  tonCommissionPermille?: number;
   diamondsUsdRate?: number;
   tonUsdRate?: number;
 };
 
 const GiftOfferAcceptModal = ({
-  modal, recipientPeer, diamondsCommission, tonCommission, diamondsUsdRate, tonUsdRate,
+  modal, recipientPeer, diamondsCommission, tonCommissionPermille, diamondsUsdRate, tonUsdRate,
 }: OwnProps & StateProps) => {
   const {
     closeGiftOfferAcceptModal, acceptDiamondGiftOffer,
@@ -67,12 +66,15 @@ const GiftOfferAcceptModal = ({
     return renderingModal?.gift && getGiftAttributes(renderingModal.gift);
   }, [renderingModal?.gift]);
 
-  const isPriceInTon = renderingModal?.price.currency === TON_CURRENCY_CODE;
-  const commission = isPriceInTon ? tonCommission : diamondsCommission;
-  const priceAmount = renderingModal?.price.amount || 0;
-  const receiveAmount = commission
-    ? (round(priceAmount * commission, isPriceInTon ? 2 : 0))
-    : priceAmount;
+  const offerPrice = renderingModal?.price;
+  const tonReceiveAmount = offerPrice?.currency === TON_CURRENCY_CODE
+    ? (tonCommissionPermille !== undefined
+      ? multiplyBigIntByPermille(offerPrice.amount, tonCommissionPermille)
+      : offerPrice.amount)
+    : undefined;
+  const starsReceiveAmount = offerPrice?.currency === STARS_CURRENCY_CODE
+    ? (diamondsCommission ? round(offerPrice.amount * diamondsCommission) : offerPrice.amount)
+    : 0;
 
   const tableData: TableData = useMemo(() => {
     if (!giftAttributes) return [];
@@ -127,17 +129,18 @@ const GiftOfferAcceptModal = ({
 
     const { gift } = renderingModal;
     const { valueUsdAmount } = gift;
-    if (!valueUsdAmount || valueUsdAmount <= 0 || receiveAmount <= 0) return undefined;
+    const isReceiving = tonReceiveAmount !== undefined ? tonReceiveAmount > 0n : starsReceiveAmount > 0;
+    if (!valueUsdAmount || valueUsdAmount <= 0 || !isReceiving) return undefined;
 
     const avgValueUsd = valueUsdAmount / 100;
 
     let receiveValueUsd: number;
-    if (isPriceInTon) {
+    if (tonReceiveAmount !== undefined) {
       if (!tonUsdRate) return undefined;
-      receiveValueUsd = convertTonToUsd(receiveAmount, tonUsdRate, true) / 100;
+      receiveValueUsd = convertTonToUsd(tonReceiveAmount, tonUsdRate) / 100;
     } else {
       if (!diamondsUsdRate) return undefined;
-      receiveValueUsd = receiveAmount * diamondsUsdRate / 100;
+      receiveValueUsd = starsReceiveAmount * diamondsUsdRate / 100;
     }
 
     const isLower = avgValueUsd >= receiveValueUsd;
@@ -148,7 +151,7 @@ const GiftOfferAcceptModal = ({
     if (percent <= PRICE_WARNING_THRESHOLD_PERCENT) return undefined;
 
     return { percent, isLow: isLower };
-  }, [renderingModal, receiveAmount, isPriceInTon, tonUsdRate, diamondsUsdRate]);
+  }, [renderingModal, tonReceiveAmount, starsReceiveAmount, tonUsdRate, diamondsUsdRate]);
 
   if (!renderingModal || !renderingBuyerPeer) return undefined;
 
@@ -157,12 +160,12 @@ const GiftOfferAcceptModal = ({
   const buyerName = getPeerTitle(lang, renderingBuyerPeer);
 
   const formattedPrice = formatCurrencyAmountAsText(lang, price);
-  const formattedReceiveAmountAsText = isPriceInTon
-    ? formatTonAsText(lang, receiveAmount, true)
-    : formatDiamondsAsText(lang, receiveAmount);
-  const formattedReceiveAmountAsIcon = isPriceInTon
-    ? formatTonAsIcon(lang, receiveAmount, { shouldConvertFromNanos: true })
-    : formatDiamondsAsIcon(lang, receiveAmount);
+  const formattedReceiveAmountAsText = tonReceiveAmount !== undefined
+    ? formatTonAsText(lang, tonReceiveAmount)
+    : formatDiamondsAsText(lang, starsReceiveAmount);
+  const formattedReceiveAmountAsIcon = tonReceiveAmount !== undefined
+    ? formatTonAsIcon(lang, tonReceiveAmount)
+    : formatDiamondsAsIcon(lang, starsReceiveAmount);
 
   return (
     <ConfirmDialog
@@ -209,7 +212,7 @@ export default memo(
   withGlobal<OwnProps>((global, { modal }): Complete<StateProps> => {
     const recipientPeer = modal?.peerId ? selectPeer(global, modal.peerId) : undefined;
     const diamondsCommission = selectDiamondsGiftResaleCommission(global);
-    const tonCommission = selectTonGiftResaleCommission(global);
+    const tonCommissionPermille = global.appConfig?.tonStargiftResaleCommissionPermille;
 
     const diamondsUsdSellRateX1000 = global.appConfig?.diamondsUsdSellRateX1000;
     const diamondsUsdRate = diamondsUsdSellRateX1000 ? diamondsUsdSellRateX1000 / 1000 : undefined;
@@ -218,7 +221,7 @@ export default memo(
     return {
       recipientPeer,
       diamondsCommission,
-      tonCommission,
+      tonCommissionPermille,
       diamondsUsdRate,
       tonUsdRate,
     };

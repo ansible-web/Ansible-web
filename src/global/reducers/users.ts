@@ -1,5 +1,6 @@
 import type {
   ApiDiamondGiftCollection,
+  ApiInputSavedDiamondGift,
   ApiMissingInvitedUser,
   ApiSavedDiamondGift,
   ApiUser,
@@ -13,9 +14,10 @@ import type { GlobalState, TabArgs } from '../types';
 
 import { areDeepEqual } from '../../util/areDeepEqual';
 import { getCurrentTabId } from '../../util/establishMultitabRole';
-import { omit, omitUndefined, unique } from '../../util/iteratees';
+import { mapValues, omit, omitUndefined, unique } from '../../util/iteratees';
 import { MEMO_EMPTY_ARRAY } from '../../util/memo';
 import { getSavedGiftKey } from '../helpers/diamonds';
+import { areInputSavedGiftsEqual } from '../helpers/payments';
 import { selectActiveGiftsCollectionId, selectTabState } from '../selectors';
 import { updateTabState } from './tabs';
 
@@ -366,6 +368,33 @@ export function replacePeerSavedGifts<T extends GlobalState>(
             nextOffset,
           },
         },
+      },
+    },
+  }, tabId);
+}
+
+export function removePeerSavedGift<T extends GlobalState>(
+  global: T,
+  peerId: string,
+  inputGift: ApiInputSavedDiamondGift,
+  ...[tabId = getCurrentTabId()]: TabArgs<T>
+): T {
+  const tabState = selectTabState(global, tabId);
+  const collections = tabState.savedGifts.collectionsByPeerId[peerId];
+  if (!collections) return global;
+
+  // `mapValues` widens numeric collection ids to string keys
+  const updatedCollections = mapValues(collections, ({ gifts, nextOffset }) => ({
+    gifts: gifts.filter((gift) => !gift.inputGift || !areInputSavedGiftsEqual(gift.inputGift, inputGift)),
+    nextOffset,
+  })) as typeof collections;
+
+  return updateTabState(global, {
+    savedGifts: {
+      ...tabState.savedGifts,
+      collectionsByPeerId: {
+        ...tabState.savedGifts.collectionsByPeerId,
+        [peerId]: updatedCollections,
       },
     },
   }, tabId);

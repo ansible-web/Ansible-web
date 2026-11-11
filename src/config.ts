@@ -32,7 +32,6 @@ export const FORCE_FALLBACK_LANG = DEBUG;
 
 export const BETA_CHANGELOG_URL = 'https://ansible.su/changelog';
 
-export const DEBUG_ALERT_MSG = 'Shoot!\nSomething went wrong, please see the error details in Dev Tools Console.';
 export const DEBUG_GRAMJS = false;
 
 export const PAGE_TITLE = import.meta.env.TG_APP_TITLE;
@@ -41,8 +40,6 @@ export const INACTIVE_MARKER = '[Inactive]';
 export const ANSIBLE_API_ID = Number(import.meta.env.TG_TELEGRAM_API_ID);
 export const ANSIBLE_API_HASH = import.meta.env.TG_TELEGRAM_API_HASH;
 export const TEST_SESSION = import.meta.env.TG_TEST_SESSION;
-
-export const DEBUG_PAYMENT_SMART_GLOCAL = false;
 
 export const SESSION_LEGACY_USER_KEY = 'user_auth';
 export const SESSION_ACCOUNT_PREFIX = 'account';
@@ -57,7 +54,7 @@ export const GLOBAL_STATE_CACHE_ARCHIVED_CHAT_LIST_LIMIT = 10;
 export const GLOBAL_STATE_CACHE_CUSTOM_EMOJI_LIMIT = 150;
 
 export const IS_SCREEN_LOCKED_CACHE_KEY = 'tt-is-screen-locked';
-export const SHOULD_DELETE_LEGACY_PASSCODE_DATA = false;
+export const SHOULD_DELETE_LEGACY_PASSCODE_DATA = true;
 
 export const MEDIA_CACHE_DISABLED = false;
 export const MEDIA_CACHE_NAME = 'tt-media';
@@ -66,7 +63,6 @@ export const MEDIA_PROGRESSIVE_CACHE_DISABLED = false;
 export const MEDIA_PROGRESSIVE_CACHE_NAME = 'tt-media-progressive';
 export const MEDIA_CACHE_MAX_BYTES = 512 * 1024; // 512 KB
 export const CUSTOM_BG_CACHE_NAME = 'tt-custom-bg';
-export const LANG_CACHE_NAME = 'tt-lang-packs-v52';
 export const ASSET_CACHE_NAME = 'tt-assets';
 export const AUTODOWNLOAD_FILESIZE_MB_LIMITS = [1, 5, 10, 50, 100, 500];
 export const DATA_BROADCAST_CHANNEL_PREFIX = 'tt-global';
@@ -102,6 +98,8 @@ export const GLOBAL_TOPIC_SEARCH_SLICE = 5;
 export const MEMBERS_SLICE = 30;
 export const PROFILE_POLLS_SLICE = 20;
 export const SAVED_MUSIC_SLICE = 30;
+export const MUSIC_PICKER_SEARCH_DEBOUNCE = 300;
+export const MUSIC_PICKER_GLOBAL_MIN_QUERY_LENGTH = 3;
 export const MEMBERS_LOAD_SLICE = 200;
 export const PROFILE_SENSITIVE_AREA = 500;
 export const TOPIC_LIST_SENSITIVE_AREA = 600;
@@ -140,7 +138,7 @@ export const DEFAULT_MAXIMUM_CHARGE_FOR_MESSAGES = 10000;
 
 export const DEFAULT_VOLUME = 1;
 export const DEFAULT_PLAYBACK_RATE = 1;
-export const PLAYBACK_RATE_FOR_AUDIO_MIN_DURATION = 20 * 60; // 20 min
+export const PLAYBACK_RATE_FOR_AUDIO_MIN_DURATION = 8 * 60; // 8 min
 export const PREVIOUS_RESTART_THRESHOLD = 5;
 export const SHUFFLE_PLAYLIST_LIMIT = 10000;
 export const SHUFFLE_PRELOAD_THRESHOLD = 40;
@@ -155,6 +153,7 @@ export const ANIMATION_LEVEL_DEFAULT = ANIMATION_LEVEL_MED;
 export const DEFAULT_MESSAGE_TEXT_SIZE_PX = 16;
 export const IOS_DEFAULT_MESSAGE_TEXT_SIZE_PX = 17;
 export const MACOS_DEFAULT_MESSAGE_TEXT_SIZE_PX = 15;
+export const RICH_CONTENT_BODY_FONT_SIZE_PX = 18;
 export const INSTANT_VIEW_FONT_SIZE_ADJUST_DEFAULT = 1;
 export const INSTANT_VIEW_FONT_SIZE_ADJUST_MIN = 0.5;
 export const INSTANT_VIEW_FONT_SIZE_ADJUST_MAX = 1.5;
@@ -206,6 +205,7 @@ export const SNAP_EFFECT_ID = 'snap-effect';
 
 export const STARS_ICON_PLACEHOLDER = '⭐';
 export const STARS_CURRENCY_CODE = 'XTR';
+export const USD_CURRENCY_CODE = 'USD';
 
 export const MIN_SCREEN_WIDTH_FOR_STATIC_RIGHT_COLUMN = 1275; // px
 export const MIN_SCREEN_WIDTH_FOR_STATIC_LEFT_COLUMN = 925; // px

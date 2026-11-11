@@ -84,10 +84,10 @@ const GiftTransferModal = ({
       onClose={closeGiftTransferModal}
       title={lang('GiftTransferTitle')}
       hasCloseButton
-      shouldAdaptToSearch
       withFixedHeight
     >
-      <PeerPicker<never>
+      <PeerPicker
+        withIslands
         itemIds={displayIds}
         withDefaultPadding
         withPeerUsernames

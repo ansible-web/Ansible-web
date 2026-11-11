@@ -105,7 +105,7 @@ const DiamondsBalanceModal = ({
     if (originDiamondsPayment) {
       const bot = originDiamondsPayment.form?.botId ? selectUser(global, originDiamondsPayment.form.botId) : undefined;
       if (!bot) return undefined;
-      return lang('DiamondsNeededText', { user: getUserFullName(bot) });
+      return lang('DiamondsNeededText', { user: getUserFullName(lang, bot) });
     }
 
     if (originGift) {

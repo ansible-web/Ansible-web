@@ -2,6 +2,7 @@ import type {
   ApiAiComposeToneType,
   ApiAppConfig,
   ApiAttachBot,
+  ApiAudio,
   ApiAvailableEffect,
   ApiAvailableReaction,
   ApiBotPreviewMedia,
@@ -131,6 +132,7 @@ export type GlobalState = {
   };
 
   recentlyFoundChatIds?: string[];
+  recentlyFoundSettingIds?: string[];
 
   twoFaSettings: {
     hint?: string;
@@ -445,6 +447,10 @@ export type GlobalState = {
     };
   };
 
+  musicSearch: {
+    audiosById: Record<string, ApiAudio>;
+  };
+
   topPeerCategories: Partial<Record<ApiTopPeerCategory, {
     peerIds: string[];
     ratingsByPeerId: Record<string, number>;
@@ -512,6 +518,9 @@ export type GlobalState = {
     balance: ApiTonAmount;
     history: DiamondsTransactionHistory;
   };
+
+  // Against USD
+  currencyRates?: Record<string, number>;
 };
 
 export type RequiredGlobalState = GlobalState & { _: never };

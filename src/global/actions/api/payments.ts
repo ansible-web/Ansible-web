@@ -1,7 +1,7 @@
 import type {
   ApiInputInvoice, ApiInputInvoiceDiamondGift,
   ApiInputInvoiceDiamondGiftAuctionBid, ApiInputInvoiceDiamondGiftResale,
-  ApiInputInvoicePremiumGiftDiamonds, ApiRequestInputInvoice,
+  ApiInputInvoicePremiumGiftDiamonds, ApiRequestInputInvoice, ApiTypeCurrencyAmount,
 } from '../../../api/types';
 import type { ApiCredentials } from '../../../components/payment/PaymentModal';
 import type { RegularLangFnParameters } from '../../../util/localization';
@@ -10,15 +10,16 @@ import type {
 } from '../../types';
 import { PaymentStep } from '../../../types';
 
-import { DEBUG_PAYMENT_SMART_GLOCAL, STARS_CURRENCY_CODE, TON_CURRENCY_CODE } from '../../../config';
+import { TON_CURRENCY_CODE, USD_CURRENCY_CODE } from '../../../config';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
-import * as langProvider from '../../../util/oldLangProvider';
 import { getStripeError } from '../../../util/payments/stripe';
 import { getServerTime } from '../../../util/serverTime';
 import { extractCurrentThemeParams } from '../../../util/themeStyle';
 import { callApi } from '../../../api/gramjs';
 import { isChatChannel, isChatSuperGroup } from '../../helpers';
 import {
+  areCurrencyAmountsEqual,
+  buildStarsAmount,
   getRequestInputInvoice,
   getRequestInputSavedDiamondGift,
 } from '../../helpers/payments';
@@ -44,18 +45,18 @@ import {
   selectChatFullInfo,
   selectDiamondsPayment,
   selectIsCurrentUserFrozen,
+  selectPaymentCredentialsData,
   selectPaymentInputInvoice,
   selectPaymentRequestId,
   selectProviderPublicToken,
   selectProviderPublishableKey,
-  selectSmartGlocalCredentials,
-  selectStripeCredentials,
   selectTabState,
 } from '../../selectors';
 
 const LOCAL_BOOST_COOLDOWN = 86400; // 24 hours
 const SMART_GLOCAL_DOMAIN = 'smart-glocal.com';
 const SMART_GLOCAL_TOKENIZE_PATH = '/cds/v1/tokenize/card';
+const CURRENCY_CODE_REGEX = /^[A-Z]{3}$/;
 
 function isValidSmartGlocalTokenizeUrl(tokenizeUrl: string) {
   if (tokenizeUrl !== tokenizeUrl.trim()) {
@@ -168,7 +169,7 @@ addActionHandler('sendDiamondGift', (global, actions, payload): ActionReturnType
     shouldUpgrade: shouldUpgrade || undefined,
   };
 
-  payInputDiamondInvoice(global, inputInvoice, gift.stars, tabId);
+  payInputDiamondInvoice(global, inputInvoice, buildStarsAmount(gift.stars), tabId);
 });
 
 addActionHandler('buyDiamondGift', (global, actions, payload): ActionReturnType => {
@@ -185,7 +186,7 @@ addActionHandler('buyDiamondGift', (global, actions, payload): ActionReturnType 
     shouldShowName,
   };
 
-  payInputDiamondInvoice(global, inputInvoice, price.amount, tabId);
+  payInputDiamondInvoice(global, inputInvoice, price, tabId);
 });
 
 addActionHandler('sendPremiumGiftByDiamonds', (global, actions, payload): ActionReturnType => {
@@ -200,7 +201,7 @@ addActionHandler('sendPremiumGiftByDiamonds', (global, actions, payload): Action
     message,
   };
 
-  payInputDiamondInvoice(global, inputInvoice, amount, tabId);
+  payInputDiamondInvoice(global, inputInvoice, buildStarsAmount(amount), tabId);
 });
 
 addActionHandler('getReceipt', async (global, actions, payload): Promise<void> => {
@@ -281,7 +282,7 @@ addActionHandler('sendPaymentForm', async (global, actions, payload): Promise<vo
     return;
   }
 
-  const { nativeProvider, formId } = form;
+  const { formId } = form;
 
   const requestInputInvoice = getRequestInputInvoice(global, inputInvoice);
   if (!requestInputInvoice) {
@@ -293,8 +294,7 @@ addActionHandler('sendPaymentForm', async (global, actions, payload): Promise<vo
 
   const credentials = {
     save: saveCredentials,
-    data: nativeProvider === 'stripe'
-      ? selectStripeCredentials(global, tabId) : selectSmartGlocalCredentials(global, tabId),
+    data: selectPaymentCredentialsData(global, tabId),
   };
   const result = await callApi('sendPaymentForm', {
     inputInvoice: requestInputInvoice,
@@ -449,16 +449,17 @@ async function sendSmartGlocalCredentials<T extends GlobalState>(
     },
   };
 
-  const tokenizeUrl = selectTabState(global, tabId).payment.form?.nativeParams.tokenizeUrl;
+  const { invoice, nativeParams } = selectTabState(global, tabId).payment.form!;
+  const { tokenizeUrl } = nativeParams;
 
   let url;
-  if (DEBUG_PAYMENT_SMART_GLOCAL) {
+  if (invoice.isTest) {
     url = 'https://tgb-playground.smart-glocal.com/cds/v1/tokenize/card';
   } else {
     url = 'https://tgb.smart-glocal.com/cds/v1/tokenize/card';
   }
 
-  if (tokenizeUrl && isValidSmartGlocalTokenizeUrl(tokenizeUrl)) {
+  if (typeof tokenizeUrl === 'string' && isValidSmartGlocalTokenizeUrl(tokenizeUrl)) {
     url = tokenizeUrl;
   }
 
@@ -499,12 +500,9 @@ async function sendSmartGlocalCredentials<T extends GlobalState>(
   setGlobal(global);
 }
 
-addActionHandler('setSmartGlocalCardInfo', (global, actions, payload): ActionReturnType => {
-  const { tabId = getCurrentTabId(), type, token } = payload;
-  return setSmartGlocalCardInfo(global, {
-    type,
-    token,
-  }, tabId);
+addActionHandler('setPaymentWebFormCredentials', (global, actions, payload): ActionReturnType => {
+  const { credentials, tabId = getCurrentTabId() } = payload;
+  return updatePayment(global, { webFormCredentials: credentials }, tabId);
 });
 
 addActionHandler('setPaymentStep', (global, actions, payload): ActionReturnType => {
@@ -979,7 +977,10 @@ addActionHandler('checkGiftCode', async (global, actions, payload): Promise<void
 
   if (!result) {
     actions.showNotification({
-      message: langProvider.oldTranslate('lng_gift_link_expired'),
+      message: {
+        key: 'GiftLinkExpired',
+        options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+      },
       tabId,
     });
     return;
@@ -1118,7 +1119,7 @@ addActionHandler('upgradeGift', async (global, actions, payload): Promise<void> 
     shouldKeepOriginalDetails: shouldKeepOriginalDetails || undefined,
   };
 
-  payInputDiamondInvoice(global, invoice, upgradeStars, tabId);
+  payInputDiamondInvoice(global, invoice, buildStarsAmount(upgradeStars), tabId);
 });
 
 addActionHandler('transferGift', (global, actions, payload): ActionReturnType => {
@@ -1158,7 +1159,7 @@ addActionHandler('transferGift', (global, actions, payload): ActionReturnType =>
     recipientId,
   };
 
-  payInputDiamondInvoice(global, invoice, transferStars, tabId);
+  payInputDiamondInvoice(global, invoice, buildStarsAmount(transferStars), tabId);
 });
 
 addActionHandler('removeGiftDescription', (global, actions, payload): ActionReturnType => {
@@ -1169,7 +1170,7 @@ addActionHandler('removeGiftDescription', (global, actions, payload): ActionRetu
     inputSavedGift: gift,
   };
 
-  payInputDiamondInvoice(global, invoice, price, tabId);
+  payInputDiamondInvoice(global, invoice, buildStarsAmount(price), tabId);
 });
 
 addActionHandler('upgradePrepaidGift', (global, actions, payload): ActionReturnType => {
@@ -1181,7 +1182,7 @@ addActionHandler('upgradePrepaidGift', (global, actions, payload): ActionReturnT
     hash,
   };
 
-  payInputDiamondInvoice(global, invoice, stars, tabId);
+  payInputDiamondInvoice(global, invoice, buildStarsAmount(stars), tabId);
 });
 
 addActionHandler('sendDiamondGiftAuctionBid', (global, actions, payload): ActionReturnType => {
@@ -1199,34 +1200,29 @@ addActionHandler('sendDiamondGiftAuctionBid', (global, actions, payload): Action
     isUpdateBid,
   };
 
-  payInputDiamondInvoice(global, invoice, bidAmount, tabId);
+  payInputDiamondInvoice(global, invoice, buildStarsAmount(bidAmount), tabId);
 });
 
 async function payInputDiamondInvoice<T extends GlobalState>(
-  global: T, inputInvoice: ApiInputInvoice, price: number,
+  global: T, inputInvoice: ApiInputInvoice, price: ApiTypeCurrencyAmount,
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ) {
   const actions = getActions();
-  const isTon = inputInvoice.type === 'stargiftResale' && inputInvoice.currency === TON_CURRENCY_CODE;
-  const balance = isTon ? global.ton?.balance : global.stars?.balance;
-  const currency = isTon ? TON_CURRENCY_CODE : STARS_CURRENCY_CODE;
+  const balance = price.currency === TON_CURRENCY_CODE ? global.ton?.balance : global.stars?.balance;
 
   if (balance === undefined) return;
 
-  if (balance.amount < price) {
-    // Tell the user upfront exactly how much they are short (1019) instead of
-    // silently opening the top-up sheet, which reads as "nothing happened".
-    // Diamonds (XTR) only — the TON path has no crystal wording.
-    if (!isTon) {
+  if (balance.amount < price.amount) {
+    if (price.currency !== TON_CURRENCY_CODE && balance.currency !== TON_CURRENCY_CODE) {
       actions.showNotification({
         message: {
           key: 'DiamondsBuyNotEnough',
-          variables: { count: price - balance.amount },
+          variables: { count: price.amount - balance.amount },
         },
         tabId,
       });
     }
-    actions.openDiamondsBalanceModal({ currency, tabId });
+    actions.openDiamondsBalanceModal({ currency: price.currency, tabId });
     return;
   }
 
@@ -1259,12 +1255,11 @@ async function payInputDiamondInvoice<T extends GlobalState>(
     return;
   }
 
-  const formPrice = form.invoice.totalAmount;
-  if (formPrice !== price) {
+  const formPrice = form.invoice.totalPrice;
+  if (formPrice && !areCurrencyAmountsEqual(formPrice, price)) {
     actions.openPriceConfirmModal({
       originalAmount: price,
       newAmount: formPrice,
-      currency,
       directInfo: {
         inputInvoice,
         formId: form.formId,
@@ -1385,3 +1380,24 @@ function handlePaymentFormError(error: string, tabId: number) {
 
   getActions().showDialog({ data: { type: 'error', message: error, hasErrorKey: true }, tabId });
 }
+
+addActionHandler('loadCurrencyRates', async (global): Promise<void> => {
+  const rates = await callApi('fetchCurrencyRates');
+  if (!rates) return;
+
+  global = getGlobal();
+
+  global = {
+    ...global,
+    // `Intl.NumberFormat` throws on a malformed code, and a non-positive rate would show `NaN`
+    currencyRates: rates.reduce<Record<string, number>>((acc, { currency, rate }) => {
+      if (CURRENCY_CODE_REGEX.test(currency) && Number.isFinite(rate) && rate > 0) {
+        acc[currency] = rate;
+      }
+
+      return acc;
+    }, { [USD_CURRENCY_CODE]: 1 }),
+  };
+
+  setGlobal(global);
+});

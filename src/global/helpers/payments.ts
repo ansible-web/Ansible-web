@@ -498,3 +498,15 @@ export function getPrizeDiamondsTransactionFromGiveaway(message: ApiMessage): Ap
 export function areInputSavedGiftsEqual(one: ApiInputSavedDiamondGift, two: ApiInputSavedDiamondGift) {
   return areRecordsShallowEqual(one, two);
 }
+
+export function buildStarsAmount(amount: number): ApiDiamondsAmount {
+  return { currency: STARS_CURRENCY_CODE, amount, nanos: 0 };
+}
+
+export function areCurrencyAmountsEqual(one?: ApiTypeCurrencyAmount, two?: ApiTypeCurrencyAmount) {
+  if (one?.currency === STARS_CURRENCY_CODE && two?.currency === STARS_CURRENCY_CODE) {
+    return one.amount === two.amount && one.nanos === two.nanos;
+  }
+
+  return one?.currency === two?.currency && one?.amount === two?.amount;
+}

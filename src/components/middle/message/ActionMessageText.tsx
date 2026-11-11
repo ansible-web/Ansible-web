@@ -29,11 +29,12 @@ import {
 } from '../../../global/selectors';
 import { selectThreadIdFromMessage } from '../../../global/selectors/threads';
 import { ensureProtocol } from '../../../util/browser/url';
+import { formatCountdown, formatShortDuration } from '../../../util/dates/duration';
+import { formatCurrency } from '../../../util/formatCurrency';
+import { formatCalendarDate, formatDateTime, secondsToDate } from '../../../util/localization/dateFormat';
 import {
-  formatCountdown, formatDateTimeToString, formatScheduledDateTime, formatShortDuration,
-} from '../../../util/dates/oldDateFormat';
-import { convertTonFromNanos, formatCurrency } from '../../../util/formatCurrency';
-import { formatCurrencyAmountAsText, formatDiamondsAsText, formatTonAsText } from '../../../util/localization/format';
+  formatCurrencyAmountAsText, formatDiamondsAsText, formatTonAsIcon, formatTonAsText,
+} from '../../../util/localization/format';
 import { conjuctionWithNodes } from '../../../util/localization/utils';
 import { getServerTime } from '../../../util/serverTime';
 import renderText from '../../common/helpers/renderText';
@@ -49,7 +50,6 @@ import {
 
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 
 import CustomEmoji from '../../common/CustomEmoji';
 import TopicDefaultIcon from '../../common/TopicDefaultIcon';
@@ -92,7 +92,6 @@ const ActionMessageText = ({
   const action = message.content.action!;
 
   const lang = useLang();
-  const oldLang = useOldLang();
 
   function renderStrong(text: TeactNode) {
     if (asPreview) return text;
@@ -257,8 +256,15 @@ const ActionMessageText = ({
 
         const topicLinkContent = (
           <>
-            {iconEmojiId ? <CustomEmoji documentId={iconEmojiId} isSelectable />
-              : <TopicDefaultIcon topicId={topicId} title={title} iconColor={iconColor} />}
+            {iconEmojiId ? <CustomEmoji documentId={iconEmojiId} className={styles.topicIcon} isSelectable />
+              : (
+                <TopicDefaultIcon
+                  className={styles.topicIcon}
+                  topicId={topicId}
+                  title={title}
+                  iconColor={iconColor}
+                />
+              )}
             {NBSP}
             {renderText(title)}
           </>
@@ -277,9 +283,10 @@ const ActionMessageText = ({
         const topicLinkContent = (
           <>
             {iconEmojiId && iconEmojiId !== DEFAULT_TOPIC_ICON_ID
-              ? <CustomEmoji documentId={iconEmojiId} isSelectable />
+              ? <CustomEmoji documentId={iconEmojiId} className={styles.topicIcon} isSelectable />
               : (
                 <TopicDefaultIcon
+                  className={styles.topicIcon}
                   topicId={topicId}
                   title={title || currentTopic?.title || lang('ActionTopicPlaceholder')}
                   iconColor={currentTopic?.iconColor}
@@ -341,7 +348,7 @@ const ActionMessageText = ({
             {
               from: senderLink,
               link: topicPlaceholderLink,
-              emoji: <CustomEmoji documentId={iconEmojiId} loopLimit={2} />,
+              emoji: <CustomEmoji documentId={iconEmojiId} className={styles.topicIcon} loopLimit={2} />,
             },
             { withNodes: true },
           );
@@ -398,6 +405,24 @@ const ActionMessageText = ({
         const userTitle = (user && getPeerTitle(lang, user)) || userFallbackText;
         const userLink = renderPeerLink(user?.id, userTitle, asPreview);
         return translateWithYou(lang, 'ActionKickUser', isOutgoing, { from: senderLink, user: userLink });
+      }
+
+      case 'requestedPeer': {
+        const { peerIds } = action;
+        const peerLinks = peerIds.map((peerId) => {
+          const peer = selectPeer(global, peerId);
+          return renderPeerLink(peerId, (peer && getPeerTitle(lang, peer)) || userFallbackText, asPreview);
+        });
+        return lang('ActionRequestedPeer', {
+          peer: conjuctionWithNodes(lang, peerLinks),
+          bot: chatLink,
+        }, { withNodes: true });
+      }
+
+      case 'managedBotCreated': {
+        const bot = selectPeer(global, action.botId);
+        const botLink = renderPeerLink(action.botId, (bot && getPeerTitle(lang, bot)) || userFallbackText, asPreview);
+        return translateWithYou(lang, 'ActionManagedBotCreated', isOutgoing, { from: senderLink, bot: botLink });
       }
 
       case 'botAllowed': {
@@ -463,8 +488,8 @@ const ActionMessageText = ({
         } = action;
 
         const price = formatCurrency(lang, amount, currency, { asFontIcon: true });
-        const cryptoPrice = cryptoAmount && type !== 'giftTon'
-          ? formatCurrency(lang, cryptoAmount, cryptoCurrency!) : undefined;
+        const cryptoPrice = cryptoAmount && cryptoCurrency === TON_CURRENCY_CODE && type !== 'giftTon'
+          ? formatTonAsIcon(lang, cryptoAmount) : undefined;
 
         const cost = cryptoPrice ? lang('ActionGiftCostCrypto', { price, cryptoPrice }, { withNodes: true }) : price;
 
@@ -499,7 +524,7 @@ const ActionMessageText = ({
 
       case 'groupCallScheduled': {
         const { scheduleDate } = action;
-        const formattedDate = formatDateTimeToString(scheduleDate * 1000, lang.code, true);
+        const formattedDate = formatDateTime(lang, secondsToDate(scheduleDate), { date: 'short', time: 'short' });
 
         if (isChannel) return lang('ActionGroupCallScheduledChannel', { date: formattedDate });
         return lang('ActionGroupCallScheduledGroup', { from: senderLink, date: formattedDate }, { withNodes: true });
@@ -692,7 +717,7 @@ const ActionMessageText = ({
               : 'ApiMessageMessageActionResaleDiamondGiftUniqueIncoming',
             {
               gift: lang('GiftUnique', { title: gift.title, number: gift.number }),
-              stars: renderStrong(amountText),
+              diamonds: renderStrong(amountText),
             },
             { withNodes: true },
           );
@@ -732,7 +757,7 @@ const ActionMessageText = ({
               'ApiMessageMessageActionResaleDiamondGiftUniqueOutgoing',
               {
                 gift: lang('GiftUnique', { title: gift.title, number: gift.number }),
-                stars: asPreview ? amountText : renderStrong(amountText),
+                diamonds: asPreview ? amountText : renderStrong(amountText),
               },
               { withNodes: true },
             );
@@ -883,23 +908,21 @@ const ActionMessageText = ({
           : 'ApiMessageActionPaidMessagesRefundedIncoming';
 
         return lang(key, {
-          stars: formatDiamondsAsText(lang, stars),
+          diamonds: formatDiamondsAsText(lang, stars),
           user: renderPeerLink(user?.id, userTitle),
         }, { withNodes: true, withMarkdown: true });
       }
 
       case 'suggestedPostSuccess': {
         const { amount: price } = action;
-        const currency = price?.currency || STARS_CURRENCY_CODE;
-        const amount = price?.amount || 0;
 
         const channel = chat?.isMonoforum ? selectMonoforumChannel(global, chatId) : chat;
         const channelTitle = channel && getPeerTitle(lang, channel);
         const channelLink = renderPeerLink(channel?.id, channelTitle || channelFallbackText, asPreview);
 
-        const formattedAmount = currency === TON_CURRENCY_CODE
-          ? formatTonAsText(lang, convertTonFromNanos(amount))
-          : formatDiamondsAsText(lang, amount);
+        const formattedAmount = price?.currency === TON_CURRENCY_CODE
+          ? formatTonAsText(lang, price.amount)
+          : formatDiamondsAsText(lang, price?.amount || 0);
 
         return lang('ActionSuggestedPostSuccess', {
           channel: channelLink,
@@ -914,16 +937,14 @@ const ActionMessageText = ({
         const postSenderLink = renderPeerLink(postSender?.id, postSenderTitle || userFallbackText, asPreview);
 
         const price = replyMessage?.suggestedPostInfo?.price;
-        const currency = price?.currency || STARS_CURRENCY_CODE;
-        const amount = price?.amount || 0;
 
         const channel = chat?.isMonoforum ? selectMonoforumChannel(global, chatId) : chat;
         const channelTitle = channel && getPeerTitle(lang, channel);
         const channelLink = renderPeerLink(channel?.id, channelTitle || channelFallbackText, asPreview);
 
-        const formattedAmount = currency === TON_CURRENCY_CODE
-          ? formatTonAsText(lang, convertTonFromNanos(amount))
-          : formatDiamondsAsText(lang, amount);
+        const formattedAmount = price?.currency === TON_CURRENCY_CODE
+          ? formatTonAsText(lang, price.amount)
+          : formatDiamondsAsText(lang, price?.amount || 0);
 
         if (payerInitiated) {
           return lang('SuggestedPostRefundedByUser', {
@@ -972,7 +993,7 @@ const ActionMessageText = ({
 
         const { scheduleDate } = action;
         if (scheduleDate) {
-          const publishDate = formatScheduledDateTime(scheduleDate, lang, oldLang);
+          const publishDate = formatCalendarDate(lang, secondsToDate(scheduleDate), { isShort: true, withTime: true });
           const isPostPublished = scheduleDate <= getServerTime();
 
           return translateWithYou(

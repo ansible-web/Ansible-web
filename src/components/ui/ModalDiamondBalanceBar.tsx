@@ -3,9 +3,10 @@ import { getActions, withGlobal } from '../../global';
 
 import type { ApiDiamondsAmount, ApiTonAmount } from '../../api/types';
 
+import { TON_CURRENCY_CODE } from '../../config';
 import { formatDiamondsAmount } from '../../global/helpers/payments';
 import buildClassName from '../../util/buildClassName';
-import { convertTonFromNanos, convertTonToUsd, formatCurrencyAsString } from '../../util/formatCurrency';
+import { convertTonToUsd, formatCurrencyAsString } from '../../util/formatCurrency';
 import { formatDiamondsAsIcon, formatTonAsIcon, NEXT_ARROW_REPLACEMENT } from '../../util/localization/format';
 
 import useIsTopmostBalanceBarModal from '../../hooks/element/useIsTopmostBalanceBarModal';
@@ -71,16 +72,16 @@ function ModalDiamondBalanceBar({
       ref={ref}
     >
       <div>
-        {isTonMode ? (
+        {currentBalance.currency === TON_CURRENCY_CODE ? (
           lang('ModalDiamondsBalanceBarDescription', {
-            stars: formatTonAsIcon(lang, convertTonFromNanos(currentBalance.amount)),
+            diamonds: formatTonAsIcon(lang, currentBalance.amount),
           }, {
             withNodes: true,
             withMarkdown: true,
           })
         ) : (
           lang('ModalDiamondsBalanceBarDescription', {
-            stars: formatDiamondsAsIcon(lang, formatDiamondsAmount(lang, currentBalance as ApiDiamondsAmount)),
+            diamonds: formatDiamondsAsIcon(lang, formatDiamondsAmount(lang, currentBalance)),
           }, {
             withNodes: true,
             withMarkdown: true,
@@ -88,10 +89,10 @@ function ModalDiamondBalanceBar({
         )}
       </div>
       <div>
-        {isTonMode && Boolean(tonUsdRate) && (
+        {currentBalance.currency === TON_CURRENCY_CODE && Boolean(tonUsdRate) && (
           <div className={styles.tonInUsdDescription} style="color: var(--color-text-secondary)">
             {`≈ ${formatCurrencyAsString(
-              convertTonToUsd((currentBalance as ApiTonAmount).amount, tonUsdRate, true),
+              convertTonToUsd(currentBalance.amount, tonUsdRate),
               'USD',
               lang.code,
             )}`}

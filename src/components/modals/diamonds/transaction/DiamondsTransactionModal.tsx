@@ -268,7 +268,8 @@ const DiamondsTransactionModal = ({
       ]);
     }
 
-    if (transaction.diamondRefCommision && transaction.paidMessages) {
+    if (transaction.diamondRefCommision && transaction.paidMessages
+      && transaction.amount.currency === STARS_CURRENCY_CODE) {
       tableData.push([
         lang('PaidMessageTransactionTotal'),
         formatDiamondsAsIcon(lang,

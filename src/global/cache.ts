@@ -7,8 +7,10 @@ import type {
   ApiKeyboardButton,
   ApiMessage,
   ApiPhoto,
+  ApiTypeCurrencyAmount,
   ApiVideo,
 } from '../api/types';
+import type { ApiMessageAction } from '../api/types/messageActions';
 import type {
   IThemeSettings, MessageList, PerformanceType, ThemeKey, ThreadId, TopicsInfo,
 } from '../types';
@@ -31,6 +33,7 @@ import {
   IS_SCREEN_LOCKED_CACHE_KEY,
   SAVED_FOLDER_ID,
   SHARED_STATE_CACHE_KEY,
+  TON_CURRENCY_CODE,
 } from '../config';
 import { MAIN_IDB_STORE } from '../util/browser/idb';
 import { isUserId } from '../util/entities/ids';
@@ -39,6 +42,7 @@ import {
   compact, pick, pickTruthy, unique,
 } from '../util/iteratees';
 import { ACCOUNT_SLOT, getGlobalStateCacheKey, GLOBAL_STATE_CACHE_KEY } from '../util/multiaccount';
+import { parseJsonWithBigInt, stringifyJsonWithBigInt } from '../util/numbers';
 import { getDek, writeGlobalsVaultForSlot } from '../util/passcode';
 import { onBeforeUnload, throttle } from '../util/schedulers';
 import { getServerTime } from '../util/serverTime';
@@ -68,6 +72,10 @@ import {
 import { getIsMobile } from '../hooks/useAppLayout';
 
 const UPDATE_THROTTLE = 5000;
+// The cached history is only a head start; the first page from the server replaces it
+const APP_CONFIG_NANOTON_KEYS = [
+  'tonSuggestedPostAmountMax', 'tonSuggestedPostAmountMin', 'tonStargiftResaleAmountMax', 'tonStargiftResaleAmountMin',
+] as const;
 
 // `patternColor` values the cache migration recognizes as defaults and replaces with the
 // wallpaper-derived ones
@@ -198,7 +206,7 @@ async function readCache(initialState: GlobalState): Promise<GlobalState> {
   }
 
   const json = localStorage.getItem(GLOBAL_STATE_CACHE_KEY);
-  const cachedFromLocalStorage = json ? JSON.parse(json) as GlobalState : undefined;
+  const cachedFromLocalStorage = json ? parseJsonWithBigInt<GlobalState>(json) : undefined;
   if (cachedFromLocalStorage) localStorage.removeItem(GLOBAL_STATE_CACHE_KEY);
 
   let cached = cachedFromLocalStorage || await loadCachedGlobal();
@@ -315,6 +323,10 @@ function pruneExpiredEphemeralMessages(cached: GlobalState) {
 
 function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
   const untypedCached = cached as any;
+  Object.values(cached.chats.fullInfoById).forEach((fullInfo) => {
+    fullInfo.isCache = true;
+  });
+
   Object.values(cached.messages.byChatId).forEach((messageStore) => {
     messageStore.ephemeralById ||= {};
     messageStore.anchoredById = {};
@@ -342,6 +354,10 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
 
   if (!cached.users.savedMusicByPeerId) {
     cached.users.savedMusicByPeerId = initialState.users.savedMusicByPeerId;
+  }
+
+  if (!cached.musicSearch) {
+    cached.musicSearch = initialState.musicSearch;
   }
 
   const cachedSharedSettings = cached.sharedState.settings;
@@ -439,6 +455,11 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
     // Набор стикеров по умолчанию теперь отдаётся каждому через getAllStickers;
     // сбрасываем кеш, чтобы он появился в «добавленных» без ручной чистки.
     cached.stickers = initialState.stickers;
+  }
+
+  if (cached.cacheVersion < 10) {
+    migrateNanotonsToBigInt(cached);
+    cached.cacheVersion = 10;
   }
 
   if (!cached.auth) {
@@ -551,10 +572,12 @@ function reduceGlobal<T extends GlobalState>(global: T) {
       'shouldShowContextMenuHint',
       'trustedBotIds',
       'recentlyFoundChatIds',
+      'recentlyFoundSettingIds',
       'peerColors',
       'savedReactionTags',
       'timezones',
       'availableEffectById',
+      'currencyRates',
     ]),
     lastIsChatInfoShown: !getIsMobile() ? global.lastIsChatInfoShown : undefined,
     stickers: reduceStickers(global),
@@ -600,11 +623,7 @@ function reduceSharedState(sharedState: SharedState): SharedState {
 }
 
 export function serializeGlobal<T extends GlobalState>(global: T) {
-  return JSON.stringify(reduceGlobal(global));
-}
-
-export function serializeShared(sharedState: SharedState) {
-  return JSON.stringify(reduceSharedState(sharedState));
+  return stringifyJsonWithBigInt(reduceGlobal(global));
 }
 
 function reduceStickers<T extends GlobalState>(global: T): GlobalState['stickers'] {
@@ -1023,4 +1042,57 @@ function migrateButtonActions(cached: GlobalState) {
       });
     });
   });
+}
+
+// Earlier caches store TON-denominated message metadata as plain numbers
+function migrateNanotonsToBigInt(cached: GlobalState) {
+  const { appConfig } = cached;
+
+  APP_CONFIG_NANOTON_KEYS.forEach((key) => {
+    const value = appConfig?.[key];
+    if (value !== undefined) appConfig[key] = BigInt(value);
+  });
+
+  Object.values(cached.messages.byChatId).forEach(({ byId, ephemeralById, threadsById }) => {
+    [...Object.values(byId), ...Object.values(ephemeralById)].forEach(({ content: { action }, suggestedPostInfo }) => {
+      migrateCurrencyAmountToBigInt(suggestedPostInfo?.price);
+      if (action) migrateActionNanotonsToBigInt(action);
+    });
+
+    Object.values(threadsById).forEach(({ localState }) => {
+      migrateCurrencyAmountToBigInt(localState?.draft?.suggestedPostInfo?.price);
+    });
+  });
+
+  Object.values(cached.messages.webPageById).forEach((webPage) => {
+    if (webPage.webpageType === 'full') webPage.gift?.resellPrice?.forEach(migrateCurrencyAmountToBigInt);
+  });
+}
+
+function migrateActionNanotonsToBigInt(action: ApiMessageAction) {
+  switch (action.type) {
+    case 'giftPremium':
+    case 'giftCode':
+    case 'giftStars':
+    case 'giftTon':
+      if (action.cryptoAmount !== undefined) action.cryptoAmount = BigInt(action.cryptoAmount);
+      break;
+    case 'starGiftUnique':
+      migrateCurrencyAmountToBigInt(action.resaleAmount);
+      action.gift.resellPrice?.forEach(migrateCurrencyAmountToBigInt);
+      break;
+    case 'suggestedPostApproval':
+    case 'suggestedPostSuccess':
+      migrateCurrencyAmountToBigInt(action.amount);
+      break;
+    case 'starGiftPurchaseOffer':
+    case 'starGiftPurchaseOfferDeclined':
+      migrateCurrencyAmountToBigInt(action.price);
+      action.gift.resellPrice?.forEach(migrateCurrencyAmountToBigInt);
+      break;
+  }
+}
+
+function migrateCurrencyAmountToBigInt(currencyAmount?: ApiTypeCurrencyAmount) {
+  if (currencyAmount?.currency === TON_CURRENCY_CODE) currencyAmount.amount = BigInt(currencyAmount.amount);
 }

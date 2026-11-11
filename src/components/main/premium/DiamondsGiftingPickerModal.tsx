@@ -1,4 +1,3 @@
-import type { FC } from '../../../lib/teact/teact';
 import {
   memo, useMemo,
   useState,
@@ -32,13 +31,13 @@ interface StateProps {
   archivedListIds?: string[];
 }
 
-const DiamondsGiftingPickerModal: FC<OwnProps & StateProps> = ({
+const DiamondsGiftingPickerModal = ({
   isOpen,
   currentUserId,
   activeListIds,
   archivedListIds,
   userIds,
-}) => {
+}: OwnProps & StateProps) => {
   const { closeDiamondsGiftingPickerModal, openDiamondsGiftModal } = getActions();
 
   const lang = useLang();
@@ -85,12 +84,12 @@ const DiamondsGiftingPickerModal: FC<OwnProps & StateProps> = ({
       onClose={closeDiamondsGiftingPickerModal}
       title={lang('GiftDiamondsTitle')}
       hasCloseButton
-      shouldAdaptToSearch
       withFixedHeight
       confirmButtonText={lang('Continue')}
       onEnter={closeDiamondsGiftingPickerModal}
     >
       <PeerPicker
+        withIslands
         className={styles.picker}
         itemIds={displayedUserIds}
         filterValue={searchQuery}

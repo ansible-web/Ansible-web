@@ -4,7 +4,7 @@ import type {
   ApiChatType, ApiFormattedText, LinkContext,
 } from '../api/types';
 import type { DeepLinkMethod } from './deepLinkParser';
-import { LeftColumnContent, SettingsScreens } from '../types';
+import { LeftColumnContent } from '../types';
 
 import { API_CHAT_TYPES, RE_TG_LINK, TON_CURRENCY_CODE } from '../config';
 import { IS_BAD_URL_PARSER } from './browser/globalEnvironment';
@@ -17,6 +17,9 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
   const parsedLink = tryParseDeepLink(url);
   if (parsedLink) {
     switch (parsedLink.type) {
+      case 'languageLink':
+        actions.openLanguageModal({ langCode: parsedLink.langCode });
+        return true;
       case 'privateMessageLink':
         actions.openPrivateChannel({
           id: parsedLink.channelId,
@@ -86,32 +89,29 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
       case 'giftAuctionLink':
         actions.openGiftAuctionBySlug({ slug: parsedLink.slug });
         return true;
-      case 'settings':
-        if (!parsedLink.screen) {
+      case 'settings': {
+        switch (parsedLink.path?.split('/')[0]) {
+          case 'premium':
+            actions.openPremiumModal();
+            return true;
+          case 'stars':
+            actions.openDiamondsBalanceModal({});
+            return true;
+          case 'ton':
+            actions.openDiamondsBalanceModal({ currency: TON_CURRENCY_CODE });
+            return true;
+          case 'send-gift':
+            actions.openGiftRecipientPicker();
+            return true;
+        }
+
+        if (parsedLink.path) {
+          actions.openSettingsLink({ path: parsedLink.path });
+        } else {
           actions.openLeftColumnContent({ contentKey: LeftColumnContent.Settings });
-          return true;
         }
-        switch (parsedLink.screen) {
-          case 'editProfile':
-            actions.openSettingsScreen({ screen: SettingsScreens.EditProfile });
-            return true;
-          case 'language':
-            actions.openSettingsScreen({ screen: SettingsScreens.Language });
-            return true;
-          case 'devices':
-            actions.openSettingsScreen({ screen: SettingsScreens.ActiveSessions });
-            return true;
-          case 'privacy':
-            actions.openSettingsScreen({ screen: SettingsScreens.Privacy });
-            return true;
-          case 'folders':
-            actions.openSettingsScreen({ screen: SettingsScreens.Folders });
-            return true;
-          case 'theme':
-            actions.openSettingsScreen({ screen: SettingsScreens.General });
-            return true;
-        }
-        break;
+        return true;
+      }
       case 'stars':
         actions.openDiamondsBalanceModal({});
         return true;
@@ -121,6 +121,13 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
       case 'oauth':
         if (linkContext?.type !== 'inner') return false;
         actions.requestLinkUrlAuth({ url: parsedLink.url });
+        return true;
+      case 'newBotLink':
+        actions.openBotCreationModal({
+          managerUsername: parsedLink.managerUsername,
+          suggestedName: parsedLink.name,
+          suggestedUsername: parsedLink.username,
+        });
         return true;
       default:
         break;

@@ -8,6 +8,7 @@ import type {
 } from '../../api/types';
 import type { IAnchorPosition, ThreadId } from '../../types';
 import type { IconName } from '../../types/icons';
+import type { RegularLangKey } from '../../types/language';
 import { MAIN_THREAD_ID } from '../../api/types';
 
 import { UNMUTE_TIMESTAMP } from '../../config';
@@ -53,7 +54,6 @@ import useAppLayout from '../../hooks/useAppLayout';
 import useFlag from '../../hooks/useFlag';
 import useLang from '../../hooks/useLang';
 import useLastCallback from '../../hooks/useLastCallback';
-import useOldLang from '../../hooks/useOldLang';
 import usePrevDuringAnimation from '../../hooks/usePrevDuringAnimation';
 import useShowTransitionDeprecated from '../../hooks/useShowTransitionDeprecated';
 
@@ -69,7 +69,7 @@ import Portal from '../ui/Portal';
 
 import './HeaderMenuContainer.scss';
 
-const BOT_BUTTONS: Record<string, { icon: IconName; label: string }> = {
+const BOT_BUTTONS: Record<string, { icon: IconName; label: RegularLangKey }> = {
   settings: {
     icon: 'bots',
     label: 'BotSettings',
@@ -234,7 +234,6 @@ const HeaderMenuContainer = ({
     openAutoDeleteTimerModal,
   } = getActions();
 
-  const oldLang = useOldLang();
   const lang = useLang();
 
   const { isMobile } = useAppLayout();
@@ -568,7 +567,7 @@ const HeaderMenuContainer = ({
           onClick={handleClick}
         >
           <span className="ephemeral-command-label">
-            {oldLang(cmd.label)}
+            {lang(cmd.label)}
             {botCommand.isEphemeral && (
               <Icon
                 name="eye-outline"
@@ -591,39 +590,39 @@ const HeaderMenuContainer = ({
           if (hasPrivacyCommand && !botPrivacyPolicyUrl) {
             sendBotCommand({ command: '/privacy' });
           } else {
-            openUrl({ url: botPrivacyPolicyUrl || oldLang('BotDefaultPrivacyPolicy') });
+            openUrl({ url: botPrivacyPolicyUrl || lang('BotDefaultPrivacyPolicy') });
           }
           closeMenu();
         }}
       >
-        {oldLang('BotPrivacyPolicy')}
+        {lang('MenuPrivacyPolicy')}
       </MenuItem>
     );
 
     return [...commandButtons || [], privacyButton].filter(Boolean);
-  }, [botCommands, oldLang, lang, botPrivacyPolicyUrl, isBot]);
+  }, [botCommands, lang, botPrivacyPolicyUrl, isBot]);
 
   const deleteTitle = useMemo(() => {
     if (!chat) return undefined;
 
     if (savedDialog) {
-      return oldLang('Delete');
+      return lang('Delete');
     }
 
     if (isPrivate) {
-      return oldLang('DeleteChatUser');
+      return lang('DeleteChat');
     }
 
     if (canDeleteChat) {
-      return oldLang('GroupInfo.DeleteAndExit');
+      return lang('GroupInfoDeleteAndExit');
     }
 
     if (isChannel) {
-      return oldLang('LeaveChannel');
+      return lang('ChannelLeave');
     }
 
-    return oldLang('Group.LeaveGroup');
-  }, [canDeleteChat, chat, isChannel, isPrivate, savedDialog, oldLang]);
+    return lang('GroupLeaveGroup');
+  }, [canDeleteChat, chat, isChannel, isPrivate, savedDialog, lang]);
 
   return (
     <Portal>
@@ -640,7 +639,7 @@ const HeaderMenuContainer = ({
               icon="search"
               onClick={handleSearch}
             >
-              {oldLang('Search')}
+              {lang('Search')}
             </MenuItem>
           )}
           {withForumActions && canCreateTopic && (
@@ -649,7 +648,7 @@ const HeaderMenuContainer = ({
                 icon="message"
                 onClick={handleCreateTopicClick}
               >
-                {oldLang('lng_forum_create_topic')}
+                {lang('ForumCreateTopic')}
               </MenuItem>
               <MenuSeparator />
             </>
@@ -659,7 +658,7 @@ const HeaderMenuContainer = ({
               icon={isChannel ? 'channel' : 'group'}
               onClick={handleSubscribe}
             >
-              {oldLang(isChannel ? 'ProfileJoinChannel' : 'ProfileJoinGroup')}
+              {lang(isChannel ? 'ProfileJoinChannel' : 'ProfileJoinGroup')}
             </MenuItem>
           )}
           {channelMonoforumId && (
@@ -683,7 +682,7 @@ const HeaderMenuContainer = ({
               icon="edit"
               onClick={handleEditClick}
             >
-              {oldLang('Edit')}
+              {lang('Edit')}
             </MenuItem>
           )}
           {canEditTopic && (
@@ -691,7 +690,7 @@ const HeaderMenuContainer = ({
               icon="edit"
               onClick={handleEditTopicClick}
             >
-              {oldLang('lng_forum_topic_edit')}
+              {lang('ForumTopicEdit')}
             </MenuItem>
           )}
           {isMobile && !withForumActions && isForum && !isBotForum && !isTopic && (
@@ -699,7 +698,7 @@ const HeaderMenuContainer = ({
               icon="forums"
               onClick={handleViewAsTopicsClick}
             >
-              {oldLang('Chat.ContextViewAsTopics')}
+              {lang('ChatContextViewAsTopics')}
             </MenuItem>
           )}
           {withForumActions && Boolean(pendingJoinRequests) && (
@@ -707,7 +706,7 @@ const HeaderMenuContainer = ({
               icon="user"
               onClick={onJoinRequestsClick}
             >
-              {isChannel ? oldLang('SubscribeRequests') : oldLang('MemberRequests')}
+              {isChannel ? lang('SubscribeRequests') : lang('MemberRequests')}
               <div className="right-badge">{pendingJoinRequests}</div>
             </MenuItem>
           )}
@@ -716,7 +715,7 @@ const HeaderMenuContainer = ({
               icon="message"
               onClick={handleOpenAsMessages}
             >
-              {oldLang('lng_forum_view_as_messages')}
+              {lang('ForumViewAsMessages')}
             </MenuItem>
           )}
           {canShowBoostModal && !canViewBoosts && (
@@ -724,7 +723,7 @@ const HeaderMenuContainer = ({
               icon="boost-outline"
               onClick={handleBoostClick}
             >
-              {oldLang(isChannel ? 'BoostingBoostChannelMenu' : 'BoostingBoostGroupMenu')}
+              {lang(isChannel ? 'BoostingBoostChannelMenu' : 'BoostingBoostGroupMenu')}
             </MenuItem>
           )}
           {canAddContact && (
@@ -732,7 +731,7 @@ const HeaderMenuContainer = ({
               icon="add-user"
               onClick={handleAddContactClick}
             >
-              {oldLang('AddContact')}
+              {lang('AddContact')}
             </MenuItem>
           )}
           {isMobile && canCall && (
@@ -740,7 +739,7 @@ const HeaderMenuContainer = ({
               icon="phone"
               onClick={handleCall}
             >
-              {oldLang('Call')}
+              {lang('Call')}
             </MenuItem>
           )}
           {canCall && (
@@ -748,7 +747,7 @@ const HeaderMenuContainer = ({
               icon="video-outlined"
               onClick={handleVideoCall}
             >
-              {oldLang('VideoCall')}
+              {lang('VideoCall')}
             </MenuItem>
           )}
           {canMute && (isMuted ? (
@@ -756,7 +755,7 @@ const HeaderMenuContainer = ({
               icon="unmute"
               onClick={handleUnmuteClick}
             >
-              {oldLang('ChatsUnmute')}
+              {lang('ChatsUnmute')}
             </MenuItem>
           )
             : (
@@ -764,7 +763,7 @@ const HeaderMenuContainer = ({
                 icon="mute"
                 onClick={handleMuteClick}
               >
-                {oldLang('ChatsMute')}
+                {lang('ChatsMute')}
                 ...
               </MenuItem>
             )
@@ -804,7 +803,7 @@ const HeaderMenuContainer = ({
               icon="voice-chat"
               onClick={handleEnterVoiceChatClick}
             >
-              {oldLang(canCreateVoiceChat ? 'StartVoipChat' : 'VoipGroupJoinCall')}
+              {lang(canCreateVoiceChat ? 'StartVoipChat' : 'VoipGroupJoinCall')}
             </MenuItem>
           )}
           {hasLinkedChat && (
@@ -812,7 +811,7 @@ const HeaderMenuContainer = ({
               icon={isChannel ? 'message' : 'channel'}
               onClick={handleLinkedChatClick}
             >
-              {oldLang(isChannel ? 'ViewDiscussion' : 'lng_profile_view_channel')}
+              {lang(isChannel ? 'ViewDiscussion' : 'ProfileViewChannel')}
             </MenuItem>
           )}
           {!withForumActions && (
@@ -820,7 +819,7 @@ const HeaderMenuContainer = ({
               icon="select"
               onClick={handleSelectMessages}
             >
-              {oldLang('ReportSelectMessages')}
+              {lang('ReportSelectMessages')}
             </MenuItem>
           )}
           {canViewBoosts && (
@@ -828,7 +827,7 @@ const HeaderMenuContainer = ({
               icon="boost-outline"
               onClick={handleBoostClick}
             >
-              {oldLang('Boosts')}
+              {lang('Boosts')}
             </MenuItem>
           )}
           {canViewStatistics && (
@@ -836,7 +835,7 @@ const HeaderMenuContainer = ({
               icon="stats"
               onClick={handleStatisticsClick}
             >
-              {oldLang('Statistics')}
+              {lang('Statistics')}
             </MenuItem>
           )}
           {isChannel && canViewMonetization && (
@@ -844,7 +843,7 @@ const HeaderMenuContainer = ({
               icon="cash-circle"
               onClick={handleMonetizationClick}
             >
-              {oldLang('lng_channel_earn_title')}
+              {lang('ChannelEarnTitle')}
             </MenuItem>
           )}
           {canTranslate && (
@@ -852,7 +851,7 @@ const HeaderMenuContainer = ({
               icon="language"
               onClick={handleEnableTranslations}
             >
-              {oldLang('lng_context_translate')}
+              {lang('AiMessageEditorTranslate')}
             </MenuItem>
           )}
           {canReportChat && (
@@ -860,7 +859,7 @@ const HeaderMenuContainer = ({
               icon="flag"
               onClick={handleReport}
             >
-              {oldLang('ReportPeer.Report')}
+              {lang('ReportPeerReport')}
             </MenuItem>
           )}
           {botButtons}
@@ -869,15 +868,16 @@ const HeaderMenuContainer = ({
               icon="gift"
               onClick={handleGiftClick}
             >
-              {oldLang('ProfileSendAGift')}
+              {lang('ProfileSendAGift')}
             </MenuItem>
           )}
+
           {isBot && (
             <MenuItem
               icon={isBlocked ? 'bots' : 'hand-stop'}
               onClick={isBlocked ? handleRestartBot : handleBlock}
             >
-              {isBlocked ? oldLang('BotRestart') : oldLang('Bot.Stop')}
+              {isBlocked ? lang('BotRestart') : lang('BotStop')}
             </MenuItem>
           )}
           {isPrivate && !isChatWithSelf && !isBot && (
@@ -893,7 +893,7 @@ const HeaderMenuContainer = ({
               icon={isBlocked ? 'user' : 'hand-stop'}
               onClick={isBlocked ? handleUnblock : handleBlock}
             >
-              {isBlocked ? oldLang('Unblock') : oldLang('BlockUser')}
+              {isBlocked ? lang('Unblock') : lang('NewContactBlock')}
             </MenuItem>
           )}
           {canLeave && (

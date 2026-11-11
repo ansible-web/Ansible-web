@@ -12,7 +12,7 @@ import type { ApiChatFolder, ApiDiamondGiftAuctionState, ApiLimitTypeWithModal, 
 import type { TabState } from '../../global/types';
 import type { ThemeKey } from '../../types';
 
-import { BASE_EMOJI_KEYWORD_LANG, DEBUG, FOLDERS_POSITION_LEFT, INACTIVE_MARKER } from '../../config';
+import { BASE_EMOJI_KEYWORD_LANG, DEBUG, FOLDERS_POSITION_LEFT } from '../../config';
 import { requestNextMutation } from '../../lib/fasterdom/fasterdom';
 import {
   selectAreFoldersPresent,
@@ -76,6 +76,7 @@ import ReactionPicker from '../middle/message/reactions/ReactionPicker.async';
 import MessageListHistoryHandler from '../middle/MessageListHistoryHandler';
 import MiddleColumn from '../middle/MiddleColumn';
 import AudioPlayer from '../middle/panes/AudioPlayer';
+import FloatingRoundVideo from '../middle/panes/FloatingRoundVideo';
 import ModalContainer from '../modals/ModalContainer';
 import PaymentModal from '../payment/PaymentModal.async';
 import ReceiptModal from '../payment/ReceiptModal.async';
@@ -110,6 +111,7 @@ export interface OwnProps {
 type StateProps = {
   isMasterTab?: boolean;
   currentUserId?: string;
+  hasCurrentUser?: boolean;
   isLeftColumnOpen: boolean;
   isMiddleColumnOpen: boolean;
   isRightColumnOpen: boolean;
@@ -208,6 +210,7 @@ const Main = ({
   noRightColumnAnimation,
   isSynced,
   currentUserId,
+  hasCurrentUser,
   isAccountFrozen,
   isAppConfigLoaded,
   isFoldersSidebarShown,
@@ -342,7 +345,6 @@ const Main = ({
   // Initial API calls
   useEffect(() => {
     if (isMasterTab && isSynced && isAppConfigLoaded && !isAccountFrozen) {
-      loadAllChats({ listType: 'saved' });
       loadAllStories();
       loadAllHiddenStories();
       loadPromoData();
@@ -350,6 +352,7 @@ const Main = ({
       loadRecentReactions();
       loadDefaultTagReactions();
       loadAttachBots();
+
       loadNotificationSettings();
       loadNotificationExceptions();
       loadTopPeers({ category: 'botsInline' });
@@ -379,6 +382,13 @@ const Main = ({
       loadActiveGiftAuctions();
     }
   }, [isMasterTab, isSynced, isAppConfigLoaded, isAccountFrozen]);
+
+  // The saved list is keyed on the current user, who may land in the global after the first sync
+  useEffect(() => {
+    if (isMasterTab && isSynced && isAppConfigLoaded && !isAccountFrozen && hasCurrentUser) {
+      loadAllChats({ listType: 'saved' });
+    }
+  }, [isMasterTab, isSynced, isAppConfigLoaded, isAccountFrozen, hasCurrentUser]);
 
   // Initial Premium API calls
   useEffect(() => {
@@ -579,9 +589,7 @@ const Main = ({
   const handleFocus = useLastCallback(() => {
     onTabFocusChange({ isBlurred: false });
 
-    if (!document.title.includes(INACTIVE_MARKER)) {
-      updatePageTitle();
-    }
+    updatePageTitle();
 
     updateIcon(false);
   });
@@ -645,6 +653,7 @@ const Main = ({
       <DraftRecipientPicker requestedDraft={requestedDraft} />
       <Dialogs />
       <AudioPlayer noUi />
+      <FloatingRoundVideo />
       <ModalContainer />
       <HistoryCalendar isOpen={isHistoryCalendarOpen} />
       <StickerSetModal
@@ -740,6 +749,7 @@ export default memo(withGlobal<OwnProps>(
 
     return {
       currentUserId,
+      hasCurrentUser: Boolean(selectUser(global, currentUserId!)),
       isLeftColumnOpen: isLeftColumnShown,
       isMiddleColumnOpen: Boolean(chatId),
       isRightColumnOpen: selectIsRightColumnShown(global, isMobile),

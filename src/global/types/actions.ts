@@ -35,6 +35,7 @@ import type {
   ApiInputSavedDiamondGift,
   ApiInputSuggestedPostInfo,
   ApiKeyboardButton,
+  ApiLanguage,
   ApiLimitTypeWithModal,
   ApiMessage,
   ApiMessageEntity,
@@ -55,6 +56,7 @@ import type {
   ApiReaction,
   ApiReactionWithPaid,
   ApiReportReason,
+  ApiRequestPeerType,
   ApiSavedDiamondGift,
   ApiSendMessageAction,
   ApiSessionData,
@@ -114,6 +116,7 @@ import type {
   ResaleGiftsFilterOptions,
   ScrollTargetPosition,
   SendMessageParams,
+  SettingsHighlight,
   SettingsScreens,
   SharedMediaType,
   Size,
@@ -276,6 +279,10 @@ export interface ActionPayloads {
     notificationSoundVolume?: number;
   };
   loadLanguages: undefined;
+  openLanguageModal: { langCode: string } & WithTabId;
+  closeLanguageModal: WithTabId | undefined;
+  applyLanguage: { language: ApiLanguage } & WithTabId;
+  removeCustomLanguage: { langCode: string };
 
   loadPasskeys: undefined;
   startPasskeyRegistration: WithTabId | undefined;
@@ -893,9 +900,8 @@ export interface ActionPayloads {
   sendCredentialsInfo: {
     credentials: ApiCredentials;
   } & WithTabId;
-  setSmartGlocalCardInfo: {
-    type: string;
-    token: string;
+  setPaymentWebFormCredentials: {
+    credentials: AnyLiteral;
   } & WithTabId;
   clearPaymentError: WithTabId | undefined;
   clearReceipt: WithTabId | undefined;
@@ -1417,6 +1423,7 @@ export interface ActionPayloads {
   } & WithTabId;
 
   loadDiamondStatus: undefined;
+  loadCurrencyRates: undefined;
   loadDiamondsTransactions: {
     type: DiamondsTransactionType;
     isTon?: boolean;
@@ -1447,6 +1454,7 @@ export interface ActionPayloads {
     currency?: ApiTypeCurrencyAmount['currency'];
   } & WithTabId;
   closeDiamondsBalanceModal: WithTabId | undefined;
+  loadExistingWaltBalance: undefined;
 
   checkChatlistInvite: {
     slug: string;
@@ -1954,6 +1962,9 @@ export interface ActionPayloads {
     timestamp?: number;
   } & WithTabId;
   closeAudioPlayer: WithTabId | undefined;
+  handleAudioPlaybackEnded: {
+    withAutoAdvance?: boolean;
+  } & WithTabId;
   setAudioPlayerVolume: {
     volume: number;
   } & WithTabId;
@@ -2129,6 +2140,8 @@ export interface ActionPayloads {
   setIsRichInputExpanded: {
     isRichInputExpanded?: boolean;
   } & WithTabId;
+  requestRichInputMedia: NonNullable<TabState['requestedRichInputMedia']> & WithTabId;
+  resetRichInputMediaRequest: WithTabId | undefined;
   changeRichMediaUploadBlocking: {
     delta: 1 | -1;
   } & WithTabId;
@@ -2184,6 +2197,7 @@ export interface ActionPayloads {
   } & WithTabId;
   forwardAudio: { toChatId: string; toThreadId?: ThreadId; confirmedDiamonds?: number } & WithTabId;
   clearAudioPendingSend: WithTabId | undefined;
+  sendAudioToSavedMessages: { audio: ApiAudio } & WithTabId;
 
   // GIFs
   loadSavedGifs: undefined;
@@ -2566,6 +2580,31 @@ export interface ActionPayloads {
   refreshLangPackFromCache: {
     langCode: string;
   };
+  openRequestPeerModal: {
+    botId: string;
+    chatId: string;
+    messageId: number;
+    buttonId: number;
+    maxQuantity: number;
+    peerType: ApiRequestPeerType;
+  } & WithTabId;
+  closeRequestPeerModal: WithTabId | undefined;
+  openBotCreationModal: {
+    managerUsername: string;
+    suggestedName?: string;
+    suggestedUsername?: string;
+  } & WithTabId;
+  closeBotCreationModal: WithTabId | undefined;
+  createBot: {
+    name: string;
+    username: string;
+  } & WithTabId;
+  sendBotRequestedPeer: {
+    chatId: string;
+    messageId: number;
+    buttonId: number;
+    requestedPeerIds: string[];
+  } & WithTabId;
   openPollModal: {
     chatId: string;
     threadId?: ThreadId;
@@ -2573,6 +2612,17 @@ export interface ActionPayloads {
     isQuiz?: boolean;
   } & WithTabId;
   closePollModal: WithTabId | undefined;
+  openMusicPicker: {
+    chatId: string;
+    threadId?: ThreadId;
+    messageListType: MessageListType;
+    shouldInsertToRichInput?: boolean;
+  } & WithTabId;
+  closeMusicPicker: WithTabId | undefined;
+  loadMusicPickerShared: WithTabId | undefined;
+  loadMusicPickerGlobal: {
+    query: string;
+  } & WithTabId;
   openTodoListModal: {
     chatId: string;
     messageId?: number;
@@ -2757,7 +2807,19 @@ export interface ActionPayloads {
   } & WithTabId;
   openSettingsScreen: {
     screen?: SettingsScreens;
+    highlight?: SettingsHighlight;
   } & WithTabId;
+  loadNestedSettingsData: undefined;
+  openSettingsLink: {
+    path: string;
+  } & WithTabId;
+  clearSettingsHighlight: WithTabId | undefined;
+  addRecentlyFoundSettingId: {
+    id: string;
+  };
+  removeRecentlyFoundSettingId: {
+    id: string;
+  };
   requestNextFoldersAction: {
     foldersAction?: ReducerAction<FoldersActions>;
   } & WithTabId;
@@ -3040,6 +3102,7 @@ export interface ActionPayloads {
     recipientId?: string;
     gift: ApiSavedDiamondGift;
     craftSlotIndex?: number;
+    isFromMessage?: boolean;
   } | {
     gift: ApiDiamondGift;
     craftSlotIndex?: number;
@@ -3238,6 +3301,9 @@ export interface ActionPayloads {
   convertGiftToDiamonds: {
     gift: ApiInputSavedDiamondGift;
   } & WithTabId;
+  deleteSavedGift: {
+    gift: ApiSavedDiamondGift;
+  } & WithTabId;
   toggleSavedGiftPinned: {
     peerId: string;
     gift: ApiSavedDiamondGift;
@@ -3302,9 +3368,8 @@ export interface ActionPayloads {
   openPaymentMessageConfirmDialogOpen: { dialogKey: string } & WithTabId;
   closePaymentMessageConfirmDialogOpen: WithTabId | undefined;
   openPriceConfirmModal: {
-    originalAmount: number;
-    newAmount: number;
-    currency: 'TON' | 'XTR';
+    originalAmount: ApiTypeCurrencyAmount;
+    newAmount: ApiTypeCurrencyAmount;
     directInfo: {
       formId: string;
       inputInvoice: ApiInputInvoice;

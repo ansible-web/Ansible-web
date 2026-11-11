@@ -44,7 +44,6 @@ import {
   buildCollectionByKey, omit, unique,
 } from '../../../util/iteratees';
 import { isLocalMessageId } from '../../../util/keys/messageKey';
-import * as langProvider from '../../../util/oldLangProvider';
 import { debounce, pause, throttle } from '../../../util/schedulers';
 import { handleSetLanguageLink } from '../../../util/setLanguageLink';
 import { extractCurrentThemeParams } from '../../../util/themeStyle';
@@ -458,7 +457,10 @@ addActionHandler('openThread', async (global, actions, payload): Promise<void> =
     setGlobal(global);
 
     actions.showNotification({
-      message: langProvider.oldTranslate(isComments ? 'ChannelPostDeleted' : 'lng_message_not_found'),
+      message: {
+        key: isComments ? 'ChannelPostDeleted' : 'MessageNotFound',
+        options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+      },
       tabId,
     });
 
@@ -503,7 +505,10 @@ addActionHandler('openThread', async (global, actions, payload): Promise<void> =
       setGlobal(global);
 
       actions.showNotification({
-        message: langProvider.oldTranslate('Group.ErrorAccessDenied'),
+        message: {
+          key: 'GroupErrorAccessDenied',
+          options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+        },
         tabId,
       });
     },
@@ -584,6 +589,9 @@ addActionHandler('loadAllChats', async (global, actions, payload): Promise<void>
     if (global.connectionState !== 'connectionStateReady' || global.auth.state !== 'authorizationStateReady') {
       return;
     }
+
+    // The saved list is keyed on the current user; `Main` asks for it again once the user lands
+    if (listType === 'saved' && !selectUser(global, global.currentUserId!)) return;
 
     const result = await loadChats(
       listType,
@@ -1692,7 +1700,13 @@ addActionHandler('openChatByPhoneNumber', async (global, actions, payload): Prom
   if (!chat) {
     actions.openPreviousChat({ tabId });
     actions.showNotification({
-      message: langProvider.oldTranslate('lng_username_by_phone_not_found').replace('{phone}', phoneNumber),
+      message: {
+        key: 'UsernameByPhoneNotFound',
+        variables: {
+          phone: phoneNumber,
+        },
+        options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+      },
       tabId,
     });
     return;
@@ -2880,27 +2894,39 @@ addActionHandler('loadTopics', async (global, actions, payload): Promise<void> =
   setGlobal(global);
 });
 
+const topicLoads = new Map<string, Promise<boolean>>();
+
 addActionHandler('loadTopicById', async (global, actions, payload): Promise<void> => {
   const { chatId, topicId } = payload;
 
   const chat = selectChat(global, chatId);
   if (!chat) return;
 
-  const result = await callApi('fetchTopicById', { chat, topicId });
-
-  if (!result) {
-    if ('tabId' in payload && payload.shouldCloseChatOnError) {
-      const { tabId = getCurrentTabId() } = payload;
-      actions.openChat({ id: undefined, tabId });
-    }
-    return;
+  const loadKey = `${chatId}-${topicId}`;
+  let load = topicLoads.get(loadKey);
+  if (!load) {
+    load = fetchAndStoreTopic(chat, topicId).finally(() => topicLoads.delete(loadKey));
+    topicLoads.set(loadKey, load);
   }
 
-  global = getGlobal();
-  global = addMessages(global, result.messages);
-  global = updateTopicWithState(global, chatId, result.topic);
-  setGlobal(global);
+  const isLoaded = await load;
+  if (!isLoaded && 'tabId' in payload && payload.shouldCloseChatOnError) {
+    const { tabId = getCurrentTabId() } = payload;
+    actions.openChat({ id: undefined, tabId });
+  }
 });
+
+async function fetchAndStoreTopic(chat: ApiChat, topicId: number) {
+  const result = await callApi('fetchTopicById', { chat, topicId });
+  if (!result) return false;
+
+  let global = getGlobal();
+  global = addMessages(global, result.messages);
+  global = updateTopicWithState(global, chat.id, result.topic);
+  setGlobal(global);
+
+  return true;
+}
 
 addActionHandler('toggleForum', async (global, actions, payload): Promise<void> => {
   const { chatId, isEnabled, tabId = getCurrentTabId() } = payload;
@@ -2915,7 +2941,10 @@ addActionHandler('toggleForum', async (global, actions, payload): Promise<void> 
     result = await callApi('toggleForum', { chat, isEnabled });
   } catch (error) {
     if ((error as ApiError).message === 'FLOOD') {
-      actions.showNotification({ message: langProvider.oldTranslate('FloodWait'), tabId });
+      actions.showNotification({ message: {
+        key: 'FloodWait',
+        options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+      }, tabId });
     } else {
       actions.showDialog({ data: { type: 'error', ...(error as ApiError), hasErrorKey: true }, tabId });
     }
@@ -3036,7 +3065,13 @@ addActionHandler('toggleTopicPinned', (global, actions, payload): ActionReturnTy
 
   if (isPinned && Object.values(topics).filter((topic) => topic.isPinned).length >= topicsPinnedLimit) {
     actions.showNotification({
-      message: langProvider.oldTranslate('LimitReachedPinnedTopics', topicsPinnedLimit, 'i'),
+      message: {
+        key: 'LimitReachedPinnedTopics',
+        variables: {
+          limit: topicsPinnedLimit,
+        },
+        options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+      },
       tabId,
     });
     return;
@@ -3051,7 +3086,10 @@ addActionHandler('checkChatlistInvite', async (global, actions, payload): Promis
   const result = await callApi('checkChatlistInvite', { slug });
   if (!result) {
     actions.showNotification({
-      message: langProvider.oldTranslate('lng_group_invite_bad_link'),
+      message: {
+        key: 'GroupInviteBadLink',
+        options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+      },
       tabId,
     });
     return;
@@ -3623,7 +3661,10 @@ addActionHandler('resolveBusinessChatLink', async (global, actions, payload): Pr
   const result = await callApi('resolveBusinessChatLink', { slug });
   if (!result) {
     actions.showNotification({
-      message: langProvider.oldTranslate('BusinessLink.ErrorExpired'),
+      message: {
+        key: 'BusinessLinkErrorExpired',
+        options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+      },
       tabId,
     });
     return;
@@ -3710,10 +3751,13 @@ async function loadChats(
   const isFirstBatch = !shouldIgnorePagination && !offsetPeer && !offsetDate && !offsetId;
   const shouldReplaceStaleState = listType === 'active' && isFirstBatch;
   const isAccountFreeze = selectIsCurrentUserFrozen(global);
-  const currentUser = selectUser(global, global.currentUserId!)!;
+
+  // Right after a reload the current user may not be in the global yet
+  const currentUser = selectUser(global, global.currentUserId!);
+  if (listType === 'saved' && !currentUser) return;
 
   const result = listType === 'saved' ? await callApi('fetchSavedChats', {
-    parentPeer: currentUser,
+    parentPeer: currentUser!,
     limit: CHAT_LIST_LOAD_SLICE,
     offsetDate,
     offsetId,
@@ -4019,7 +4063,10 @@ async function getAttachBotOrNotify<T extends GlobalState>(
   global = getGlobal();
   if (!result) {
     actions.showNotification({
-      message: langProvider.oldTranslate('WebApp.AddToAttachmentUnavailableError'),
+      message: {
+        key: 'WebAppAddToAttachmentUnavailableError',
+        options: { withNodes: true, withMarkdown: true, renderTextFilters: ['br', 'links'] },
+      },
       tabId,
     });
 
@@ -4096,7 +4143,7 @@ async function openChatByUsername<T extends GlobalState>(
   if (!chat) {
     if (!isCurrentChat) {
       actions.openPreviousChat({ tabId });
-      actions.showNotification({ message: 'User does not exist', tabId });
+      actions.showNotification({ message: { key: 'NoUsernameFound' }, tabId });
     }
 
     return;

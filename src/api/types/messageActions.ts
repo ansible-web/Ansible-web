@@ -123,6 +123,16 @@ export interface ApiMessageActionBotAllowed extends ActionMediaType {
   app?: ApiBotApp;
 }
 
+export interface ApiMessageActionRequestedPeer extends ActionMediaType {
+  type: 'requestedPeer';
+  peerIds: string[];
+}
+
+export interface ApiMessageActionManagedBotCreated extends ActionMediaType {
+  type: 'managedBotCreated';
+  botId: string;
+}
+
 export interface ApiMessageActionContactSignUp extends ActionMediaType {
   type: 'contactSignUp';
 }
@@ -160,7 +170,7 @@ export interface ApiMessageActionGiftPremium extends ActionMediaType {
   amount: number;
   days: number;
   cryptoCurrency?: string;
-  cryptoAmount?: number;
+  cryptoAmount?: bigint;
   message?: ApiFormattedText;
 }
 
@@ -199,7 +209,7 @@ export interface ApiMessageActionGiftCode extends ActionMediaType {
   currency?: string;
   amount?: number;
   cryptoCurrency?: string;
-  cryptoAmount?: number;
+  cryptoAmount?: bigint;
   message?: ApiFormattedText;
 }
 
@@ -233,7 +243,7 @@ export interface ApiMessageActionGiftDiamonds extends ActionMediaType {
   amount: number;
   stars: number;
   cryptoCurrency?: string;
-  cryptoAmount?: number;
+  cryptoAmount?: bigint;
   transactionId?: string;
 }
 
@@ -242,7 +252,7 @@ export interface ApiMessageActionGiftTon extends ActionMediaType {
   currency: string;
   amount: number;
   cryptoCurrency: string;
-  cryptoAmount: number;
+  cryptoAmount: bigint;
   transactionId?: string;
 }
 
@@ -407,27 +417,65 @@ export interface ApiMessageActionUnsupported extends ActionMediaType {
   type: 'unsupported';
 }
 
-export type ApiMessageAction = ApiMessageActionUnsupported | ApiMessageActionChatCreate | ApiMessageActionChatEditTitle
-  | ApiMessageActionChatEditPhoto | ApiMessageActionChatDeletePhoto | ApiMessageActionChatAddUser
-  | ApiMessageActionChatDeleteUser | ApiMessageActionChatJoinedByLink | ApiMessageActionChannelCreate
-  | ApiMessageActionChatMigrateTo | ApiMessageActionChannelMigrateFrom | ApiMessageActionPinMessage
-  | ApiMessageActionHistoryClear | ApiMessageActionSetMessagesTtl
-  | ApiMessageActionGameScore | ApiMessageActionPaymentSent | ApiMessageActionPhoneCall
-  | ApiMessageActionScreenshotTaken | ApiMessageActionCustomAction | ApiMessageActionBotAllowed
-  | ApiMessageActionBoostApply | ApiMessageActionContactSignUp | ApiMessageActionExpiredContent
-  | ApiMessageActionGroupCall | ApiMessageActionInviteToGroupCall | ApiMessageActionGroupCallScheduled
-  | ApiMessageActionChatJoinedByRequest | ApiMessageActionChatJoinedViaCommunity
-  | ApiMessageActionWebViewDataSent | ApiMessageActionGiftPremium
-  | ApiMessageActionTopicCreate | ApiMessageActionTopicEdit | ApiMessageActionSuggestProfilePhoto
+export type ApiMessageAction = ApiMessageActionUnsupported
+  | ApiMessageActionChatCreate
+  | ApiMessageActionChatEditTitle
+  | ApiMessageActionChatEditPhoto
+  | ApiMessageActionChatDeletePhoto
+  | ApiMessageActionChatAddUser
+  | ApiMessageActionChatDeleteUser
+  | ApiMessageActionChatJoinedByLink
+  | ApiMessageActionChannelCreate
+  | ApiMessageActionChatMigrateTo
+  | ApiMessageActionChannelMigrateFrom
+  | ApiMessageActionPinMessage
+  | ApiMessageActionHistoryClear
+  | ApiMessageActionSetMessagesTtl
+  | ApiMessageActionGameScore
+  | ApiMessageActionPaymentSent
+  | ApiMessageActionPhoneCall
+  | ApiMessageActionScreenshotTaken
+  | ApiMessageActionCustomAction
+  | ApiMessageActionBotAllowed
+  | ApiMessageActionBoostApply
+  | ApiMessageActionContactSignUp
+  | ApiMessageActionExpiredContent
+  | ApiMessageActionRequestedPeer
+  | ApiMessageActionManagedBotCreated
+  | ApiMessageActionGroupCall
+  | ApiMessageActionInviteToGroupCall
+  | ApiMessageActionGroupCallScheduled
+  | ApiMessageActionChatJoinedByRequest
+  | ApiMessageActionChatJoinedViaCommunity
+  | ApiMessageActionWebViewDataSent
+  | ApiMessageActionGiftPremium
+  | ApiMessageActionTopicCreate
+  | ApiMessageActionTopicEdit
+  | ApiMessageActionSuggestProfilePhoto
   | ApiMessageActionSuggestBirthday
-  | ApiMessageActionChannelJoined | ApiMessageActionGiftCode | ApiMessageActionGiveawayLaunch
-  | ApiMessageActionGiveawayResults | ApiMessageActionPaymentRefunded | ApiMessageActionGiftDiamonds
-  | ApiMessageActionGiftTon | ApiMessageActionPrizeDiamonds | ApiMessageActionDiamondGift
+  | ApiMessageActionChannelJoined
+  | ApiMessageActionGiftCode
+  | ApiMessageActionGiveawayLaunch
+  | ApiMessageActionGiveawayResults
+  | ApiMessageActionPaymentRefunded
+  | ApiMessageActionGiftDiamonds
+  | ApiMessageActionGiftTon
+  | ApiMessageActionPrizeDiamonds
+  | ApiMessageActionDiamondGift
   | ApiMessageActionDiamondGiftUnique
-  | ApiMessageActionPaidMessagesRefunded | ApiMessageActionPaidMessagesPrice | ApiMessageActionSuggestedPostApproval
-  | ApiMessageActionSuggestedPostSuccess | ApiMessageActionSuggestedPostRefund | ApiMessageActionTodoCompletions
-  | ApiMessageActionTodoAppendTasks | ApiMessageActionPollAppendAnswer | ApiMessageActionPollDeleteAnswer
+  | ApiMessageActionPaidMessagesRefunded
+  | ApiMessageActionPaidMessagesPrice
+  | ApiMessageActionSuggestedPostApproval
+  | ApiMessageActionSuggestedPostSuccess
+  | ApiMessageActionSuggestedPostRefund
+  | ApiMessageActionTodoCompletions
+  | ApiMessageActionTodoAppendTasks
+  | ApiMessageActionPollAppendAnswer
+  | ApiMessageActionPollDeleteAnswer
   | ApiMessageActionDiamondGiftPurchaseOffer
-  | ApiMessageActionDiamondGiftPurchaseOfferDeclined | ApiMessageActionNewCreatorPending
-  | ApiMessageActionChangeCreator | ApiMessageActionNoForwardsToggle | ApiMessageActionNoForwardsRequest
+  | ApiMessageActionDiamondGiftPurchaseOfferDeclined
+  | ApiMessageActionNewCreatorPending
+  | ApiMessageActionChangeCreator
+  | ApiMessageActionNoForwardsToggle
+  | ApiMessageActionNoForwardsRequest
   | ApiMessageActionChangeCommunity;

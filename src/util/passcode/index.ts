@@ -9,6 +9,7 @@ import {
   loadPasscodeMeta,
   PASSCODE_META_KEY,
   type PasscodeMeta,
+  requestPasscodeStateLock,
 } from './meta';
 import { clearPasscodeNavigationDek } from './navigation';
 import {
@@ -213,7 +214,9 @@ async function changePasscodeNow(passcode: string) {
     currentContext.meta.lockEpoch,
     currentContext.meta.autolockDuration,
   );
-  const entries = await encryptVaultEntries(dek, generation, sessionSnapshot, globalSnapshots, wallpaperBlobs);
+  const entries = await encryptVaultEntries(
+    dek, generation, sessionSnapshot, globalSnapshots, wallpaperBlobs,
+  );
 
   const latestMeta = await loadPasscodeMeta();
   if (
@@ -500,9 +503,11 @@ export async function clearWallpaperVaultBlobs() {
 }
 
 export async function clearPasscodeStore() {
-  await PASSCODE_IDB_STORE.clear();
-  forgetDek();
-  resetSessionStore();
+  await requestPasscodeStateLock(async () => {
+    await PASSCODE_IDB_STORE.clear();
+    forgetDek();
+    resetSessionStore();
+  });
 }
 
 export async function hasLegacyEncryptedSession() {
@@ -781,6 +786,7 @@ async function removeVaultGeneration(generation: string) {
   try {
     const wallpaperVaultKeys = await getWallpaperVaultKeys(generation);
     const globalVaultKeys = await getGlobalVaultKeys(generation);
+
     await PASSCODE_IDB_STORE.delMany([
       getSessionsVaultKey(generation),
       ...globalVaultKeys,

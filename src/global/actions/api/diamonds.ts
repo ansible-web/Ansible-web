@@ -23,11 +23,13 @@ import { addActionHandler, getGlobal, getPromiseActions, setGlobal } from '../..
 import {
   appendDiamondsSubscriptions,
   appendDiamondsTransactions,
+  removePeerSavedGift,
   replaceGiftAuction,
   replacePeerSavedGifts,
   updateChats,
   updateDiamondsSubscriptionLoading,
   updatePeerDiamondGiftCollections,
+  updatePeerFullInfo,
   updateStarsBalance,
   updateUsers,
 } from '../../reducers';
@@ -39,6 +41,8 @@ import {
   selectGiftProfileFilter,
   selectPeer,
   selectPeerCollectionSavedGifts,
+  selectPeerDiamondGiftCollections,
+  selectPeerFullInfo,
   selectPeerSavedGifts,
   selectTabState,
 } from '../../selectors';
@@ -500,6 +504,43 @@ addActionHandler('convertGiftToDiamonds', async (global, actions, payload): Prom
   actions.openDiamondsBalanceModal({ tabId });
 });
 
+addActionHandler('deleteSavedGift', async (global, actions, payload): Promise<void> => {
+  const { gift, tabId = getCurrentTabId() } = payload;
+  const inputGift = gift.inputGift!;
+
+  const requestInputGift = getRequestInputSavedDiamondGift(global, inputGift);
+  if (!requestInputGift) return;
+
+  const result = await callApi('deleteStarGift', {
+    inputSavedGift: requestInputGift,
+  });
+
+  if (!result) {
+    return;
+  }
+
+  global = getGlobal();
+  const peerId = inputGift.type === 'user' ? global.currentUserId! : inputGift.chatId;
+  Object.values(global.byTabId).forEach(({ id }) => {
+    global = removePeerSavedGift(global, peerId, inputGift, id);
+  });
+
+  // User profiles count only displayed gifts, while channel owners see all of them
+  const isCounted = inputGift.type === 'chat' || !gift.isUnsaved;
+  const diamondGiftCount = selectPeerFullInfo(global, peerId)?.diamondGiftCount;
+  if (isCounted && diamondGiftCount) {
+    global = updatePeerFullInfo(global, peerId, { diamondGiftCount: diamondGiftCount - 1 });
+  }
+  setGlobal(global);
+
+  // Collection icons come from their first gift
+  if (selectPeerDiamondGiftCollections(global, peerId)?.length) {
+    actions.loadDiamondGiftCollections({ peerId, tabId });
+  }
+
+  actions.showNotification({ icon: 'delete', message: { key: 'NotificationGiftDeleted' }, tabId });
+});
+
 addActionHandler('openGiftUpgradeModal', async (global, actions, payload): Promise<void> => {
   const {
     giftId, gift, peerId, tabId = getCurrentTabId(),
@@ -808,6 +849,7 @@ addActionHandler('openGiftInfoModalFromMessage', async (global, actions, payload
     diamondsToConvert: starGift?.diamondsToConvert,
     isNameHidden: action.isNameHidden,
     isUnsaved: !action.isSaved,
+    isRefunded: action.isRefunded,
     fromId,
     messageId: message.id,
     isConverted: starGift?.isConverted,
@@ -823,7 +865,9 @@ addActionHandler('openGiftInfoModalFromMessage', async (global, actions, payload
     canCraftAt: uniqueGift?.canCraftAt,
   };
 
-  actions.openGiftInfoModal({ peerId: giftReceiverId, gift, tabId });
+  actions.openGiftInfoModal({
+    peerId: giftReceiverId, gift, isFromMessage: true, tabId,
+  });
 });
 
 addActionHandler('openGiftInfoValueModal', async (global, actions, payload): Promise<void> => {

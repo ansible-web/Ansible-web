@@ -980,6 +980,8 @@ export type ApiUpdateLangPackTooLong = {
 
 export type ApiUpdateLangPack = {
   '@type': 'updateLangPack';
+  langCode: string;
+  fromVersion: number;
   version: number;
   strings: Record<string, LangPackStringValue>;
   keysToRemove: string[];
@@ -997,49 +999,149 @@ export type ApiUpdateWebPage = {
   webPage: ApiWebPage;
 };
 
-export type ApiUpdate = (
-  ApiUpdateReady | ApiUpdateSession | ApiUpdateWebAuthTokenFailed | ApiUpdateRequestUserUpdate |
-  ApiUpdateAuthorizationState | ApiUpdateAuthorizationError | ApiUpdateConnectionState | ApiUpdateCurrentUser |
-  ApiUpdateChat | ApiUpdateChatTypingStatus | ApiUpdateChatFullInfo | ApiUpdatePinnedChatIds |
-  ApiUpdateChatMembers | ApiUpdateChatParticipantRank | ApiUpdateChatJoin | ApiUpdateChatLeave
-  | ApiUpdateChatPinned | ApiUpdatePinnedMessageIds |
-  ApiUpdateChatListType | ApiUpdateChatFolder | ApiUpdateChatFoldersOrder | ApiUpdateRecommendedChatFolders |
-  ApiUpdateNewMessage | ApiUpdateMessage | ApiUpdateNewEphemeralMessage | ApiUpdateEphemeralMessage
-  | ApiUpdateDeleteEphemeralMessages | ApiUpdateThreadInfo | ApiUpdateCommonBoxMessages | ApiUpdatePasskeyOption |
-  ApiUpdateDeleteMessages | ApiUpdateMessagePoll | ApiUpdateMessagePollUnread | ApiUpdateMessagePollVote |
-  ApiUpdateDeleteHistory |
-  ApiDeleteParticipantHistory | ApiUpdateMessageSendSucceeded | ApiUpdateMessageSendFailed |
-  ApiUpdateServiceNotification | ApiDeleteContact | ApiUpdateUser | ApiUpdateUserStatus |
-  ApiUpdateUserFullInfo | ApiUpdateVideoProcessingPending | ApiUpdatePeerSettings | ApiUpdatePeerHistoryTtl
-  | ApiUpdateUserAlreadyAuthorized |
-  ApiUpdateAvatar | ApiUpdateMessageImage | ApiUpdateDraftMessage | ApiUpdateScheduledMessageSendFailed |
-  ApiUpdateError | ApiUpdateResetContacts | ApiUpdateStartEmojiInteraction | ApiUpdateThreadReadState |
-  ApiUpdateFavoriteStickers | ApiUpdateStickerSet | ApiUpdateStickerSets | ApiUpdateStickerSetsOrder |
-  ApiUpdateRecentStickers | ApiUpdateSavedGifs | ApiUpdateNewScheduledMessage | ApiUpdateMoveStickerSetToTop |
-  ApiUpdateScheduledMessageSendSucceeded | ApiUpdateScheduledMessage | ApiUpdateDiamondPaymentStateCompleted |
-  ApiUpdateDeleteScheduledMessages | ApiUpdateResetMessages | ApiUpdateMessageTranslations |
-  ApiUpdateFailedMessageTranslations | ApiUpdateWebPage | ApiUpdateChatTypingDraft | ApiUpdateChatTypingDraftStopped
-  | ApiUpdateDiscussion |
-  ApiUpdateTwoFaError | ApiUpdateTwoFaStateWaitCode | ApiUpdateWebViewResultSent |
-  ApiUpdateJoinChatWebViewDecision |
-  ApiUpdateDefaultNotifySettings | ApiUpdatePeerNotifySettings | ApiUpdatePeerBlocked | ApiUpdatePrivacy |
-  ApiUpdateServerTimeOffset | ApiUpdateMessageReactions | ApiUpdateSavedReactionTags |
-  ApiUpdateGroupCallParticipants | ApiUpdateGroupCallConnection | ApiUpdateGroupCall | ApiUpdateGroupCallStreams |
-  ApiUpdateGroupCallConnectionState | ApiUpdateGroupCallLeavePresentation | ApiUpdateGroupCallChatId |
-  ApiUpdatePendingJoinRequests | ApiUpdatePaymentStateCompleted |
-  ApiUpdatePhoneCall | ApiUpdatePhoneCallSignalingData | ApiUpdatePhoneCallMediaState |
-  ApiUpdatePhoneCallConnectionState | ApiUpdateBotMenuButton | ApiUpdateTranscribedAudio | ApiUpdateUserEmojiStatus |
-  ApiUpdateMessageExtendedMedia | ApiUpdateConfig | ApiUpdateTopicNotifySettings | ApiUpdatePinnedTopic |
-  ApiUpdatePinnedTopicsOrder | ApiUpdateTopic | ApiUpdateTopics | ApiUpdateRecentEmojiStatuses |
-  ApiUpdateRecentReactions | ApiUpdateStory | ApiUpdateReadStories | ApiUpdateDeleteStory | ApiUpdateSentStoryReaction |
-  ApiRequestReconnectApi | ApiRequestSync | ApiUpdateFetchingDifference | ApiUpdateChannelMessages |
-  ApiUpdateStealthMode | ApiUpdateAttachMenuBots | ApiUpdateNewAuthorization | ApiUpdateGroupInvitePrivacyForbidden |
-  ApiUpdateViewForumAsMessages | ApiUpdateSavedDialogPinned | ApiUpdatePinnedSavedDialogIds | ApiUpdateChatLastMessage |
-  ApiUpdateDeleteSavedHistory | ApiUpdatePremiumFloodWait | ApiUpdateDiamondsBalance | ApiUpdateDiamondGiftAuctionState
-  | ApiUpdateDiamondGiftAuctionUserState | ApiUpdateDiamondGiftCraftFail | ApiUpdateBotCommands
-  | ApiUpdateQuickReplyMessage | ApiUpdateQuickReplies
-  | ApiDeleteQuickReply | ApiUpdateDeleteQuickReplyMessages | ApiUpdateDeleteProfilePhoto | ApiUpdateNewProfilePhoto
-  | ApiUpdateEntities | ApiUpdatePaidReactionPrivacy | ApiUpdateLangPackTooLong | ApiUpdateLangPack
+export type ApiUpdate = (ApiUpdateReady
+  | ApiUpdateSession
+  | ApiUpdateWebAuthTokenFailed
+  | ApiUpdateRequestUserUpdate
+  | ApiUpdateAuthorizationState
+  | ApiUpdateAuthorizationError
+  | ApiUpdateConnectionState
+  | ApiUpdateCurrentUser
+  | ApiUpdateChat
+  | ApiUpdateChatTypingStatus
+  | ApiUpdateChatFullInfo
+  | ApiUpdatePinnedChatIds
+  | ApiUpdateChatMembers
+  | ApiUpdateChatParticipantRank
+  | ApiUpdateChatJoin
+  | ApiUpdateChatLeave
+  | ApiUpdateChatPinned
+  | ApiUpdatePinnedMessageIds
+  | ApiUpdateChatListType
+  | ApiUpdateChatFolder
+  | ApiUpdateChatFoldersOrder
+  | ApiUpdateRecommendedChatFolders
+  | ApiUpdateNewMessage
+  | ApiUpdateMessage
+  | ApiUpdateNewEphemeralMessage
+  | ApiUpdateEphemeralMessage
+  | ApiUpdateDeleteEphemeralMessages
+  | ApiUpdateThreadInfo
+  | ApiUpdateCommonBoxMessages
+  | ApiUpdatePasskeyOption
+  | ApiUpdateDeleteMessages
+  | ApiUpdateMessagePoll
+  | ApiUpdateMessagePollUnread
+  | ApiUpdateMessagePollVote
+  | ApiUpdateDeleteHistory
+  | ApiDeleteParticipantHistory
+  | ApiUpdateMessageSendSucceeded
+  | ApiUpdateMessageSendFailed
+  | ApiUpdateServiceNotification
+  | ApiDeleteContact
+  | ApiUpdateUser
+  | ApiUpdateUserStatus
+  | ApiUpdateUserFullInfo
+  | ApiUpdateVideoProcessingPending
+  | ApiUpdatePeerSettings
+  | ApiUpdatePeerHistoryTtl
+  | ApiUpdateUserAlreadyAuthorized
+  | ApiUpdateAvatar
+  | ApiUpdateMessageImage
+  | ApiUpdateDraftMessage
+  | ApiUpdateScheduledMessageSendFailed
+  | ApiUpdateError
+  | ApiUpdateResetContacts
+  | ApiUpdateStartEmojiInteraction
+  | ApiUpdateThreadReadState
+  | ApiUpdateFavoriteStickers
+  | ApiUpdateStickerSet
+  | ApiUpdateStickerSets
+  | ApiUpdateStickerSetsOrder
+  | ApiUpdateRecentStickers
+  | ApiUpdateSavedGifs
+  | ApiUpdateNewScheduledMessage
+  | ApiUpdateMoveStickerSetToTop
+  | ApiUpdateScheduledMessageSendSucceeded
+  | ApiUpdateScheduledMessage
+  | ApiUpdateDiamondPaymentStateCompleted
+  | ApiUpdateDeleteScheduledMessages
+  | ApiUpdateResetMessages
+  | ApiUpdateMessageTranslations
+  | ApiUpdateFailedMessageTranslations
+  | ApiUpdateWebPage
+  | ApiUpdateChatTypingDraft
+  | ApiUpdateChatTypingDraftStopped
+  | ApiUpdateDiscussion
+  | ApiUpdateTwoFaError
+  | ApiUpdateTwoFaStateWaitCode
+  | ApiUpdateWebViewResultSent
+  | ApiUpdateJoinChatWebViewDecision
+  | ApiUpdateDefaultNotifySettings
+  | ApiUpdatePeerNotifySettings
+  | ApiUpdatePeerBlocked
+  | ApiUpdatePrivacy
+  | ApiUpdateServerTimeOffset
+  | ApiUpdateMessageReactions
+  | ApiUpdateSavedReactionTags
+  | ApiUpdateGroupCallParticipants
+  | ApiUpdateGroupCallConnection
+  | ApiUpdateGroupCall
+  | ApiUpdateGroupCallStreams
+  | ApiUpdateGroupCallConnectionState
+  | ApiUpdateGroupCallLeavePresentation
+  | ApiUpdateGroupCallChatId
+  | ApiUpdatePendingJoinRequests
+  | ApiUpdatePaymentStateCompleted
+  | ApiUpdatePhoneCall
+  | ApiUpdatePhoneCallSignalingData
+  | ApiUpdatePhoneCallMediaState
+  | ApiUpdatePhoneCallConnectionState
+  | ApiUpdateBotMenuButton
+  | ApiUpdateTranscribedAudio
+  | ApiUpdateUserEmojiStatus
+  | ApiUpdateMessageExtendedMedia
+  | ApiUpdateConfig
+  | ApiUpdateTopicNotifySettings
+  | ApiUpdatePinnedTopic
+  | ApiUpdatePinnedTopicsOrder
+  | ApiUpdateTopic
+  | ApiUpdateTopics
+  | ApiUpdateRecentEmojiStatuses
+  | ApiUpdateRecentReactions
+  | ApiUpdateStory
+  | ApiUpdateReadStories
+  | ApiUpdateDeleteStory
+  | ApiUpdateSentStoryReaction
+  | ApiRequestReconnectApi
+  | ApiRequestSync
+  | ApiUpdateFetchingDifference
+  | ApiUpdateChannelMessages
+  | ApiUpdateStealthMode
+  | ApiUpdateAttachMenuBots
+  | ApiUpdateNewAuthorization
+  | ApiUpdateGroupInvitePrivacyForbidden
+  | ApiUpdateViewForumAsMessages
+  | ApiUpdateSavedDialogPinned
+  | ApiUpdatePinnedSavedDialogIds
+  | ApiUpdateChatLastMessage
+  | ApiUpdateDeleteSavedHistory
+  | ApiUpdatePremiumFloodWait
+  | ApiUpdateDiamondsBalance
+  | ApiUpdateDiamondGiftAuctionState
+  | ApiUpdateDiamondGiftAuctionUserState
+  | ApiUpdateDiamondGiftCraftFail
+  | ApiUpdateBotCommands
+  | ApiUpdateQuickReplyMessage
+  | ApiUpdateQuickReplies
+  | ApiDeleteQuickReply
+  | ApiUpdateDeleteQuickReplyMessages
+  | ApiUpdateDeleteProfilePhoto
+  | ApiUpdateNewProfilePhoto
+  | ApiUpdateEntities
+  | ApiUpdatePaidReactionPrivacy
+  | ApiUpdateLangPackTooLong
+  | ApiUpdateLangPack
   | ApiUpdateNotSupportedInFrozenAccountError
   | ApiUpdateAiComposeTones
 );

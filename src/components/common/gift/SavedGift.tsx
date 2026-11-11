@@ -196,7 +196,7 @@ const SavedGift = ({
           inline
         >
           {resellPrice.currency === 'TON'
-            ? formatTonAsIcon(lang, resellPrice.amount, { shouldConvertFromNanos: true, className: styles.diamond })
+            ? formatTonAsIcon(lang, resellPrice.amount, { className: styles.diamond })
             : formatDiamondsAsIcon(lang, resellPrice.amount, { className: styles.diamond })}
         </Button>
       )}

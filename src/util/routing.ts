@@ -28,16 +28,16 @@ function captureInitialLocation() {
   const url = new URL(window.location.href);
   const hash = url.hash.slice(1);
   const separator = hash.indexOf('?');
-  const hasParameters = hash.includes('=') || hash.startsWith('tgWebAuth') || hash.includes('&');
+  const hasParameters = hash.includes('=') || hash.startsWith('asWebAuth') || hash.includes('&');
   const navigation = separator >= 0 ? hash.slice(0, separator) : !hasParameters ? hash : '';
   const parameters = new URLSearchParams(separator >= 0 ? hash.slice(separator + 1) : hasParameters ? hash : '');
-  const hasAuth = [...parameters.keys()].some((key) => key.startsWith('tgWebAuth'));
+  const hasAuth = [...parameters.keys()].some((key) => key.startsWith('asWebAuth'));
   const hasDuplicateAuth = [...parameters.keys()].some((key) => (
-    key.startsWith('tgWebAuth') && parameters.getAll(key).length !== 1
+    key.startsWith('asWebAuth') && parameters.getAll(key).length !== 1
   ));
   const auth = Object.fromEntries(parameters);
   for (const key of [...parameters.keys()]) {
-    if (key.startsWith('tgWebAuth')) parameters.delete(key);
+    if (key.startsWith('asWebAuth')) parameters.delete(key);
   }
   url.hash = navigation + (parameters.size ? `${navigation ? '?' : ''}${parameters}` : '');
   initialLocationHash = url.hash;

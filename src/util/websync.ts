@@ -1,9 +1,6 @@
 import { getGlobal } from '../global';
 
-import {
-  APP_CODE_NAME,
-  DEBUG, IS_MOCKED_CLIENT,
-} from '../config';
+import { APP_CODE_NAME, DEBUG, IS_MOCKED_CLIENT } from '../config';
 import { IS_TAURI } from './browser/globalEnvironment';
 import { hasStoredSession } from './sessions';
 

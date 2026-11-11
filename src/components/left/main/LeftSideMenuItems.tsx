@@ -50,6 +50,7 @@ type OwnProps = {
   onSelectArchived: NoneToVoidFunction;
   onBotMenuOpened: NoneToVoidFunction;
   onBotMenuClosed: NoneToVoidFunction;
+  onSwitchAccount: (url: string) => void;
   footer?: string;
 };
 
@@ -78,6 +79,7 @@ const LeftSideMenuItems = ({
   onSelectSettings,
   onBotMenuOpened,
   onBotMenuClosed,
+  onSwitchAccount,
   footer,
 }: OwnProps & StateProps) => {
   const {
@@ -99,7 +101,9 @@ const LeftSideMenuItems = ({
 
   const archivedUnreadChatsCount = useFolderManagerForUnreadCounters()[ARCHIVED_FOLDER_ID]?.chatsCount || 0;
 
-  const bots = useMemo(() => Object.values(attachBots).filter((bot) => bot.isForSideMenu), [attachBots]);
+  const bots = useMemo(() => Object.values(attachBots).filter((bot) => (
+    bot.isForSideMenu
+  )), [attachBots]);
 
   const handleSelectMyProfile = useLastCallback(() => {
     openChatWithInfo({ id: currentUserId, shouldReplaceHistory: true, isOwnProfile: true });
@@ -168,6 +172,7 @@ const LeftSideMenuItems = ({
             currentUser={currentUser}
             totalLimit={accountsTotalLimit}
             onSelectCurrent={onSelectSettings}
+            onSwitchAccount={onSwitchAccount}
           />
           <MenuSeparator />
         </>
@@ -201,6 +206,7 @@ const LeftSideMenuItems = ({
       >
         {lang('MenuContacts')}
       </MenuItem>
+
       {bots.map((bot) => (
         <AttachBotItem
           bot={bot}

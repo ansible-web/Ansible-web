@@ -134,7 +134,7 @@ const PublicPostsSearchLauncher = ({
             onClick={handlePaidSearchClick}
           >
             {lang('PublicPostsSearchForDiamonds', {
-              stars: formatDiamondsAsIcon(lang, starsAmount, { asFont: true }),
+              diamonds: formatDiamondsAsIcon(lang, starsAmount, { asFont: true }),
             }, { withNodes: true })}
           </Button>
           {Boolean(waitTill) && (

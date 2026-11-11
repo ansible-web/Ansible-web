@@ -11,11 +11,13 @@ import {
   STARS_CURRENCY_CODE,
   TON_CURRENCY_CODE,
 } from '../../../config';
+import { buildStarsAmount } from '../../../global/helpers/payments';
 import { selectIsMonoforumAdmin, selectPeer } from '../../../global/selectors';
 import { selectDraft } from '../../../global/selectors/threads';
 import buildClassName from '../../../util/buildClassName';
-import { formatScheduledDateTime, formatShortDuration } from '../../../util/dates/oldDateFormat';
-import { convertTonFromNanos, convertTonToNanos } from '../../../util/formatCurrency';
+import { formatShortDuration } from '../../../util/dates/duration';
+import { formatTonFromNanos, parseTonPrefixToNanos } from '../../../util/formatCurrency';
+import { formatCalendarDate, secondsToDate } from '../../../util/localization/dateFormat';
 import {
   formatDiamondsAsIcon,
   formatDiamondsAsText,
@@ -26,7 +28,6 @@ import { getServerTime } from '../../../util/serverTime';
 import useFlag from '../../../hooks/useFlag';
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
-import useOldLang from '../../../hooks/useOldLang';
 
 import CalendarModal from '../../common/CalendarModal';
 import Icon from '../../common/icons/Icon';
@@ -42,13 +43,13 @@ export type OwnProps = {
 
 type StateProps = {
   diamondBalance?: ApiDiamondsAmount;
-  tonBalance?: number;
+  tonBalance?: bigint;
   peer?: ApiPeer;
   currentDraft?: ApiDraft;
   maxDiamondsAmount: number;
   minDiamondsAmount: number;
-  tonMaxAmount: number;
-  tonMinAmount: number;
+  tonMaxAmount: bigint;
+  tonMinAmount: bigint;
   ageMinSeconds: number;
   futureMin: number;
   futureMax: number;
@@ -80,9 +81,8 @@ const SuggestMessageModal = ({
   const currentReplyInfo = currentDraft?.replyInfo;
   const isInSuggestChangesMode = Boolean(currentReplyInfo);
 
-  const [currencyAmount, setCurrencyAmount] = useState<number | undefined>(
-    currentSuggestedPostInfo?.price?.amount || undefined,
-  );
+  // Kept as typed, so that a price in Grams turns into nanotons without a float in between
+  const [amountText, setAmountText] = useState(() => formatPriceText(currentSuggestedPostInfo?.price));
   const [selectedCurrency, setSelectedCurrency] = useState<ApiTypeCurrencyAmount['currency']>(
     currentSuggestedPostInfo?.price?.currency || STARS_CURRENCY_CODE,
   );
@@ -93,9 +93,7 @@ const SuggestMessageModal = ({
   );
 
   useEffect(() => {
-    const price = currentSuggestedPostInfo?.price;
-    const amount = price?.currency === TON_CURRENCY_CODE ? convertTonFromNanos(price.amount) : price?.amount;
-    setCurrencyAmount(amount);
+    setAmountText(formatPriceText(currentSuggestedPostInfo?.price));
     setSelectedCurrency(currentSuggestedPostInfo?.price?.currency || STARS_CURRENCY_CODE);
     setScheduleDate(currentSuggestedPostInfo?.scheduleDate
       ? currentSuggestedPostInfo.scheduleDate * 1000
@@ -103,9 +101,11 @@ const SuggestMessageModal = ({
   }, [currentSuggestedPostInfo]);
 
   const lang = useLang();
-  const oldLang = useOldLang();
 
   const isCurrencyDiamonds = selectedCurrency === STARS_CURRENCY_CODE;
+  const starsAmount = Number(amountText) || 0;
+  const tonAmount = parseTonPrefixToNanos(amountText);
+  const hasAmount = isCurrencyDiamonds ? starsAmount > 0 : tonAmount > 0n;
   const now = getServerTime();
   const minAt = (now + futureMin) * 1000;
   const maxAt = (now + futureMax) * 1000;
@@ -113,12 +113,17 @@ const SuggestMessageModal = ({
 
   const handleAmountChange = useLastCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+
+    if (!isCurrencyDiamonds) {
+      setAmountText(parseTonPrefixToNanos(value) > tonMaxAmount ? formatTonFromNanos(tonMaxAmount) : value);
+      return;
+    }
+
     const number = parseFloat(value);
-
     const result = value === '' || Number.isNaN(number) ? undefined
-      : Math.min(Math.max(number, 0), currentMaxAmount);
+      : Math.min(Math.max(number, 0), maxDiamondsAmount);
 
-    setCurrencyAmount(result);
+    setAmountText(result?.toString() ?? '');
   });
 
   const handleExpireDateChange = useLastCallback((date: Date) => {
@@ -131,16 +136,10 @@ const SuggestMessageModal = ({
     closeCalendar();
   });
 
-  const currentMinAmount = isCurrencyDiamonds ? minDiamondsAmount : convertTonFromNanos(tonMinAmount);
-  const currentMaxAmount = isCurrencyDiamonds ? maxDiamondsAmount : convertTonFromNanos(tonMaxAmount);
-  const isDisabled = Boolean(currencyAmount) && currencyAmount < currentMinAmount;
+  const isBelowMin = hasAmount && (isCurrencyDiamonds ? starsAmount < minDiamondsAmount : tonAmount < tonMinAmount);
 
   const handleOffer = useLastCallback(() => {
-    const neededAmount = currencyAmount
-      ? (isCurrencyDiamonds ? currencyAmount : convertTonToNanos(currencyAmount))
-      : 0;
-
-    if (isDisabled) {
+    if (isBelowMin) {
       return;
     }
 
@@ -148,17 +147,17 @@ const SuggestMessageModal = ({
       if (isCurrencyDiamonds) {
         const currentBalance = diamondBalance?.amount || 0;
 
-        if (neededAmount > currentBalance) {
+        if (starsAmount > currentBalance) {
           openDiamondsBalanceModal({
             topup: {
-              balanceNeeded: neededAmount,
+              balanceNeeded: starsAmount,
             },
           });
           return;
         }
       } else {
-        const currentTonBalance = tonBalance || 0;
-        if (neededAmount > currentTonBalance) {
+        const currentTonBalance = tonBalance || 0n;
+        if (tonAmount > currentTonBalance) {
           openDiamondsBalanceModal({
             currency: TON_CURRENCY_CODE,
           });
@@ -168,7 +167,7 @@ const SuggestMessageModal = ({
     }
 
     updateDraftSuggestedPostInfo({
-      price: { currency: selectedCurrency, amount: neededAmount, nanos: 0 },
+      price: isCurrencyDiamonds ? buildStarsAmount(starsAmount) : { currency: TON_CURRENCY_CODE, amount: tonAmount },
       scheduleDate: scheduleDate
         ? Math.max(scheduleDate / 1000, getServerTime() + futureMin + FUTURE_TIME_ADJUSTMENT)
         : undefined,
@@ -197,18 +196,18 @@ const SuggestMessageModal = ({
           <InputText
             label={lang('InputPlaceholderPrice')}
             className={buildClassName(styles.input)}
-            value={currencyAmount?.toString()}
+            value={amountText}
             onChange={handleAmountChange}
             inputMode="numeric"
             tabIndex={0}
             teactExperimentControlled={isCurrencyDiamonds}
           />
           <div className={styles.description}>
-            {currencyAmount !== undefined && currencyAmount > 0 && currencyAmount < currentMinAmount
+            {isBelowMin
               ? lang('DescriptionSuggestedPostMinimumOffer', {
                 amount: isCurrencyDiamonds
-                  ? formatDiamondsAsText(lang, currentMinAmount)
-                  : formatTonAsText(lang, currentMinAmount) },
+                  ? formatDiamondsAsText(lang, minDiamondsAmount)
+                  : formatTonAsText(lang, tonMinAmount) },
               { withNodes: true, withMarkdown: true })
               : isCurrencyDiamonds
                 ? lang('SuggestMessagePriceDescriptionDiamonds')
@@ -222,7 +221,7 @@ const SuggestMessageModal = ({
               type="text"
               className={buildClassName('form-control', isCalendarOpened && 'focus')}
               value={scheduleDate
-                ? formatScheduledDateTime(scheduleDate / 1000, lang, oldLang)
+                ? formatCalendarDate(lang, secondsToDate(scheduleDate / 1000), { isShort: true, withTime: true })
                 : lang('SuggestMessageAnytime')}
               autoComplete="off"
               onClick={openCalendar}
@@ -258,14 +257,14 @@ const SuggestMessageModal = ({
         <Button
           className={styles.offerButton}
           onClick={handleOffer}
-          disabled={isDisabled}
+          disabled={isBelowMin}
           inline
         >
           {isInSuggestChangesMode ? lang('ButtonUpdateTerms')
-            : currencyAmount ? lang('ButtonOfferAmount', {
+            : hasAmount ? lang('ButtonOfferAmount', {
               amount: isCurrencyDiamonds
-                ? formatDiamondsAsIcon(lang, currencyAmount, { asFont: true })
-                : formatTonAsIcon(lang, currencyAmount),
+                ? formatDiamondsAsIcon(lang, starsAmount, { asFont: true })
+                : formatTonAsIcon(lang, tonAmount),
             }, {
               withNodes: true,
               withMarkdown: true,
@@ -275,6 +274,12 @@ const SuggestMessageModal = ({
     </Modal>
   );
 };
+
+function formatPriceText(price?: ApiTypeCurrencyAmount) {
+  if (!price?.amount) return '';
+
+  return price.currency === TON_CURRENCY_CODE ? formatTonFromNanos(price.amount) : String(price.amount);
+}
 
 export default memo(withGlobal<OwnProps>(
   (global, { modal }): Complete<StateProps> => {

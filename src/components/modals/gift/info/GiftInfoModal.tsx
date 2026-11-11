@@ -15,8 +15,8 @@ import { getMainUsername } from '../../../../global/helpers/users';
 import { selectPeer, selectPeerPaidMessagesDiamonds, selectUser } from '../../../../global/selectors';
 import buildClassName from '../../../../util/buildClassName';
 import { copyTextToClipboard } from '../../../../util/clipboard';
-import { formatDateTimeToString } from '../../../../util/dates/oldDateFormat';
-import { formatCurrency, formatCurrencyAsString } from '../../../../util/formatCurrency';
+import { formatCurrencyAsString } from '../../../../util/formatCurrency';
+import { formatDateTime, secondsToDate } from '../../../../util/localization/dateFormat';
 import {
   formatDiamondsAsIcon, formatDiamondsAsText, formatTonAsIcon, formatTonAsText,
   NEXT_ARROW_REPLACEMENT,
@@ -31,7 +31,6 @@ import useCurrentOrPrev from '../../../../hooks/useCurrentOrPrev';
 import useFlag from '../../../../hooks/useFlag';
 import useLang from '../../../../hooks/useLang';
 import useLastCallback from '../../../../hooks/useLastCallback';
-import useOldLang from '../../../../hooks/useOldLang';
 
 import AnimatedIconFromSticker from '../../../common/AnimatedIconFromSticker';
 import Avatar from '../../../common/Avatar';
@@ -62,6 +61,7 @@ type StateProps = {
   currentUserId?: string;
   diamondGiftMaxConvertPeriod?: number;
   hasAdminRights?: boolean;
+  isChatOwner?: boolean;
   currentUserEmojiStatus?: ApiEmojiStatusType;
   collectibleEmojiStatuses?: ApiEmojiStatusType[];
   tonExplorerUrl?: string;
@@ -81,6 +81,7 @@ const GiftInfoModal = ({
   currentUserId,
   diamondGiftMaxConvertPeriod,
   hasAdminRights,
+  isChatOwner,
   currentUserEmojiStatus,
   collectibleEmojiStatuses,
   tonExplorerUrl,
@@ -93,6 +94,7 @@ const GiftInfoModal = ({
     closeGiftInfoModal,
     changeGiftVisibility,
     convertGiftToDiamonds,
+    deleteSavedGift,
     openChatWithInfo,
     focusMessage,
     openGiftUpgradeModal,
@@ -106,12 +108,11 @@ const GiftInfoModal = ({
   } = getActions();
 
   const [isConvertConfirmOpen, openConvertConfirm, closeConvertConfirm] = useFlag();
+  const [isDeleteConfirmOpen, openDeleteConfirm, closeDeleteConfirm] = useFlag();
 
   const lang = useLang();
-  const oldLang = useOldLang();
+
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  // own-TON MARKER: платёж в TON убран (1018) — цена только в кристаллах (XTR).
-  // Оставлено как всегда-false, чтобы ветки цены не переписывать; сеттер снят вместе с чекбоксом.
   const [shouldPayInTon] = useState<boolean>(false);
   const [giftMessage, setGiftMessage] = useState('');
   const [shouldHideName, setShouldHideName] = useState(true);
@@ -158,6 +159,9 @@ const GiftInfoModal = ({
         ? renderingTargetPeer?.id === currentUserId
         : gift?.ownerId === currentUserId || isSelfUnique
   );
+
+  const canDelete = Boolean(canManage && !renderingModal?.isFromMessage && (!isTargetChat || isChatOwner)
+    && gift?.type === 'starGift' && !gift.isLimited && !gift.isAuction && !savedGift.isRefunded);
 
   function getResalePrice(isInTon?: boolean) {
     if (!isGiftUnique) return undefined;
@@ -209,6 +213,12 @@ const GiftInfoModal = ({
     const { inputGift } = savedGift!;
     convertGiftToDiamonds({ gift: inputGift! });
     closeConvertConfirm();
+    handleClose();
+  });
+
+  const handleDelete = useLastCallback(() => {
+    deleteSavedGift({ gift: savedGift! });
+    closeDeleteConfirm();
     handleClose();
   });
 
@@ -325,13 +335,15 @@ const GiftInfoModal = ({
         <Button className={styles.buyButton} onClick={handleBuyGift}>
           <span>
             {lang('ButtonBuyGift', {
-              stars: formatCurrency(lang, resellPrice.amount, resellPrice.currency, { asFontIcon: false }),
+              diamonds: resellPrice.currency === TON_CURRENCY_CODE
+                ? formatTonAsIcon(lang, resellPrice.amount, { isMono: true })
+                : formatDiamondsAsIcon(lang, resellPrice.amount, {}),
             }, { withNodes: true })}
           </span>
           {resellPrice?.currency === TON_CURRENCY_CODE && Boolean(resellPriceInDiamonds) && (
             <span className={styles.footerHint}>
               {lang('GiftBuyEqualsTo', {
-                stars: formatDiamondsAsIcon(lang, resellPriceInDiamonds.amount),
+                diamonds: formatDiamondsAsIcon(lang, resellPriceInDiamonds.amount),
               }, { withNodes: true })}
             </span>
           )}
@@ -401,11 +413,19 @@ const GiftInfoModal = ({
     let text = '';
     if (gift.type === 'starGift') {
       if (gift.firstSaleDate) {
-        text += `${lang('GiftInfoFirstSale')} ${formatDateTimeToString(gift.firstSaleDate * 1000, lang.code, true)}`;
+        text += `${lang('GiftInfoFirstSale')} ${formatDateTime(
+          lang,
+          secondsToDate(gift.firstSaleDate),
+          { date: 'short', time: 'short' },
+        )}`;
       }
       if (gift.lastSaleDate) {
         text += '\n';
-        text += `${lang('GiftInfoLastSale')} ${formatDateTimeToString(gift.lastSaleDate * 1000, lang.code, true)}`;
+        text += `${lang('GiftInfoLastSale')} ${formatDateTime(
+          lang,
+          secondsToDate(gift.lastSaleDate),
+          { date: 'short', time: 'short' },
+        )}`;
       }
     }
 
@@ -535,10 +555,9 @@ const GiftInfoModal = ({
       <div className={styles.headerRightButtons}>
         {Boolean(resellPrice?.amount) && (
           <div className={styles.giftResalePriceContainer}>
-            {formatCurrency(lang, resellPrice.amount, resellPrice.currency, {
-              asFontIcon: false,
-              iconClassName: styles.giftResalePriceDiamond,
-            })}
+            {resellPrice.currency === TON_CURRENCY_CODE
+              ? formatTonAsIcon(lang, resellPrice.amount, { isMono: true, className: styles.giftResalePriceDiamond })
+              : formatDiamondsAsIcon(lang, resellPrice.amount, { className: styles.giftResalePriceDiamond })}
           </div>
         )}
         {canCraft && (
@@ -598,7 +617,7 @@ const GiftInfoModal = ({
         !fromId ? (
           <>
             <Avatar size="small" peer={CUSTOM_PEER_HIDDEN} />
-            <span className={styles.unknown}>{oldLang(CUSTOM_PEER_HIDDEN.titleKey!)}</span>
+            <span className={styles.unknown}>{lang(CUSTOM_PEER_HIDDEN.titleKey!)}</span>
           </>
         ) : { chatId: fromId },
       ]);
@@ -608,21 +627,27 @@ const GiftInfoModal = ({
       if (savedGift?.date) {
         tableData.push([
           lang('GiftInfoDate'),
-          <span title={saleDateInfo}>{formatDateTimeToString(savedGift.date * 1000, lang.code, true)}</span>,
+          <span title={saleDateInfo}>
+            {formatDateTime(
+              lang,
+              secondsToDate(savedGift.date),
+              { date: 'short', time: 'short' },
+            )}
+          </span>,
         ]);
       }
 
       if (gift.firstSaleDate && !savedGift) {
         tableData.push([
           lang('GiftInfoFirstSale'),
-          formatDateTimeToString(gift.firstSaleDate * 1000, lang.code, true),
+          formatDateTime(lang, secondsToDate(gift.firstSaleDate), { date: 'short', time: 'short' }),
         ]);
       }
 
       if (gift.lastSaleDate && !savedGift) {
         tableData.push([
           lang('GiftInfoLastSale'),
-          formatDateTimeToString(gift.lastSaleDate * 1000, lang.code, true),
+          formatDateTime(lang, secondsToDate(gift.lastSaleDate), { date: 'short', time: 'short' }),
         ]);
       }
 
@@ -782,7 +807,7 @@ const GiftInfoModal = ({
                 className={styles.removeMessageButton}
                 size="smaller"
                 color="translucent"
-                ariaLabel="Delete original details"
+                ariaLabel={lang('AriaDeleteGiftDetails')}
                 onClick={handleRemoveMessage}
                 iconName="delete"
               />
@@ -853,7 +878,7 @@ const GiftInfoModal = ({
     };
   }, [
     typeGift, savedGift, renderingTargetPeer, giftSticker, lang,
-    canManage, hasConvertOption, isSender, oldLang, tonExplorerUrl,
+    canManage, hasConvertOption, isSender, tonExplorerUrl,
     gift, giftAttributes, renderFooterButton, isTargetChat,
     isGiftUnique, saleDateInfo, canCraft, handleOpenCraftModal,
     canBuyGift, giftOwnerTitle, resellPrice, uniqueGiftTitle, uniqueGiftSubtitle, releasedByPeer,
@@ -866,6 +891,7 @@ const GiftInfoModal = ({
       canManage={canManage}
       collectibleEmojiStatuses={collectibleEmojiStatuses}
       currentUserEmojiStatus={currentUserEmojiStatus}
+      onDelete={canDelete ? openDeleteConfirm : undefined}
     />
   );
 
@@ -894,8 +920,8 @@ const GiftInfoModal = ({
           noDefaultTitle
           onClose={closeConfirmModal}
           confirmLabel={lang('ButtonBuyGift', {
-            stars: confirmPrice?.currency === TON_CURRENCY_CODE
-              ? formatTonAsIcon(lang, confirmPrice.amount, { shouldConvertFromNanos: true })
+            diamonds: confirmPrice?.currency === TON_CURRENCY_CODE
+              ? formatTonAsIcon(lang, confirmPrice.amount)
               : formatDiamondsAsIcon(lang, confirmPrice.amount),
           }, { withNodes: true })}
           confirmHandler={handleConfirmBuyGift}
@@ -919,8 +945,8 @@ const GiftInfoModal = ({
               <p>
                 {lang('GiftBuyConfirmDescription', {
                   gift: lang('GiftUnique', { title: uniqueGift.title, number: uniqueGift.number }),
-                  stars: confirmPrice?.currency === TON_CURRENCY_CODE
-                    ? formatTonAsText(lang, confirmPrice.amount, true)
+                  diamonds: confirmPrice?.currency === TON_CURRENCY_CODE
+                    ? formatTonAsText(lang, confirmPrice.amount)
                     : formatDiamondsAsText(lang, confirmPrice.amount),
                 }, {
                   withNodes: true,
@@ -933,8 +959,8 @@ const GiftInfoModal = ({
               <p>
                 {lang('GiftBuyForPeerConfirmDescription', {
                   gift: lang('GiftUnique', { title: uniqueGift.title, number: uniqueGift.number }),
-                  stars: confirmPrice?.currency === TON_CURRENCY_CODE
-                    ? formatTonAsText(lang, confirmPrice.amount, true)
+                  diamonds: confirmPrice?.currency === TON_CURRENCY_CODE
+                    ? formatTonAsText(lang, confirmPrice.amount)
                     : formatDiamondsAsText(lang, confirmPrice.amount),
                   peer: getPeerTitle(lang, recipientPeer),
                 }, {
@@ -943,9 +969,6 @@ const GiftInfoModal = ({
                 })}
               </p>
             )}
-          {/* own-TON MARKER: чекбокс «Оплатить в TON» убран (1018) — оплата только в кристаллах.
-              Для возврата восстановить <Checkbox label=LabelPayInTON checked=shouldPayInTon
-              onCheck=setShouldPayInTon/> + <div>DescriptionPayInTON</div> (и вернуть сеттер на L108). */}
           {recipientPeer && (
             <div className={styles.resaleOptions}>
               {!paidMessagesDiamonds && (
@@ -1002,6 +1025,19 @@ const GiftInfoModal = ({
           <div>{lang('GiftInfoConvertDescription2')}</div>
         </ConfirmDialog>
       )}
+      {canDelete && (
+        <ConfirmDialog
+          isOpen={isDeleteConfirmOpen}
+          onClose={closeDeleteConfirm}
+          confirmHandler={handleDelete}
+          confirmLabel={lang('Delete')}
+          confirmIsDestructive
+          title={lang('GiftInfoDelete')}
+        >
+          <p>{lang('GiftInfoDeleteDescription')}</p>
+          <p>{lang('GiftInfoDeleteDescription2')}</p>
+        </ConfirmDialog>
+      )}
     </>
   );
 };
@@ -1017,6 +1053,7 @@ export default memo(withGlobal<OwnProps>(
     const targetPeer = modal?.peerId ? selectPeer(global, modal.peerId) : undefined;
     const chat = targetPeer && isApiPeerChat(targetPeer) ? targetPeer : undefined;
     const hasAdminRights = chat && getHasAdminRight(chat, 'postMessages');
+    const isChatOwner = chat?.isOwner;
     const currentUser = selectUser(global, currentUserId!);
     const recipientPeer = modal?.recipientId && currentUserId !== modal.recipientId
       ? selectPeer(global, modal.recipientId) : undefined;
@@ -1035,6 +1072,7 @@ export default memo(withGlobal<OwnProps>(
       diamondGiftMaxConvertPeriod: global.appConfig.diamondGiftMaxConvertPeriod,
       tonExplorerUrl: global.appConfig.tonExplorerUrl,
       hasAdminRights,
+      isChatOwner,
       currentUserEmojiStatus,
       collectibleEmojiStatuses,
       currentUser,

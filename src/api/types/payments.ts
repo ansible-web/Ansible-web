@@ -549,3 +549,9 @@ export interface ApiUniqueDiamondGiftValueInfo {
   fragmentListedCount?: number;
   fragmentListedUrl?: string;
 }
+
+export interface ApiCurrencyRate {
+  currency: string;
+  // Ratio to USD, which itself always comes as `1`
+  rate: number;
+}

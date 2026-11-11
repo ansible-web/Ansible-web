@@ -216,7 +216,8 @@ export interface ApiDiamondsAmount {
 
 export interface ApiTonAmount {
   currency: typeof TON_CURRENCY_CODE;
-  amount: number;
+  // Nanotons
+  amount: bigint;
 }
 
 export interface ApiDiamondsTransactionPeerUnsupported {

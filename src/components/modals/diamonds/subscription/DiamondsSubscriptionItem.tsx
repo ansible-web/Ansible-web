@@ -71,7 +71,8 @@ const DiamondsSubscriptionItem = ({ subscription }: OwnProps) => {
         )}
         <p className={styles.description}>
           {lang(
-            hasExpired ? 'DiamondsSubscriptionExpired'
+            hasExpired
+              ? 'DiamondsSubscriptionExpired'
               : isCancelled ? 'DiamondsSubscriptionExpires' : 'DiamondsSubscriptionRenews',
             { date: formattedDate },
           )}

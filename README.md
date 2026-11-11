@@ -18,6 +18,9 @@ Web client for the [Ansible](https://ansible.su) messaging service.
 
 ## What this is
 
+The current client base is Telegram Web A **12.0.48**, API layer **232**.
+Ansible release **0.4.2** retains the Ansible interface and service integrations.
+
 Ansible Web is the official web client for the Ansible messenger. It
 is built on top of the Telegram Web A codebase under GPL v3, with the
 following high-level modifications:

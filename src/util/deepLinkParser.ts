@@ -8,10 +8,39 @@ import { isBase64Url } from './encoding/base64';
 import { toChannelId } from './entities/ids';
 import { isUsernameValid } from './entities/username';
 
-export type DeepLinkMethod = 'resolve' | 'login' | 'passport' | 'settings' | 'join' | 'addstickers' | 'addemoji' |
-  'setlanguage' | 'addtheme' | 'addstyle' | 'confirmphone' | 'socks' | 'proxy' | 'privatepost' | 'bg' | 'share' |
-  'msg' | 'msg_url' | 'invoice' | 'addlist' | 'boost' | 'giftcode' | 'message' | 'premium_offer' |
-  'premium_multigift' | 'stars_topup' | 'nft' | 'stars' | 'ton' | 'stargift_auction' | 'premium' | 'oauth';
+export type DeepLinkMethod = 'resolve'
+  | 'login'
+  | 'passport'
+  | 'settings'
+  | 'join'
+  | 'addstickers'
+  | 'addemoji'
+  | 'setlanguage'
+  | 'addtheme'
+  | 'addstyle'
+  | 'confirmphone'
+  | 'socks'
+  | 'proxy'
+  | 'privatepost'
+  | 'bg'
+  | 'share'
+  | 'msg'
+  | 'msg_url'
+  | 'invoice'
+  | 'addlist'
+  | 'boost'
+  | 'giftcode'
+  | 'message'
+  | 'premium_offer'
+  | 'premium_multigift'
+  | 'stars_topup'
+  | 'nft'
+  | 'stars'
+  | 'ton'
+  | 'stargift_auction'
+  | 'premium'
+  | 'oauth'
+  | 'newbot';
 
 interface PublicMessageLink {
   type: 'publicMessageLink';
@@ -47,6 +76,11 @@ interface ChatFolderLink {
 interface LoginCodeLink {
   type: 'loginCodeLink';
   code: string;
+}
+
+interface LanguageLink {
+  type: 'languageLink';
+  langCode: string;
 }
 
 interface AnsiblePassportLink {
@@ -121,7 +155,7 @@ interface TonModalLink {
 
 interface SettingsScreenLink {
   type: 'settings';
-  screen?: 'devices' | 'folders' | 'language' | 'privacy' | 'editProfile' | 'theme';
+  path?: string;
 }
 
 interface OAuthLink {
@@ -129,25 +163,33 @@ interface OAuthLink {
   url: string;
 }
 
-type DeepLink =
-  AnsiblePassportLink |
-  LoginCodeLink |
-  PublicMessageLink |
-  PrivateMessageLink |
-  ShareLink |
-  ChatFolderLink |
-  PublicUsernameOrBotLink |
-  PrivateChannelLink |
-  BusinessChatLink |
-  PremiumReferrerLink |
-  PremiumMultigiftLink |
-  ChatBoostLink |
-  GiftUniqueLink |
-  GiftAuctionLink |
-  DiamondsModalLink |
-  TonModalLink |
-  SettingsScreenLink |
-  OAuthLink;
+interface NewBotLink {
+  type: 'newBotLink';
+  managerUsername: string;
+  username?: string;
+  name?: string;
+}
+
+type DeepLink = LanguageLink
+  | AnsiblePassportLink
+  | LoginCodeLink
+  | PublicMessageLink
+  | PrivateMessageLink
+  | ShareLink
+  | ChatFolderLink
+  | PublicUsernameOrBotLink
+  | PrivateChannelLink
+  | BusinessChatLink
+  | PremiumReferrerLink
+  | PremiumMultigiftLink
+  | ChatBoostLink
+  | GiftUniqueLink
+  | GiftAuctionLink
+  | DiamondsModalLink
+  | TonModalLink
+  | SettingsScreenLink
+  | OAuthLink
+  | NewBotLink;
 
 type BuilderParams<T extends DeepLink> = Record<keyof Omit<T, 'type'>, string | undefined>;
 type BuilderReturnType<T extends DeepLink> = T | undefined;
@@ -172,6 +214,7 @@ type OAuthLinkBuilderParams = Omit<BuilderParams<OAuthLink>, 'url'> & {
 const ELIGIBLE_HOSTNAMES = new Set(['asme.su']);
 const MAX_BOT_START_PARAMETER_LENGTH = 64;
 
+// A `tc:` link is only followed as a platform deep link, never from message content
 export function isDeepLink(link: string): boolean {
   return Boolean(link.match(RE_TME_LINK) || link.match(RE_TG_LINK));
 }
@@ -220,6 +263,8 @@ function parseTgLink(url: URL) {
 
   const deepLinkType = getTgDeepLinkType(queryParams, pathParams, method);
   switch (deepLinkType) {
+    case 'languageLink':
+      return buildLanguageLink({ langCode: queryParams.lang });
     case 'publicMessageLink': {
       const {
         domain, post, single, thread, comment, t,
@@ -296,9 +341,15 @@ function parseTgLink(url: URL) {
     case 'ton':
       return { type: 'ton' } satisfies TonModalLink;
     case 'settings':
-      return buildSettingsScreenLink({ screen: pathParams.length === 1 ? pathParams[0] : undefined });
+      return { type: 'settings', path: pathParams.join('/').toLowerCase() || undefined } satisfies SettingsScreenLink;
     case 'oauth':
       return buildOAuthLink({ url: url.toString() });
+    case 'newBotLink':
+      return buildNewBotLink({
+        managerUsername: queryParams.manager,
+        username: queryParams.username,
+        name: queryParams.name,
+      });
     default:
       break;
   }
@@ -314,6 +365,8 @@ function parseHttpLink(url: URL) {
 
   const deepLinkType = getHttpDeepLinkType(queryParams, pathParams);
   switch (deepLinkType) {
+    case 'languageLink':
+      return buildLanguageLink({ langCode: pathParams[1] });
     case 'publicMessageLink': {
       const {
         single, comment, t,
@@ -414,6 +467,12 @@ function parseHttpLink(url: URL) {
         slug: pathParams[1],
       });
     }
+    case 'newBotLink':
+      return buildNewBotLink({
+        managerUsername: pathParams[1],
+        username: pathParams[2],
+        name: queryParams.name,
+      });
     default:
       break;
   }
@@ -426,8 +485,10 @@ function getHttpDeepLinkType(
 ): DeepLinkType {
   const len = pathParams.length;
   const method = pathParams[0];
+  if (method === 'setlanguage') return len === 2 ? 'languageLink' : 'unknown';
   if (len === 1) {
     if (method === 'share') return 'shareLink';
+
     if (method === 'boost' || queryParams.boost !== undefined) return 'chatBoostLink';
 
     if (isUsernameValid(method)) {
@@ -448,6 +509,7 @@ function getHttpDeepLinkType(
     if (isUsernameValid(pathParams[0]) && isNumber(pathParams[1])) {
       return 'publicMessageLink';
     }
+    if (method === 'newbot') return 'newBotLink';
   } else if (len === 3) {
     if (method === 'c' && pathParams.slice(1).every(isNumber)) {
       return 'privateMessageLink';
@@ -456,6 +518,7 @@ function getHttpDeepLinkType(
       return 'publicMessageLink';
     }
     if (method === 'nft') return 'giftUniqueLink';
+    if (method === 'newbot') return 'newBotLink';
   } else if (len === 4) {
     if (method === 'c' && pathParams.slice(1).every(isNumber)) {
       return 'privateMessageLink';
@@ -470,6 +533,8 @@ function getTgDeepLinkType(
   method: DeepLinkMethod,
 ): DeepLinkType {
   switch (method) {
+    case 'setlanguage':
+      return 'languageLink';
     case 'resolve': {
       const {
         domain, post, bot_id, scope, public_key, nonce, startapp,
@@ -480,6 +545,7 @@ function getTgDeepLinkType(
       if (domain === 'oauth' && startapp) {
         return 'oauth';
       }
+
       if (domain && post) {
         return 'publicMessageLink';
       }
@@ -526,6 +592,8 @@ function getTgDeepLinkType(
     }
     case 'oauth':
       return 'oauth';
+    case 'newbot':
+      return 'newBotLink';
     default:
       break;
   }
@@ -622,6 +690,13 @@ function buildLoginCodeLink(params: BuilderParams<LoginCodeLink>): BuilderReturn
     type: 'loginCodeLink',
     code,
   };
+}
+
+function buildLanguageLink(params: BuilderParams<LanguageLink>): BuilderReturnType<LanguageLink> {
+  const { langCode } = params;
+  if (!langCode?.trim()) return undefined;
+
+  return { type: 'languageLink', langCode };
 }
 
 function buildAnsiblePassportLink(
@@ -774,37 +849,6 @@ function buildGiftAuctionLink(params: BuilderParams<GiftAuctionLink>): BuilderRe
   };
 }
 
-function buildSettingsScreen(screenParam: string) {
-  switch (screenParam) {
-    case 'devices':
-      return 'devices';
-    case 'folders':
-      return 'folders';
-    case 'language':
-      return 'language';
-    case 'privacy':
-      return 'privacy';
-    case 'edit_profile':
-      return 'editProfile';
-    case 'theme':
-      return 'theme';
-    default:
-      break;
-  }
-  return undefined;
-}
-
-function buildSettingsScreenLink(params: BuilderParams<SettingsScreenLink>): BuilderReturnType<SettingsScreenLink> {
-  const {
-    screen,
-  } = params;
-
-  return {
-    type: 'settings',
-    screen: screen ? buildSettingsScreen(screen) : undefined,
-  };
-}
-
 function buildOAuthLink(params: OAuthLinkBuilderParams): BuilderReturnType<OAuthLink> {
   const {
     url,
@@ -814,6 +858,26 @@ function buildOAuthLink(params: OAuthLinkBuilderParams): BuilderReturnType<OAuth
     url,
   };
 }
+
+function buildNewBotLink(params: BuilderParams<NewBotLink>): BuilderReturnType<NewBotLink> {
+  const {
+    managerUsername,
+    username,
+    name,
+  } = params;
+
+  if (!managerUsername || !isUsernameValid(managerUsername)) {
+    return undefined;
+  }
+
+  return {
+    type: 'newBotLink',
+    managerUsername,
+    username,
+    name,
+  };
+}
+
 function buildPremiumReferrerLink(params: BuilderParams<PremiumReferrerLink>): BuilderReturnType<PremiumReferrerLink> {
   const {
     ref,

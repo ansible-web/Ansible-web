@@ -2,6 +2,7 @@ import type {
   ApiAiComposeTone,
   ApiAiComposeToneExample,
   ApiAttachBot,
+  ApiAudio,
   ApiBirthday,
   ApiBoost,
   ApiBoostsStatus,
@@ -32,6 +33,7 @@ import type {
   ApiInputAiComposeTone,
   ApiInputInvoice,
   ApiInputRichMessage,
+  ApiLanguage,
   ApiLimitTypeWithModal,
   ApiMessage,
   ApiMissingInvitedUser,
@@ -50,6 +52,7 @@ import type {
   ApiPreparedInlineMessage,
   ApiReactionWithPaid,
   ApiReceiptRegular,
+  ApiRequestPeerType,
   ApiSavedDiamondGift,
   ApiSavedGifts,
   ApiSearchPostsFlood,
@@ -97,6 +100,7 @@ import type {
   ProfileTabType,
   ResaleGiftsFilterOptions,
   ScrollTargetPosition,
+  SettingsHighlight,
   SettingsScreens,
   SharedMediaType,
   ShippingOption,
@@ -106,6 +110,7 @@ import type {
   ThreadId,
 } from '../../types';
 import type { BrowserState } from '../../types/browser';
+import type { RegularLangKey } from '../../types/language';
 import type { SearchResultKey } from '../../util/keys/searchResultKey';
 import type { RegularLangFnParameters } from '../../util/localization';
 import type { ProfileCollectionKey } from '../selectors/payments';
@@ -170,6 +175,27 @@ type MessageReportContext = {
   title?: string;
   sections: ReportSection[];
   isSubmitting?: boolean;
+};
+
+export type MusicPickerSharedResults = {
+  generation: number;
+  ids: SearchResultKey[];
+  loadedCount?: number;
+  nextOffsetRate?: number;
+  nextOffsetId?: number;
+  nextOffsetPeerId?: string;
+  totalCount?: number;
+  isLoading?: boolean;
+  isFullyLoaded?: boolean;
+};
+
+export type MusicPickerGlobalResults = {
+  query: string;
+  generation: number;
+  ids: string[];
+  nextOffset?: string;
+  isLoading?: boolean;
+  isFullyLoaded?: boolean;
 };
 
 export type TabState = {
@@ -313,6 +339,7 @@ export type TabState = {
   leftColumn: {
     contentKey: LeftColumnContent;
     settingsScreen: SettingsScreens;
+    settingsHighlight?: SettingsHighlight;
   };
 
   globalSearch: {
@@ -502,11 +529,13 @@ export type TabState = {
       type: string;
       token: string;
     };
+    webFormCredentials?: AnyLiteral;
     receipt?: ApiReceiptRegular;
     error?: {
       field?: string;
       messageKey?: RegularLangFnParameters;
       descriptionKey?: RegularLangFnParameters;
+      description?: string;
     };
     isPaymentModalOpen?: boolean;
     isExtendedMedia?: boolean;
@@ -515,7 +544,6 @@ export type TabState = {
       value: string;
       validUntil: number;
     };
-    url?: string;
     botId?: string;
   };
   diamondsPayment: {
@@ -526,9 +554,8 @@ export type TabState = {
   };
 
   priceConfirmModal?: {
-    originalAmount?: number;
-    newAmount?: number;
-    currency: 'TON' | 'XTR';
+    originalAmount: ApiTypeCurrencyAmount;
+    newAmount: ApiTypeCurrencyAmount;
     directInfo?: {
       formId: string;
       inputInvoice: ApiInputInvoice;
@@ -537,7 +564,7 @@ export type TabState = {
 
   chatCreation?: {
     progress: ChatCreationProgress;
-    error?: string;
+    error?: RegularLangKey;
   };
 
   profileEdit?: {
@@ -610,11 +637,28 @@ export type TabState = {
     filter?: ApiChatType[];
   };
 
+  requestedRichInputMedia?: {
+    chatId: string;
+    threadId: ThreadId;
+    messageListType: MessageListType;
+    audio?: ApiAudio;
+    files?: File[];
+  };
+
   pollModal?: {
     chatId: string;
     threadId?: ThreadId;
     messageListType: MessageListType;
     isQuiz?: boolean;
+  };
+
+  musicPicker?: {
+    chatId: string;
+    threadId: ThreadId;
+    messageListType: MessageListType;
+    shouldInsertToRichInput?: boolean;
+    shared?: MusicPickerSharedResults;
+    global?: MusicPickerGlobalResults;
   };
 
   todoListModal?: {
@@ -628,6 +672,22 @@ export type TabState = {
     message: ApiPreparedInlineMessage;
     webAppKey: string;
     botId: string;
+  };
+
+  requestPeerModal?: {
+    botId: string;
+    chatId: string;
+    messageId: number;
+    buttonId: number;
+    maxQuantity: number;
+    peerType: ApiRequestPeerType;
+  };
+
+  botCreationModal?: {
+    managerId: string;
+    suggestedName?: string;
+    suggestedUsername?: string;
+    occupiedUsername?: string;
   };
 
   sharePreparedMessageModal?: {
@@ -745,6 +805,15 @@ export type TabState = {
     example?: ApiAiComposeToneExample;
     isAlreadyAdded?: boolean;
     hasExampleError?: boolean;
+  };
+
+  languageModal?: {
+    requestId: number;
+    langCode: string;
+    language?: ApiLanguage;
+    isLoading?: boolean;
+    isApplying?: boolean;
+    error?: 'unsupported' | 'failed';
   };
 
   aiMessageEditorPendingResult?: {
@@ -956,6 +1025,7 @@ export type TabState = {
     recipientId?: string;
     gift: ApiSavedDiamondGift | ApiDiamondGift;
     craftSlotIndex?: number;
+    isFromMessage?: boolean;
   };
 
   giftInfoValueModal?: {
