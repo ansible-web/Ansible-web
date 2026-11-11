@@ -208,7 +208,13 @@ export async function importContact({
   }));
 
   if (result instanceof GramJs.contacts.ImportedContacts && result.users.length) {
-    addUserToLocalDb(result.users[0]);
+    result.users.forEach((mtUser) => {
+      addUserToLocalDb(mtUser);
+      const user = buildApiUser(mtUser);
+      if (user) {
+        sendApiUpdate({ '@type': 'updateUser', id: user.id, user });
+      }
+    });
   }
 
   return result?.imported.length ? buildApiPeerId(result.imported[0].userId, 'user') : undefined;
