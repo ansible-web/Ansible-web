@@ -53,7 +53,6 @@ export const PREMIUM_FEATURE_TITLES = {
   last_seen: 'PremiumPreviewLastSeen',
   message_privacy: 'PremiumPreviewMessagePrivacy',
   effects: 'PremiumMessageEffects',
-  ai_compose: 'PremiumPreviewAiTools',
   rich_formatting: 'PremiumPreviewRichFormatting',
   todo: 'PremiumPreviewTodo',
   pm_noforwards: 'PremiumPreviewNoForwards',
@@ -78,7 +77,6 @@ export const PREMIUM_FEATURE_DESCRIPTIONS = {
   last_seen: 'PremiumPreviewLastSeenDescription',
   message_privacy: 'PremiumPreviewMessagePrivacyDescription',
   effects: 'PremiumMessageEffectsInfo',
-  ai_compose: 'PremiumPreviewAiToolsDescription',
   rich_formatting: 'PremiumPreviewRichFormattingDescription',
   todo: 'PremiumPreviewTodoDescription',
   pm_noforwards: 'PremiumPreviewNoForwardsDescription',
@@ -137,7 +135,9 @@ const PremiumFeatureModal = ({
 }: OwnProps) => {
   const lang = useLang();
   const scrollContainerRef = useRef<HTMLDivElement>();
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(PREMIUM_FEATURE_SECTIONS.indexOf(initialSection));
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(
+    Math.max(0, PREMIUM_FEATURE_SECTIONS.indexOf(initialSection)),
+  );
   const [reverseAnimationSlideIndex, setReverseAnimationSlideIndex] = useState(0);
   const [isScrolling, startScrolling, stopScrolling] = useFlag();
 
@@ -205,7 +205,7 @@ const PremiumFeatureModal = ({
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer || (prevInitialSection === initialSection)) return;
 
-    const index = filteredSections.indexOf(initialSection);
+    const index = Math.max(0, filteredSections.indexOf(initialSection));
     setCurrentSlideIndex(index);
     startScrolling();
     animateHorizontalScroll(scrollContainer, scrollContainer.clientWidth * index, 0)

@@ -3,6 +3,7 @@ import { withGlobal } from '../../../global';
 
 import type { ApiAiComposeToneType, ApiInputAiComposeTone } from '../../../api/types';
 
+import { IS_BUILT_IN_AI_ENABLED } from '../../../config';
 import { compareAiTones, getInputTone } from '../../../util/aiComposeTones';
 import buildClassName from '../../../util/buildClassName';
 import { MEMO_EMPTY_ARRAY } from '../../../util/memo';
@@ -38,7 +39,7 @@ const TranslationToneSelector = ({
     onSelectTone(tone);
   });
 
-  if (!tones.length) return undefined;
+  if (!IS_BUILT_IN_AI_ENABLED || !tones.length) return undefined;
 
   return (
     <div className={buildClassName(styles.root, 'TranslationToneSelector')} style={style}>

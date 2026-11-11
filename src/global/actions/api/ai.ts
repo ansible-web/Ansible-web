@@ -1,6 +1,7 @@
 import type { ApiInputAiComposeTone } from '../../../api/types';
 import type { ActionReturnType, AiEditorResult, GlobalState } from '../../types';
 
+import { IS_BUILT_IN_AI_ENABLED } from '../../../config';
 import { compareAiTones, getToneCacheKey } from '../../../util/aiComposeTones';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { callApi } from '../../../api/gramjs';
@@ -52,6 +53,7 @@ function buildTranslateCacheKey(
 let nextComposeRequestId = 0;
 
 addActionHandler('composeWithAiMessageEditor', async (global, actions, payload): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const {
     shouldProofread, isEmojify, translateToLang, tone,
     tabId = getCurrentTabId(),
@@ -134,6 +136,7 @@ addActionHandler('composeWithAiMessageEditor', async (global, actions, payload):
 });
 
 addActionHandler('createAiTone', async (global, actions, payload): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const {
     title, emojiId, prompt, shouldDisplayAuthor,
     tabId = getCurrentTabId(),
@@ -158,6 +161,7 @@ addActionHandler('createAiTone', async (global, actions, payload): Promise<void>
 });
 
 addActionHandler('deleteAiTone', async (global, actions, payload): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tone, tabId = getCurrentTabId() } = payload;
 
   const result = await callApi('deleteAiTone', { tone });
@@ -171,6 +175,7 @@ addActionHandler('deleteAiTone', async (global, actions, payload): Promise<void>
 });
 
 addActionHandler('updateAiTone', async (global, actions, payload): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const {
     tone, title, emojiId, prompt, shouldDisplayAuthor,
     tabId = getCurrentTabId(),
@@ -203,6 +208,7 @@ addActionHandler('updateAiTone', async (global, actions, payload): Promise<void>
 });
 
 addActionHandler('openAiTonePreview', async (global, actions, payload): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { slug, tabId = getCurrentTabId() } = payload;
 
   const result = await callApi('fetchAiTone', {
@@ -237,6 +243,7 @@ addActionHandler('openAiTonePreview', async (global, actions, payload): Promise<
 });
 
 addActionHandler('closeAiTonePreview', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tabId = getCurrentTabId() } = payload || {};
   return updateTabState(global, {
     aiTonePreviewModal: undefined,
@@ -244,6 +251,7 @@ addActionHandler('closeAiTonePreview', (global, actions, payload): ActionReturnT
 });
 
 addActionHandler('saveAiTone', async (global, actions, payload): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tone, unsave, tabId = getCurrentTabId() } = payload;
 
   if (!unsave && showToneLimitNotification(global, actions, tabId)) return;
@@ -263,6 +271,7 @@ addActionHandler('saveAiTone', async (global, actions, payload): Promise<void> =
 });
 
 addActionHandler('loadAiTonePreviewExample', async (global, actions, payload): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tone, num, tabId = getCurrentTabId() } = payload;
 
   // Clear current example to trigger loading state
@@ -294,6 +303,7 @@ addActionHandler('loadAiTonePreviewExample', async (global, actions, payload): P
 });
 
 addActionHandler('loadAiComposeTones', async (global): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const hash = global.aiComposeTones?.hash;
   const result = await callApi('fetchAiComposeTones', { hash });
   if (!result) return;

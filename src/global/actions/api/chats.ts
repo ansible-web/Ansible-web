@@ -1820,11 +1820,7 @@ addActionHandler('openAnsibleLink', async (global, actions, payload): Promise<vo
     return;
   }
 
-  if (part1 === 'addstyle') {
-    if (!part2) return;
-    actions.openAiTonePreview({ slug: part2, tabId });
-    return;
-  }
+  if (part1 === 'addstyle') return;
 
   if (part1 === 'share') {
     const text = formatShareText(params.url, params.text);

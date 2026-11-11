@@ -18,7 +18,7 @@ import type {
   ApiWebPage,
 } from '../../../api/types';
 import type {
-  IAnchorPosition, MessageListType, ThreadId, TranslationTone,
+  IAnchorPosition, MessageListType, ThreadId,
 } from '../../../types';
 import type { ClipboardTextFormat, MessageCopyRequest } from '../../../types/messageCopy';
 
@@ -41,7 +41,6 @@ import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
 
 import AvatarList from '../../common/AvatarList';
-import Icon from '../../common/icons/Icon';
 import Menu from '../../ui/Menu';
 import MenuItem, { MenuItemSubtitle, MenuItemTitle } from '../../ui/MenuItem';
 import MenuSeparator from '../../ui/MenuSeparator';
@@ -96,7 +95,6 @@ type OwnProps = {
   canTranslate?: boolean;
   canShowOriginal?: boolean;
   canSelectLanguage?: boolean;
-  currentTranslationTone?: TranslationTone;
   isPrivate?: boolean;
   isCurrentUserPremium?: boolean;
   canDownload?: boolean;
@@ -144,7 +142,6 @@ type OwnProps = {
   onShowSeenBy?: NoneToVoidFunction;
   onShowReactors?: NoneToVoidFunction;
   onTranslate?: NoneToVoidFunction;
-  onTranslateWithTone?: (tone: TranslationTone) => void;
   onShowOriginal?: NoneToVoidFunction;
   onSelectLanguage?: NoneToVoidFunction;
   onToggleReaction?: (reaction: ApiReaction) => void;
@@ -210,7 +207,6 @@ const MessageContextMenu = ({
   canTranslate,
   canShowOriginal,
   canSelectLanguage,
-  currentTranslationTone,
   isDownloading,
   repliesThreadInfo,
   canShowSeenBy,
@@ -254,7 +250,6 @@ const MessageContextMenu = ({
   onCopyMessages,
   onReactionPickerOpen,
   onTranslate,
-  onTranslateWithTone,
   onShowOriginal,
   onSelectLanguage,
   userFullName,
@@ -495,39 +490,6 @@ const MessageContextMenu = ({
           <MenuItem icon="language" onClick={onShowOriginal}>
             {lang('ShowOriginalButton')}
           </MenuItem>
-        )}
-        {canShowOriginal && (
-          <NestedMenuItem
-            icon="tone"
-            submenuClassName="translation-tone-menu"
-            submenu={(
-              <>
-                <MenuItem
-                  icon={currentTranslationTone === 'neutral' ? 'check' : undefined}
-                  customIcon={currentTranslationTone !== 'neutral' ? <Icon name="placeholder" /> : undefined}
-                  onClick={() => onTranslateWithTone?.('neutral')}
-                >
-                  {lang('TranslationToneNeutral')}
-                </MenuItem>
-                <MenuItem
-                  icon={currentTranslationTone === 'formal' ? 'check' : undefined}
-                  customIcon={currentTranslationTone !== 'formal' ? <Icon name="placeholder" /> : undefined}
-                  onClick={() => onTranslateWithTone?.('formal')}
-                >
-                  {lang('TranslationToneFormal')}
-                </MenuItem>
-                <MenuItem
-                  icon={currentTranslationTone === 'casual' ? 'check' : undefined}
-                  customIcon={currentTranslationTone !== 'casual' ? <Icon name="placeholder" /> : undefined}
-                  onClick={() => onTranslateWithTone?.('casual')}
-                >
-                  {lang('TranslationToneCasual')}
-                </MenuItem>
-              </>
-            )}
-          >
-            {lang('TranslationTone')}
-          </NestedMenuItem>
         )}
         {canSelectLanguage && (
           <MenuItem icon="web" onClick={onSelectLanguage}>{lang('Language')}</MenuItem>

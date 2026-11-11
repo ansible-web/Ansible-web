@@ -294,7 +294,6 @@ const ContextMenuContainer = ({
     reportMessages,
     openTodoListModal,
     showNotification,
-    setSettingOption,
     loadRichMessage,
     loadSavedMusicIds,
     toggleMusicInProfile,
@@ -726,19 +725,6 @@ const ContextMenuContainer = ({
     closeMenu();
   });
 
-  const handleTranslateWithTone = useLastCallback((tone: TranslationTone) => {
-    const { languageCode } = parseTranslationCacheKey(translationRequestLanguage!);
-
-    setSettingOption({ translationTone: tone });
-    requestMessageTranslation({
-      chatId: message.chatId,
-      id: message.id,
-      toLanguageCode: languageCode,
-      tone,
-    });
-    closeMenu();
-  });
-
   const handleShowOriginal = useLastCallback(() => {
     showOriginalMessage({
       chatId: message.chatId,
@@ -824,7 +810,6 @@ const ContextMenuContainer = ({
         canTranslate={canTranslate}
         canShowOriginal={canShowOriginal}
         canSelectLanguage={canSelectLanguage}
-        currentTranslationTone={currentTranslationTone}
         canPlayAnimatedEmojis={canPlayAnimatedEmojis}
         shouldRenderShowWhen={shouldRenderShowWhen}
         canLoadReadDate={canLoadReadDate}
@@ -867,7 +852,6 @@ const ContextMenuContainer = ({
         onShowReactors={handleOpenReactorListModal}
         onReactionPickerOpen={handleReactionPickerOpen}
         onTranslate={handleTranslate}
-        onTranslateWithTone={handleTranslateWithTone}
         onShowOriginal={handleShowOriginal}
         onSelectLanguage={handleSelectLanguage}
         userFullName={userFullName}

@@ -1034,12 +1034,7 @@ addActionHandler('openQuickChatPicker', (global, actions, payload): ActionReturn
 
 addTabStateResetterAction('closeQuickChatPicker', 'isQuickChatPickerOpen');
 
-addActionHandler('openCocoonModal', (global, actions, payload): ActionReturnType => {
-  const { tabId = getCurrentTabId() } = payload || {};
-  return updateTabState(global, {
-    isCocoonModalOpen: true,
-  }, tabId);
-});
+addActionHandler('openCocoonModal', (): ActionReturnType => undefined);
 
 addTabStateResetterAction('closeCocoonModal', 'isCocoonModalOpen');
 

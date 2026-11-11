@@ -7,7 +7,7 @@ import type { IAnchorPosition, MessageListType, ThreadId, TranslationTone } from
 import { MAIN_THREAD_ID } from '../../api/types';
 import { ManagementScreens } from '../../types';
 
-import { COCOON_EMOJI_ID, SERVICE_NOTIFICATIONS_USER_ID } from '../../config';
+import { SERVICE_NOTIFICATIONS_USER_ID } from '../../config';
 import { requestMeasure, requestNextMutation } from '../../lib/fasterdom/fasterdom';
 import {
   getHasAdminRight,
@@ -41,14 +41,10 @@ import { useHotkeys } from '../../hooks/useHotkeys';
 import useLang from '../../hooks/useLang';
 import useLastCallback from '../../hooks/useLastCallback';
 
-import CustomEmoji from '../common/CustomEmoji';
-import Icon from '../common/icons/Icon';
 import Button from '../ui/Button';
 import DropdownMenu from '../ui/DropdownMenu';
-import Link from '../ui/Link';
 import MenuItem from '../ui/MenuItem';
 import MenuSeparator from '../ui/MenuSeparator';
-import NestedMenuItem from '../ui/NestedMenuItem';
 import HeaderMenuContainer from './HeaderMenuContainer.async';
 
 interface OwnProps {
@@ -127,13 +123,11 @@ const HeaderActions = ({
     showNotification,
     openChat,
     requestChatTranslation,
-    setChatTranslationTone,
     togglePeerTranslations,
     openChatLanguageModal,
     setSettingOption,
     setViewForumAsMessages,
     openFrozenAccountModal,
-    openCocoonModal,
   } = getActions();
   const menuButtonRef = useRef<HTMLButtonElement>();
 
@@ -239,10 +233,6 @@ const HeaderActions = ({
     openChatLanguageModal({ chatId });
   });
 
-  const handleCocoonClick = useLastCallback(() => {
-    openCocoonModal();
-  });
-
   const handleDoNotTranslate = useLastCallback(() => {
     if (!detectedChatLanguage) return;
 
@@ -252,11 +242,6 @@ const HeaderActions = ({
     requestChatTranslation({ chatId, toLanguageCode: undefined });
 
     showNotification({ message: getTextWithLanguage('AddedToDoNotTranslate', detectedChatLanguage) });
-  });
-
-  const handleSetTone = useLastCallback((tone: TranslationTone) => {
-    setChatTranslationTone({ chatId, tone });
-    setSettingOption({ translationTone: tone });
   });
 
   useHotkeys(useMemo(() => ({
@@ -292,57 +277,10 @@ const HeaderActions = ({
           <MenuItem icon="replace" onClick={handleChangeLanguage}>
             {lang('ChatTranslateMenuTo')}
           </MenuItem>
-          <NestedMenuItem
-            icon="tone"
-            submenuClassName="translation-tone-menu"
-            submenu={(
-              <>
-                <MenuItem
-                  icon={currentTone === 'neutral' ? 'check' : undefined}
-                  customIcon={currentTone !== 'neutral' ? <Icon name="placeholder" /> : undefined}
-                  onClick={() => handleSetTone('neutral')}
-                >
-                  {lang('TranslationToneNeutral')}
-                </MenuItem>
-                <MenuItem
-                  icon={currentTone === 'formal' ? 'check' : undefined}
-                  customIcon={currentTone !== 'formal' ? <Icon name="placeholder" /> : undefined}
-                  onClick={() => handleSetTone('formal')}
-                >
-                  {lang('TranslationToneFormal')}
-                </MenuItem>
-                <MenuItem
-                  icon={currentTone === 'casual' ? 'check' : undefined}
-                  customIcon={currentTone !== 'casual' ? <Icon name="placeholder" /> : undefined}
-                  onClick={() => handleSetTone('casual')}
-                >
-                  {lang('TranslationToneCasual')}
-                </MenuItem>
-              </>
-            )}
-          >
-            {lang('TranslationTone')}
-          </NestedMenuItem>
           <MenuSeparator />
           {detectedChatLanguage
             && <MenuItem icon="hand-stop" onClick={handleDoNotTranslate}>{doNotTranslateText}</MenuItem>}
           <MenuItem icon="close-circle" onClick={handleHide}>{lang('Hide')}</MenuItem>
-          <MenuSeparator />
-          <MenuItem withWrap onClick={handleCocoonClick}>
-            {lang('TranslateMenuCocoon', {
-              link: (
-                <Link isPrimary onClick={(e) => e.preventDefault()}>
-                  {lang('TranslateMenuCocoonLinkText')}
-                </Link>
-              ),
-            }, {
-              withNodes: true,
-              withMarkdown: true,
-              specialReplacement: {
-                '🥚': <CustomEmoji documentId={COCOON_EMOJI_ID} />,
-              },
-            })}
-          </MenuItem>
         </DropdownMenu>
       )}
       {!isMobile && (

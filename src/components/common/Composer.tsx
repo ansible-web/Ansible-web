@@ -44,9 +44,9 @@ import type { RegularLangKey } from '../../types/language';
 import type { RichEditorTooltipsConfig } from './tooltips/types';
 import { ApiMediaFormat, ApiMessageEntityTypes, MAIN_THREAD_ID } from '../../api/types';
 
-import {
-  BASE_EMOJI_KEYWORD_LANG,
+import { BASE_EMOJI_KEYWORD_LANG,
   HEART_REACTION,
+  IS_BUILT_IN_AI_ENABLED,
   MAX_UPLOAD_FILEPART_SIZE,
   MIN_ROUND_VIDEO_RECORDING_TIME,
   ONE_TIME_MEDIA_TTL_SECONDS,
@@ -55,8 +55,7 @@ import {
   SEND_MESSAGE_ACTION_INTERVAL,
   SERVICE_NOTIFICATIONS_USER_ID,
   STARS_CURRENCY_CODE,
-  VIDEO_RECORDING_FILENAME,
-} from '../../config';
+  VIDEO_RECORDING_FILENAME } from '../../config';
 import { requestMeasure, requestMutation, requestNextMutation } from '../../lib/fasterdom/fasterdom';
 import {
   canEditMedia,
@@ -1010,7 +1009,7 @@ const Composer = ({
 
   const aiMessageToSendRef = useRef<ApiInputRichMessage>();
   useEffect(() => {
-    if (!isInMessageList || !aiMessageEditorPendingResult) return;
+    if (!IS_BUILT_IN_AI_ENABLED || !isInMessageList || !aiMessageEditorPendingResult) return;
 
     const {
       content, shouldSendWithAttachments, shouldSend,
@@ -1708,7 +1707,7 @@ const Composer = ({
   });
 
   useEffect(() => {
-    if (!isInMessageList || !aiMessageEditorPendingResult?.shouldSend
+    if (!IS_BUILT_IN_AI_ENABLED || !isInMessageList || !aiMessageEditorPendingResult?.shouldSend
       || richMessage !== aiMessageToSendRef.current
       || aiMessageEditorPendingResult.chatId !== chatId
       || aiMessageEditorPendingResult.threadId !== threadId) return;
@@ -2716,7 +2715,8 @@ const Composer = ({
     && !isComposerBlocked && !isEditingMedia;
   const canCloseRichInput = Boolean(isRichInputExpansionActive && !isComposerBlocked);
   const canToggleRichInput = canOpenRichInput || canCloseRichInput;
-  const shouldShowAiButton = (isRichInputExpansionActive || (shouldShowRichInputButton && hasInputContent))
+  const shouldShowAiButton = IS_BUILT_IN_AI_ENABLED
+    && (isRichInputExpansionActive || (shouldShowRichInputButton && hasInputContent))
     && !isInStoryViewer && !hasAttachments && !isComposerBlocked && !activeRecording && !hasRichMediaBlocking;
   const {
     ref: voiceRecordBarRef, shouldRender: shouldRenderVoiceRecordBar,
@@ -2989,20 +2989,22 @@ const Composer = ({
             disabled={isRichInputExpansionActive && hasRichMediaBlocking}
             onClick={isRichInputExpansionActive ? collapseRichInput : handleOpenRichInput}
           />
-          <Button
-            round
-            faded
-            size="smaller"
-            className={buildClassName(
-              'ai-composer-button',
-              (!shouldShowAiButton || isRichInputExpansionActive) && 'ai-composer-button-hidden',
-            )}
-            color="translucent"
-            ariaLabel={lang('AiMessageEditor')}
-            iconName="ai"
-            tabIndex={shouldShowAiButton && !isRichInputExpansionActive ? 0 : -1}
-            onClick={handleOpenAiEditor}
-          />
+          {IS_BUILT_IN_AI_ENABLED && (
+            <Button
+              round
+              faded
+              size="smaller"
+              className={buildClassName(
+                'ai-composer-button',
+                (!shouldShowAiButton || isRichInputExpansionActive) && 'ai-composer-button-hidden',
+              )}
+              color="translucent"
+              ariaLabel={lang('AiMessageEditor')}
+              iconName="ai"
+              tabIndex={shouldShowAiButton && !isRichInputExpansionActive ? 0 : -1}
+              onClick={handleOpenAiEditor}
+            />
+          )}
           <MessageInput
             ref={inputRef}
             id={inputId}

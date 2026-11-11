@@ -34,8 +34,8 @@ import type {
 import { MAIN_THREAD_ID, MESSAGE_DELETED } from '../../../api/types';
 import { LoadMoreDirection } from '../../../types';
 
-import {
-  GIF_MIME_TYPE,
+import { GIF_MIME_TYPE,
+  IS_BUILT_IN_AI_ENABLED,
   MAX_MEDIA_FILES_FOR_ALBUM,
   MESSAGE_ID_REQUIRED_ERROR,
   MESSAGE_LIST_SLICE,
@@ -45,8 +45,7 @@ import {
   SUPPORTED_AUDIO_CONTENT_TYPES,
   SUPPORTED_PHOTO_CONTENT_TYPES,
   SUPPORTED_VIDEO_CONTENT_TYPES,
-  TON_CURRENCY_CODE,
-} from '../../../config';
+  TON_CURRENCY_CODE } from '../../../config';
 import { ensureProtocol } from '../../../util/browser/url';
 import { IS_IOS } from '../../../util/browser/windowEnvironment';
 import { copyTextToClipboardFromPromise } from '../../../util/clipboard';
@@ -3676,6 +3675,7 @@ addActionHandler('translateMessages', (global, actions, payload): ActionReturnTy
 });
 
 addActionHandler('summarizeMessage', async (global, actions, payload): Promise<void> => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const {
     chatId, id, toLanguageCode, onError,
   } = payload;

@@ -9,13 +9,12 @@ import type { MessageListType, ThreadId } from '../../../types';
 import type { RichEditorTooltipsConfig } from '../../common/tooltips/types';
 import type { RichEditor } from './richEditorTypes';
 
-import {
-  BASE_EMOJI_KEYWORD_LANG,
+import { BASE_EMOJI_KEYWORD_LANG,
   EDITABLE_INPUT_MODAL_ID,
+  IS_BUILT_IN_AI_ENABLED,
   SUPPORTED_AUDIO_CONTENT_TYPES,
   SUPPORTED_PHOTO_CONTENT_TYPES,
-  SUPPORTED_VIDEO_CONTENT_TYPES,
-} from '../../../config';
+  SUPPORTED_VIDEO_CONTENT_TYPES } from '../../../config';
 import { requestMeasure, requestMutation } from '../../../lib/fasterdom/fasterdom';
 import { getAttachmentMediaType } from '../../../global/helpers';
 import {
@@ -337,7 +336,7 @@ const AttachmentModal = ({
         return;
       }
       const { totalLines } = calcTextLineHeightAndCount(input, true);
-      setShouldShowAiButton(totalLines >= 3);
+      setShouldShowAiButton(IS_BUILT_IN_AI_ENABLED && totalLines >= 3);
     });
   }, [isForMessage, richText, isOpen]);
 
@@ -379,7 +378,7 @@ const AttachmentModal = ({
   });
 
   const handleSendWithAiResult = useLastCallback(() => {
-    if (!isForMessage || !aiMessageEditorPendingResult?.shouldSendWithAttachments
+    if (!IS_BUILT_IN_AI_ENABLED || !isForMessage || !aiMessageEditorPendingResult?.shouldSendWithAttachments
       || !isOpen || hasPreparingAttachments) return;
     if (aiMessageEditorPendingResult.chatId !== chatId || aiMessageEditorPendingResult.threadId !== threadId) return;
 
@@ -828,16 +827,18 @@ const AttachmentModal = ({
             styles.captionWrapper,
           )}
         >
-          <Button
-            round
-            size="tiny"
-            color="translucent"
-            tabIndex={shouldShowAiButton ? 0 : -1}
-            className={buildClassName(styles.aiButton, !shouldShowAiButton && styles.aiButtonHidden)}
-            onClick={handleOpenAiEditor}
-            ariaLabel={lang('AiMessageEditor')}
-            iconName="ai"
-          />
+          {IS_BUILT_IN_AI_ENABLED && (
+            <Button
+              round
+              size="tiny"
+              color="translucent"
+              tabIndex={shouldShowAiButton ? 0 : -1}
+              className={buildClassName(styles.aiButton, !shouldShowAiButton && styles.aiButtonHidden)}
+              onClick={handleOpenAiEditor}
+              ariaLabel={lang('AiMessageEditor')}
+              iconName="ai"
+            />
+          )}
           <div className={styles.caption}>
             <SymbolMenuButton
               chatId={chatId}

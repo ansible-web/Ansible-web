@@ -48,7 +48,6 @@ import PremiumSubscriptionOption from './PremiumSubscriptionOption';
 import styles from './PremiumMainModal.module.scss';
 
 import PremiumAds from '../../../assets/premium/PremiumAds.svg';
-import PremiumAi from '../../../assets/premium/PremiumAi.svg';
 import PremiumBadge from '../../../assets/premium/PremiumBadge.svg';
 import PremiumChats from '../../../assets/premium/PremiumChats.svg';
 import PremiumEffects from '../../../assets/premium/PremiumEffects.svg';
@@ -91,7 +90,6 @@ const PREMIUM_FEATURE_COLOR_ICONS: Record<ApiPremiumSection, string> = {
   last_seen: PremiumLastSeen,
   message_privacy: PremiumMessagePrivacy,
   effects: PremiumEffects,
-  ai_compose: PremiumAi,
   rich_formatting: PremiumRichFormatting,
   todo: PremiumTodo,
   pm_noforwards: PremiumNoforwards,

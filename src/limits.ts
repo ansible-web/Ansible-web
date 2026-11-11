@@ -111,7 +111,6 @@ export const DEFAULT_APP_CONFIG: ApiAppConfig = {
     'animated_userpics',
     'premium_stickers',
     'effects',
-    'ai_compose',
     'rich_formatting',
     'todo',
     'pm_noforwards',

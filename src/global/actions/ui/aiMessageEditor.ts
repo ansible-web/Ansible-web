@@ -1,5 +1,6 @@
 import type { ActionReturnType } from '../../types';
 
+import { IS_BUILT_IN_AI_ENABLED } from '../../../config';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { hasAiEditorContent } from '../../helpers/aiMessageEditor';
 import { addActionHandler } from '../../index';
@@ -10,6 +11,7 @@ import { selectTranslationLanguage } from '../../selectors/settings';
 import { showToneLimitNotification } from '../api/ai';
 
 addActionHandler('openAiMessageEditorModal', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const {
     chatId, threadId, content, initialTab = 'style', isFromAttachment, isEditing,
     tabId = getCurrentTabId(),
@@ -37,6 +39,7 @@ addActionHandler('openAiMessageEditorModal', (global, actions, payload): ActionR
 });
 
 addActionHandler('closeAiMessageEditorModal', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tabId = getCurrentTabId() } = payload || {};
 
   return updateTabState(global, {
@@ -45,6 +48,7 @@ addActionHandler('closeAiMessageEditorModal', (global, actions, payload): Action
 });
 
 addActionHandler('setAiMessageEditorTab', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tab, tabId = getCurrentTabId() } = payload;
 
   const aiMessageEditorModal = selectTabState(global, tabId).aiMessageEditorModal;
@@ -59,6 +63,7 @@ addActionHandler('setAiMessageEditorTab', (global, actions, payload): ActionRetu
 });
 
 addActionHandler('setAiMessageEditorTranslateOptions', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const {
     selectedLanguage, shouldEmojify, clearResult,
     tabId = getCurrentTabId(),
@@ -88,6 +93,7 @@ addActionHandler('setAiMessageEditorTranslateOptions', (global, actions, payload
 });
 
 addActionHandler('setAiMessageEditorStyleOptions', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const {
     shouldEmojify, customPrompt, clearResult,
     tabId = getCurrentTabId(),
@@ -117,6 +123,7 @@ addActionHandler('setAiMessageEditorStyleOptions', (global, actions, payload): A
 });
 
 addActionHandler('applyAiMessageEditorResult', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tabId = getCurrentTabId() } = payload || {};
 
   const aiMessageEditorModal = selectTabState(global, tabId).aiMessageEditorModal;
@@ -140,6 +147,7 @@ addActionHandler('applyAiMessageEditorResult', (global, actions, payload): Actio
 });
 
 addActionHandler('sendAiMessageEditorResult', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const {
     isSilent, scheduledAt, scheduleRepeatPeriod,
     tabId = getCurrentTabId(),
@@ -181,6 +189,7 @@ addActionHandler('sendAiMessageEditorResult', (global, actions, payload): Action
 });
 
 addActionHandler('clearAiMessageEditorPendingResult', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tabId = getCurrentTabId() } = payload || {};
 
   return updateTabState(global, {
@@ -189,6 +198,7 @@ addActionHandler('clearAiMessageEditorPendingResult', (global, actions, payload)
 });
 
 addActionHandler('openAiToneEditorModal', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { toneToEdit, tabId = getCurrentTabId() } = payload || {};
 
   if (!toneToEdit && showToneLimitNotification(global, actions, tabId)) {
@@ -201,6 +211,7 @@ addActionHandler('openAiToneEditorModal', (global, actions, payload): ActionRetu
 });
 
 addActionHandler('closeAiToneEditorModal', (global, actions, payload): ActionReturnType => {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const { tabId = getCurrentTabId() } = payload || {};
 
   return updateTabState(global, {

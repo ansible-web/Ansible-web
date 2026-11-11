@@ -46,17 +46,16 @@ import {
   MESSAGE_DELETED,
 } from '../../types';
 
-import {
-  DEBUG,
+import { DEBUG,
   GIF_MIME_TYPE,
+  IS_BUILT_IN_AI_ENABLED,
   MAX_INT_32,
   MENTION_UNREAD_SLICE,
   MESSAGE_ID_REQUIRED_ERROR,
   POLL_UNREAD_SLICE,
   REACTION_UNREAD_SLICE,
   SUPPORTED_PHOTO_CONTENT_TYPES,
-  SUPPORTED_VIDEO_CONTENT_TYPES,
-} from '../../../config';
+  SUPPORTED_VIDEO_CONTENT_TYPES } from '../../../config';
 import buildUploadingMedia from '../../../util/buildUploadingMedia';
 import { fetchFile } from '../../../util/files';
 import { compact, omit, split } from '../../../util/iteratees';
@@ -2895,7 +2894,6 @@ export async function translateText(params: TranslateTextParams) {
   let result;
   const isMessageTranslation = 'chat' in params;
   const { toLanguageCode, tone } = params;
-  const apiTone = tone === 'neutral' ? undefined : tone;
 
   if (isMessageTranslation) {
     const { chat, messageIds } = params;
@@ -2904,14 +2902,12 @@ export async function translateText(params: TranslateTextParams) {
       peer: buildInputPeer(chat.id, chat.accessHash),
       id: messageIds,
       toLang: toLanguageCode,
-      tone: apiTone,
     }));
   } else {
     const { text } = params;
     result = await invokeRequest(new GramJs.messages.TranslateText({
       text: text.map((t) => buildInputTextWithEntities(t)),
       toLang: toLanguageCode,
-      tone: apiTone,
     }));
   }
 
@@ -2959,7 +2955,6 @@ export async function translateRichMessage({
     peer: buildInputPeer(chat.id, chat.accessHash),
     id: messageIds,
     toLang: toLanguageCode,
-    tone: tone === 'neutral' ? undefined : tone,
   }));
 
   if (!result) {
@@ -2996,6 +2991,7 @@ export async function fetchMessageSummary({
 }: {
   chat: ApiChat; id: number; toLanguageCode?: string; tone?: string;
 }) {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const result = await invokeRequest(new GramJs.messages.SummarizeText({
     peer: buildInputPeer(chat.id, chat.accessHash),
     id,
@@ -3250,6 +3246,7 @@ export async function composeMessageWithAI({
   translateToLang?: string;
   tone?: ApiInputAiComposeTone;
 }): Promise<{ result?: ApiComposedMessageWithAI; error?: 'floodPremium' | 'aiError' | 'generic' }> {
+  if (!IS_BUILT_IN_AI_ENABLED) return { error: 'generic' };
   try {
     const result = await invokeRequest(new GramJs.messages.ComposeMessageWithAI({
       text: buildInputTextWithEntities(text),
@@ -3288,6 +3285,7 @@ export async function composeRichMessageWithAI({
   translateToLang?: string;
   tone?: ApiInputAiComposeTone;
 }): Promise<{ result?: ApiRichMessage; error?: 'floodPremium' | 'aiError' | 'generic' } | undefined> {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const inputText = text && buildInputRichMessage(text);
   if (text && !inputText) return { error: 'generic' };
 
@@ -3319,6 +3317,7 @@ export async function fetchAiComposeTones({
 }: {
   hash?: string;
 }) {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const result = await invokeRequest(new GramJs.aicompose.GetTones({
     hash: hash ? BigInt(hash) : DEFAULT_PRIMITIVES.BIGINT,
   }));
@@ -3344,6 +3343,7 @@ export async function createAiTone({
   prompt: string;
   shouldDisplayAuthor?: boolean;
 }) {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const result = await invokeRequest(new GramJs.aicompose.CreateTone({
     title,
     prompt,
@@ -3361,6 +3361,7 @@ export async function deleteAiTone({
 }: {
   tone: ApiInputAiComposeTone;
 }) {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   return invokeRequest(new GramJs.aicompose.DeleteTone({
     tone: buildInputAiComposeTone(tone),
   }));
@@ -3379,6 +3380,7 @@ export async function updateAiTone({
   prompt?: string;
   shouldDisplayAuthor?: boolean;
 }) {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const result = await invokeRequest(new GramJs.aicompose.UpdateTone({
     tone: buildInputAiComposeTone(tone),
     title,
@@ -3397,6 +3399,7 @@ export async function fetchAiTone({
 }: {
   tone: ApiInputAiComposeTone;
 }) {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const result = await invokeRequest(new GramJs.aicompose.GetTone({
     tone: buildInputAiComposeTone(tone),
   }));
@@ -3417,6 +3420,7 @@ export async function fetchAiToneExample({
   tone: ApiInputAiComposeTone;
   num: number;
 }) {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   const result = await invokeRequest(new GramJs.aicompose.GetToneExample({
     tone: buildInputAiComposeTone(tone),
     num,
@@ -3434,6 +3438,7 @@ export async function saveAiTone({
   tone: ApiInputAiComposeTone;
   unsave?: boolean;
 }) {
+  if (!IS_BUILT_IN_AI_ENABLED) return undefined;
   return invokeRequest(new GramJs.aicompose.SaveTone({
     tone: buildInputAiComposeTone(tone),
     unsave: Boolean(unsave),

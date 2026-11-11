@@ -46,7 +46,7 @@ import type {
 import type { Signal } from '../../../util/signals';
 import { MAIN_THREAD_ID } from '../../../api/types';
 
-import { EMOJI_STATUS_LOOP_LIMIT, MESSAGE_APPEARANCE_DELAY } from '../../../config';
+import { EMOJI_STATUS_LOOP_LIMIT, IS_BUILT_IN_AI_ENABLED, MESSAGE_APPEARANCE_DELAY } from '../../../config';
 import {
   areReactionsEmpty,
   extractMessageText,
@@ -575,7 +575,7 @@ const Message = ({
     onMessageUnmount?.(messageId);
   });
 
-  const hasSummary = Boolean(message.summaryLanguageCode);
+  const hasSummary = IS_BUILT_IN_AI_ENABLED && Boolean(message.summaryLanguageCode);
 
   const isLocal = isMessageLocal(message);
   const isOwn = isOwnMessage(message);
