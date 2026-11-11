@@ -10,6 +10,8 @@ active until the release pipeline explicitly selects it.
 replacement. Repeated builds preserve that deadline. HTML and mutable files come
 from the new build. A digest collision, inconsistent previous manifest, or a
 combined image exceeding 2 GiB / 30000 files fails composition before publication.
+An unversioned WASM/binary URL must keep identical bytes across the transition;
+changing it fails composition and requires versioning that dependency's URL.
 The image keeps the retention manifest private through the Nginx configuration.
 Tabs older than the retention window require a reload.
 

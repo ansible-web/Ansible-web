@@ -15,6 +15,9 @@
 *.mo text eol=lf
 *.svg text eol=lf
 *.sh text eol=lf
+*.Dockerfile text eol=lf
+*.nginx.conf text eol=lf
+.dockerignore text eol=lf
 
 # Denote all files that are truly binary and should not be modified.
 *.gif binary

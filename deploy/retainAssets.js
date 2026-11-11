@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -23,6 +24,19 @@ async function composeAssets(currentRoot, previousRoot, outputRoot) {
   const current = await inventory(currentRoot);
   const previous = await inventory(previousRoot);
   const previousManifest = await readManifest(previousRoot);
+  for (const [relative, entry] of Object.entries(previousManifest ?? {})) {
+    const file = previous.get(relative);
+    if (!HASHED_ASSET.test(relative) || !file || entry?.sha256 !== file.sha256) {
+      throw new Error(`Previous manifest references a missing or inconsistent asset: ${relative}`);
+    }
+  }
+  for (const [relative, file] of current) {
+    const oldFile = previous.get(relative);
+    if (/\.(wasm|bin)$/.test(relative) && !HASHED_ASSET.test(relative)
+      && oldFile && oldFile.sha256 !== file.sha256) {
+      throw new Error(`Mutable binary URL changes across releases: ${relative}; version its URL first`);
+    }
+  }
   const entries = new Map();
   let retainedCount = 0;
   let totalBytes = 0;
@@ -75,18 +89,25 @@ async function composeAssets(currentRoot, previousRoot, outputRoot) {
   })}\n`);
 }
 
-async function inventory(root, relativeRoot = '') {
+async function inventory(root, relativeRoot = '', budget = { bytes: 0, files: 0 }) {
   const result = new Map();
   for (const entry of await fs.readdir(path.join(root, relativeRoot), { withFileTypes: true })) {
     const relative = path.posix.join(relativeRoot, entry.name);
     if (relative === MANIFEST_NAME) continue;
     if (entry.name.startsWith('.') || entry.isSymbolicLink()) throw new Error(`Unexpected asset entry: ${relative}`);
     if (entry.isDirectory()) {
-      for (const [name, file] of await inventory(root, relative)) result.set(name, file);
+      for (const [name, file] of await inventory(root, relative, budget)) result.set(name, file);
     } else if (entry.isFile()) {
       const source = path.join(root, relative);
-      const data = await fs.readFile(source);
-      result.set(relative, { source, size: data.length, sha256: createHash('sha256').update(data).digest('hex') });
+      const { size } = await fs.stat(source);
+      budget.bytes += size;
+      budget.files += 1;
+      if (budget.bytes > MAX_BYTES || budget.files > MAX_FILES) {
+        throw new Error('Input assets exceed 2 GiB / 30000 files');
+      }
+      const hash = createHash('sha256');
+      for await (const chunk of createReadStream(source)) hash.update(chunk);
+      result.set(relative, { source, size, sha256: hash.digest('hex') });
     } else {
       throw new Error(`Unsupported asset entry: ${relative}`);
     }
