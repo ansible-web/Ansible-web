@@ -7,7 +7,7 @@ import type { IAnchorPosition, MessageListType, ThreadId, TranslationTone } from
 import { MAIN_THREAD_ID } from '../../api/types';
 import { ManagementScreens } from '../../types';
 
-import { COCOON_EMOJI_ID } from '../../config';
+import { COCOON_EMOJI_ID, SERVICE_NOTIFICATIONS_USER_ID } from '../../config';
 import { requestMeasure, requestNextMutation } from '../../lib/fasterdom/fasterdom';
 import {
   getHasAdminRight,
@@ -30,6 +30,7 @@ import {
   selectRequestedChatTranslationLanguage,
   selectRequestedChatTranslationTone,
   selectTranslationLanguage,
+  selectUser,
   selectUserFullInfo,
 } from '../../global/selectors';
 import { ARE_CALLS_SUPPORTED, IS_APP } from '../../util/browser/windowEnvironment';
@@ -456,6 +457,7 @@ export default memo(withGlobal<OwnProps>(
     }
 
     const bot = selectBot(global, chatId);
+    const user = selectUser(global, chatId);
     const chatFullInfo = !isPrivate ? selectChatFullInfo(global, chatId) : undefined;
     const userFullInfo = isPrivate ? selectUserFullInfo(global, chatId) : undefined;
     const fullInfo = chatFullInfo || userFullInfo;
@@ -471,6 +473,7 @@ export default memo(withGlobal<OwnProps>(
     );
     const canSearch = isMainThread || isDiscussionThread;
     const canCall = ARE_CALLS_SUPPORTED && isUserId(chat.id) && !isChatWithSelf && !bot && !chat.isSupport
+      && chat.id !== SERVICE_NOTIFICATIONS_USER_ID && user?.type !== 'userTypeDeleted'
       && !isAnonymousForwardsChat(chat.id);
     const canMute = isMainThread && !isChatWithSelf && !canSubscribe;
     const canLeave = isSavedDialog || (isMainThread && !canSubscribe);
