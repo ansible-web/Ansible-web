@@ -3,6 +3,8 @@
 `web.Dockerfile` builds the production client with Node 26 and composes its static
 files with the currently deployed image, supplied as `PREVIOUS_WEB_IMAGE` with a
 full `@sha256:` digest. The API identity comes from the authorized CI parameters.
+`SOURCE_REVISION` is the full Git commit and identifies both `build.txt` and the
+final image's `org.opencontainers.image.revision` label.
 The existing TeamCity host Dockerfile remains separate; this image recipe is not
 active until the release pipeline explicitly selects it.
 
