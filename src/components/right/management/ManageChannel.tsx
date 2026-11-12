@@ -278,7 +278,7 @@ const ManageChannel = ({
               </span>
             </ListItem>
           )}
-          {Boolean(chat.joinRequests?.length) && (
+          {canInvite && Boolean(chat.joinRequests?.length) && (
             <ListItem
               icon="add-user-filled"
               onClick={handleClickRequests}
