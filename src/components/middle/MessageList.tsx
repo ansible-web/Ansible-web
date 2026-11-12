@@ -368,6 +368,7 @@ const MessageList = ({
   const liveTailReleaseTimerRef = useRef<number>();
   const liveTailStartOriginalIdRef = useRef<number>();
   const scrollTopBeforeUpdateRef = useRef<number>();
+  const bottomOffsetBeforeUpdateRef = useRef<number>();
   const [releasedLiveTailStartOriginalId, setReleasedLiveTailStartOriginalId] = useState<number>();
 
   const isSavedDialog = getIsSavedDialog(chatId, threadId, currentUserId);
@@ -932,7 +933,11 @@ const MessageList = ({
     () => {
       isReplacingHistoryRef.current = true;
       forceMeasure(() => {
-        scrollTopBeforeUpdateRef.current = containerRef.current?.scrollTop;
+        const container = containerRef.current;
+        scrollTopBeforeUpdateRef.current = container?.scrollTop;
+        bottomOffsetBeforeUpdateRef.current = container
+          ? container.scrollHeight - container.scrollTop - container.offsetHeight
+          : undefined;
         rememberScrollPositionRef.current();
       });
     },
@@ -1113,7 +1118,8 @@ const MessageList = ({
         )
         : addedMessagesHeight;
       if (wasMessageAdded) {
-        bottomOffset -= addedTailHeight;
+        // A large incoming batch must not make a scrolled-up viewport appear to be at the bottom.
+        bottomOffset = bottomOffsetBeforeUpdateRef.current ?? bottomOffset - addedTailHeight;
       }
       const isAtBottom = isViewportNewest && prevIsViewportNewest && bottomOffset <= BOTTOM_THRESHOLD;
       const wasAtBottomBeforeTypingDraft = Boolean(

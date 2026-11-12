@@ -30,6 +30,8 @@ env:
 
 jobs:
   get-version:
+    # Ansible Web is released through TeamCity; keep inherited Air packaging manual in this fork.
+    if: github.event_name == 'workflow_dispatch' || github.repository == 'Ajaxy/telegram-tt'
     runs-on: ubuntu-latest
     outputs:
       package-version: ${{ steps.extract-version.outputs.package-version }}
