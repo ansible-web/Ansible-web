@@ -7,7 +7,7 @@ const MANIFEST_NAME = '.ansible-assets.json';
 const RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_BYTES = 2 * 1024 * 1024 * 1024;
 const MAX_FILES = 30000;
-const HASHED_ASSET = /[-.][\w-]{8,64}\.(?:js|css|wasm|bin|json|svg|png|jpe?g|webp|gif|woff2?|ttf|ass)$/;
+const HASHED_ASSET = /[-.][\w-]{8,64}\.(?:js|mjs|css|wasm|bin|json|svg|png|jpe?g|webp|gif|woff2?|ttf|ass)$/;
 
 await composeAssets(...process.argv.slice(2));
 

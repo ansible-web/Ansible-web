@@ -15,6 +15,8 @@ combined image exceeding 2 GiB / 30000 files fails composition before publicatio
 An unversioned WASM/binary URL must keep identical bytes across the transition;
 changing it fails composition and requires versioning that dependency's URL.
 The image keeps the retention manifest private through the Nginx configuration.
+Hashed JavaScript modules (`.mjs`) participate in retention. Nginx serves them
+with a JavaScript MIME type and returns 404 for missing modules.
 Tabs older than the retention window require a reload.
 
 The production Service must switch to a fully ready candidate pool whose image
@@ -30,3 +32,7 @@ Service endpoints and both old-tab/new-tab requests after switching. Switching
 back must also account for tabs that have already loaded the new build; a plain
 rollback image has no new-build chunks. Do not publish this client through the
 current mixed-pod pipeline before that transition is implemented and qualified.
+The rollback image composes the previous application's files with the candidate's
+hashed assets and uses the qualified static-server configuration, including
+module MIME types. Its application version and entry point remain the previous
+release's; both generations' lazy imports and workers must resolve byte-exactly.
