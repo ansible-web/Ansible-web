@@ -3,8 +3,13 @@
 `web.Dockerfile` builds the production client with Node 26 and composes its static
 files with the currently deployed image, supplied as `PREVIOUS_WEB_IMAGE` with a
 full `@sha256:` digest. The API identity comes from the authorized CI parameters.
+The `scratch` default fails the builder's preflight; an explicit serving image
+is required.
 `SOURCE_REVISION` is the full Git commit and identifies both `build.txt` and the
 final image's `org.opencontainers.image.revision` label.
+The `candidate` target is the default. The `rollback` target keeps the deployed
+application's entry points and adds the candidate's hashed assets. Its labels
+identify the original application image and the new assets' source revision.
 The existing TeamCity host Dockerfile remains separate; this image recipe is not
 active until the release pipeline explicitly selects it.
 
@@ -23,6 +28,11 @@ The production Service must switch to a fully ready candidate pool whose image
 contains both releases' assets. Ordinary mixed-version rolling updates can route
 a new HTML request to a new pod and its next chunk request to an old pod. Retaining
 old files in new pods alone does not solve that direction of the race.
+The serving old pool first receives the qualified `rollback` image, preserving
+the old application's entry points while adding the candidate's assets. Every
+serving endpoint must complete this compatibility phase before selecting the
+new pool. Existing keep-alive connections to old pods can then resolve chunks
+from either build. The compatible old pool also remains the rollback target.
 
 Before switching production traffic, qualify the candidate image through an
 isolated Service: index/version, all referenced imports and workers, previous
