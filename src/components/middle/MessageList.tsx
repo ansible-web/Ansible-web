@@ -1053,6 +1053,7 @@ const MessageList = ({
     if (
       isViewportNewest
       && wasMessageAdded
+      && (bottomOffsetBeforeUpdateRef.current ?? 0) <= BOTTOM_THRESHOLD
       && !hasLiveTail
       && !isInSendCollapsePhase
       && (hasForcedMessagesScroll || (
