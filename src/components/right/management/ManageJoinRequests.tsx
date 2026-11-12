@@ -4,7 +4,7 @@ import { getActions, withGlobal } from '../../../global';
 import type { ApiChat } from '../../../api/types';
 
 import { STICKER_SIZE_JOIN_REQUESTS } from '../../../config';
-import { isChatChannel } from '../../../global/helpers';
+import { getHasAdminRight, isChatChannel } from '../../../global/helpers';
 import { selectChat } from '../../../global/selectors';
 import { isUserId } from '../../../util/entities/ids';
 import { LOCAL_TGS_URLS } from '../../common/helpers/animatedAssets';
@@ -29,6 +29,7 @@ type OwnProps = {
 type StateProps = {
   chat?: ApiChat;
   isChannel?: boolean;
+  canInvite: boolean;
 };
 
 const ManageJoinRequests = ({
@@ -36,6 +37,7 @@ const ManageJoinRequests = ({
   chatId,
   isActive,
   isChannel,
+  canInvite,
   onClose,
 }: OwnProps & StateProps) => {
   const { hideAllChatJoinRequests, loadChatJoinRequests } = getActions();
@@ -50,20 +52,28 @@ const ManageJoinRequests = ({
   });
 
   useEffect(() => {
+    if (!canInvite) {
+      if (isActive) onClose();
+      return;
+    }
     if (!chat?.joinRequests && !isUserId(chatId)) {
       loadChatJoinRequests({ chatId });
     }
-  }, [chat, chatId, loadChatJoinRequests]);
+  }, [canInvite, isActive, onClose, chat, chatId, loadChatJoinRequests]);
 
   const handleAcceptAllRequests = useCallback(() => {
+    if (!canInvite) return;
     hideAllChatJoinRequests({ chatId, isApproved: true });
     closeAcceptAllDialog();
-  }, [hideAllChatJoinRequests, chatId, closeAcceptAllDialog]);
+  }, [canInvite, hideAllChatJoinRequests, chatId, closeAcceptAllDialog]);
 
   const handleRejectAllRequests = useCallback(() => {
+    if (!canInvite) return;
     hideAllChatJoinRequests({ chatId, isApproved: false });
     closeRejectAllDialog();
-  }, [hideAllChatJoinRequests, chatId, closeRejectAllDialog]);
+  }, [canInvite, hideAllChatJoinRequests, chatId, closeRejectAllDialog]);
+
+  if (!canInvite) return undefined;
 
   return (
     <div className="Management ManageJoinRequests">
@@ -139,6 +149,7 @@ export default memo(withGlobal<OwnProps>(
     return {
       chat,
       isChannel: chat && isChatChannel(chat),
+      canInvite: Boolean(chat && getHasAdminRight(chat, 'inviteUsers')),
     };
   },
 )(ManageJoinRequests));
