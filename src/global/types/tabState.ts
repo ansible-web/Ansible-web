@@ -53,6 +53,7 @@ import type {
   ApiReactionWithPaid,
   ApiReceiptRegular,
   ApiRequestPeerType,
+  ApiRichText,
   ApiSavedDiamondGift,
   ApiSavedGifts,
   ApiSearchPostsFlood,
@@ -99,7 +100,9 @@ import type {
   ProfileEditProgress,
   ProfileTabType,
   ResaleGiftsFilterOptions,
+  RoundVideoMode,
   ScrollTargetPosition,
+  SettingsConfirmation,
   SettingsHighlight,
   SettingsScreens,
   SharedMediaType,
@@ -111,6 +114,7 @@ import type {
 } from '../../types';
 import type { BrowserState } from '../../types/browser';
 import type { RegularLangKey } from '../../types/language';
+import type { WebAppMediaKind } from '../../types/webapp';
 import type { SearchResultKey } from '../../util/keys/searchResultKey';
 import type { RegularLangFnParameters } from '../../util/localization';
 import type { ProfileCollectionKey } from '../selectors/payments';
@@ -235,6 +239,7 @@ export type TabState = {
   ratingPhoneCall?: ApiPhoneCall;
 
   messageLists: MessageList[];
+  globalThemePreviewChatId?: string;
 
   contentToBeScheduled?: {
     gif?: ApiVideo;
@@ -261,6 +266,8 @@ export type TabState = {
     isResizingContainer?: boolean;
     quote?: string;
     quoteOffset?: number;
+    todoItemId?: number;
+    pollOption?: string;
     scrollTargetPosition?: ScrollTargetPosition;
   };
 
@@ -471,6 +478,8 @@ export type TabState = {
       direction: 'next' | 'prev';
       isAuto?: boolean;
     };
+    // Round video leaves its message for the floating player even while the message is visible
+    roundVideoMode?: RoundVideoMode;
   };
 
   isAudioPlaylistModalOpen?: boolean;
@@ -488,6 +497,7 @@ export type TabState = {
     fromChatId?: string;
     messageId?: number;
     quoteText?: ApiFormattedText;
+    quoteRich?: ApiRichText[];
     quoteOffset?: number;
     toChatId?: string;
     toThreadId?: ThreadId;
@@ -578,6 +588,7 @@ export type TabState = {
   dialogs: ApiDialog[];
 
   safeLinkModalUrl?: string;
+  safeLinkModalIsWidget?: boolean;
   mapModal?: {
     point: ApiGeoPoint;
     zoom?: number;
@@ -731,6 +742,12 @@ export type TabState = {
   locationAccessModal?: {
     bot: ApiUser;
     webAppKey: string;
+  };
+
+  mediaAccessModal?: {
+    bot: ApiUser;
+    webAppKey: string;
+    kinds: WebAppMediaKind[];
   };
 
   confetti?: {
@@ -1003,6 +1020,8 @@ export type TabState = {
 
   qrCodeModal?: {
     peerId: string;
+    uniqueGifts?: ApiSavedDiamondGift[];
+    uniqueGiftsNextOffset?: string;
   };
 
   diamondsBalanceModal?: {
@@ -1200,6 +1219,8 @@ export type TabState = {
 
   isPasskeyModalOpen?: boolean;
 
+  settingsConfirmation?: SettingsConfirmation;
+
   leaveGroupModal?: {
     chatId: string;
     nextOwnerId?: string;
@@ -1235,5 +1256,6 @@ export type TabState = {
   messageMediaEditorRequest?: {
     chatId: string;
     messageId: number;
+    videoTime?: number;
   };
 };

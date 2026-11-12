@@ -33,6 +33,7 @@ import type {
   ApiReactions,
   ApiStickerSet,
   ApiThreadInfo,
+  ApiTopic,
   ApiWebPage,
   BoughtPaidMedia,
 } from './messages';
@@ -42,7 +43,9 @@ import type {
   ApiNotifyPeerType,
   ApiPasskeyOption,
   ApiPeerNotifySettings,
+  ApiPeerTheme,
   ApiSessionData,
+  ApiWallpaper,
 } from './misc';
 import type { ApiEmojiStatusType, ApiPeerSettings } from './peers';
 import type { ApiRichMessage } from './richMessage';
@@ -424,6 +427,15 @@ export type ApiUpdateMessagePoll = {
   webPages?: ApiWebPage[];
 };
 
+export type ApiUpdateMessageWidgetData = {
+  '@type': 'updateMessageWidgetData';
+  chatId: string;
+  messageId: number;
+  chatData?: string;
+  publicData?: string;
+  publicDataHash?: string;
+};
+
 export type ApiUpdateMessagePollUnread = {
   '@type': 'updateMessagePollUnread';
   chatId: string;
@@ -520,6 +532,19 @@ export type ApiUpdatePeerHistoryTtl = {
   '@type': 'updatePeerHistoryTtl';
   id: string;
   ttlPeriod?: number;
+};
+
+export type ApiUpdatePeerTheme = {
+  '@type': 'updatePeerTheme';
+  id: string;
+  peerTheme?: ApiPeerTheme;
+  shouldReload?: boolean;
+};
+
+export type ApiUpdatePeerWallpaper = {
+  '@type': 'updatePeerWallpaper';
+  id: string;
+  wallpaper?: ApiWallpaper;
 };
 
 export type ApiUpdateUser = {
@@ -815,6 +840,13 @@ export type ApiUpdateTopic = {
   '@type': 'updateTopic';
   chatId: string;
   topicId: number;
+};
+
+export type ApiUpdateTopicEdit = {
+  '@type': 'updateTopicEdit';
+  chatId: string;
+  topicId: number;
+  topicEdit: Partial<ApiTopic>;
 };
 
 export type ApiUpdateTopics = {
@@ -1142,6 +1174,10 @@ export type ApiUpdate = (ApiUpdateReady
   | ApiUpdatePaidReactionPrivacy
   | ApiUpdateLangPackTooLong
   | ApiUpdateLangPack
+  | ApiUpdateMessageWidgetData
+  | ApiUpdatePeerTheme
+  | ApiUpdatePeerWallpaper
+  | ApiUpdateTopicEdit
   | ApiUpdateNotSupportedInFrozenAccountError
   | ApiUpdateAiComposeTones
 );

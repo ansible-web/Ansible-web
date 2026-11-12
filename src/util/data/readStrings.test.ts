@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, test, vi } from 'vitest';
 
 import readStrings from './readStrings';
 
@@ -23,5 +23,22 @@ describe('readStrings', () => {
     expect(readStrings('"Label" = "a=b \\"quoted\\"";\n"Label" = "replacement";')).toEqual({ Label: 'replacement' });
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn).toHaveBeenCalledWith('Duplicate key:', 'Label');
+  });
+});
+
+describe('readStrings', () => {
+  test('keeps semicolons inside values', () => {
+    expect(readStrings('"A" = "First; second";\r\n"B" = "Third";\n', true)).toEqual({
+      A: 'First; second',
+      B: 'Third',
+    });
+  });
+
+  test('throws on missing semicolon in strict mode', () => {
+    expect(() => readStrings('"A" = "First";\n"B" = "Second"\n', true)).toThrow('Missing semicolon in line 2');
+  });
+
+  test('skips bad lines in lenient mode', () => {
+    expect(readStrings('"A" = "First"\n"B" = "Second";\n')).toEqual({ B: 'Second' });
   });
 });

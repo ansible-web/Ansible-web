@@ -99,6 +99,7 @@ const GiftTransferModal = ({
         onFilterChange={setSearchQuery}
         onSelectedIdChange={handlePeerSelect}
       />
+
     </PickerModal>
   );
 };

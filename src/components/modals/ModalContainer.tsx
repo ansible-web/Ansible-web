@@ -66,6 +66,7 @@ import LanguageModal from './language/LanguageModal.async';
 import LeaveGroupModal from './leaveGroup/LeaveGroupModal.async';
 import LocationAccessModal from './locationAccess/LocationAccessModal.async';
 import MapModal from './map/MapModal.async';
+import MediaAccessModal from './mediaAccess/MediaAccessModal.async';
 import MusicPickerModal from './musicPicker/MusicPickerModal.async';
 import OneTimeMediaModal from './oneTimeMedia/OneTimeMediaModal.async';
 import PaidReactionModal from './paidReaction/PaidReactionModal.async';
@@ -82,6 +83,7 @@ import RankModal from './rank/RankModal.async';
 import ReportAdModal from './reportAd/ReportAdModal.async';
 import ReportModal from './reportModal/ReportModal.async';
 import RequestPeerModal from './requestPeer/RequestPeerModal.async';
+import SettingsConfirmationModal from './settingsConfirmation/SettingsConfirmationModal.async';
 import SharePreparedMessageModal from './sharePreparedMessage/SharePreparedMessageModal.async';
 import StealthModeModal from './storyStealthMode/StealthModeModal.async';
 import SuggestedPostApprovalModal from './suggestedPostApproval/SuggestedPostApprovalModal.async';
@@ -173,9 +175,11 @@ type ModalKey = keyof Pick<
   | 'languageModal'
   | 'autoDeleteTimerModal'
   | 'botCreationModal'
+  | 'settingsConfirmation'
+  | 'mediaAccessModal'
 >;
 type WrappedModalKey = 'pollModal' | 'musicPicker' | 'mapModal' | 'safeLinkModalUrl' | 'autoDeleteTimerModal'
-  | 'botCreationModal';
+  | 'botCreationModal' | 'settingsConfirmation' | 'mediaAccessModal';
 type LegacyModalKey = Exclude<ModalKey, WrappedModalKey>;
 
 type ModalStateProps = {
@@ -314,6 +318,8 @@ const WRAPPED_MODALS: WrappedModalRegistry = {
   safeLinkModalUrl: SafeLinkModal,
   autoDeleteTimerModal: AutoDeleteTimerModal,
   botCreationModal: BotCreationModal,
+  settingsConfirmation: SettingsConfirmationModal,
+  mediaAccessModal: MediaAccessModal,
 };
 
 const LEGACY_MODAL_KEYS = Object.keys(LEGACY_MODALS) as LegacyModalKey[];

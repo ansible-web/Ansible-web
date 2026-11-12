@@ -51,11 +51,13 @@ import WritingPreview from '../../../assets/tgs-previews/message/Writing.svg';
 import PausePreview from '../../../assets/tgs-previews/Pause.svg';
 import PlayPreview from '../../../assets/tgs-previews/Play.svg';
 import SearchPreview from '../../../assets/tgs-previews/Search.svg';
-import HandStopPreview from '../../../assets/tgs-previews/settings/HandStopPreview.png';
+import HandStopPreview from '../../../assets/tgs-previews/settings/HandStop.avif';
+import LockPreview from '../../../assets/tgs-previews/settings/Lock.avif';
 import PasskeysPreview from '../../../assets/tgs-previews/settings/Passkeys.svg';
 
 export const LOCAL_TGS_PREVIEW_URLS = {
   HandStop: HandStopPreview,
+  Lock: LockPreview,
   PlayPause: PlayPreview,
   PlayPausePaused: PausePreview,
   BrokenGift: BrokenGiftPreview,

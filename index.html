@@ -8,18 +8,11 @@
     %TG_APP_TITLE%
   </title>
 
-  <meta name="title" content="%TG_APP_TITLE%">
   <meta name="description"
     content="Ansible is a cloud-based mobile and desktop messaging app with a focus on security and speed.">
   <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-title" content="%TG_APP_TITLE%">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="%TG_APP_TITLE%">
+        content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="application-name" content="%TG_APP_TITLE%">
-  <meta name="msapplication-TileColor" content="#38AEEB">
-  <meta name="msapplication-config" content="./browserconfig.xml">
   <meta name="theme-color" content="#ffffff">
   <meta name="google" content="notranslate">
 
@@ -31,15 +24,15 @@
   <meta property="og:title" content="%TG_APP_TITLE%">
   <meta property="og:description"
         content="Ansible is a cloud-based mobile and desktop messaging app with a focus on security and speed.">
-  <meta property="og:image" content="./%TG_MAIN_ICON%.png">
+  <meta property="og:image" content="%TG_SOCIAL_IMAGE_URL%">
 
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:card" content="summary">
   <meta property="twitter:url" content="%TG_PUBLIC_URL%">
   <meta property="twitter:title" content="%TG_APP_TITLE%">
   <meta property="twitter:description"
     content="Ansible is a cloud-based mobile and desktop messaging app with a focus on security and speed.">
-  <meta property="twitter:image" content="./%TG_MAIN_ICON%.png">
+  <meta property="twitter:image" content="%TG_SOCIAL_IMAGE_URL%">
 
   <link rel="canonical" href="https://web.ansible.su/">
   <link rel="apple-touch-icon" sizes="180x180" href="./%TG_APPLE_ICON%.png">
@@ -55,6 +48,8 @@
 
   <!-- Navigation opt-in must apply before parser-blocking scripts allow the first render -->
   <link rel="stylesheet" href="./view-transitions.css">
+  <!-- The last main wallpaper, served by the service worker, so the first paint already has it -->
+  <link rel="stylesheet" href="./wallpaper-snapshot.css">
   <script vite-ignore src="./redirect.js"></script>
   <style>
     @layer reset, variables, ui, components;

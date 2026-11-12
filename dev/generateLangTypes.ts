@@ -14,7 +14,7 @@ type LangVariable = string | number | undefined;
 
 const data = readFileSync('./src/assets/localization/fallback.strings', 'utf8');
 
-const parsed = readStrings(data, true);
+const parsed = readStrings(data, true, true);
 // Empty runtime strings retain their call signatures in a separate build-time contract
 const excludedContracts = readStrings(readFileSync('./src/assets/localization/excluded.strings', 'utf8'));
 Object.entries(excludedContracts).forEach(([key, value]) => {

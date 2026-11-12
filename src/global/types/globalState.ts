@@ -10,6 +10,7 @@ import type {
   ApiChatFolder,
   ApiChatFullInfo,
   ApiChatlistExportedInvite,
+  ApiChatTheme,
   ApiConfig,
   ApiCountry,
   ApiCountryCode,
@@ -41,6 +42,7 @@ import type {
   ApiSavedDiamondGift,
   ApiSavedReactionTag,
   ApiSession,
+  ApiShareThemeBackdrop,
   ApiSponsoredMessage,
   ApiStealthMode,
   ApiSticker,
@@ -82,6 +84,7 @@ import type {
   TopicsInfo,
   WebPageMediaSize,
 } from '../../types';
+import type { MediaEditorSettings } from '../../types/mediaEditor';
 import type { RegularLangFnParameters } from '../../util/localization';
 import type { SharedState } from './sharedState';
 import type { TabState } from './tabState';
@@ -97,6 +100,10 @@ export type GlobalState = {
     byId: Record<string, ApiTimezone>;
     hash: number;
   };
+  shareThemeBackdrops?: {
+    list: ApiShareThemeBackdrop[];
+    hash: number;
+  };
   aiComposeTones?: {
     tones: ApiAiComposeToneType[];
     hash: string;
@@ -104,6 +111,19 @@ export type GlobalState = {
   isCacheApiSupported?: boolean;
   connectionState?: ApiUpdateConnectionStateType;
   currentUserId?: string;
+  messageWidgetStorage: Record<string, Record<number, {
+    senderId: string;
+    threadId: ThreadId;
+    storage: {
+      local?: Record<string, string>;
+      session?: Record<string, string>;
+    };
+    // When the widget was last shown or wrote `local` (`Date.now()`), for the cap on stored widgets
+    lastSeenAt?: number;
+    // The last content height the widget reported and its resize anchor, so the bubble opens at its size
+    height?: number;
+    resizeAnchor?: 'top' | 'bottom';
+  }>>;
   isSyncing?: boolean;
   isAppConfigLoaded?: boolean;
   isAppUpdateAvailable?: boolean;
@@ -149,6 +169,8 @@ export type GlobalState = {
     webPageMediaSize?: WebPageMediaSize;
     shouldSendInHighQuality?: boolean;
   };
+
+  mediaEditorSettings?: MediaEditorSettings;
 
   attachMenu: {
     hash?: string;
@@ -472,6 +494,7 @@ export type GlobalState = {
   settings: {
     byKey: AccountSettings;
     loadedWallpapers?: ApiWallpaper[];
+    chatThemes?: ApiChatTheme[];
     privacy: Partial<Record<ApiPrivacyKey, ApiPrivacySettings>>;
     notifyDefaults?: Record<ApiNotifyPeerType, ApiPeerNotifySettings>;
     lastPremiumBandwithNotificationDate?: number;
@@ -479,11 +502,6 @@ export type GlobalState = {
     botVerificationShownPeerIds: string[];
     accountDaysTtl: number;
     passkeys?: ApiPasskey[];
-  };
-
-  push?: {
-    deviceToken: string;
-    subscribedAt: number;
   };
 
   transcriptions: Record<string, ApiTranscription>;

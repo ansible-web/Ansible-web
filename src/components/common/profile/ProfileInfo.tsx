@@ -6,6 +6,7 @@ import type {
   ApiPeerColorOption,
   ApiPeerPhotos,
   ApiPeerProfileColorSet,
+  ApiPhoto,
   ApiSavedGifts,
   ApiSticker,
   ApiTopic,
@@ -27,6 +28,7 @@ import {
   selectCurrentMessageList,
   selectCustomEmoji,
   selectPeer,
+  selectPeerAvatarPhoto,
   selectPeerHasProfileBackground,
   selectPeerPhotos,
   selectPeerProfileColor,
@@ -95,6 +97,7 @@ type StateProps = {
   emojiStatusSticker?: ApiSticker;
   emojiStatusSlug?: string;
   profilePhotos?: ApiPeerPhotos;
+  avatarPhoto?: ApiPhoto;
   profileColorOption?: ApiPeerColorOption<ApiPeerProfileColorSet>;
   theme: ThemeKey;
   isPlain?: boolean;
@@ -131,6 +134,7 @@ const ProfileInfo = ({
   emojiStatusSticker,
   emojiStatusSlug,
   profilePhotos,
+  avatarPhoto,
   peerId,
   isForMonoforum,
   profileColorOption,
@@ -599,6 +603,9 @@ const ProfileInfo = ({
           key={peer?.id}
           size="jumbo"
           peer={peer}
+          photo={avatarPhoto}
+          withVideo={canPlayVideo}
+          loopIndefinitely
           style={createVtnStyle('avatar', true)}
           storyCircleStyle={createVtnStyle('avatarStoryCircle', true)}
           onClick={hasAvatar ? handleMinimizedAvatarClick : undefined}
@@ -648,6 +655,7 @@ export default memo(withGlobal<OwnProps>(
     const userStatus = selectUserStatus(global, peerId);
     const chat = selectChat(global, peerId);
     const profilePhotos = selectPeerPhotos(global, peerId);
+    const avatarPhoto = selectPeerAvatarPhoto(global, peerId);
     const { mediaIndex, chatId: avatarOwnerId } = selectTabState(global).mediaViewer;
     const isForum = chat?.isForum;
     const { threadId: currentTopicId } = selectCurrentMessageList(global) || {};
@@ -680,6 +688,7 @@ export default memo(withGlobal<OwnProps>(
       emojiStatusSlug,
       emojiStatus,
       profilePhotos,
+      avatarPhoto,
       topic,
       messagesCount: topic ? selectThreadMessagesCount(global, peerId, topic.id) : undefined,
       profileColorOption: profileColor,

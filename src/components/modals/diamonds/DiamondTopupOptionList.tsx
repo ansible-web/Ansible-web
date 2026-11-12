@@ -6,7 +6,7 @@ import type { ApiDiamondGiveawayOption, ApiDiamondTopupOption } from '../../../a
 
 import buildClassName from '../../../util/buildClassName';
 import { formatCurrency } from '../../../util/formatCurrency';
-import { formatInteger } from '../../../util/textFormat';
+import { formatInteger } from '../../../util/text/textFormat';
 import renderText from '../../common/helpers/renderText';
 
 import useFlag from '../../../hooks/useFlag';

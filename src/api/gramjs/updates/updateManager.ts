@@ -444,6 +444,7 @@ async function fetchDifferenceSlices() {
     if (response instanceof GramJs.updates.DifferenceEmpty) {
       localDb.commonBoxState.seq = response.seq;
       localDb.commonBoxState.date = response.date;
+      popSeqQueue();
       return;
     }
 
@@ -453,6 +454,7 @@ async function fetchDifferenceSlices() {
     applyState(newState);
 
     if (!(response instanceof GramJs.updates.DifferenceSlice)) {
+      popSeqQueue();
       return;
     }
   }
@@ -511,24 +513,27 @@ async function requestChannelDifferenceInternal(channelId: string, reason: Chann
     return;
   }
 
+  let pts: number;
   if (response instanceof GramJs.updates.ChannelDifferenceTooLong) {
-    forceSync();
-    return;
-  }
-
-  localDb.channelPtsById[channelId] = response.pts;
-  updateChannelShortpollTimeout(channelId, response);
-
-  if (response instanceof GramJs.updates.ChannelDifferenceEmpty) {
-    if (response.final) {
-      scheduleShortpollIfEligible(channelId);
+    // Like other clients, skip the gap and continue from the dialog state instead of resyncing everything
+    const dialogPts = response.dialog instanceof GramJs.Dialog ? response.dialog.pts : undefined;
+    if (!dialogPts) {
+      forceSync();
+      return;
     }
-
-    popPtsQueue(channelId); // Continue processing updates in queue
-    return;
+    pts = dialogPts;
+    // Skipped range is not delivered, refresh opened chats without resetting update state
+    sendApiUpdate({ '@type': 'requestSync' });
+  } else {
+    // Apply `otherUpdates` against the old pts, so they are not dropped as already applied
+    if (response instanceof GramJs.updates.ChannelDifference) processDifference(response);
+    pts = response.pts;
   }
 
-  processDifference(response, channelId);
+  // Queued live updates may have been applied past `pts` while processing the difference
+  localDb.channelPtsById[channelId] = Math.max(localDb.channelPtsById[channelId], pts);
+  updateChannelShortpollTimeout(channelId, response);
+  popPtsQueue(channelId); // Continue processing updates in queue
 
   if (!response.final) {
     await requestChannelDifferenceInternal(channelId, 'gapRecovery');
@@ -629,7 +634,6 @@ async function loadRemoteState() {
 
 function processDifference(
   difference: GramJs.updates.Difference | GramJs.updates.DifferenceSlice | GramJs.updates.ChannelDifference,
-  channelId?: string,
 ) {
   difference.newMessages.forEach((message) => {
     updater(new GramJs.UpdateNewMessage({
@@ -655,13 +659,6 @@ function processDifference(
     const shouldApplyImmediately = !channelTooLongIds.has(updateChannelId);
     processUpdate(update, shouldApplyImmediately, !shouldApplyImmediately);
   });
-
-  // Continue processing updates in queues
-  if (channelId) {
-    popPtsQueue(channelId);
-  } else {
-    popSeqQueue();
-  }
 }
 
 function getPtsCount(update: PtsUpdate) {

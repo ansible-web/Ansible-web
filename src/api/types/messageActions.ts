@@ -1,6 +1,7 @@
 import type { ApiGroupCall, ApiPhoneCallDiscardReason } from './calls';
 import type { ApiDiamondGiftRegular, ApiDiamondGiftUnique, ApiTypeCurrencyAmount } from './diamonds';
 import type { ApiBotApp, ApiFormattedText, ApiPhoto, ApiPollAnswer, ApiTodoItem } from './messages';
+import type { ApiWallpaper } from './misc';
 import type { ApiBirthday } from './users';
 
 interface ActionMediaType {
@@ -80,6 +81,19 @@ export interface ApiMessageActionSetMessagesTtl extends ActionMediaType {
   type: 'setMessagesTtl';
   period: number;
   autoSettingFromId?: string;
+}
+
+export interface ApiMessageActionSetChatTheme extends ActionMediaType {
+  type: 'setChatTheme';
+  emoticon?: string;
+  gift?: Pick<ApiDiamondGiftUnique, 'title' | 'number'>;
+}
+
+export interface ApiMessageActionSetChatWallpaper extends ActionMediaType {
+  type: 'setChatWallpaper';
+  isSame?: true;
+  isForBoth?: true;
+  wallpaper?: ApiWallpaper;
 }
 
 export interface ApiMessageActionGameScore extends ActionMediaType {
@@ -328,6 +342,10 @@ export interface ApiMessageActionPaidMessagesRefunded extends ActionMediaType {
   stars: number;
 }
 
+export interface ApiMessageActionNoPaidMessagesTokenUsed extends ActionMediaType {
+  type: 'noPaidMessagesTokenUsed';
+}
+
 export interface ApiMessageActionPaidMessagesPrice extends ActionMediaType {
   type: 'paidMessagesPrice';
   stars: number;
@@ -452,6 +470,8 @@ export type ApiMessageAction = ApiMessageActionUnsupported
   | ApiMessageActionTopicCreate
   | ApiMessageActionTopicEdit
   | ApiMessageActionSuggestProfilePhoto
+  | ApiMessageActionSetChatTheme
+  | ApiMessageActionSetChatWallpaper
   | ApiMessageActionSuggestBirthday
   | ApiMessageActionChannelJoined
   | ApiMessageActionGiftCode
@@ -472,6 +492,7 @@ export type ApiMessageAction = ApiMessageActionUnsupported
   | ApiMessageActionTodoAppendTasks
   | ApiMessageActionPollAppendAnswer
   | ApiMessageActionPollDeleteAnswer
+  | ApiMessageActionNoPaidMessagesTokenUsed
   | ApiMessageActionDiamondGiftPurchaseOffer
   | ApiMessageActionDiamondGiftPurchaseOfferDeclined
   | ApiMessageActionNewCreatorPending

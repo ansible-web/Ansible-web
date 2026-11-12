@@ -1,6 +1,4 @@
-import {
-  memo, useCallback, useMemo, useState,
-} from '../../../lib/teact/teact';
+import { memo, useCallback, useMemo } from '../../../lib/teact/teact';
 import { getActions } from '../../../global';
 
 import type { Signal } from '../../../util/signals';
@@ -11,7 +9,6 @@ import useLang from '../../../hooks/useLang';
 import useMultiClick from '../../../hooks/useMultiClick';
 
 import Button from '../../ui/Button';
-import ConfirmDialog from '../../ui/ConfirmDialog';
 import DropdownMenu from '../../ui/DropdownMenu';
 import MenuItem from '../../ui/MenuItem';
 import SettingsSearchInput from './search/SettingsSearchInput';
@@ -20,58 +17,41 @@ type OwnProps = {
   currentScreen: SettingsScreens;
   editedFolderId?: number;
   hasProfileBackground?: boolean;
-  isMenuForcedOpen?: boolean;
   searchSessionId: number;
   getSearchQuery: Signal<string>;
   onReset: () => void;
   onSearchOpen: NoneToVoidFunction;
   onSearchQueryChange: (query: string) => void;
-  onMenuClose: NoneToVoidFunction;
 };
 
 const SettingsHeader = ({
   currentScreen,
   editedFolderId,
   hasProfileBackground,
-  isMenuForcedOpen,
   searchSessionId,
   getSearchQuery,
   onReset,
   onSearchOpen,
   onSearchQueryChange,
-  onMenuClose,
 }: OwnProps) => {
   const {
-    signOut,
     openDeleteChatFolderModal,
     openSettingsScreen,
+    openSettingsConfirmation,
   } = getActions();
 
   const lang = useLang();
   const { isMobile } = useAppLayout();
-  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
 
   const handleMultiClick = useMultiClick(5, () => {
     openSettingsScreen({ screen: SettingsScreens.Experimental });
   });
-  const openSignOutConfirmation = useCallback(() => {
-    setIsSignOutDialogOpen(true);
-  }, []);
-
-  const closeSignOutConfirmation = useCallback(() => {
-    setIsSignOutDialogOpen(false);
-  }, []);
 
   const openDeleteFolderConfirmation = useCallback(() => {
     if (!editedFolderId) return;
 
     openDeleteChatFolderModal({ folderId: editedFolderId });
   }, [editedFolderId, openDeleteChatFolderModal]);
-
-  const handleSignOutMessage = useCallback(() => {
-    closeSignOutConfirmation();
-    signOut({ forceInitApi: true });
-  }, [closeSignOutConfirmation, signOut]);
 
   const SettingsMenuButton = useMemo(() => {
     return ({ onTrigger, isOpen }: { onTrigger: () => void; isOpen?: boolean }) => (
@@ -311,10 +291,10 @@ const SettingsHeader = ({
               className="settings-more-menu"
               trigger={SettingsMenuButton}
               positionX="right"
-              forceOpen={isMenuForcedOpen}
-              onClose={onMenuClose}
             >
-              <MenuItem icon="logout" onClick={openSignOutConfirmation}>{lang('LogOutTitle')}</MenuItem>
+              <MenuItem icon="logout" onClick={() => openSettingsConfirmation({ confirmation: 'logOut' })}>
+                {lang('LogOutTitle')}
+              </MenuItem>
             </DropdownMenu>
           </div>
         );
@@ -334,14 +314,6 @@ const SettingsHeader = ({
         iconName="arrow-left"
       />
       {renderHeaderContent()}
-      <ConfirmDialog
-        isOpen={isSignOutDialogOpen}
-        onClose={closeSignOutConfirmation}
-        text={lang('SureLogout')}
-        confirmLabel={lang('AccountSettingsLogout')}
-        confirmHandler={handleSignOutMessage}
-        confirmIsDestructive
-      />
     </div>
   );
 };

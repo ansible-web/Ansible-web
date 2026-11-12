@@ -17,6 +17,7 @@ export const PRODUCTION_URL = `https://${PRODUCTION_HOSTNAME}`;
 export const WEB_VERSION_BASE = `https://${PRODUCTION_HOSTNAME}/`; // Used to redirect to other versions
 export const BASE_URL = import.meta.env.TG_PUBLIC_URL;
 export const ACCOUNT_QUERY = 'account';
+export const VAPID_SERVER_KEY = import.meta.env.TG_VAPID_KEY;
 
 export const IS_MOCKED_CLIENT = import.meta.env.TG_APP_MOCKED_CLIENT === '1';
 export const IS_TEST = APP_ENV === 'test';
@@ -66,6 +67,9 @@ export const MEDIA_PROGRESSIVE_CACHE_NAME = 'tt-media-progressive';
 export const MEDIA_CACHE_MAX_BYTES = 512 * 1024; // 512 KB
 export const CUSTOM_BG_CACHE_NAME = 'tt-custom-bg';
 export const ASSET_CACHE_NAME = 'tt-assets';
+// The stylesheet `index.html` links: the service worker serves it from this cache before any script runs
+export const WALLPAPER_SNAPSHOT_CACHE_NAME = 'tt-wallpaper-snapshot';
+export const WALLPAPER_SNAPSHOT_PATH = 'wallpaper-snapshot.css';
 export const AUTODOWNLOAD_FILESIZE_MB_LIMITS = [1, 5, 10, 50, 100, 500];
 export const DATA_BROADCAST_CHANNEL_PREFIX = 'tt-global';
 export const ESTABLISH_BROADCAST_CHANNEL_PREFIX = 'tt-establish';
@@ -185,6 +189,25 @@ export const VIDEO_RECORDING_MIME_TYPE = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2
 export const ROUND_VIDEO_BITRATE = 1_200_000; // bps
 export const ROUND_AUDIO_BITRATE = 64_000; // bps
 
+// Video editor
+export const MAX_EDITABLE_VIDEO_SOURCE_SIZE = 1000 * 1024 * 1024;
+export const MAX_EDITABLE_VIDEO_PIXELS = 4096 * 4096;
+export const MAX_EDITABLE_VIDEO_OUTPUT_SIZE = 1024 * 1024 * 1024;
+export const MIN_VIDEO_TRIM_DURATION = 1; // s
+export const MIN_TRIMMABLE_VIDEO_DURATION = 1.5; // s
+export const VIDEO_TIME_PRECISION = 0.001; // s
+export const VIDEO_THUMB_MAX_SIDE = 320; // px
+export const VIDEO_COVER_MAX_SIDE = 1280; // px
+export const VIDEO_COVER_JPEG_QUALITY = 0.87;
+export const VIDEO_MAX_FRAME_RATE = 60;
+export const VIDEO_LOW_LEVEL_MAX_FRAME_RATE = 30;
+export const VIDEO_GIF_LEVEL = 720;
+export const VIDEO_GIF_MAX_SOURCE_SIZE = 10 * 1024 * 1024;
+export const AVATAR_MIN_SIDE = 256; // px
+export const AVATAR_MAX_SIDE = 800; // px
+export const AVATAR_VIDEO_MAX_DURATION = 10; // s
+export const AVATAR_VIDEO_MAX_FRAME_RATE = 30;
+
 export const EDITABLE_INPUT_ID = 'editable-message-text';
 export const EDITABLE_INPUT_MODAL_ID = 'editable-message-text-modal';
 export const EDITABLE_STORY_INPUT_ID = 'editable-story-input-text';
@@ -201,9 +224,6 @@ export const VT_TYPE_CLASS_PREFIX = 'active-vt-';
 
 export const RESIZE_HANDLE_CLASS_NAME = 'resizeHandle';
 export const RESIZE_HANDLE_SELECTOR = `.${RESIZE_HANDLE_CLASS_NAME}`;
-
-export const SNAP_EFFECT_CONTAINER_ID = 'snap-effect-container';
-export const SNAP_EFFECT_ID = 'snap-effect';
 
 export const STARS_ICON_PLACEHOLDER = '⭐';
 export const STARS_CURRENCY_CODE = 'XTR';
@@ -242,6 +262,8 @@ export const API_THROTTLE_RESET_UPDATES = new Set([
 ]);
 
 export const LOCK_SCREEN_ANIMATION_DURATION_MS = 200;
+
+export const NOTIFICATION_MAX_VOLUME = 10;
 
 export const STICKER_SIZE_INLINE_DESKTOP_FACTOR = 13;
 export const STICKER_SIZE_INLINE_MOBILE_FACTOR = 11;
@@ -304,6 +326,10 @@ export const SUPPORTED_PHOTO_CONTENT_TYPES = new Set([
 export const SUPPORTED_VIDEO_CONTENT_TYPES = new Set([
   'video/mp4', 'video/quicktime',
 ]);
+
+export const SUPPORTED_AVATAR_CONTENT_TYPES = [
+  ...SUPPORTED_PHOTO_CONTENT_TYPES, ...SUPPORTED_VIDEO_CONTENT_TYPES,
+].join(', ');
 
 export const SUPPORTED_AUDIO_CONTENT_TYPES = new Set([
   'audio/mp3',

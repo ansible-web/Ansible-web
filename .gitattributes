@@ -20,6 +20,7 @@
 .dockerignore text eol=lf
 
 # Denote all files that are truly binary and should not be modified.
+*.avif binary
 *.gif binary
 *.ico binary
 *.jpeg binary

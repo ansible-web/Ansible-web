@@ -1,25 +1,38 @@
 const IS_DEBUG = import.meta.env?.TG_APP_ENV !== 'production';
 
-export default function readStrings(data: string, shouldIncludeEmpty = false): Record<string, string> {
-  const lines = data.split(/;\r?\n?/);
+export default function readStrings(
+  data: string, isStrict?: boolean, shouldIncludeEmpty = false,
+): Record<string, string> {
+  const report = (message: string) => {
+    if (isStrict) throw new Error(message);
+    // eslint-disable-next-line no-console
+    console.warn(message);
+  };
+
+  const lines = data.split(/\r?\n/);
   const result: Record<string, string> = {};
-  for (const line of lines) {
-    if (!line.startsWith('"')) continue;
-    const [key, value] = parseLine(line) || [];
+  lines.forEach((rawLine, index) => {
+    const line = rawLine.trimEnd();
+    if (!line.startsWith('"')) return;
+    if (!line.endsWith(';')) {
+      report(`Missing semicolon in line ${index + 1}: ${line}`);
+      return;
+    }
+    const [key, value] = parseLine(line.slice(0, -1)) || [];
     if (typeof key !== 'string' || !key || typeof value !== 'string') {
-      // eslint-disable-next-line no-console
-      console.warn('Bad formatting in line:', line);
-      continue;
+      report(`Bad formatting in line ${index + 1}: ${line}`);
+      return;
     }
     // Empty translations are intentional exclusions. Keep the existing
     // fallback behavior without reporting a valid .strings entry as malformed.
-    if (!value && !shouldIncludeEmpty) continue;
+    if (!value && !shouldIncludeEmpty) return;
     if (result[key]) {
+      if (isStrict) report(`Duplicate key in line ${index + 1}: ${key}`);
       // eslint-disable-next-line no-console
-      console.warn('Duplicate key:', key);
+      else console.warn('Duplicate key:', key);
     }
     result[key] = value;
-  }
+  });
   return result;
 }
 

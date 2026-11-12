@@ -3,12 +3,14 @@ import type { ApiBotInfo } from './bots';
 import type { ApiBusinessIntro, ApiBusinessLocation, ApiBusinessWorkHours } from './business';
 import type { ApiDiamondsRating, ApiSavedDiamondGift } from './diamonds';
 import type { ApiAudio, ApiDocument, ApiFormattedText, ApiPhoto } from './messages';
+import type { ApiPeerTheme, ApiWallpaper } from './misc';
 import type {
   ApiBotVerification,
   ApiEmojiStatusType,
   ApiFakeType,
   ApiPeerSettings,
   ApiProfileTab,
+  ApiShareTheme,
   ApiTypePeerColor,
 } from './peers';
 
@@ -55,6 +57,8 @@ export interface ApiUser {
 }
 
 export interface ApiUserFullInfo {
+  peerTheme?: ApiPeerTheme;
+  wallpaper?: ApiWallpaper;
   isBlocked?: boolean;
   ttlPeriod?: number;
   bio?: string;
@@ -95,6 +99,7 @@ export interface ApiUserFullInfo {
   noForwardsPeerEnabled?: boolean;
   isUnofficialSecurityRisk?: boolean;
   botManagerId?: string;
+  shareTheme?: ApiShareTheme;
 }
 
 export type ApiUserType = 'userTypeBot' | 'userTypeRegular' | 'userTypeDeleted' | 'userTypeUnknown';

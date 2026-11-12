@@ -60,6 +60,7 @@ type OwnProps = {
   emojiStatusSize?: number;
   noRtl?: boolean;
   noAvatar?: boolean;
+  forceRoundAvatar?: boolean;
   noStatusOrTyping?: boolean;
   withStory?: boolean;
   storyViewerOrigin?: StoryViewerOrigin;
@@ -85,6 +86,7 @@ const GroupChatInfo = ({
   statusIcon,
   avatarSize = 'medium',
   noAvatar,
+  forceRoundAvatar,
   status,
   withDots,
   withMediaViewer,
@@ -254,6 +256,7 @@ const GroupChatInfo = ({
             size={avatarSize}
             peer={chat}
             withStory={withStory}
+            forceRound={forceRoundAvatar}
             asMessageBubble={Boolean(monoforumChannel)}
             storyViewerOrigin={storyViewerOrigin}
             storyViewerMode="single-peer"

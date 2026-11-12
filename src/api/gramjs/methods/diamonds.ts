@@ -201,6 +201,20 @@ export function saveStarGift({
   }));
 }
 
+// Shows a gift held in the wallet on the own profile, or hides it from every profile
+export function displayStarGift({
+  slug,
+  shouldDisplay,
+}: {
+  slug: string;
+  shouldDisplay?: boolean;
+}) {
+  return invokeRequest(new GramJs.payments.DisplayStarGift({
+    slug,
+    peer: shouldDisplay ? new GramJs.InputPeerSelf() : undefined,
+  }));
+}
+
 export function convertStarGift({
   inputSavedGift,
 }: {

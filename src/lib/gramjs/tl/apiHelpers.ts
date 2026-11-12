@@ -162,7 +162,7 @@ function getArgFromReader(
                 return reader.asReadDate();
             default:
                 return arg.isBareType
-                    ? classes[arg.type].fromReader(reader)
+                    ? arg.type.split('.').reduce((namespace, name) => namespace[name], classes).fromReader(reader)
                     : reader.asReadObject();
         }
     }

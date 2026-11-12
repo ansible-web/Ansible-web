@@ -15,7 +15,7 @@ import SwayingDiamond from './SwayingDiamond.tsx';
 
 import styles from './ParticlesHeader.module.scss';
 
-import Cocoon from '../../../assets/cocoon.webp';
+import Cocoon from '../../../assets/cocoon.avif';
 
 interface OwnProps {
   model: 'swaying-star' | 'speeding-diamond' | 'ai-egg' | 'sticker';

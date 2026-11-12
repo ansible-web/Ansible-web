@@ -44,12 +44,15 @@ import {
   buildCollectionByKey, omit, unique,
 } from '../../../util/iteratees';
 import { isLocalMessageId } from '../../../util/keys/messageKey';
+import { getTranslationFn } from '../../../util/localization';
+import { notifyAboutMessage } from '../../../util/notifications';
 import { debounce, pause, throttle } from '../../../util/schedulers';
 import { handleSetLanguageLink } from '../../../util/setLanguageLink';
 import { extractCurrentThemeParams } from '../../../util/themeStyle';
 import { callApi } from '../../../api/gramjs';
 import {
   getIsSavedDialog,
+  getUserFirstOrLastName,
   isChatArchived,
   isChatBasicGroup,
   isChatChannel,
@@ -58,6 +61,7 @@ import {
   isChatSuperGroup,
   isUserBot,
 } from '../../helpers';
+import { getRequestInputSavedDiamondGift } from '../../helpers/payments';
 import {
   addActionHandler, getActions, getGlobal, setGlobal,
 } from '../../index';
@@ -99,6 +103,7 @@ import {
   updateTopicsInfo,
   updateTopicWithState,
   updateUser,
+  updateUserFullInfo,
   updateUsers,
 } from '../../reducers';
 import { updateGroupCall } from '../../reducers/calls';
@@ -138,6 +143,7 @@ import {
   selectTopicsInfo,
   selectUser,
   selectUserByPhoneNumber,
+  selectUserFullInfo,
 } from '../../selectors';
 import { selectGroupCall } from '../../selectors/calls';
 import { selectCurrentLimit } from '../../selectors/limits';
@@ -157,6 +163,8 @@ const CHATLIST_LIMIT_ERROR_LIST = new Set([
   'CHATLISTS_TOO_MUCH',
   'INVITES_TOO_MUCH',
 ]);
+
+const pendingNoPaidMessagesTokenImports = new Map<string, Promise<void>>();
 
 const runThrottledForLoadTopChats = throttle((cb) => cb(), 3000, true);
 const runDebouncedForLoadFullChat = debounce((cb) => cb(), 500, false, true);
@@ -325,7 +333,7 @@ addActionHandler('openThread', (global, actions, payload): ActionReturnType => {
 addActionHandler('openThread', async (global, actions, payload): Promise<void> => {
   const {
     type, isComments, noForumTopicPanel, shouldReplaceHistory, shouldReplaceLast,
-    focusMessageId,
+    focusMessageId, todoItemId, pollOption,
     tabId = getCurrentTabId(),
   } = payload;
   let { chatId } = payload;
@@ -489,6 +497,8 @@ addActionHandler('openThread', async (global, actions, payload): Promise<void> =
       chatId,
       threadId,
       messageId: focusMessageId,
+      todoItemId,
+      pollOption,
       tabId,
     });
   }
@@ -693,10 +703,23 @@ addActionHandler('invalidateFullInfo', (global, actions, payload): ActionReturnT
   };
 });
 
-addActionHandler('loadTopChats', (): ActionReturnType => {
-  runThrottledForLoadTopChats(() => {
-    loadChats('active', undefined, true);
-    loadChats('archived', undefined, true);
+addActionHandler('loadTopChats', (global, actions, payload): ActionReturnType => {
+  const message = payload?.messageToNotify;
+
+  // shortcut: throttling keeps only the latest pending call, upgrade if bursts need separate notifications
+  runThrottledForLoadTopChats(async () => {
+    await Promise.all([
+      loadChats('active', undefined, true),
+      loadChats('archived', undefined, true),
+    ]);
+
+    if (!message) return;
+
+    global = getGlobal();
+    const chat = selectChat(global, message.chatId);
+    if (chat) {
+      void notifyAboutMessage({ chat, message });
+    }
   });
 });
 
@@ -859,7 +882,7 @@ addActionHandler('createChannel', async (global, actions, payload): Promise<void
     return;
   }
 
-  const { id: channelId, accessHash } = createdChannel;
+  const { id: channelId } = createdChannel;
 
   global = getGlobal();
   global = updateChat(global, channelId, createdChannel);
@@ -885,8 +908,8 @@ addActionHandler('createChannel', async (global, actions, payload): Promise<void
     setGlobal(global);
   }
 
-  if (channelId && accessHash && photo) {
-    await callApi('editChatPhoto', { chatId: channelId, accessHash, photo });
+  if (photo) {
+    await callApi('editChatPhoto', { chat: createdChannel, photo });
   }
 });
 
@@ -1198,11 +1221,8 @@ addActionHandler('createGroupChat', async (global, actions, payload): Promise<vo
       setGlobal(global);
     }
 
-    if (chatId && photo) {
-      await callApi('editChatPhoto', {
-        chatId,
-        photo,
-      });
+    if (photo) {
+      await callApi('editChatPhoto', { chat: createdChat, photo });
     }
   } catch (err) {
     if ((err as ApiError).message === 'USERS_TOO_FEW') {
@@ -1690,7 +1710,7 @@ addActionHandler('checkChatInvite', async (global, actions, payload): Promise<vo
 
 addActionHandler('openChatByPhoneNumber', async (global, actions, payload): Promise<void> => {
   const {
-    phoneNumber, startAttach, attach, text, tabId = getCurrentTabId(),
+    phoneNumber, startAttach, attach, text, noPaidMessagesToken, tabId = getCurrentTabId(),
   } = payload;
 
   // Open temporary empty chat to make the click response feel faster
@@ -1712,6 +1732,10 @@ addActionHandler('openChatByPhoneNumber', async (global, actions, payload): Prom
     return;
   }
 
+  if (noPaidMessagesToken) {
+    await applyNoPaidMessagesToken(global, actions, chat.id, noPaidMessagesToken, tabId);
+  }
+
   if (text) {
     actions.openChatWithDraft({ chatId: chat.id, text: { text }, tabId });
   } else {
@@ -1722,6 +1746,29 @@ addActionHandler('openChatByPhoneNumber', async (global, actions, payload): Prom
     global = getGlobal();
     openAttachMenuFromLink(global, actions, chat.id, attach, startAttach, tabId);
   }
+});
+
+addActionHandler('openChatByContactToken', async (global, actions, payload): Promise<void> => {
+  const { token, noPaidMessagesToken, tabId = getCurrentTabId() } = payload;
+
+  actions.openChat({ id: TMP_CHAT_ID, tabId });
+
+  const result = await callApi('importContactToken', { token });
+  if (!result || 'messageKey' in result) {
+    actions.openPreviousChat({ tabId });
+    actions.showNotification({ message: result?.messageKey ?? { key: 'ContactLinkInvalid' }, tabId });
+    return;
+  }
+
+  global = getGlobal();
+  global = updateUser(global, result.id, result);
+  setGlobal(global);
+
+  if (noPaidMessagesToken) {
+    await applyNoPaidMessagesToken(global, actions, result.id, noPaidMessagesToken, tabId);
+  }
+
+  actions.openChat({ id: result.id, tabId });
 });
 
 addActionHandler('openAnsibleLink', async (global, actions, payload): Promise<void> => {
@@ -1780,6 +1827,7 @@ addActionHandler('openAnsibleLink', async (global, actions, payload): Promise<vo
       startAttach: params.startattach,
       attach: params.attach,
       text: params.text,
+      noPaidMessagesToken: params.free || undefined,
       tabId,
     });
     return;
@@ -1878,6 +1926,7 @@ addActionHandler('openAnsibleLink', async (global, actions, payload): Promise<vo
       startApp: params.startapp,
       mode: params.mode,
       originalParts: [part1, part2, part3],
+      noPaidMessagesToken: params.free || undefined,
       tabId,
     });
   } else {
@@ -1954,7 +2003,7 @@ addActionHandler('openChatByUsername', async (global, actions, payload): Promise
   const {
     username, messageId, commentId, startParam, startGroup, startAttach, attach, threadId, originalParts,
     startApp, shouldStartMainApp, mode, isDirect,
-    text, onChatChanged, choose, ref, timestamp, linkContext,
+    text, onChatChanged, choose, ref, timestamp, linkContext, noPaidMessagesToken,
     tabId = getCurrentTabId(),
   } = payload;
 
@@ -2021,6 +2070,7 @@ addActionHandler('openChatByUsername', async (global, actions, payload): Promise
           timestamp,
           linkContext,
           isDirect,
+          noPaidMessagesToken,
         }, tabId,
       );
       if (onChatChanged) {
@@ -2375,7 +2425,7 @@ addActionHandler('updateChat', async (global, actions, payload): Promise<void> =
       ? callApi('updateChatAbout', chat, about)
       : undefined,
     photo
-      ? callApi('editChatPhoto', { chatId, accessHash: chat.accessHash, photo })
+      ? callApi('editChatPhoto', { chat, photo })
       : undefined,
   ]);
 
@@ -2393,11 +2443,7 @@ addActionHandler('updateChatPhoto', async (global, actions, payload): Promise<vo
   const chat = selectChat(global, chatId);
   if (!chat) return;
 
-  await callApi('editChatPhoto', {
-    chatId,
-    accessHash: chat.accessHash,
-    photo,
-  });
+  await callApi('editChatPhoto', { chat, photo });
   actions.loadFullChat({ chatId, withPhotos: true });
 });
 
@@ -2408,10 +2454,7 @@ addActionHandler('deleteChatPhoto', async (global, actions, payload): Promise<vo
 
   let isDeleted;
   if (photo.id === chat.avatarPhotoId) {
-    isDeleted = await callApi('editChatPhoto', {
-      chatId,
-      accessHash: chat.accessHash,
-    });
+    isDeleted = await callApi('editChatPhoto', { chat });
   } else {
     isDeleted = await callApi('deleteProfilePhotos', [photo]);
   }
@@ -3652,6 +3695,33 @@ addActionHandler('setMainProfileTab', async (global, actions, payload): Promise<
   }
 });
 
+addActionHandler('setPeerShareTheme', async (global, actions, payload): Promise<void> => {
+  const { peerId, theme } = payload;
+  const peer = selectPeer(global, peerId);
+  if (!peer) return;
+
+  const inputGift = theme?.type === 'gift' ? getRequestInputSavedDiamondGift(global, theme.inputGift) : undefined;
+  if (theme?.type === 'gift' && !inputGift) return;
+
+  const oldShareTheme = selectPeerFullInfo(global, peerId)?.shareTheme;
+  const shareTheme = theme?.type === 'gift' ? { type: 'gift' as const, gift: theme.gift } : theme;
+
+  global = updatePeerFullInfo(global, peerId, { shareTheme });
+  setGlobal(global);
+
+  const result = await callApi('setShareTheme', {
+    peer,
+    theme: inputGift ? { type: 'gift', inputGift } : shareTheme?.type === 'emojiBackdrop' ? shareTheme : undefined,
+  });
+
+  global = getGlobal();
+  // Skip the rollback if a newer save has replaced this theme
+  if (!result && selectPeerFullInfo(global, peerId)?.shareTheme === shareTheme) {
+    global = updatePeerFullInfo(global, peerId, { shareTheme: oldShareTheme });
+    setGlobal(global);
+  }
+});
+
 addActionHandler('resolveBusinessChatLink', async (global, actions, payload): Promise<void> => {
   const { slug, tabId = getCurrentTabId() } = payload;
   const result = await callApi('resolveBusinessChatLink', { slug });
@@ -4088,12 +4158,13 @@ async function openChatByUsername<T extends GlobalState>(
     timestamp?: number;
     linkContext?: LinkContext;
     isDirect?: boolean;
+    noPaidMessagesToken?: string;
   },
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ) {
   const {
     username, threadId, channelPostId, startParam, ref, startAttach, attach, text, timestamp,
-    linkContext, isDirect,
+    linkContext, isDirect, noPaidMessagesToken,
   } = params;
   const currentChat = selectCurrentChat(global, tabId);
 
@@ -4150,6 +4221,11 @@ async function openChatByUsername<T extends GlobalState>(
 
   const targetChat = (isDirect && monoforumChat) || chat;
 
+  if (noPaidMessagesToken && isUserId(chat.id)) {
+    await applyNoPaidMessagesToken(global, actions, chat.id, noPaidMessagesToken, tabId);
+    global = getGlobal();
+  }
+
   openChatWithParams(global, actions, targetChat, {
     isCurrentChat,
     threadId,
@@ -4162,6 +4238,71 @@ async function openChatByUsername<T extends GlobalState>(
     timestamp,
     linkContext,
   }, tabId);
+}
+
+async function applyNoPaidMessagesToken<T extends GlobalState>(
+  global: T,
+  actions: RequiredGlobalActions,
+  userId: string,
+  token: string,
+  ...[tabId = getCurrentTabId()]: TabArgs<T>
+) {
+  const importKey = `${userId}:${token}`;
+  const pendingImport = pendingNoPaidMessagesTokenImports.get(importKey);
+  if (pendingImport) {
+    await pendingImport;
+    return;
+  }
+
+  const importPromise = importNoPaidMessagesToken(global, actions, userId, token, tabId);
+  pendingNoPaidMessagesTokenImports.set(importKey, importPromise);
+  await importPromise;
+  pendingNoPaidMessagesTokenImports.delete(importKey);
+}
+
+async function importNoPaidMessagesToken<T extends GlobalState>(
+  global: T,
+  actions: RequiredGlobalActions,
+  userId: string,
+  token: string,
+  ...[tabId = getCurrentTabId()]: TabArgs<T>
+) {
+  global = getGlobal();
+  const user = selectUser(global, userId);
+  if (!user || user.isSelf || isUserBot(user)) return;
+
+  const wasPaid = Boolean(user.paidMessagesDiamonds);
+
+  const result = await callApi('importNoPaidMessagesToken', { user, token });
+  if (!result) return;
+
+  if ('messageKey' in result) {
+    actions.showNotification({
+      message: result.errorMessage === 'USER_ID_INVALID' ? { key: 'NoPaidTokenUserInvalid' } : result.messageKey,
+      tabId,
+    });
+    return;
+  }
+
+  global = getGlobal();
+  global = updateUser(global, userId, result);
+  if (selectUserFullInfo(global, userId)) {
+    global = updateUserFullInfo(global, userId, { paidMessagesDiamonds: undefined });
+  }
+  setGlobal(global);
+
+  actions.loadFullUser({ userId });
+
+  if (wasPaid && !result.paidMessagesDiamonds) {
+    actions.showNotification({
+      message: {
+        key: 'NoPaidTokenImported',
+        variables: { user: getUserFirstOrLastName(getTranslationFn(), result) },
+        options: { withNodes: true, withMarkdown: true },
+      },
+      tabId,
+    });
+  }
 }
 
 async function openChatWithParams<T extends GlobalState>(

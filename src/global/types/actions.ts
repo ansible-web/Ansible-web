@@ -3,6 +3,7 @@ import type {
   ApiAttachBot,
   ApiAttachment,
   ApiAudio,
+  ApiAvatarUpload,
   ApiBirthday,
   ApiChat,
   ApiChatAdminRights,
@@ -57,9 +58,12 @@ import type {
   ApiReactionWithPaid,
   ApiReportReason,
   ApiRequestPeerType,
+  ApiRichText,
   ApiSavedDiamondGift,
   ApiSendMessageAction,
   ApiSessionData,
+  ApiShareThemeEmojiBackdrop,
+  ApiShareThemeGift,
   ApiSticker,
   ApiStickerSet,
   ApiStickerSetInfo,
@@ -114,8 +118,10 @@ import type {
   ProfileTabType,
   RepeatMode,
   ResaleGiftsFilterOptions,
+  RoundVideoMode,
   ScrollTargetPosition,
   SendMessageParams,
+  SettingsConfirmation,
   SettingsHighlight,
   SettingsScreens,
   SharedMediaType,
@@ -127,8 +133,9 @@ import type {
   WebPageMediaSize,
 } from '../../types';
 import type { BrowserModalStateType, BrowserTab } from '../../types/browser';
+import type { MediaEditorSettings } from '../../types/mediaEditor';
 import type { ClipboardTextFormat, MessageCopyRequest } from '../../types/messageCopy';
-import type { WebApp, WebAppOutboundEvent } from '../../types/webapp';
+import type { WebApp, WebAppMediaKind, WebAppOutboundEvent } from '../../types/webapp';
 import type { RegularLangFnParameters } from '../../util/localization';
 import type { DownloadableMedia } from '../helpers';
 import type { SharedState } from './sharedState';
@@ -162,13 +169,10 @@ export interface ActionPayloads {
   setAuthRememberMe: { value: boolean };
   clearAuthErrorKey: undefined;
   uploadProfilePhoto: {
-    file: File;
+    photo: ApiAvatarUpload;
     isFallback?: boolean;
-    videoTs?: number;
-    isVideo?: boolean;
     bot?: ApiUser;
-    tabId?: number;
-  };
+  } & WithTabId;
   goToAuthQrCode: undefined;
   loginWithPasskey: undefined;
 
@@ -274,6 +278,7 @@ export interface ActionPayloads {
   };
 
   updateWebNotificationSettings: {
+    shouldShowPushPreviewsWhenLocked?: boolean;
     hasWebNotifications?: boolean;
     hasPushNotifications?: boolean;
     notificationSoundVolume?: number;
@@ -291,6 +296,10 @@ export interface ActionPayloads {
   };
   openPasskeyModal: WithTabId | undefined;
   closePasskeyModal: WithTabId | undefined;
+  openSettingsConfirmation: {
+    confirmation: SettingsConfirmation;
+  } & WithTabId;
+  closeSettingsConfirmation: WithTabId | undefined;
 
   loadPrivacySettings: {
     skipIfCached?: boolean;
@@ -310,6 +319,7 @@ export interface ActionPayloads {
   };
   loadNotificationExceptions: undefined;
   setThemeSettings: { theme: ThemeKey } & Partial<IThemeSettings>;
+  syncGlobalWallpaperCache: { background: string };
   animateMessageSending: { chatId: string; threadId: ThreadId; tabId: number };
   updateIsOnline: { isOnline: boolean };
 
@@ -332,8 +342,8 @@ export interface ActionPayloads {
   clearWebPagePreview: WithTabId | undefined;
   loadWallpapers: undefined;
   uploadWallpaper: File;
-  setDeviceToken: { token: string };
-  deleteDeviceToken: undefined;
+  loadChatThemes: undefined;
+  applyChatTheme: { emoticon?: string } & WithTabId;
   createServiceNotification: {
     message: ApiMessage;
   };
@@ -484,6 +494,11 @@ export interface ActionPayloads {
     startAttach?: string | boolean;
     attach?: string;
     text?: string;
+    noPaidMessagesToken?: string;
+  } & WithTabId;
+  openChatByContactToken: {
+    token: string;
+    noPaidMessagesToken?: string;
   } & WithTabId;
   toggleSavedDialogPinned: {
     id: string;
@@ -577,6 +592,31 @@ export interface ActionPayloads {
   deleteEphemeralMessage: {
     chatId: string;
     messageId: number;
+  };
+  setMessageWidgetStorage: {
+    accountId: string;
+    chatId: string;
+    messageId: number;
+    area: 'local' | 'session';
+    values: Record<string, string>;
+  };
+  clearMessageWidgetStorage: undefined;
+  markMessageWidgetSeen: {
+    accountId: string;
+    chatId: string;
+    messageId: number;
+  };
+  setMessageWidgetHeight: {
+    accountId: string;
+    chatId: string;
+    messageId: number;
+    height: number;
+    resizeAnchor: 'top' | 'bottom';
+  };
+  setMessagesWidgetPublicData: {
+    messages: { chatId: string; messageId: number }[];
+    publicData: string;
+    publicDataHash: string;
   };
   resetLocalPaidMessages: WithTabId | undefined;
   deleteParticipantHistory: {
@@ -779,6 +819,7 @@ export interface ActionPayloads {
     onChatChanged?: CallbackAction;
     linkContext?: LinkContext;
     isDirect?: boolean;
+    noPaidMessagesToken?: string;
   } & WithTabId;
   processBoostParameters: {
     usernameOrId: string;
@@ -788,6 +829,11 @@ export interface ActionPayloads {
     chatId: string;
     threadId: ThreadId;
     scrollOffset: number;
+  } & WithTabId;
+  setHiddenBotKeyboardId: {
+    chatId: string;
+    threadId: ThreadId;
+    messageId?: number;
   } & WithTabId;
   unpinAllMessages: {
     chatId: string;
@@ -837,7 +883,7 @@ export interface ActionPayloads {
   createChannel: {
     title: string;
     about?: string;
-    photo?: File;
+    photo?: ApiAvatarUpload;
     memberIds?: string[];
     discussionChannelId?: string;
   } & (
@@ -846,7 +892,7 @@ export interface ActionPayloads {
   createGroupChat: {
     title: string;
     memberIds: string[];
-    photo?: File;
+    photo?: ApiAvatarUpload;
   } & WithTabId;
   resetChatCreation: WithTabId | undefined;
 
@@ -1101,7 +1147,7 @@ export interface ActionPayloads {
     offsetUserId?: string;
     limit?: number;
   };
-  loadTopChats: undefined;
+  loadTopChats: { messageToNotify?: ApiMessage } | undefined;
   showDialog: {
     data: TabState['dialogs'][number];
   } & WithTabId;
@@ -1119,6 +1165,8 @@ export interface ActionPayloads {
     noForumTopicPanel?: boolean;
     quote?: string;
     quoteOffset?: number;
+    todoItemId?: number;
+    pollOption?: string;
     scrollTargetPosition?: ScrollTargetPosition;
     timestamp?: number;
   } & WithTabId;
@@ -1253,12 +1301,16 @@ export interface ActionPayloads {
     chatId: string;
     tab: ApiProfileTab;
   };
+  setPeerShareTheme: {
+    peerId: string;
+    theme?: ApiShareThemeEmojiBackdrop | ApiShareThemeGift & { inputGift: ApiInputSavedDiamondGift };
+  };
 
   updateChat: {
     chatId: string;
     title: string;
     about: string;
-    photo?: File;
+    photo?: ApiAvatarUpload;
   } & WithTabId;
   updateChatDetectedLanguage: {
     chatId: string;
@@ -1297,6 +1349,8 @@ export interface ActionPayloads {
     shouldReplaceLast?: boolean;
     noForumTopicPanel?: boolean;
     focusMessageId?: number;
+    todoItemId?: number;
+    pollOption?: string;
   } & ({
     isComments: true;
     chatId?: string;
@@ -1978,6 +2032,9 @@ export interface ActionPayloads {
   setAudioPlaybackSource: {
     source: PlaybackSource;
   } & WithTabId;
+  setRoundVideoMode: {
+    mode?: RoundVideoMode;
+  } & WithTabId;
   playNextTrack: {
     isAuto?: boolean;
   } & WithTabId;
@@ -2015,7 +2072,7 @@ export interface ActionPayloads {
 
   loadCurrentUser: undefined;
   updateProfile: {
-    photo?: File;
+    photo?: ApiAvatarUpload;
     firstName?: string;
     lastName?: string;
     bio?: string;
@@ -2036,11 +2093,6 @@ export interface ActionPayloads {
     isFromSuggestion?: boolean;
   } & WithTabId;
   closeBirthdaySetupModal: WithTabId | undefined;
-  updateBotProfile: {
-    photo?: File;
-    firstName?: string;
-    bio?: string;
-  } & WithTabId;
   setBotInfo: {
     bot?: ApiUser | undefined;
     langCode?: string;
@@ -2151,6 +2203,7 @@ export interface ActionPayloads {
     fromChatId: string;
     messageId?: number;
     quoteText?: ApiFormattedText;
+    quoteRich?: ApiRichText[];
     quoteOffset?: number;
   } & WithTabId;
 
@@ -2644,6 +2697,7 @@ export interface ActionPayloads {
     webPageMediaSize?: WebPageMediaSize;
     shouldSendInHighQuality?: boolean;
   };
+  updateMediaEditorSettings: MediaEditorSettings;
   updateShouldSaveAttachmentsCompression: { shouldSave: boolean } & WithTabId;
   applyDefaultAttachmentsCompression: undefined;
 
@@ -2683,6 +2737,7 @@ export interface ActionPayloads {
   closeMapModal: WithTabId | undefined;
   toggleSafeLinkModal: {
     url?: string;
+    isWidget?: boolean;
   } & WithTabId;
   closeUrlAuthModal: WithTabId | undefined;
   showNotification: Omit<ApiNotification, 'localId'> & { localId?: string } & WithTabId;
@@ -2709,6 +2764,7 @@ export interface ActionPayloads {
     peerId: string;
   } & WithTabId;
   closeQrCodeModal: WithTabId | undefined;
+  loadQrCodeUniqueGifts: WithTabId | undefined;
 
   // Calls
   joinGroupCall: {
@@ -2801,6 +2857,7 @@ export interface ActionPayloads {
   } & WithTabId;
   loadPeerColors: undefined;
   loadTimezones: undefined;
+  loadShareThemeBackdrops: undefined;
   loadAiComposeTones: undefined;
   openLeftColumnContent: {
     contentKey?: LeftColumnContent;
@@ -3454,7 +3511,7 @@ export interface ActionPayloads {
 
   uploadContactProfilePhoto: {
     userId: string;
-    file?: File;
+    photo?: ApiAvatarUpload;
     isSuggest?: boolean;
   } & WithTabId;
 
@@ -3470,6 +3527,15 @@ export interface ActionPayloads {
   } & WithTabId;
   closeLocationAccessModal: WithTabId | undefined;
 
+  openMediaAccessModal: {
+    bot: ApiUser;
+    webAppKey: string;
+    kinds: WebAppMediaKind[];
+  } & WithTabId;
+  closeMediaAccessModal: {
+    isAccessGranted: boolean;
+  } & WithTabId;
+
   toggleUserEmojiStatusPermission: {
     botId: string;
     isEnabled: boolean;
@@ -3478,6 +3544,12 @@ export interface ActionPayloads {
 
   toggleUserLocationPermission: {
     botId: string;
+    isAccessGranted: boolean;
+  };
+
+  toggleUserMediaPermission: {
+    botId: string;
+    kind: WebAppMediaKind;
     isAccessGranted: boolean;
   };
 
@@ -3492,6 +3564,7 @@ export interface ActionPayloads {
   requestMessageMediaEditor: {
     chatId: string;
     messageId: number;
+    videoTime?: number;
   } & WithTabId;
   resetMessageMediaEditorRequest: WithTabId | undefined;
 }

@@ -5365,7 +5365,7 @@ dependencies = [
 
 [[package]]
 name = "behappy"
-version = "2.12.2"
+version = "0.4.3"
 dependencies = [
  "ab_glyph",
  "cocoa",

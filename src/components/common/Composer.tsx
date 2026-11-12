@@ -41,6 +41,7 @@ import type {
   ThreadId,
 } from '../../types';
 import type { RegularLangKey } from '../../types/language';
+import type { MediaEditorResult } from '../ui/mediaEditor/MediaEditor';
 import type { RichEditorTooltipsConfig } from './tooltips/types';
 import { ApiMediaFormat, ApiMessageEntityTypes, MAIN_THREAD_ID } from '../../api/types';
 
@@ -65,6 +66,8 @@ import {
   getMediaHash,
   getMessageDocumentPhoto,
   getMessagePhoto,
+  getMessageVideo,
+  getPhotoFullDimensions,
   getReactionKey,
   getStoryKey,
   hasMessageMedia,
@@ -92,6 +95,7 @@ import {
   selectChatMessageOrEphemeral,
   selectChatType,
   selectCurrentMessageList,
+  selectCurrentMiddleSearch,
   selectCustomEmoji,
   selectEditingMessage,
   selectEphemeralMessage,
@@ -127,9 +131,11 @@ import {
   selectEditingDraft,
   selectEditingScheduledDraft,
   selectNoWebPage,
+  selectTabThreadParam,
 } from '../../global/selectors/threads';
+import { revokeAttachmentUrls } from '../../util/attachments';
 import {
-  IS_IOS, IS_VIDEO_RECORDING_SUPPORTED, IS_VOICE_RECORDING_SUPPORTED,
+  IS_IOS, IS_TOUCH_ENV, IS_VIDEO_RECORDING_SUPPORTED, IS_VOICE_RECORDING_SUPPORTED,
 } from '../../util/browser/windowEnvironment';
 import buildClassName from '../../util/buildClassName';
 import captureEscKeyListener from '../../util/captureEscKeyListener';
@@ -145,11 +151,12 @@ import { fetch } from '../../util/mediaLoader';
 import { MEMO_EMPTY_ARRAY } from '../../util/memo';
 import { getServerTime } from '../../util/serverTime';
 import stopEvent from '../../util/stopEvent';
-import { getUtf8Length } from '../../util/textFormat';
+import { getUtf8Length } from '../../util/text/textFormat';
 import { EMPTY_RICH_MEDIA_CAPTION } from '../../util/tiptap/richMedia';
 import windowSize from '../../util/windowSize';
 import applyIosAutoCapitalizationFix from '../middle/composer/helpers/applyIosAutoCapitalizationFix';
 import buildAttachment, {
+  buildAttachmentWithVideoCover,
   buildGifAttachment,
   prepareAttachment,
   prepareAttachmentsToSend,
@@ -159,7 +166,9 @@ import { armSendCollapseReserve } from '../middle/helpers/messageListReserves';
 import {
   buildRichMessageFromFormatted,
   getRichInputAsFormatted,
+  hasUnsupportedRichBlocks,
   isValidInputRichMessage,
+  removeUnsupportedRichBlocks,
 } from '../ui/textInput/richText';
 import renderText from './helpers/renderText';
 import { hasActiveRichEditorTooltip } from './tooltips/helpers';
@@ -197,7 +206,7 @@ import useVoiceRecording from '../middle/composer/hooks/useVoiceRecording';
 import AttachmentModal from '../middle/composer/AttachmentModal.async';
 import AttachMenu from '../middle/composer/AttachMenu';
 import BotCommandMenu from '../middle/composer/BotCommandMenu.async';
-import BotKeyboardMenu from '../middle/composer/BotKeyboardMenu';
+import BotKeyboard from '../middle/composer/BotKeyboard';
 import BotMenuButton from '../middle/composer/BotMenuButton';
 import ComposerEmbeddedMessage from '../middle/composer/ComposerEmbeddedMessage';
 import CustomSendMenu from '../middle/composer/CustomSendMenu.async';
@@ -213,6 +222,7 @@ import WebPagePreview from '../middle/composer/WebPagePreview';
 import MessageEffect from '../middle/message/MessageEffect';
 import ReactionSelector from '../middle/message/reactions/ReactionSelector';
 import Button from '../ui/Button';
+import ConfirmDialog from '../ui/ConfirmDialog';
 import MediaEditor from '../ui/mediaEditor/MediaEditor.async';
 import ResponsiveHoverButton from '../ui/ResponsiveHoverButton';
 import Spinner from '../ui/Spinner';
@@ -277,6 +287,8 @@ type StateProps = {
   aiMessageEditorPendingResult: TabState['aiMessageEditorPendingResult'];
   botKeyboardMessageId?: number;
   botKeyboardPlaceholder?: string;
+  hiddenBotKeyboardId?: number;
+  hasActiveMiddleSearch?: boolean;
   withScheduledButton?: boolean;
   autoDeletePeriod?: number;
   isInScheduledList?: boolean;
@@ -422,6 +434,8 @@ const Composer = ({
   aiMessageEditorPendingResult,
   botKeyboardMessageId,
   botKeyboardPlaceholder,
+  hiddenBotKeyboardId,
+  hasActiveMiddleSearch,
   inputPlaceholder,
   withScheduledButton,
   autoDeletePeriod,
@@ -535,6 +549,7 @@ const Composer = ({
     setSettingOption,
     openPremiumModal,
     openAiMessageEditorModal,
+    setHiddenBotKeyboardId,
   } = getActions();
 
   const lang = useLang();
@@ -542,6 +557,7 @@ const Composer = ({
 
   const inputRef = useRef<HTMLDivElement>();
   const composerRef = useRef<HTMLDivElement>();
+  const symbolMenuSlotRef = useRef<HTMLDivElement>();
   const counterRef = useRef<HTMLSpanElement>();
 
   const storyReactionRef = useRef<HTMLButtonElement>();
@@ -568,6 +584,11 @@ const Composer = ({
     closeRemoveFormattingModal,
   ] = useFlag();
   const shouldFocusAfterFormattingRemovalRef = useRef(false);
+  const [
+    isRemoveUnsupportedDialogOpen,
+    openRemoveUnsupportedDialog,
+    closeRemoveUnsupportedDialog,
+  ] = useFlag();
 
   const canMediaBeReplaced = isEditingMedia && canEditMedia(editingMessage!);
 
@@ -672,6 +693,14 @@ const Composer = ({
     canSendAudios: canSendAudios && !isEditingMedia,
     shouldSendInHighQuality: attachmentSettings.shouldSendInHighQuality,
   });
+  const richMediaEditorSource = useMemo(() => (editingRichMediaAttachment ? {
+    blobUrl: editingRichMediaAttachment.sourceBlobUrl ?? editingRichMediaAttachment.blobUrl,
+    mimeType: editingRichMediaAttachment.mimeType,
+    filename: editingRichMediaAttachment.filename,
+  } : undefined), [editingRichMediaAttachment]);
+  const handleApplyRichMediaEdit = useLastCallback((result: MediaEditorResult) => {
+    if (result.kind === 'photo') void handleSaveRichMediaEdit(result.file, result.editState);
+  });
   const hasAttachments = Boolean(attachments.length);
   const handleRichMediaSelect = useLastCallback((files: File[], shouldSendAsFile?: boolean) => {
     handleRichMediaFiles(files, undefined, undefined, shouldSendAsFile);
@@ -739,6 +768,11 @@ const Composer = ({
       return false;
     }
 
+    if (hasUnsupportedRichBlocks(richEditor.getValue())) {
+      openRemoveUnsupportedDialog();
+      return false;
+    }
+
     if (!isInMessageList || isCurrentUserPremium) {
       return true;
     }
@@ -771,6 +805,12 @@ const Composer = ({
     richEditor.replaceValue(buildRichMessageFromFormatted(formattedValue));
     shouldFocusAfterFormattingRemovalRef.current = true;
     closeRemoveFormattingModal();
+  });
+
+  // The message is not sent right away, so the user can review what remains
+  const handleRemoveUnsupported = useLastCallback(() => {
+    richEditor.replaceValue(removeUnsupportedRichBlocks(richEditor.getValue()));
+    closeRemoveUnsupportedDialog();
   });
 
   const handleSubscribeToPremium = useLastCallback(() => {
@@ -882,26 +922,43 @@ const Composer = ({
     shouldSendInHighQuality: attachmentSettings.shouldSendInHighQuality,
   });
 
-  const mediaEditRequestRef = useRef<number>();
   useEffect(() => {
-    if (!mediaEditorMessage) return;
-    const media = getMessagePhoto(mediaEditorMessage) || getMessageDocumentPhoto(mediaEditorMessage);
-    if (!media) return;
+    if (!mediaEditorMessage) return undefined;
+    const media = getMessagePhoto(mediaEditorMessage) || getMessageDocumentPhoto(mediaEditorMessage)
+      || getMessageVideo(mediaEditorMessage);
+    if (!media) return undefined;
     const mediaHash = getMediaHash(media, 'full');
-    if (!mediaHash) return;
-    const now = Date.now();
-    mediaEditRequestRef.current = now;
+    if (!mediaHash) return undefined;
+    let isCancelled = false;
     fetch(mediaHash, ApiMediaFormat.BlobUrl).then(async (blobUrl) => {
-      if (mediaEditRequestRef.current !== now) return;
+      if (isCancelled || !blobUrl) return;
       const blob = await fetchBlob(blobUrl);
-      const attachment = await buildAttachment(getMediaFilename(media), blob);
-      handleSetAttachments([attachment]);
+      const attachment = await buildAttachment(getMediaFilename(media), blob, {
+        isFromMessageMedia: true,
+        shouldSendAsSpoiler: (media.mediaType !== 'document' && media.isSpoiler) || undefined,
+      });
+      const cover = media.mediaType === 'video' ? media.cover : undefined;
+      const coverHash = cover && getMediaHash(cover, 'full');
+      const coverBlobUrl = coverHash ? await fetch(coverHash, ApiMediaFormat.BlobUrl) : undefined;
+      const coverBlob = coverBlobUrl ? await fetchBlob(coverBlobUrl) : undefined;
+      if (isCancelled || (cover && !coverBlob)) {
+        revokeAttachmentUrls(attachment);
+        return;
+      }
+
+      handleSetAttachments([coverBlob
+        ? buildAttachmentWithVideoCover(attachment, coverBlob, getPhotoFullDimensions(cover!))
+        : attachment]);
     });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [mediaEditorMessage, handleSetAttachments]);
 
-  const [isBotKeyboardOpen, openBotKeyboard, closeBotKeyboard] = useFlag();
   const [isBotCommandMenuOpen, openBotCommandMenu, closeBotCommandMenu] = useFlag();
   const [isSymbolMenuOpen, openSymbolMenu, closeSymbolMenu] = useFlag();
+  const [isSymbolMenuLoaded, markSymbolMenuLoaded] = useFlag();
   const [isSendAsMenuOpen, openSendAsMenu, closeSendAsMenu] = useFlag();
   const [isHoverDisabled, disableHover, enableHover] = useFlag();
 
@@ -939,6 +996,34 @@ const Composer = ({
 
   const activeRecording = activeVoiceRecording || activeVideoRecording;
   const [isEmbeddedMessageOpen, setIsEmbeddedMessageOpen] = useState(false);
+
+  const hasBotKeyboard = Boolean(botKeyboardMessageId) && isInMessageList && messageListType === 'thread';
+  const canShowBotKeyboard = hasBotKeyboard && !editingMessage && !isSelectModeActive && !activeRecording;
+  const canShowSymbolMenu = (!isComposerBlocked || canSendGifs || canSendStickers)
+    && !isNeedPremium && !isAccountFrozen;
+  const isSymbolMenuShown = canShowSymbolMenu && (isSymbolMenuOpen || isSymbolMenuForced) && isSymbolMenuLoaded;
+  const isSymbolMenuInKeyboardSlot = Boolean(isMobile && hasBotKeyboard);
+  const isBotKeyboardSuppressed = (IS_TOUCH_ENV && isInputHasFocus) || hasInputContent
+    || Boolean(isMobile && (isSymbolMenuShown || hasActiveMiddleSearch));
+  const isBotKeyboardShown = canShowBotKeyboard && botKeyboardMessageId !== hiddenBotKeyboardId
+    && !isBotKeyboardSuppressed;
+  const isBotKeyboardOpen = isBotKeyboardShown && !isRichInputExpansionActive;
+  const isKeyboardSlotOpen = isBotKeyboardShown || (isSymbolMenuInKeyboardSlot && isSymbolMenuShown);
+
+  const hideBotKeyboard = useLastCallback(() => {
+    setHiddenBotKeyboardId({ chatId, threadId, messageId: botKeyboardMessageId });
+  });
+
+  const showBotKeyboard = useLastCallback(() => {
+    setHiddenBotKeyboardId({ chatId, threadId, messageId: undefined });
+  });
+
+  useEffectWithPrevDeps(([prevHasInputContent, wasBotKeyboardOpen, prevChatId, prevThreadId]) => {
+    if (!hasInputContent || prevHasInputContent || !wasBotKeyboardOpen) return;
+    if (chatId !== prevChatId || threadId !== prevThreadId) return;
+
+    hideBotKeyboard();
+  }, [hasInputContent, isBotKeyboardOpen, chatId, threadId]);
 
   useEffect(() => {
     if (!activeRecording) return;
@@ -978,7 +1063,6 @@ const Composer = ({
   }, [richMessage, canSendTyping, sendMessageAction]);
 
   const isAdmin = chat && isChatAdmin(chat);
-  const [inlineBotHelp, setInlineBotHelp] = useState<string | undefined>();
 
   const insertMention = useLastCallback((peer: ApiPeer, forceFocus = false) => {
     const username = getMainUsername(peer);
@@ -1048,7 +1132,7 @@ const Composer = ({
 
   const resetComposer = useLastCallback((shouldPreserveInput = false, shouldSkipCollapseLatch = false) => {
     if (!shouldPreserveInput) {
-      if (!shouldSkipCollapseLatch) {
+      if (!shouldSkipCollapseLatch && !isKeyboardSlotOpen) {
         const footer = inputRef.current?.closest<HTMLElement>('.middle-column-footer');
         const scroller = footer?.parentElement?.querySelector<HTMLElement>(':scope > .MessageList');
         if (scroller) {
@@ -1394,6 +1478,11 @@ const Composer = ({
     }
 
     const currentRichMessage = richEditor.getValue();
+    if (hasUnsupportedRichBlocks(currentRichMessage)) {
+      openRemoveUnsupportedDialog();
+      return false;
+    }
+
     const formattedRichMessage = currentRichMessage.blocks.length
       ? getRichInputAsFormatted(currentRichMessage) : undefined;
     if (currentRichMessage.blocks.length && !formattedRichMessage) {
@@ -2125,7 +2214,6 @@ const Composer = ({
     inlineBot: isInMessageList ? {
       isEnabled: getIsInlineBotTooltipEnabled,
       onSelect: handleInlineBotSelect,
-      onHelpChange: setInlineBotHelp,
     } : undefined,
     formatter: {
       isEnabled: getIsFormatterEnabled,
@@ -2138,7 +2226,7 @@ const Composer = ({
     getIsEmojiTooltipEnabled, getIsFormatterEnabled, getIsInlineBotTooltipEnabled,
     getIsMentionTooltipEnabled, getIsStickerTooltipEnabled, getRichEditorTooltipContext,
     getTooltipBoundary, handleBotCommandSelect, handleInlineBotSelect, handleStickerSelect,
-    isInMessageList, setInlineBotHelp,
+    isInMessageList,
   ]);
 
   const handleToDoListSend = useLastCallback((todo: ApiNewMediaTodo) => {
@@ -2235,6 +2323,19 @@ const Composer = ({
       closeSymbolMenu();
       openSendAsMenu();
     }, MOBILE_KEYBOARD_HIDE_DELAY_MS);
+  });
+
+  const handleToggleBotKeyboard = useLastCallback(() => {
+    if (isBotKeyboardOpen) {
+      hideBotKeyboard();
+      return;
+    }
+
+    if (IS_TOUCH_ENV) {
+      document.querySelector<HTMLDivElement>(editableInputCssSelector)?.blur();
+    }
+    closeSymbolMenu();
+    showBotKeyboard();
   });
 
   useEffect(() => {
@@ -2389,7 +2490,7 @@ const Composer = ({
 
     if (!isComposerBlocked) {
       if (slowModePlaceholder) return slowModePlaceholder;
-      if (botKeyboardPlaceholder) return botKeyboardPlaceholder;
+      if (isBotKeyboardOpen && botKeyboardPlaceholder) return botKeyboardPlaceholder;
       if (inputPlaceholder) return inputPlaceholder;
       if (paidMessagesDiamonds) {
         return lang('ComposerPlaceholderPaidMessage', {
@@ -2434,7 +2535,7 @@ const Composer = ({
 
     return lang('ComposerPlaceholderNoText');
   }, [
-    activeRecording, botKeyboardPlaceholder, chat, inputPlaceholder, isChannel, isComposerBlocked,
+    activeRecording, botKeyboardPlaceholder, chat, inputPlaceholder, isBotKeyboardOpen, isChannel, isComposerBlocked,
     isInStoryViewer, isSilentPosting, lang, replyToTopic, isReplying, threadId, windowWidth, paidMessagesDiamonds,
     hasSuggestedPost, slowModePlaceholder, stealthMode?.activeUntil, user?.canManageBotForumTopics,
   ]);
@@ -2757,7 +2858,7 @@ const Composer = ({
     });
   }, [shouldRenderPaidDiamonds, diamondsForAllMessages, paidDiamondsRef, mainButtonRef]);
 
-  return (
+  const composer = (
     <div ref={composerRef} className={fullClassName}>
       {isInMessageList && canAttachMedia && !hasRichOnlyContent && isReady && !isRichInputExpansionActive && (
         <DropArea
@@ -2797,6 +2898,7 @@ const Composer = ({
         isForMessage={isInMessageList}
         shouldSchedule={canSchedule && isInScheduledList}
         canSchedule={canSchedule}
+        canSendGifs={canSendGifs}
         forceDarkTheme={isInStoryViewer}
         onSendSilent={handleSendSilentAttachments}
         onSend={handleSendAttachmentsFromModal}
@@ -2811,11 +2913,11 @@ const Composer = ({
       />
       <MediaEditor
         isOpen={Boolean(editingRichMediaAttachment)}
-        imageUrl={editingRichMediaAttachment?.blobUrl}
-        mimeType={editingRichMediaAttachment?.mimeType}
-        filename={editingRichMediaAttachment?.filename}
+        source={richMediaEditorSource}
+        initialEditState={editingRichMediaAttachment?.editState}
+        chatId={chatId}
         onClose={handleCloseRichMediaEditor}
-        onSave={handleSaveRichMediaEdit}
+        onApply={handleApplyRichMediaEdit}
       />
       {isForCurrentMessageList && (
         <ToDoListModal
@@ -3018,7 +3120,6 @@ const Composer = ({
             threadId={threadId}
             isActive={!hasAttachments}
             placeholder={placeholder}
-            forcedPlaceholder={inlineBotHelp}
             canAutoFocus={isReady && isForCurrentMessageList && !hasAttachments && isInMessageList}
             noFocusInterception={hasAttachments}
             shouldSuppressFocus={isMobile && isSymbolMenuOpen}
@@ -3112,27 +3213,17 @@ const Composer = ({
                         iconName="cash-circle"
                       />
                     )}
-                    {Boolean(botKeyboardMessageId) && !activeRecording && !editingMessage && (
-                      <>
-                        <ResponsiveHoverButton
-                          className={buildClassName('composer-action-button', isBotKeyboardOpen && 'activated')}
-                          round
-                          color="translucent"
-                          noClickActivation
-                          onActivate={openBotKeyboard}
-                          ariaLabel={lang('AriaComposerBotKeyboard')}
-                        >
-                          <Icon name="bot-command" />
-                        </ResponsiveHoverButton>
-                        {!isMobile && (
-                          <BotKeyboardMenu
-                            messageId={botKeyboardMessageId}
-                            threadId={threadId}
-                            isOpen={isBotKeyboardOpen}
-                            onClose={closeBotKeyboard}
-                          />
-                        )}
-                      </>
+                    {canShowBotKeyboard && (
+                      <Button
+                        className={buildClassName('composer-action-button', isBotKeyboardOpen && 'activated')}
+                        round
+                        color="translucent"
+                        noFastClick
+                        onClick={handleToggleBotKeyboard}
+                        ariaLabel={lang(isBotKeyboardOpen ? 'AriaComposerHideBotKeyboard' : 'AriaComposerBotKeyboard')}
+                      >
+                        <Icon name="bot-keyboard" />
+                      </Button>
                     )}
                   </>
                 )}
@@ -3165,7 +3256,7 @@ const Composer = ({
               getPlaybackEl={renderedVideoRecording?.getPlaybackEl}
             />
           )}
-          {((!isComposerBlocked || canSendGifs || canSendStickers) && !isNeedPremium && !isAccountFrozen) && (
+          {canShowSymbolMenu && (
             <SymbolMenuButton
               chatId={chatId}
               threadId={threadId}
@@ -3185,7 +3276,9 @@ const Composer = ({
               onEmojiSelect={insertTextAndUpdateCursor}
               closeBotCommandMenu={closeBotCommandMenu}
               closeSendAsMenu={closeSendAsMenu}
+              onLoad={markSymbolMenuLoaded}
               isSymbolMenuForced={isSymbolMenuForced}
+              keyboardSlotElement={isSymbolMenuInKeyboardSlot ? symbolMenuSlotRef.current : undefined}
               canSendPlainText={!isComposerBlocked}
               inputCssSelector={editableInputCssSelector}
               idPrefix={type}
@@ -3218,14 +3311,6 @@ const Composer = ({
                 />
               )}
             </Button>
-          )}
-          {isMobile && isInMessageList && Boolean(botKeyboardMessageId) && (
-            <BotKeyboardMenu
-              messageId={botKeyboardMessageId}
-              threadId={threadId}
-              isOpen={isBotKeyboardOpen}
-              onClose={closeBotKeyboard}
-            />
           )}
           {isInMessageList && botCommands && (
             <BotCommandMenu
@@ -3331,6 +3416,15 @@ const Composer = ({
         setAutoApprove={setShouldPaidMessageAutoApprove}
         confirmHandler={paymentMessageConfirmDialogHandler}
       />
+      <ConfirmDialog
+        isOpen={isRemoveUnsupportedDialogOpen}
+        title={lang('RemoveUnsupportedBlocksTitle')}
+        text={lang('RemoveUnsupportedBlocksText')}
+        confirmLabel={lang('RemoveUnsupportedBlocks')}
+        confirmIsDestructive
+        confirmHandler={handleRemoveUnsupported}
+        onClose={closeRemoveUnsupportedDialog}
+      />
       {isInMessageList && (
         <RemoveFormattingModal
           isOpen={isRemoveFormattingModalOpen}
@@ -3341,6 +3435,28 @@ const Composer = ({
         />
       )}
     </div>
+  );
+
+  if (!isInMessageList) return composer;
+
+  return (
+    <>
+      {composer}
+      <div
+        ref={symbolMenuSlotRef}
+        className={buildClassName('symbol-menu-slot', isBotKeyboardOpen && 'keyboard-open')}
+        inert={isBotKeyboardOpen}
+      />
+      <BotKeyboard
+        key={`${chatId}_${threadId}`}
+        chatId={chatId}
+        threadId={threadId}
+        messageId={botKeyboardMessageId}
+        isOpen={isBotKeyboardOpen}
+        isSymbolMenuOpen={isSymbolMenuInKeyboardSlot && isSymbolMenuShown}
+        onClose={hideBotKeyboard}
+      />
+    </>
   );
 };
 
@@ -3471,6 +3587,8 @@ export default memo(withGlobal<OwnProps>(
       isInScheduledList,
       botKeyboardMessageId,
       botKeyboardPlaceholder: keyboardMessage?.keyboardPlaceholder,
+      hiddenBotKeyboardId: selectTabThreadParam(global, chatId, threadId, 'hiddenBotKeyboardId'),
+      hasActiveMiddleSearch: Boolean(selectCurrentMiddleSearch(global)),
       isForwarding,
       isReplying,
       hasSuggestedPost,

@@ -7,22 +7,20 @@ import { SettingsScreens } from '../../../types';
 import { FAQ_URL, PRIVACY_URL } from '../../../config';
 import { formatDiamondsAmount } from '../../../global/helpers/payments';
 import {
+  selectIsCurrentUserFrozen,
   selectIsGiveawayGiftsPurchaseAvailable,
   selectIsPremiumPurchaseBlocked,
 } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
 import { formatDiamondsAsIcon } from '../../../util/localization/format';
 
-import useFlag from '../../../hooks/useFlag';
 import useHistoryBack from '../../../hooks/useHistoryBack';
 import useLang from '../../../hooks/useLang';
-import useLastCallback from '../../../hooks/useLastCallback';
 
 import DiamondIcon from '../../common/icons/DiamondIcon';
 import ChatExtra from '../../common/profile/ChatExtra';
 import ProfileInfo from '../../common/profile/ProfileInfo';
 import Island from '../../gili/layout/Island';
-import ConfirmDialog from '../../ui/ConfirmDialog';
 import ListItem from '../../ui/ListItem';
 
 import styles from './SettingsMain.module.scss';
@@ -37,6 +35,7 @@ type StateProps = {
   currentUserId?: string;
   canBuyPremium?: boolean;
   isGiveawayAvailable?: boolean;
+  isCurrentUserFrozen?: boolean;
   diamondsBalance?: ApiDiamondsAmount;
 };
 
@@ -46,20 +45,19 @@ const SettingsMain = ({
   sessionCount,
   canBuyPremium,
   isGiveawayAvailable,
+  isCurrentUserFrozen,
   diamondsBalance,
   onReset,
 }: OwnProps & StateProps) => {
   const {
     loadMoreProfilePhotos,
     openPremiumModal,
-    openSupportChat,
     openUrl,
     openGiftRecipientPicker,
     openDiamondsBalanceModal,
     openSettingsScreen,
+    openSettingsConfirmation,
   } = getActions();
-
-  const [isSupportDialogOpen, openSupportDialog, closeSupportDialog] = useFlag(false);
 
   const lang = useLang();
 
@@ -72,11 +70,6 @@ const SettingsMain = ({
   useHistoryBack({
     isActive,
     onBack: onReset,
-  });
-
-  const handleOpenSupport = useLastCallback(() => {
-    openSupportChat();
-    closeSupportDialog();
   });
 
   return (
@@ -98,6 +91,7 @@ const SettingsMain = ({
         )}
       </div>
       <div className={styles.menuSection}>
+
         <Island>
           <ListItem
             icon="account-filled"
@@ -262,7 +256,7 @@ const SettingsMain = ({
             icon="support-filled"
             iconBg="red"
             narrow
-            onClick={openSupportDialog}
+            onClick={() => openSettingsConfirmation({ confirmation: 'askQuestion' })}
           >
             {lang('AskAQuestion')}
           </ListItem>
@@ -284,14 +278,6 @@ const SettingsMain = ({
           </ListItem>
         </Island>
       </div>
-      <ConfirmDialog
-        isOpen={isSupportDialogOpen}
-        confirmLabel={lang('OK')}
-        title={lang('AskAQuestion')}
-        textParts={lang('MenuAskText', undefined, { withNodes: true, renderTextFilters: ['br'] })}
-        confirmHandler={handleOpenSupport}
-        onClose={closeSupportDialog}
-      />
     </div>
   );
 };
@@ -307,6 +293,7 @@ export default memo(withGlobal<OwnProps>(
       currentUserId,
       canBuyPremium: !selectIsPremiumPurchaseBlocked(global),
       isGiveawayAvailable,
+      isCurrentUserFrozen: selectIsCurrentUserFrozen(global),
       diamondsBalance,
     };
   },
