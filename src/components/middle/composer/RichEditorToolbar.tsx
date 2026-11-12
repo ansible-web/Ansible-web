@@ -345,13 +345,14 @@ const RichEditorToolbar = ({ editor, isEnabled, onOpenAiEditor }: OwnProps) => {
   return (
     <div className="rich-editor-toolbar-viewport" aria-hidden={!isEnabled} inert={!isEnabled}>
       <div className="rich-editor-toolbar">
-        <Button
-          color="translucent"
-          iconName="ai"
-          ariaLabel={lang('AiMessageEditor')}
-          disabled={!onOpenAiEditor}
-          onClick={onOpenAiEditor}
-        />
+        {onOpenAiEditor && (
+          <Button
+            color="translucent"
+            iconName="ai"
+            ariaLabel={lang('AiMessageEditor')}
+            onClick={onOpenAiEditor}
+          />
+        )}
         <DropdownMenu
           className="rich-editor-toolbar-menu"
           positionX="left"
