@@ -270,6 +270,7 @@ async function signInUserWithQrCode(
   client: AnsibleClient, apiCredentials: ApiCredentials, authParams: UserAuthParams,
 ): Promise<Api.TypeUser> {
   let isScanningComplete = false;
+  let scannedResult: Api.auth.LoginTokenSuccess | Api.auth.LoginTokenMigrateTo | undefined;
 
   const { apiId, apiHash } = apiCredentials;
   const exceptIds = authParams.accountIds?.map((id) => tryParseBigInt(id)).filter(Boolean) || [];
@@ -292,6 +293,10 @@ async function signInUserWithQrCode(
       }));
       // eslint-disable-next-line no-console
       console.log('[QR] ExportLoginToken result:', result?.className);
+      // The expiry poll can receive the accepted token before the update handler wins the race
+      if (result instanceof Api.auth.LoginTokenSuccess || result instanceof Api.auth.LoginTokenMigrateTo) {
+        return result;
+      }
       if (!(result instanceof Api.auth.LoginToken)) {
         throw new Error('Unexpected');
       }
@@ -303,12 +308,13 @@ async function signInUserWithQrCode(
         sleep((expires - getServerTime()) * 1000),
       ]);
     }
+    return undefined;
   })();
 
-  const updatePromise = new Promise<void>((resolve) => {
+  const updatePromise = new Promise<undefined>((resolve) => {
     client.addEventHandler((update: Api.TypeUpdate) => {
       if (update instanceof Api.UpdateLoginToken) {
-        resolve();
+        resolve(undefined);
       }
     }, { build: (update: Update) => update });
   });
@@ -316,8 +322,11 @@ async function signInUserWithQrCode(
   try {
     // Either we receive an update that QR is successfully scanned,
     // or we receive a rejection caused by user going back to the regular auth form
-    await Promise.race([updatePromise, inputPromise]);
+    scannedResult = await Promise.race([updatePromise, inputPromise]);
   } catch (err: unknown) {
+    if (err instanceof RPCError && err.errorMessage === 'SESSION_PASSWORD_NEEDED') {
+      return signInWithPassword(client, apiCredentials, authParams);
+    }
     if (err instanceof Error && err.message === 'RESTART_AUTH') {
       return await signInUser(client, apiCredentials, authParams);
     }
@@ -332,7 +341,7 @@ async function signInUserWithQrCode(
   }
 
   try {
-    const result2 = await client.invoke(new Api.auth.ExportLoginToken({
+    const result2 = scannedResult ?? await client.invoke(new Api.auth.ExportLoginToken({
       apiId,
       apiHash,
       exceptIds,
