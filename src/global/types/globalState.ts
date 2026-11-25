@@ -359,6 +359,7 @@ export type GlobalState = {
     defaultTags: ApiReaction[];
     effectReactions: ApiReaction[];
     availableReactions?: ApiAvailableReaction[];
+    availableReactionsHash?: number;
     hash: {
       topReactions?: string;
       recentReactions?: string;

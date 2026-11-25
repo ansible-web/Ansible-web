@@ -73,13 +73,20 @@ export function sendEmojiInteraction({
   });
 }
 
-export async function fetchAvailableReactions() {
+// A fresh worker or a replaced document store must hydrate its media references first
+const reactionCatalogHashes = new WeakMap<typeof localDb.documents, number>();
+
+export async function fetchAvailableReactions({ hash }: { hash?: number }) {
+  const { documents } = localDb;
   const result = await invokeRequest(new GramJs.messages.GetAvailableReactions({
-    hash: DEFAULT_PRIMITIVES.INT,
+    hash: hash !== undefined && hash === reactionCatalogHashes.get(documents) ? hash : DEFAULT_PRIMITIVES.INT,
   }));
 
-  if (!result || result instanceof GramJs.messages.AvailableReactionsNotModified) {
+  if (!result || documents !== localDb.documents) {
     return undefined;
+  }
+  if (result instanceof GramJs.messages.AvailableReactionsNotModified) {
+    return { isNotModified: true } as const;
   }
 
   result.reactions.forEach((reaction) => {
@@ -100,7 +107,9 @@ export async function fetchAvailableReactions() {
     }
   });
 
-  return result.reactions.map(buildApiAvailableReaction);
+  const reactions = result.reactions.map(buildApiAvailableReaction);
+  reactionCatalogHashes.set(documents, result.hash);
+  return { reactions, hash: result.hash };
 }
 
 export async function fetchAvailableEffects() {

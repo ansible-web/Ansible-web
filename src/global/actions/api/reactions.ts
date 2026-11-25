@@ -63,13 +63,22 @@ const INTERACTION_RANDOM_OFFSET = 40;
 let interactionLocalId = 0;
 
 addActionHandler('loadAvailableReactions', async (global): Promise<void> => {
-  const result = await callApi('fetchAvailableReactions');
-  if (!result) {
+  const { currentUserId } = global;
+  const result = await callApi('fetchAvailableReactions', { hash: global.reactions.availableReactionsHash });
+  global = getGlobal();
+  if (global.currentUserId !== currentUserId) {
+    return;
+  }
+  requestActionTimeout({
+    action: 'loadAvailableReactions',
+    payload: undefined,
+  }, GENERAL_REFETCH_INTERVAL);
+  if (!result || result.isNotModified) {
     return;
   }
 
   // Preload animations
-  result.forEach((availableReaction) => {
+  result.reactions.forEach((availableReaction) => {
     if (availableReaction.aroundAnimation) {
       mediaLoader.fetch(`sticker${availableReaction.aroundAnimation.id}`, ApiMediaFormat.BlobUrl);
     }
@@ -89,15 +98,11 @@ addActionHandler('loadAvailableReactions', async (global): Promise<void> => {
     ...global,
     reactions: {
       ...global.reactions,
-      availableReactions: result,
+      availableReactions: result.reactions,
+      availableReactionsHash: result.hash,
     },
   };
   setGlobal(global);
-
-  requestActionTimeout({
-    action: 'loadAvailableReactions',
-    payload: undefined,
-  }, GENERAL_REFETCH_INTERVAL);
 });
 
 addActionHandler('loadAvailableEffects', async (global): Promise<void> => {
