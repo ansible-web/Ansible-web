@@ -118,7 +118,8 @@ export default class PromisedWebSockets {
 
       this.client.onclose = (event) => {
         const { code, reason, wasClean } = event;
-        if (code !== 1000) {
+        // Browsers report 1005 when a clean closing handshake omits the optional status code.
+        if (!wasClean || (code !== 1000 && code !== 1005)) {
           // eslint-disable-next-line no-console
           console.error(`Socket ${ip} closed. Code: ${code}, reason: ${reason}, was clean: ${wasClean}`);
         }
@@ -165,7 +166,7 @@ export default class PromisedWebSockets {
   }
 
   close() {
-    this.client?.close();
+    this.client?.close(1000);
     this.closed = true;
   }
 

@@ -13,5 +13,8 @@ export default function updateWebmanifest() {
     return;
   }
 
-  manifest.setAttribute('href', 'site_apple.webmanifest');
+  const appleManifest = import.meta.env.TG_APP_ENV === 'production'
+    ? 'site_apple.webmanifest'
+    : 'site_apple_dev.webmanifest';
+  manifest.setAttribute('href', appleManifest);
 }
