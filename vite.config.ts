@@ -205,7 +205,6 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
     TG_CSP: csp,
     TG_APPLE_ICON: appleIcon,
     TG_MAIN_ICON: isProductionApp ? 'icon-192x192' : 'icon-dev-192x192',
-    TG_MANIFEST: isProductionApp ? 'site.webmanifest' : 'site_dev.webmanifest',
     TG_SOCIAL_IMAGE_URL: socialImageUrl,
     TG_TELEGRAM_API_ID: telegramApiId,
     TG_TELEGRAM_API_HASH: telegramApiHash,
@@ -222,6 +221,7 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       exclude: ['temml'],
     },
     define: {
+      'import.meta.env.AS_MANIFEST': JSON.stringify(isProductionApp ? 'site.webmanifest' : 'site_dev.webmanifest'),
       APP_VERSION: JSON.stringify(APP_VERSION),
       APP_BUILD: JSON.stringify(APP_BUILD),
     },
