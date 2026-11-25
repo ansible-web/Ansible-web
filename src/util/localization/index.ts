@@ -39,6 +39,7 @@ import { replaceInStringsWithTeact } from '../replaceWithTeact';
 import { fastRaf } from '../schedulers';
 import { resetDateFormatCache } from './dateFormat';
 import { normalizeProfilePlaceholders } from './profilePlaceholders';
+import { normalizeDiamondPlaceholder } from './utils';
 
 import Deferred from '../Deferred';
 import LimitedMap from '../primitives/LimitedMap';
@@ -483,7 +484,7 @@ function getIntlLocale(languageInfo = language) {
   return languageInfo?.pluralCode || FORMATTERS_FALLBACK_LANG;
 }
 
-function getString(langKey: LangKey, count: number) {
+function getString(langKey: LangKey, count: number, variables?: object) {
   const shouldForceFallback = FORCE_FALLBACK_LANG && language?.langCode === FALLBACK_LANG_CODE;
   let langPackStringValue = !shouldForceFallback ? langPack?.strings[langKey] : undefined;
   if (langPackStringValue && isDeletedLangString(langPackStringValue)) langPackStringValue = undefined;
@@ -506,7 +507,7 @@ function getString(langKey: LangKey, count: number) {
     ? (langPackStringValue[pluralSuffix] ?? langPackStringValue.other)
     : langPackStringValue;
 
-  return string && normalizeProfilePlaceholders(langKey, string);
+  return string && normalizeProfilePlaceholders(langKey, normalizeDiamondPlaceholder(string, variables));
 }
 
 function processVariable(value: TeactNode | LangFnParametersShape<LangFnOptions>) {
@@ -527,7 +528,7 @@ function processTranslation(
   }
 
   const pluralValue = options && 'pluralValue' in options ? Number(options.pluralValue) : 0;
-  const string = getString(langKey, pluralValue);
+  const string = getString(langKey, pluralValue, variables);
 
   if (string === undefined) return langKey;
 
@@ -555,7 +556,7 @@ function processTranslationAdvanced(
   options?: AdvancedLangFnOptions | AdvancedLangFnOptionsWithPlural,
 ): TeactNode {
   const pluralValue = options && 'pluralValue' in options ? Number(options.pluralValue) : 0;
-  const string = getString(langKey, pluralValue);
+  const string = getString(langKey, pluralValue, variables);
   if (string === undefined) return langKey;
 
   const variableEntries = variables ? Object.entries(variables) : [];
