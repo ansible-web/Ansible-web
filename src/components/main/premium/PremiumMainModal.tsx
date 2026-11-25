@@ -12,7 +12,7 @@ import type {
 } from '../../../api/types';
 import type { GlobalState } from '../../../global/types';
 
-import { PREMIUM_FEATURE_SECTIONS, TME_LINK_PREFIX } from '../../../config';
+import { PREMIUM_FEATURE_SECTIONS } from '../../../config';
 import { getUserFullName } from '../../../global/helpers';
 import {
   selectCustomEmoji,
@@ -146,7 +146,7 @@ const PremiumMainModal = ({
   gift,
 }: OwnProps & StateProps) => {
   const {
-    closePremiumModal, openInvoice, requestConfetti, openAnsibleLink, loadStickers, openStickerSet,
+    closePremiumModal, openInvoice, requestConfetti, openChatByUsername, loadStickers, openStickerSet,
   } = getActions();
 
   const lang = useLang();
@@ -188,8 +188,10 @@ const PremiumMainModal = ({
         slug: premiumSlug,
       });
     } else if (premiumBotUsername) {
-      openAnsibleLink({
-        url: `${TME_LINK_PREFIX}${premiumBotUsername}?start=${startParam || 'promo'}`,
+      openChatByUsername({
+        username: premiumBotUsername,
+        startParam: startParam || 'promo',
+        shouldStartBot: true,
       });
       closePremiumModal();
     }

@@ -7,6 +7,7 @@ import type { ApiDimensions, StoryboardInfo } from '../../api/types';
 
 import { IS_IOS, IS_TOUCH_ENV, IS_YA_BROWSER } from '../../util/browser/windowEnvironment';
 import getPointerPosition from '../../util/events/getPointerPosition';
+import { getIsKeyboardShortcut } from '../../util/keyboardShortcuts';
 import { clamp } from '../../util/math';
 import safePlay from '../../util/safePlay';
 import stopEvent from '../../util/stopEvent';
@@ -88,6 +89,7 @@ const VideoPlayer = ({
   } = getActions();
   const lang = useLang();
 
+  const rootRef = useRef<HTMLDivElement>();
   const videoRef = useRef<HTMLVideoElement>();
   const [isPlaying, setIsPlaying] = useState(!IS_TOUCH_ENV || !IS_IOS);
   const [isFullscreen, setFullscreen, exitFullscreen] = useFullscreen(videoRef, setIsPlaying);
@@ -152,12 +154,28 @@ const VideoPlayer = ({
   });
 
   const handleVideoMove = useLastCallback(() => {
-    toggleControls(true);
+    toggleControls(true, true);
   });
 
   const handleVideoLeave = useLastCallback((e) => {
     checkMousePositionAndToggleControls(e.clientX, e.clientY);
   });
+
+  const handleWindowMouseMove = useLastCallback((e: MouseEvent) => {
+    if (rootRef.current?.contains(e.target as Node)) return;
+    checkMousePositionAndToggleControls(e.clientX, e.clientY);
+  });
+
+  const shouldToggleControls = !IS_TOUCH_ENV && !isForceMobileVersion;
+
+  useEffect(() => {
+    if (!shouldToggleControls) return undefined;
+
+    window.addEventListener('mousemove', handleWindowMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleWindowMouseMove);
+    };
+  }, [shouldToggleControls]);
 
   const handleSeekingChange = useLastCallback((isSeeking: boolean) => {
     setIsSeeking(isSeeking);
@@ -302,22 +320,13 @@ const VideoPlayer = ({
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isInPictureInPicture) return;
-      switch (e.key) {
-        case ' ':
-        case 'Enter':
-          e.preventDefault();
-          togglePlayState(e);
-          break;
-        case 'Left': // IE/Edge specific value
-        case 'ArrowLeft':
-          e.preventDefault();
-          rewind(-1);
-          break;
-        case 'Right': // IE/Edge specific value
-        case 'ArrowRight':
-          e.preventDefault();
-          rewind(1);
-          break;
+
+      if (getIsKeyboardShortcut(e, 'toggleVideoPlayback')) {
+        e.preventDefault();
+        togglePlayState(e);
+      } else if (getIsKeyboardShortcut(e, 'seekVideo')) {
+        e.preventDefault();
+        rewind(e.key === 'ArrowLeft' ? -1 : 1);
       }
     };
 
@@ -330,10 +339,10 @@ const VideoPlayer = ({
 
   const wrapperStyle = posterSize && `width: ${posterSize.width}px; height: ${posterSize.height}px`;
   const videoStyle = `background-image: url(${posterData})`;
-  const shouldToggleControls = !IS_TOUCH_ENV && !isForceMobileVersion;
 
   return (
     <div
+      ref={rootRef}
       className="VideoPlayer"
       onMouseMove={shouldToggleControls ? handleVideoMove : undefined}
       onMouseLeave={shouldToggleControls ? handleVideoLeave : undefined}

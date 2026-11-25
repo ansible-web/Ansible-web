@@ -1,12 +1,16 @@
-import type { ElementRef } from '../../../lib/teact/teact';
-import { getActions } from '../../../global';
+import { getActions, getGlobal } from '../../../global';
 
 import type { ApiMessageEntity } from '../../../api/types';
 import type { ObserveFn } from '../../../hooks/useIntersectionObserver';
 import type { TextPart, ThreadId } from '../../../types';
 import type { TextFilter } from './renderText';
-import { ApiMessageEntityTypes } from '../../../api/types';
+import { ApiMessageEntityTypes, MAIN_THREAD_ID } from '../../../api/types';
 
+import { isChatChannel } from '../../../global/helpers';
+import {
+  selectChat, selectChatFullInfo, selectChatMessage, selectIsChatWithBot,
+} from '../../../global/selectors';
+import { selectThreadIdFromMessage } from '../../../global/selectors/threads';
 import { ensureProtocol } from '../../../util/browser/url';
 import buildClassName from '../../../util/buildClassName';
 import { copyTextToClipboard } from '../../../util/clipboard';
@@ -41,8 +45,6 @@ export function renderTextWithEntities({
   observeIntersectionForLoading,
   observeIntersectionForPlaying,
   withTranslucentThumbs,
-  sharedCanvasRef,
-  sharedCanvasHqRef,
   cacheBuster,
   forcePlayback,
   noCustomEmojiPlayback,
@@ -62,8 +64,6 @@ export function renderTextWithEntities({
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;
   withTranslucentThumbs?: boolean;
-  sharedCanvasRef?: ElementRef<HTMLCanvasElement>;
-  sharedCanvasHqRef?: ElementRef<HTMLCanvasElement>;
   cacheBuster?: string;
   forcePlayback?: boolean;
   noCustomEmojiPlayback?: boolean;
@@ -165,8 +165,7 @@ export function renderTextWithEntities({
         observeIntersectionForPlaying,
         withTranslucentThumbs,
         emojiSize,
-        sharedCanvasRef,
-        sharedCanvasHqRef,
+        hasCanvasContent: type === ApiMessageEntityTypes.Blockquote && hasCanvasContent(nestedEntities),
         cacheBuster,
         forcePlayback,
         noCustomEmojiPlayback,
@@ -330,6 +329,14 @@ function organizeEntity(
   };
 }
 
+function hasCanvasContent(entities: IOrganizedEntity[]): boolean {
+  return entities.some(({ entity, nestedEntities }) => (
+    entity.type === ApiMessageEntityTypes.Spoiler
+    || entity.type === ApiMessageEntityTypes.CustomEmoji
+    || hasCanvasContent(nestedEntities)
+  ));
+}
+
 function processEntity({
   entity,
   entityContent,
@@ -341,8 +348,7 @@ function processEntity({
   observeIntersectionForPlaying,
   withTranslucentThumbs,
   emojiSize,
-  sharedCanvasRef,
-  sharedCanvasHqRef,
+  hasCanvasContent: withCanvasContent,
   cacheBuster,
   forcePlayback,
   noCustomEmojiPlayback,
@@ -362,8 +368,7 @@ function processEntity({
   observeIntersectionForPlaying?: ObserveFn;
   withTranslucentThumbs?: boolean;
   emojiSize?: number;
-  sharedCanvasRef?: ElementRef<HTMLCanvasElement>;
-  sharedCanvasHqRef?: ElementRef<HTMLCanvasElement>;
+  hasCanvasContent?: boolean;
   cacheBuster?: string;
   forcePlayback?: boolean;
   noCustomEmojiPlayback?: boolean;
@@ -403,8 +408,6 @@ function processEntity({
           size={emojiSize}
           isSelectable
           withSharedAnimation
-          sharedCanvasRef={sharedCanvasRef}
-          sharedCanvasHqRef={sharedCanvasHqRef}
           observeIntersectionForLoading={observeIntersectionForLoading}
           observeIntersectionForPlaying={observeIntersectionForPlaying}
           withTranslucentThumb={withTranslucentThumbs}
@@ -428,14 +431,21 @@ function processEntity({
       return <strong data-entity-type={entity.type}>{renderNestedMessagePart()}</strong>;
     case ApiMessageEntityTypes.Blockquote:
       return (
-        <Blockquote canBeCollapsible={entity.canCollapse} isToggleDisabled={isInSelectMode}>
+        <Blockquote
+          canBeCollapsible={entity.canCollapse}
+          isToggleDisabled={isInSelectMode}
+          hasCanvasContent={withCanvasContent}
+          contentKey={cacheBuster}
+        >
           {renderNestedMessagePart()}
         </Blockquote>
       );
     case ApiMessageEntityTypes.BotCommand:
+      // No chat context (stories, gifts, etc.): nowhere safe to send it
+      if (!chatId) return renderNestedMessagePart();
       return (
         <a
-          onClick={handleBotCommandClick}
+          onClick={(e) => handleBotCommandClick(e, chatId, threadId, messageId)}
           className="text-entity-link"
           dir="auto"
           data-entity-type={entity.type}
@@ -557,7 +567,9 @@ function processEntity({
         </a>
       );
     case ApiMessageEntityTypes.Spoiler:
-      return <Spoiler containerId={containerId}>{renderNestedMessagePart()}</Spoiler>;
+      return (
+        <Spoiler containerId={containerId}>{renderNestedMessagePart()}</Spoiler>
+      );
     case ApiMessageEntityTypes.CustomEmoji:
       return (
         <CustomEmoji
@@ -567,8 +579,6 @@ function processEntity({
           size={emojiSize}
           isSelectable
           withSharedAnimation
-          sharedCanvasRef={sharedCanvasRef}
-          sharedCanvasHqRef={sharedCanvasHqRef}
           observeIntersectionForLoading={observeIntersectionForLoading}
           observeIntersectionForPlaying={observeIntersectionForPlaying}
           withTranslucentThumb={withTranslucentThumbs}
@@ -691,8 +701,24 @@ function getHtmlLinkUrl(entityContent: string, entity: ApiMessageEntity) {
   return escapeHtmlAttribute(ensureProtocol(getLinkUrl(entityContent, entity)));
 }
 
-export function handleBotCommandClick(e: React.MouseEvent<HTMLAnchorElement>) {
-  getActions().sendBotCommand({ command: e.currentTarget.innerText });
+export function handleBotCommandClick(
+  e: React.MouseEvent<HTMLAnchorElement>, chatId: string, threadId?: ThreadId, messageId?: number,
+) {
+  const global = getGlobal();
+  const chat = selectChat(global, chatId);
+  // Like official clients, only where a bot can read it
+  const hasBots = selectIsChatWithBot(global, chatId) || selectChatFullInfo(global, chatId)?.botIds?.length;
+  if (!chat || isChatChannel(chat) || !hasBots) return;
+
+  // Media viewer captions have no list thread, so take the message's own
+  const message = threadId === undefined && messageId ? selectChatMessage(global, chatId, messageId) : undefined;
+  const { closeMediaViewer, sendBotCommand } = getActions();
+  closeMediaViewer();
+  sendBotCommand({
+    command: e.currentTarget.innerText,
+    chatId,
+    threadId: threadId ?? (message ? selectThreadIdFromMessage(global, message) : MAIN_THREAD_ID),
+  });
 }
 
 export function handleHashtagClick(hashtag?: string, username?: string) {

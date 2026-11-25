@@ -323,6 +323,7 @@ export enum SettingsScreens {
   DoNotTranslate,
   FoldersShare,
   Passkeys,
+  KeyboardShortcuts,
 }
 
 export type StickerSetOrReactionsSetOrRecent = Pick<ApiStickerSet, (
@@ -752,6 +753,7 @@ export interface ThreadLocalState {
   draft?: ApiDraft;
 
   noWebPage?: boolean;
+  webPagePreviewId?: string;
 
   typingStatusByPeerId?: Record<string, ApiTypingStatus>;
 

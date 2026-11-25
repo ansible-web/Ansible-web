@@ -35,6 +35,7 @@ import {
   resolveEphemeralCommand,
 } from '../../helpers';
 import { isButtonUnsupported } from '../../helpers/buttons';
+import { getPeerFullTitle } from '../../helpers/peers';
 import {
   addActionHandler, getActions, getGlobal, setGlobal,
 } from '../../index';
@@ -61,7 +62,6 @@ import {
   selectChatMessage,
   selectChatMessageOrEphemeral,
   selectCurrentChat,
-  selectCurrentMessageList,
   selectEphemeralMessage,
   selectIsCurrentUserFrozen,
   selectIsCurrentUserPremium,
@@ -77,7 +77,7 @@ import {
   selectWebApp,
 } from '../../selectors';
 import { selectCurrentLimit, selectPremiumLimit } from '../../selectors/limits';
-import { selectDraft } from '../../selectors/threads.ts';
+import { selectDraft, selectThreadIdFromMessage } from '../../selectors/threads.ts';
 import { fetchChatByUsername } from './chats';
 import { getPeerDiamondsForMessage, sendEphemeralMessages } from './messages';
 
@@ -153,6 +153,8 @@ addActionHandler('clickBotInlineButton', (global, actions, payload): ActionRetur
     case 'command':
       actions.sendBotCommand({
         command: button.text,
+        chatId: chat.id,
+        threadId: threadId ?? selectThreadIdFromMessage(global, message),
         botId: message.ephemeralBotId || message.senderId,
         tabId,
       });
@@ -162,6 +164,7 @@ addActionHandler('clickBotInlineButton', (global, actions, payload): ActionRetur
       void answerCallbackButton(global, {
         chat,
         messageId: message.ephemeralId || message.id,
+        botId: message.viaBotId || message.ephemeralBotId || message.senderId || chatId,
         threadId,
         data: button.action.data,
         isEphemeral: message.isEphemeral,
@@ -235,6 +238,7 @@ addActionHandler('clickBotInlineButton', (global, actions, payload): ActionRetur
       void answerCallbackButton(global, {
         chat,
         messageId,
+        botId: message.viaBotId || message.ephemeralBotId || message.senderId || chatId,
         threadId,
         isGame: true,
         isEphemeral: message.isEphemeral,
@@ -252,14 +256,14 @@ addActionHandler('clickBotInlineButton', (global, actions, payload): ActionRetur
 
     case 'simpleWebView': {
       const { url } = button.action;
-      const sender = selectSender(global, message);
-      if (!sender) {
+      const botId = message.ephemeralBotId || selectSender(global, message)?.id;
+      if (!botId) {
         return;
       }
 
       const theme = extractCurrentThemeParams();
       actions.requestSimpleWebView({
-        url, botId: sender.id, theme, buttonText: button.text, tabId,
+        url, botId, theme, buttonText: button.text, tabId,
       });
       break;
     }
@@ -267,7 +271,7 @@ addActionHandler('clickBotInlineButton', (global, actions, payload): ActionRetur
     case 'webView': {
       const { url } = button.action;
       const sender = selectSender(global, message);
-      const botId = message.viaBotId || sender?.id;
+      const botId = message.ephemeralBotId || message.viaBotId || sender?.id;
       if (!botId) {
         return;
       }
@@ -276,6 +280,7 @@ addActionHandler('clickBotInlineButton', (global, actions, payload): ActionRetur
         url,
         botId,
         peerId: chat.id,
+        threadId: threadId ?? selectThreadIdFromMessage(global, message),
         theme,
         buttonText: button.text,
         tabId,
@@ -299,19 +304,16 @@ addActionHandler('clickBotInlineButton', (global, actions, payload): ActionRetur
 
 addActionHandler('sendBotCommand', (global, actions, payload): ActionReturnType => {
   const {
-    command, chatId, botId, tabId = getCurrentTabId(),
+    command, chatId, threadId, botId,
   } = payload;
-  const chat = chatId ? selectChat(global, chatId) : selectCurrentChat(global, tabId);
-  const currentMessageList = selectCurrentMessageList(global, tabId);
-
-  if (!chat || !currentMessageList) {
+  const chat = selectChat(global, chatId);
+  if (!chat) {
     return;
   }
 
-  const { threadId } = currentMessageList;
   const draftReplyInfo = selectDraft(global, chat.id, threadId)?.replyInfo;
-  actions.resetDraftReplyInfo({ tabId });
-  actions.clearWebPagePreview({ tabId });
+  actions.resetDraftReplyInfo({ chatId, threadId });
+  actions.clearWebPagePreview({ chatId, threadId });
 
   const lastMessageId = selectChatLastMessageId(global, chat.id);
   const ephemeralCommand = draftReplyInfo?.type !== 'ephemeral'
@@ -364,6 +366,8 @@ addActionHandler('restartBot', async (global, actions, payload): Promise<void> =
   }
 
   const lastMessageId = selectChatLastMessageId(global, chat.id);
+  const { pendingBotStart } = selectTabState(global, tabId);
+  const startParam = pendingBotStart?.botId === bot.id ? pendingBotStart.param : undefined;
 
   const result = await callApi('unblockUser', { user: bot });
   if (!result) {
@@ -372,7 +376,12 @@ addActionHandler('restartBot', async (global, actions, payload): Promise<void> =
 
   global = getGlobal();
   global = removeBlockedUser(global, bot.id);
+  global = updateTabState(global, { pendingBotStart: undefined }, tabId);
   setGlobal(global);
+  if (startParam) {
+    void callApi('startBot', { bot, startParam });
+    return;
+  }
   void sendBotCommand(chat, MAIN_THREAD_ID, '/start', undefined, selectSendAs(global, chatId), lastMessageId);
 });
 
@@ -506,8 +515,8 @@ addActionHandler('sendInlineBotResult', async (global, actions, payload): Promis
   const replyInfo = selectMessageReplyInfo(global, chatId, threadId, draftReplyInfo);
   if (replyInfo?.type === 'ephemeral') return;
 
-  actions.resetDraftReplyInfo({ tabId });
-  actions.clearWebPagePreview({ tabId });
+  actions.resetDraftReplyInfo({ chatId, threadId });
+  actions.clearWebPagePreview({ chatId, threadId });
 
   const diamondsForOneMessage = await getPeerDiamondsForMessage(global, chatId);
   const params = {
@@ -583,10 +592,10 @@ addActionHandler('resetAllInlineBots', (global, actions, payload): ActionReturnT
 
 addActionHandler('startBot', async (global, actions, payload): Promise<void> => {
   const {
-    botId, chatId, param,
+    botId, chatId, param, tabId = getCurrentTabId(),
   } = payload;
 
-  const bot = selectUser(global, botId);
+  const bot = selectBot(global, botId);
   const chat = chatId ? selectChat(global, chatId) : undefined;
   if (!bot || (chatId && !chat)) {
     return;
@@ -603,6 +612,9 @@ addActionHandler('startBot', async (global, actions, payload): Promise<void> => 
   }
 
   if (!chat) {
+    global = getGlobal();
+    global = updateTabState(global, { pendingBotStart: undefined }, tabId);
+    setGlobal(global);
     await callApi('startBot', {
       bot,
       startParam: param,
@@ -714,7 +726,7 @@ addActionHandler('requestSimpleWebView', async (global, actions, payload): Promi
 
 addActionHandler('requestWebView', async (global, actions, payload): Promise<void> => {
   const {
-    url, botId, peerId, theme, isSilent, buttonText, isFromBotMenu, startParam, isFullscreen,
+    url, botId, peerId, threadId, theme, isSilent, buttonText, isFromBotMenu, startParam, isFullscreen,
     tabId = getCurrentTabId(),
   } = payload;
 
@@ -740,15 +752,12 @@ addActionHandler('requestWebView', async (global, actions, payload): Promise<voi
     return;
   }
 
-  const currentMessageList = selectCurrentMessageList(global, tabId);
-
-  const { chatId, threadId = MAIN_THREAD_ID } = currentMessageList || {};
-  const draftReplyInfo = chatId ? selectDraft(global, chatId, threadId)?.replyInfo : undefined;
-  const replyInfo = chatId && draftReplyInfo?.type !== 'ephemeral'
-    ? selectMessageReplyInfo(global, chatId, threadId, draftReplyInfo) : undefined;
+  const draftReplyInfo = selectDraft(global, peerId, threadId)?.replyInfo;
+  const replyInfo = draftReplyInfo?.type !== 'ephemeral'
+    ? selectMessageReplyInfo(global, peerId, threadId, draftReplyInfo) : undefined;
   if (replyInfo?.type === 'ephemeral') return;
 
-  const sendAs = chatId ? selectSendAs(global, chatId) : undefined;
+  const sendAs = selectSendAs(global, peerId);
   const result = await callApi('requestWebView', {
     url,
     bot,
@@ -776,6 +785,7 @@ addActionHandler('requestWebView', async (global, actions, payload): Promise<voi
     appName: bot.firstName,
     botId,
     peerId,
+    threadId,
     queryId,
     isSameOrigin,
     replyInfo,
@@ -1255,6 +1265,7 @@ addActionHandler('callAttachBot', (global, actions, payload): ActionReturnType =
     actions.requestWebView({
       url,
       peerId: chatId,
+      threadId,
       botId: (isFromBotMenu ? chatId : bot.id),
       theme,
       buttonText: '',
@@ -1594,10 +1605,11 @@ async function sendBotCommand(
 async function answerCallbackButton<T extends GlobalState>(
   global: T,
   {
-    chat, messageId, threadId, data, isGame, isEphemeral,
+    chat, messageId, botId, threadId, data, isGame, isEphemeral,
   }: {
     chat: ApiChat;
     messageId: number;
+    botId?: string;
     threadId?: ThreadId;
     data?: string;
     isGame?: true;
@@ -1628,9 +1640,14 @@ async function answerCallbackButton<T extends GlobalState>(
   }
   const { message, alert: isError, url } = result;
 
-  if (isError) {
+  if (isError && message) {
+    // Attribute the alert to the bot so it can't pose as a client error
+    global = getGlobal();
+    const lang = getTranslationFn();
+    const bot = botId ? selectPeer(global, botId) : undefined;
+    const title = (bot && getPeerFullTitle(lang, bot)) || lang('Bot');
     showDialog({
-      data: message ? { type: 'error', message } : { type: 'localized', text: { key: 'ErrorUnspecified' } },
+      data: { type: 'message', title, text: { text: message } },
       tabId,
     });
   } else if (message) {

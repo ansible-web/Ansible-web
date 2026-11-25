@@ -1,6 +1,6 @@
 import type { ThreadId } from '../types';
 
-import { RE_TG_LINK, RE_TME_LINK } from '../config';
+import { RE_TG_LINK, RE_TME_LINK, TME_WEB_DOMAINS } from '../config';
 import { IS_BAD_URL_PARSER } from './browser/globalEnvironment';
 import { ensureProtocol } from './browser/url';
 import { parseTimestampDuration } from './dates/timestamp';
@@ -111,6 +111,12 @@ interface PublicUsernameOrBotLink {
   noPaidMessagesToken?: string;
 }
 
+interface GroupCallLink {
+  type: 'groupCallLink';
+  username: string;
+  inviteHash?: string;
+}
+
 interface PrivateChannelLink {
   type: 'privateChannelLink';
   channelId: string;
@@ -186,6 +192,7 @@ type DeepLink = LanguageLink
   | ShareLink
   | ChatFolderLink
   | PublicUsernameOrBotLink
+  | GroupCallLink
   | PrivateChannelLink
   | BusinessChatLink
   | PremiumReferrerLink
@@ -220,7 +227,11 @@ type OAuthLinkBuilderParams = Omit<BuilderParams<OAuthLink>, 'url'> & {
   url: string;
 };
 
-const ELIGIBLE_HOSTNAMES = new Set(['asme.su']);
+const TME_HOSTNAMES = new Set([...TME_WEB_DOMAINS, 'www.asme.su']);
+const RE_HTTP_PROTOCOL = /^https?:/i;
+const RE_TG_SLASHES_PROTOCOL = /^as:\/\//i;
+const TME_SUBDOMAIN_SUFFIX = '.asme.su';
+const SUBDOMAIN_LINK_TYPES = new Set<DeepLinkType>(['publicUsernameOrBotLink', 'publicMessageLink', 'groupCallLink']);
 const MAX_BOT_START_PARAMETER_LENGTH = 64;
 
 // A `tc:` link is only followed as a platform deep link, never from message content
@@ -252,12 +263,12 @@ function parseDeepLink(url: string) {
   if (!correctUrl) {
     return undefined;
   }
-  if (correctUrl.startsWith('https:') || correctUrl.startsWith('http:')) {
+  if (RE_HTTP_PROTOCOL.test(correctUrl)) {
     const urlParsed = new URL(correctUrl);
     return parseHttpLink(urlParsed);
   }
-  if (correctUrl.startsWith('as:')) {
-    const urlToParse = IS_BAD_URL_PARSER ? correctUrl.replace(/^as:\/\//, 'https://') : correctUrl;
+  if (RE_TG_LINK.test(correctUrl)) {
+    const urlToParse = IS_BAD_URL_PARSER ? correctUrl.replace(RE_TG_SLASHES_PROTOCOL, 'https://') : correctUrl;
     const urlParsed = new URL(urlToParse);
     return parseTgLink(urlParsed);
   }
@@ -331,6 +342,11 @@ function parseTgLink(url: URL) {
         direct: queryParams.direct,
         noPaidMessagesToken: queryParams.free,
       });
+    case 'groupCallLink':
+      return buildGroupCallLink({
+        username: queryParams.domain,
+        inviteHash: getGroupCallInviteHash(queryParams),
+      });
     case 'privateChannelLink': {
       return buildPrivateChannelLink({ channelId: queryParams.channel });
     }
@@ -368,9 +384,14 @@ function parseTgLink(url: URL) {
   return undefined;
 }
 
-function parseHttpLink(url: URL) {
-  if (!ELIGIBLE_HOSTNAMES.has(url.hostname)) {
-    return undefined;
+function parseHttpLink(url: URL): DeepLink | undefined {
+  if (!TME_HOSTNAMES.has(url.hostname)) {
+    const subdomainUsername = getTmeSubdomainUsername(url.hostname);
+    if (!subdomainUsername) {
+      return undefined;
+    }
+    const link = parseHttpLink(new URL(`https://asme.su/${subdomainUsername}${url.pathname}${url.search}`));
+    return link && SUBDOMAIN_LINK_TYPES.has(link.type) ? link : undefined;
   }
   const queryParams = getQueryParams(url);
   const pathParams = getPathParams(url);
@@ -454,6 +475,11 @@ function parseHttpLink(url: URL) {
         direct: queryParams.direct,
         noPaidMessagesToken: queryParams.free,
       });
+    case 'groupCallLink':
+      return buildGroupCallLink({
+        username: pathParams[0],
+        inviteHash: getGroupCallInviteHash(queryParams),
+      });
     case 'privateChannelLink': {
       return buildPrivateChannelLink({ channelId: pathParams[1] });
     }
@@ -500,6 +526,7 @@ function getHttpDeepLinkType(
 ): DeepLinkType {
   const len = pathParams.length;
   const method = pathParams[0];
+  const hasGroupCall = getGroupCallInviteHash(queryParams) !== undefined;
   if (method === 'setlanguage') return len === 2 ? 'languageLink' : 'unknown';
   if (len === 1) {
     if (method === 'share') return 'shareLink';
@@ -507,7 +534,7 @@ function getHttpDeepLinkType(
     if (method === 'boost' || queryParams.boost !== undefined) return 'chatBoostLink';
 
     if (isUsernameValid(method)) {
-      return 'publicUsernameOrBotLink';
+      return hasGroupCall ? 'groupCallLink' : 'publicUsernameOrBotLink';
     }
   } else if (len === 2) {
     if (method === 'addlist') return 'chatFolderLink';
@@ -523,7 +550,7 @@ function getHttpDeepLinkType(
     }
 
     if (isUsernameValid(pathParams[0]) && isNumber(pathParams[1])) {
-      return 'publicMessageLink';
+      return hasGroupCall ? 'groupCallLink' : 'publicMessageLink';
     }
     if (method === 'newbot') return 'newBotLink';
   } else if (len === 3) {
@@ -531,7 +558,7 @@ function getHttpDeepLinkType(
       return 'privateMessageLink';
     }
     if (isUsernameValid(pathParams[0]) && pathParams.slice(1).every(isNumber)) {
-      return 'publicMessageLink';
+      return hasGroupCall ? 'groupCallLink' : 'publicMessageLink';
     }
     if (method === 'nft') return 'giftUniqueLink';
     if (method === 'newbot') return 'newBotLink';
@@ -562,11 +589,9 @@ function getTgDeepLinkType(
         return 'oauth';
       }
 
-      if (domain && post) {
-        return 'publicMessageLink';
-      }
-      if (isUsernameValid(domain)) {
-        return 'publicUsernameOrBotLink';
+      if (domain && isUsernameValid(domain)) {
+        if (getGroupCallInviteHash(queryParams) !== undefined) return 'groupCallLink';
+        return post ? 'publicMessageLink' : 'publicUsernameOrBotLink';
       }
       break;
     }
@@ -793,6 +818,19 @@ function normalizeBotStartGroup(startGroup?: string) {
   return '';
 }
 
+function buildGroupCallLink(params: BuilderParams<GroupCallLink>): BuilderReturnType<GroupCallLink> {
+  const { username, inviteHash } = params;
+  if (!username || !isUsernameValid(username)) {
+    return undefined;
+  }
+
+  return {
+    type: 'groupCallLink',
+    username,
+    inviteHash: inviteHash || undefined,
+  };
+}
+
 function buildPrivateChannelLink(params: BuilderParams<PrivateChannelLink>): BuilderReturnType<PrivateChannelLink> {
   const {
     channelId,
@@ -942,6 +980,18 @@ function buildPremiumMultigiftLink(
 
 function isNumber(s: string) {
   return /^-?\d+$/.test(s);
+}
+
+function getGroupCallInviteHash(queryParams: Record<string, string>) {
+  return queryParams.livestream ?? queryParams.videochat ?? queryParams.voicechat;
+}
+
+function getTmeSubdomainUsername(hostname: string) {
+  if (!hostname.endsWith(TME_SUBDOMAIN_SUFFIX)) {
+    return undefined;
+  }
+  const subdomain = hostname.slice(0, -TME_SUBDOMAIN_SUFFIX.length);
+  return isUsernameValid(subdomain) ? subdomain : undefined;
 }
 
 function getPathParams(url: URL) {

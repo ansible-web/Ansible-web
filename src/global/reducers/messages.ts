@@ -79,7 +79,7 @@ export function updateCurrentMessageList<T extends GlobalState>(
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ): T {
   const {
-    messageLists, globalThemePreviewChatId, aiMessageEditorModal, aiMessageEditorPendingResult,
+    messageLists, globalThemePreviewChatId, aiMessageEditorModal, aiMessageEditorPendingResult, pendingBotStart,
   } = selectTabState(global, tabId);
   let newMessageLists: MessageList[];
   if (shouldReplaceHistory || IS_TEST) {
@@ -113,6 +113,7 @@ export function updateCurrentMessageList<T extends GlobalState>(
   return updateTabState(global, {
     messageLists: newMessageLists,
     globalThemePreviewChatId: nextList?.chatId === globalThemePreviewChatId ? globalThemePreviewChatId : undefined,
+    pendingBotStart: nextList?.chatId === pendingBotStart?.botId ? pendingBotStart : undefined,
     aiMessageEditorModal: hasChanged ? undefined : aiMessageEditorModal,
     aiMessageEditorPendingResult: hasChanged ? undefined : aiMessageEditorPendingResult,
   }, tabId);
@@ -217,7 +218,11 @@ export function updateEphemeralMessage<T extends GlobalState>(
   let ephemeralById = store?.ephemeralById || {};
   if (message.anchorMsgId) {
     const anchor = selectChatMessage(global, message.chatId, message.anchorMsgId);
-    if (anchor && (anchor.content.action || anchor.groupedId || anchor.isDeleting)) return global;
+    if (anchor && (
+      anchor.content.action || anchor.groupedId || anchor.isDeleting
+      // The overlay keeps the anchor's sender, so a bot may only stand in for its own messages
+      || (anchor.senderId !== message.ephemeralBotId && anchor.viaBotId !== message.ephemeralBotId)
+    )) return global;
 
     const previous = Object.values(ephemeralById).find(({ anchorMsgId }) => anchorMsgId === message.anchorMsgId);
     if (previous && previous.id !== message.id) {

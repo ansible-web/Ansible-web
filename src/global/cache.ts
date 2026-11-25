@@ -35,6 +35,7 @@ import {
   SHARED_STATE_CACHE_KEY,
   TON_CURRENCY_CODE,
 } from '../config';
+import { buildColor, serializeColor } from '../lib/color';
 import { MAIN_IDB_STORE } from '../util/browser/idb';
 import { isUserId } from '../util/entities/ids';
 import { getOrderedIds } from '../util/folderManager';
@@ -84,6 +85,7 @@ const LEGACY_DARK_THEME_PATTERN_COLOR = '#48576166';
 const SHARED_STATE_PATTERN_COLORS_CACHE_VERSION = 3;
 const SHARED_STATE_V1_LIGHT_PATTERN_COLOR = '#77854b66';
 const SHARED_STATE_V1_DARK_PATTERN_COLOR = '#27308a66';
+const SHARED_STATE_HEX_PATTERN_COLORS_CACHE_VERSION = 5;
 const updateCacheThrottled = throttle(() => onFullyIdle(() => updateCache()), UPDATE_THROTTLE, false);
 const updateCacheForced = () => updateCache(true);
 
@@ -330,6 +332,31 @@ export function migrateSharedCache(
     };
   }
 
+  if (cacheVersion < SHARED_STATE_HEX_PATTERN_COLORS_CACHE_VERSION) {
+    // Older versions saved `patternColor` as `hsla(...)`, while the wallpaper helpers expect hex
+    const themes = cloneThemeSettings(migrated.settings.themes);
+    (['light', 'dark'] as const).forEach((theme) => {
+      const patternColor = themes[theme]?.patternColor;
+      if (!patternColor || patternColor.startsWith('#')) return;
+
+      try {
+        themes[theme]!.patternColor = serializeColor(
+          buildColor(patternColor), { format: 'hex', collapse: false, alpha: true },
+        );
+      } catch {
+        themes[theme]!.patternColor = getDefaultPatternColor(theme);
+      }
+    });
+
+    migrated = {
+      ...migrated,
+      settings: {
+        ...migrated.settings,
+        themes,
+      },
+    };
+  }
+
   return migrated;
 }
 
@@ -421,6 +448,10 @@ function unsafeMigrateCache(cached: GlobalState, initialState: GlobalState) {
 
   if (cachedSharedSettings.shouldReplaceTextShortcuts === undefined) {
     cachedSharedSettings.shouldReplaceTextShortcuts = true;
+  }
+
+  if (!cachedSharedSettings.keyboardShortcuts) {
+    cachedSharedSettings.keyboardShortcuts = {};
   }
 
   if (cached.appConfig.webAppAllowedProtocols === undefined) {
@@ -939,6 +970,7 @@ function reduceMessages<T extends GlobalState>(global: T): GlobalState['messages
           ...thread.localState,
           listedIds: thread.localState?.lastViewportIds,
           draft: thread.localState?.draft,
+          webPagePreviewId: undefined,
           typingStatusByPeerId: undefined,
         },
       };

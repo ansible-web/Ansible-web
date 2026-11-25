@@ -34,6 +34,7 @@ import { copyTextToClipboard } from '../../../util/clipboard';
 import { bufferToHex } from '../../../util/encoding/buffer';
 import { isLocalMessageId } from '../../../util/keys/messageKey';
 import loadWidgetSandbox from '../../../util/loadWidgetSandbox';
+import { getOpenModalCount } from '../../../util/openModals';
 import trimText from '../../../util/text/trimText';
 import { extractCurrentThemeParams, prepareHexColor } from '../../../util/themeStyle';
 import {
@@ -269,7 +270,7 @@ function Widget({
     const global = getGlobal();
     if (!isVisible || isInSelectMode || global.currentUserId !== accountId || global.passcode.isScreenLocked) return;
     // One dialog at a time: a link that arrives while one is shown is dropped. Web ignores haptics.
-    if (document.querySelector('.Modal')) return;
+    if (getOpenModalCount()) return;
     if (action.kind === 'openLink') {
       toggleSafeLinkModal({ url: action.url, isWidget: true });
     } else if (action.kind === 'openTelegramLink') {

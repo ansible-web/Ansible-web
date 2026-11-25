@@ -8,6 +8,7 @@ import type {
 import { requestNextMutation } from '../../../lib/fasterdom/fasterdom';
 import { ARE_CALLS_SUPPORTED } from '../../../util/browser/windowEnvironment';
 import { copyTextToClipboard } from '../../../util/clipboard';
+import { isUserId } from '../../../util/entities/ids';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { omit } from '../../../util/iteratees';
 import safePlay from '../../../util/safePlay';
@@ -17,7 +18,7 @@ import {
   addActionHandler, getGlobal,
   setGlobal,
 } from '../../index';
-import { updateGroupCall } from '../../reducers/calls';
+import { removeGroupCall, updateGroupCall } from '../../reducers/calls';
 import { updateTabState } from '../../reducers/tabs';
 import {
   selectChat, selectChatFullInfo, selectIsCurrentUserFrozen,
@@ -98,6 +99,12 @@ async function fetchGroupCall<T extends GlobalState>(global: T, groupCall: Parti
   if (!result) return undefined;
 
   global = getGlobal();
+
+  if (result.groupCall.connectionState === 'discarded') {
+    global = removeGroupCall(global, groupCall.id!);
+    setGlobal(global);
+    return result.groupCall;
+  }
 
   const existingGroupCall = selectGroupCall(global, groupCall.id!);
 
@@ -203,17 +210,52 @@ addActionHandler('joinVoiceChatByLink', async (global, actions, payload): Promis
     return;
   }
 
+  actions.openChat({ id: chat.id, tabId });
+  if (isUserId(chat.id)) return;
+
   global = getGlobal();
   const full = await loadFullChat(global, actions, chat);
+  if (!full) return;
 
-  if (full?.groupCall) {
+  const { groupCall } = full;
+  if (!groupCall) {
+    actions.showNotification({ message: { key: 'GroupInviteBadLink' }, tabId });
+    return;
+  }
+
+  global = getGlobal();
+  if (groupCall.id === global.groupCalls.activeGroupCallId || global.phoneCall) {
     actions.requestMasterAndJoinGroupCall({
-      id: full.groupCall.id,
-      accessHash: full.groupCall.accessHash,
+      id: groupCall.id,
+      accessHash: groupCall.accessHash,
       inviteHash,
       tabId,
     });
+    return;
   }
+
+  if (!ARE_CALLS_SUPPORTED) {
+    actions.showNotification({ message: { key: 'GroupCallsUnsupported' }, tabId });
+    return;
+  }
+
+  global = updateTabState(global, {
+    joinGroupCallModal: {
+      chatId: chat.id,
+      id: groupCall.id!,
+      accessHash: groupCall.accessHash!,
+      inviteHash,
+    },
+  }, tabId);
+  setGlobal(global);
+});
+
+addActionHandler('closeJoinGroupCallModal', (global, actions, payload): ActionReturnType => {
+  const { tabId = getCurrentTabId() } = payload || {};
+
+  return updateTabState(global, {
+    joinGroupCallModal: undefined,
+  }, tabId);
 });
 
 addActionHandler('requestMasterAndJoinGroupCall', (global, actions, payload): ActionReturnType => {
@@ -258,10 +300,40 @@ addActionHandler('joinGroupCall', async (global, actions, payload): Promise<void
   global = getGlobal();
   void checkNavigatorUserMediaPermissions(global, actions, true, tabId);
 
-  const { groupCalls: { activeGroupCallId } } = global;
   let groupCall = id ? selectGroupCall(global, id) : selectChatGroupCall(global, chatId!);
 
-  if (groupCall && groupCall.id === activeGroupCallId) {
+  if (groupCall && groupCall.id === global.groupCalls.activeGroupCallId) {
+    actions.toggleGroupCallPanel({ tabId });
+    return;
+  }
+
+  const isInAnotherCall = Boolean(global.groupCalls.activeGroupCallId);
+
+  if (!groupCall && (!id || !accessHash) && chatId) {
+    const chat = selectChat(global, chatId);
+
+    if (!chat) return;
+
+    await loadFullChat(global, actions, chat);
+    global = getGlobal();
+    groupCall = selectChatGroupCall(global, chatId);
+  }
+
+  if (groupCall ? !groupCall.isLoaded || isInAnotherCall : id && accessHash) {
+    groupCall = await fetchGroupCall(global, groupCall || { id, accessHash });
+  }
+
+  if (!groupCall) return;
+
+  if (groupCall.connectionState === 'discarded') {
+    actions.showNotification({ message: { key: 'VoiceChatInactive' }, tabId });
+    return;
+  }
+
+  global = getGlobal();
+  const { activeGroupCallId } = global.groupCalls;
+
+  if (groupCall.id === activeGroupCallId) {
     actions.toggleGroupCallPanel({ tabId });
     return;
   }
@@ -276,29 +348,6 @@ addActionHandler('joinGroupCall', async (global, actions, payload): Promise<void
     return;
   }
 
-  if (groupCall && activeGroupCallId === groupCall.id) {
-    actions.toggleGroupCallPanel({ tabId });
-    return;
-  }
-
-  if (!groupCall && (!id || !accessHash) && chatId) {
-    const chat = selectChat(global, chatId);
-
-    if (!chat) return;
-
-    await loadFullChat(global, actions, chat);
-    global = getGlobal();
-    groupCall = selectChatGroupCall(global, chatId);
-  } else if (!groupCall && id && accessHash) {
-    groupCall = await fetchGroupCall(global, {
-      id,
-      accessHash,
-    });
-  }
-
-  if (!groupCall) return;
-
-  global = getGlobal();
   global = updateGroupCall(
     global,
     groupCall.id,

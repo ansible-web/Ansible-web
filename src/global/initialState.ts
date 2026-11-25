@@ -75,7 +75,7 @@ export const INITIAL_PERFORMANCE_STATE_MIN: PerformanceType = {
   textStreaming: false,
 };
 
-export const SHARED_STATE_CACHE_VERSION = 4;
+export const SHARED_STATE_CACHE_VERSION = 5;
 
 const PREFERS_REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -101,6 +101,7 @@ export const INITIAL_SHARED_STATE: SharedState = {
     animationLevel: PREFERS_REDUCED_MOTION ? ANIMATION_LEVEL_MIN : ANIMATION_LEVEL_DEFAULT,
     foldersPosition: FOLDERS_POSITION_DEFAULT,
     messageSendKeyCombo: 'enter',
+    keyboardShortcuts: {},
     shouldReplaceTextShortcuts: true,
     performance: PREFERS_REDUCED_MOTION ? INITIAL_PERFORMANCE_STATE_MIN : INITIAL_PERFORMANCE_STATE_MAX,
     shouldSkipBrowserCloseConfirmation: false,

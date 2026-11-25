@@ -10,6 +10,14 @@ Authors.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.3] - Unreleased
+
+- Integrate Telegram Web A 13.0.2 through `4566a14adb` (API layer 233).
+- Add keyboard shortcut settings, WebGPU spoilers, a startup skeleton and
+  confirmation when joining a group call from an Ansible link.
+- Update resumable downloads, media content-type handling and widget CSS parsing.
+- Preserve Ansible's DC keys, Diamonds, QR login and scrolled-up chat history.
+
 ## [0.4.2] - Unreleased
 
 ### Changed

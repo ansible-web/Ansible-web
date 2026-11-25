@@ -1,7 +1,9 @@
 import type { EmojiFitzModifier } from '../../util/emoji/skinTone';
 import type { CancellableCallback } from '../../util/PostMessageConnector';
+import type { GpuCanvasFrame } from '../gpuCanvas/types';
 
 import { createWorkerInterface } from '../../util/createPostMessageInterface';
+import { readStreamWithLimit } from '../../util/encoding/readStreamWithLimit';
 import simdWasmUrl from './tlottie.wasm?url';
 import noSimdWasmUrl from './tlottie-no-simd.wasm?url';
 
@@ -31,6 +33,8 @@ interface TLottieExports {
 const HIGH_PRIORITY_MAX_FPS = 60;
 const LOW_PRIORITY_MAX_FPS = 30;
 const RGBA_BYTES_PER_PIXEL = 4;
+// Same cap as Telegram iOS, macOS and tweb; guards against gzip bombs
+const MAX_DECOMPRESSED_SIZE = 8 * 1024 * 1024;
 // This module uses `i8x16.splat` and `i8x16.popcnt` to detect SIMD support
 const SIMD_TEST = new Uint8Array([
   0x00, 0x61, 0x73, 0x6D, 0x01, 0x00, 0x00, 0x00,
@@ -66,6 +70,7 @@ const renderers = new Map<string, {
   customColor?: [number, number, number];
 }>();
 const rendererOperations = new Map<string, Promise<unknown>>();
+let gpuCanvasPort: MessagePort | undefined;
 
 async function init(
   key: string,
@@ -146,8 +151,7 @@ async function fetchAnimationData(tgsUrl: string) {
 
   // Prefer native gzip decompression over library. This use case has ~same speed
   const decompressionStream = response.body.pipeThrough(new DecompressionStream('gzip'));
-  const result = await new Response(decompressionStream).arrayBuffer();
-  return new Uint8Array(result);
+  return await readStreamWithLimit(decompressionStream, MAX_DECOMPRESSED_SIZE) || new Uint8Array(0);
 }
 
 function createInstance(animationData: Uint8Array, fitzModifier?: EmojiFitzModifier) {
@@ -180,8 +184,9 @@ function calcParams(instance: number, isLowPriority: boolean) {
   };
 }
 
+// A frame for the GPU canvas goes to its worker, and the origin only learns that it is ready
 async function renderFrames(
-  key: string, frameIndex: number, onProgress: CancellableCallback,
+  key: string, frameIndex: number, gpuGeneration: number | undefined, onProgress: CancellableCallback,
 ) {
   if (!tlottie) {
     await tlottiePromise;
@@ -200,7 +205,18 @@ async function renderFrames(
     return;
   }
 
-  imageData.data.set(new Uint8Array(tlottie!.memory.buffer, pixelsPtr, imgSize * imgSize * RGBA_BYTES_PER_PIXEL));
+  const pixels = new Uint8Array(tlottie!.memory.buffer, pixelsPtr, imgSize * imgSize * RGBA_BYTES_PER_PIXEL);
+
+  if (gpuGeneration !== undefined) {
+    const { buffer } = pixels.slice();
+    gpuCanvasPort!.postMessage({
+      renderId: key, generation: gpuGeneration, frameIndex, size: imgSize, pixels: buffer,
+    } satisfies GpuCanvasFrame, [buffer]);
+    onProgress(frameIndex);
+    return;
+  }
+
+  imageData.data.set(pixels);
 
   const imageBitmap = await createImageBitmap(imageData);
 
@@ -209,6 +225,10 @@ async function renderFrames(
 
 function packColor([r, g, b]: [number, number, number]) {
   return (r << 16) | (g << 8) | b;
+}
+
+function connectGpuCanvas(port: MessagePort) {
+  gpuCanvasPort = port;
 }
 
 function destroy(key: string) {
@@ -249,6 +269,7 @@ const api = {
     enqueueRendererOperation(args[0], () => renderFrames(...args))
   ),
   'tlottie:destroy': (key: string) => enqueueRendererOperation(key, () => destroy(key)),
+  'tlottie:connectGpuCanvas': connectGpuCanvas,
 };
 
 createWorkerInterface(api, 'media');

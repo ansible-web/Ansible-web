@@ -63,7 +63,7 @@ import {
 } from '../../helpers';
 import { getRequestInputSavedDiamondGift } from '../../helpers/payments';
 import {
-  addActionHandler, getActions, getGlobal, setGlobal,
+  addActionHandler, getActions, getGlobal, getPromiseActions, setGlobal,
 } from '../../index';
 import {
   addChatListIds,
@@ -117,6 +117,7 @@ import {
   updateThreadReadState,
 } from '../../reducers/threads';
 import {
+  selectBot,
   selectCanOpenMessageList,
   selectChat,
   selectChatByUsername,
@@ -128,6 +129,7 @@ import {
   selectChatMessages,
   selectCurrentChat,
   selectCurrentMessageList,
+  selectIsChatBotNotStarted,
   selectIsChatPinned,
   selectIsChatWithSelf,
   selectIsCurrentUserFrozen,
@@ -1784,7 +1786,6 @@ addActionHandler('openAnsibleLink', async (global, actions, payload): Promise<vo
     checkChatInvite,
     openStickerSet,
     openChatWithDraft,
-    joinVoiceChatByLink,
     openInvoice,
     checkChatlistInvite,
     openChatByUsername: openChatByUsernameAction,
@@ -1896,13 +1897,7 @@ addActionHandler('openAnsibleLink', async (global, actions, payload): Promise<vo
 
   const shouldTryOpenChat = (part1 && !part2) || Number.isInteger(Number(part2)) || isWebApp;
 
-  if (params.hasOwnProperty('voicechat') || params.hasOwnProperty('livestream')) {
-    joinVoiceChatByLink({
-      username: part1,
-      inviteHash: params.voicechat || params.livestream,
-      tabId,
-    });
-  } else if (part1.startsWith('$')) {
+  if (part1.startsWith('$')) {
     openInvoice({
       type: 'slug',
       slug: part1.substring(1),
@@ -2001,8 +1996,8 @@ addActionHandler('acceptChatInvite', async (global, actions, payload): Promise<v
 
 addActionHandler('openChatByUsername', async (global, actions, payload): Promise<void> => {
   const {
-    username, messageId, commentId, startParam, startGroup, startAttach, attach, threadId, originalParts,
-    startApp, shouldStartMainApp, mode, isDirect,
+    username, messageId, commentId, startParam, shouldStartBot, startGroup, startAttach, attach, threadId,
+    originalParts, startApp, shouldStartMainApp, mode, isDirect,
     text, onChatChanged, choose, ref, timestamp, linkContext, noPaidMessagesToken,
     tabId = getCurrentTabId(),
   } = payload;
@@ -2063,6 +2058,7 @@ addActionHandler('openChatByUsername', async (global, actions, payload): Promise
           threadId,
           channelPostId: messageId,
           startParam,
+          shouldStartBot,
           ref,
           startAttach,
           attach,
@@ -4151,6 +4147,7 @@ async function openChatByUsername<T extends GlobalState>(
     threadId?: ThreadId;
     channelPostId?: number;
     startParam?: string;
+    shouldStartBot?: boolean;
     ref?: string;
     startAttach?: string;
     attach?: string;
@@ -4163,7 +4160,7 @@ async function openChatByUsername<T extends GlobalState>(
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ) {
   const {
-    username, threadId, channelPostId, startParam, ref, startAttach, attach, text, timestamp,
+    username, threadId, channelPostId, startParam, shouldStartBot, ref, startAttach, attach, text, timestamp,
     linkContext, isDirect, noPaidMessagesToken,
   } = params;
   const currentChat = selectCurrentChat(global, tabId);
@@ -4231,6 +4228,7 @@ async function openChatByUsername<T extends GlobalState>(
     threadId,
     messageId: channelPostId,
     startParam,
+    shouldStartBot,
     referrer,
     startAttach,
     attach,
@@ -4314,6 +4312,7 @@ async function openChatWithParams<T extends GlobalState>(
     threadId?: ThreadId;
     messageId?: number;
     startParam?: string;
+    shouldStartBot?: boolean;
     referrer?: string;
     startAttach?: string;
     attach?: string;
@@ -4324,7 +4323,7 @@ async function openChatWithParams<T extends GlobalState>(
   ...[tabId = getCurrentTabId()]: TabArgs<T>
 ) {
   const {
-    isCurrentChat, threadId, messageId, startParam, referrer, startAttach, attach, text, timestamp,
+    isCurrentChat, threadId, messageId, startParam, shouldStartBot, referrer, startAttach, attach, text, timestamp,
     linkContext,
   } = params;
 
@@ -4356,8 +4355,25 @@ async function openChatWithParams<T extends GlobalState>(
     actions.openThread({ chatId: chat.id, threadId: threadId ?? MAIN_THREAD_ID, tabId });
   }
 
-  if (startParam && !referrer) {
-    actions.startBot({ botId: chat.id, param: startParam, tabId });
+  global = getGlobal();
+  const bot = selectBot(global, chat.id);
+  if (bot && startParam && !referrer) {
+    const pendingBotStart = { botId: bot.id, param: startParam };
+    global = updateTabState(global, { pendingBotStart }, tabId);
+    setGlobal(global);
+
+    if (!selectUserFullInfo(global, bot.id)) {
+      await getPromiseActions().loadFullUser({ userId: bot.id });
+    }
+    global = getGlobal();
+    const fullInfo = selectUserFullInfo(global, bot.id);
+
+    // Pending start is cleared if the user pressed START or left the chat while loading
+    const canStartAtOnce = selectTabState(global, tabId).pendingBotStart === pendingBotStart && (shouldStartBot
+      || (fullInfo && !fullInfo.isBlocked && !selectIsChatBotNotStarted(global, bot.id)));
+    if (canStartAtOnce) {
+      actions.startBot({ botId: bot.id, param: startParam, tabId });
+    }
   }
 
   if (attach) {

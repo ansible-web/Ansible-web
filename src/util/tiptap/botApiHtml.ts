@@ -660,10 +660,8 @@ function parseStoredRichText(value?: string): ApiRichText | undefined {
   if (!value) return undefined;
 
   try {
-    const richText = JSON.parse(value) as Partial<ApiRichText>;
-    return richText && typeof richText === 'object' && typeof richText.type === 'string'
-      ? richText as ApiRichText
-      : undefined;
+    const richText: unknown = JSON.parse(value);
+    return isApiRichText(richText) ? richText : undefined;
   } catch {
     return undefined;
   }
@@ -733,10 +731,9 @@ function normalizeCustomEmoji(element: HTMLElement) {
 }
 
 function normalizeRenderedTable(table: HTMLTableElement) {
-  const wrapper = table.parentElement?.matches('[data-rich-block-type="table"]')
-    ? table.parentElement
-    : undefined;
-  const title = wrapper?.querySelector<HTMLElement>(':scope > [data-rich-block-type="tableTitle"]');
+  // A table with a GPU canvas has its content wrapped
+  const wrapper = table.closest<HTMLElement>('[data-rich-block-type="table"]') || undefined;
+  const title = wrapper?.querySelector<HTMLElement>('[data-rich-block-type="tableTitle"]');
   if (title) {
     const caption = document.createElement('caption');
     caption.append(...title.childNodes);

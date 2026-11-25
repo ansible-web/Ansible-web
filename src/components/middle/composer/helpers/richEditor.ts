@@ -76,6 +76,7 @@ import { buildRichEditorFormatting } from '../../../ui/textInput/richEditorForma
 import { buildRichEditorBlockquote } from './richEditorBlockquote';
 import { RichEditorBotApiHtml } from './richEditorBotApiHtml';
 import { RichEditorCaption } from './richEditorCaption';
+import { RichEditorKeyboardShortcuts } from './richEditorKeyboardShortcuts';
 import { RichEditorMarkdown, RichEditorReverseMarkdown } from './richEditorMarkdown';
 import { RichEditorPullquote } from './richEditorPullquote';
 import {
@@ -87,10 +88,7 @@ import { RichEditorTextReplacements } from './richEditorTextReplacements';
 
 import { requestSharedCanvasCoordsRecalculation } from '../../../../hooks/useCoordsInSharedCanvas';
 
-import {
-  buildRichEditorTooltips,
-  openRichEditorFormatterControl,
-} from '../../../common/tooltips/extensions/RichEditorTooltips';
+import { buildRichEditorTooltips } from '../../../common/tooltips/extensions/RichEditorTooltips';
 import EditableCodeBlock from '../richInput/EditableCodeBlock';
 import EditableListItem from '../richInput/EditableListItem';
 import { buildRichEditorMedia } from '../richInput/EditableMedia';
@@ -123,7 +121,6 @@ type RichEditorOrderedListUpdate = {
 type CreateRichEditorParams = {
   element: HTMLDivElement;
   sharedCanvasRef?: ElementRef<HTMLCanvasElement>;
-  sharedCanvasHqRef?: ElementRef<HTMLCanvasElement>;
   content: TiptapJsonContent;
   getIsRichInputExpanded: () => boolean;
   getCanInsertMedia: (type: RichEditorMediaItem['type']) => boolean;
@@ -195,7 +192,6 @@ const RichEditorHistory = Extension.create({
 export function __createRichEditor({
   element,
   sharedCanvasRef,
-  sharedCanvasHqRef,
   content,
   getIsRichInputExpanded,
   getCanInsertMedia,
@@ -213,7 +209,7 @@ export function __createRichEditor({
       getIsRichInputExpanded,
       onMediaEdit,
       onMediaFiles,
-      { sharedCanvasRef, sharedCanvasHqRef },
+      { sharedCanvasRef },
     ),
     editorProps: {
       // Undo a just-applied input rule before structural `Backspace` handlers, since opener-last
@@ -232,7 +228,7 @@ export function __createRichEditor({
     },
     onUpdate: ({ editor }) => {
       onUpdate(editor);
-      requestSharedCanvasCoordsRecalculation(sharedCanvasRef, sharedCanvasHqRef);
+      requestSharedCanvasCoordsRecalculation(sharedCanvasRef);
     },
     onDestroy: () => removeRichEditorDropIndicator(richEditor.view),
   });
@@ -304,6 +300,7 @@ function buildRichEditorExtensions(
     RichEditorReverseMarkdown,
     RichEditorHistory,
     RichEditorTextReplacements,
+    RichEditorKeyboardShortcuts,
     buildRichEditorFormatting(getIsRichInputExpanded),
     RichEditorBotApiHtml,
     buildRichEditorPlaceholder(),
@@ -442,7 +439,7 @@ function buildRichEditorSchemaExtensions(
       },
     }),
     RichEditorUnderline,
-    RichEditorDate.configure({ onClick: onDateClick }),
+    DateMark.configure({ onClick: onDateClick }),
     FormattedDateNode.configure({ onClick: onDateClick }),
     SpoilerMark,
     MarkedTextMark,
@@ -1069,24 +1066,9 @@ const RichEditorCodeBlock = CodeBlockLowlightExtension.extend({
 
 const RichEditorCode = CodeExtension.extend({
   addKeyboardShortcuts() {
-    return {
-      'Mod-m': () => {
-        if (this.editor.state.selection.empty && !this.editor.isActive(this.name)) {
-          return false;
-        }
-
-        return toggleRichEditorCode(this.editor);
-      },
-      'Mod-M': () => toggleRichEditorCode(this.editor),
-    };
+    return {};
   },
 });
-
-function toggleRichEditorCode(editor: Editor) {
-  return editor.state.selection.empty
-    ? editor.commands.toggleCode()
-    : editor.commands.toggleSelectionCode();
-}
 
 const RichEditorLink = LinkExtension.extend({
   parseMarkdown(token, helpers) {
@@ -1118,36 +1100,11 @@ const RichEditorLink = LinkExtension.extend({
       },
     })];
   },
-
-  addKeyboardShortcuts() {
-    return {
-      'Mod-k': () => openRichEditorFormatterControl(this.editor, 'link'),
-      'Mod-K': () => openRichEditorFormatterControl(this.editor, 'link'),
-    };
-  },
 });
 
 const RichEditorStrike = StrikeExtension.extend({
   addKeyboardShortcuts() {
-    return {
-      ...this.parent?.(),
-      'Mod-s': () => {
-        if (this.editor.state.selection.empty && !this.editor.isActive(this.name)) {
-          return false;
-        }
-
-        return this.editor.commands.toggleStrike();
-      },
-    };
-  },
-});
-
-const RichEditorDate = DateMark.extend({
-  addKeyboardShortcuts() {
-    return {
-      'Mod-d': () => openRichEditorFormatterControl(this.editor, 'date'),
-      'Mod-D': () => openRichEditorFormatterControl(this.editor, 'date'),
-    };
+    return {};
   },
 });
 
@@ -1198,6 +1155,10 @@ const RichEditorSubscript = SubscriptExtension.extend({
   renderMarkdown(node, helpers) {
     return `<sub>${helpers.renderChildren(node)}</sub>`;
   },
+
+  addKeyboardShortcuts() {
+    return {};
+  },
 });
 
 const RichEditorSuperscript = SuperscriptExtension.extend({
@@ -1207,6 +1168,10 @@ const RichEditorSuperscript = SuperscriptExtension.extend({
 });
 
 const RichEditorBulletList = BulletList.extend({
+  addKeyboardShortcuts() {
+    return {};
+  },
+
   addAttributes() {
     return {
       [BULLET_LIST_CHECKLIST_ATTR]: {
@@ -1226,6 +1191,10 @@ const RichEditorBulletList = BulletList.extend({
 });
 
 const RichEditorOrderedList = OrderedList.extend({
+  addKeyboardShortcuts() {
+    return {};
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),

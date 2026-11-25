@@ -122,7 +122,7 @@ import {
   selectTopicFromMessage,
   selectUser,
   selectUserFullInfo,
-  selectWebPage,
+  selectWebPagePreview,
 } from '../../global/selectors';
 import { selectCurrentLimit } from '../../global/selectors/limits';
 import { selectSharedSettings } from '../../global/selectors/sharedState';
@@ -135,7 +135,7 @@ import {
 } from '../../global/selectors/threads';
 import { revokeAttachmentUrls } from '../../util/attachments';
 import {
-  IS_IOS, IS_TOUCH_ENV, IS_VIDEO_RECORDING_SUPPORTED, IS_VOICE_RECORDING_SUPPORTED,
+  IS_ANDROID, IS_IOS, IS_TOUCH_ENV, IS_VIDEO_RECORDING_SUPPORTED, IS_VOICE_RECORDING_SUPPORTED,
 } from '../../util/browser/windowEnvironment';
 import buildClassName from '../../util/buildClassName';
 import captureEscKeyListener from '../../util/captureEscKeyListener';
@@ -181,6 +181,7 @@ import useDerivedState from '../../hooks/useDerivedState';
 import useEffectWithPrevDeps from '../../hooks/useEffectWithPrevDeps';
 import useFlag from '../../hooks/useFlag';
 import useForceUpdate from '../../hooks/useForceUpdate';
+import useKeyboardShortcutHint from '../../hooks/useKeyboardShortcutHint';
 import useLang from '../../hooks/useLang';
 import useLastCallback from '../../hooks/useLastCallback';
 import usePeerColor from '../../hooks/usePeerColor';
@@ -2649,6 +2650,17 @@ const Composer = ({
       }
   }
 
+  const isMobileDevice = isMobile && (IS_IOS || IS_ANDROID);
+  const isSendShortcutButton = !isMobileDevice
+    && (mainButtonState === MainButtonState.Send || mainButtonState === MainButtonState.Edit);
+  const sendButtonLabel = useKeyboardShortcutHint(
+    lang(sendButtonAriaLabel),
+    isSendShortcutButton ? 'sendMessage' : undefined,
+    isRichInputExpansionActive ? 'ctrl-enter' : undefined,
+  );
+  const undoLabel = useKeyboardShortcutHint(lang('Undo'), 'undo');
+  const redoLabel = useKeyboardShortcutHint(lang('Redo'), 'redo');
+
   const fullClassName = buildClassName(
     'Composer',
     isInMessageList && 'is-chat-composer',
@@ -3060,7 +3072,7 @@ const Composer = ({
               faded
               size="smaller"
               color="translucent"
-              ariaLabel={lang('Undo')}
+              ariaLabel={undoLabel}
               iconName="undo"
               disabled={!richEditor.canUndo}
               onClick={richEditor.undo}
@@ -3070,7 +3082,7 @@ const Composer = ({
               faded
               size="smaller"
               color="translucent"
-              ariaLabel={lang('Redo')}
+              ariaLabel={redoLabel}
               iconName="redo"
               disabled={!richEditor.canRedo}
               onClick={richEditor.redo}
@@ -3159,7 +3171,6 @@ const Composer = ({
                       >
                         <Button
                           round
-                          faded
                           className="composer-action-button"
                           color="translucent"
                           onClick={handleToggleSilentPosting}
@@ -3173,7 +3184,6 @@ const Composer = ({
                     {withScheduledButton && (
                       <Button
                         round
-                        faded
                         className="composer-action-button scheduled-button"
                         color="translucent"
                         onClick={handleAllScheduledClick}
@@ -3184,7 +3194,6 @@ const Composer = ({
                     {Boolean(autoDeletePeriod) && (
                       <Button
                         round
-                        faded
                         className="composer-action-button"
                         color="translucent"
                         onClick={handleAutoDeleteClick}
@@ -3196,7 +3205,6 @@ const Composer = ({
                     {shouldShowGiftButton && (
                       <Button
                         round
-                        faded
                         className="composer-action-button"
                         color="translucent"
                         onClick={handleGiftClick}
@@ -3206,7 +3214,6 @@ const Composer = ({
                     {shouldShowSuggestedPostButton && (
                       <Button
                         round
-                        faded
                         className="composer-action-button"
                         color="translucent"
                         onClick={handleSuggestPostClick}
@@ -3315,6 +3322,8 @@ const Composer = ({
           {isInMessageList && botCommands && (
             <BotCommandMenu
               isOpen={isBotCommandMenuOpen}
+              chatId={chatId}
+              threadId={threadId}
               botCommands={botCommands}
               onClose={closeBotCommandMenu}
             />
@@ -3337,7 +3346,7 @@ const Composer = ({
         disabled={areRecordingsNotAllowed || hasRichMediaBlocking}
         allowDisabledClick
         noFastClick
-        ariaLabel={mainButtonState === MainButtonState.Stop ? lang('BotDraftStop') : lang(sendButtonAriaLabel)}
+        ariaLabel={mainButtonState === MainButtonState.Stop ? lang('BotDraftStop') : sendButtonLabel}
         onClick={mainButtonHandler}
         onContextMenu={mainButtonContextMenuHandler}
       >
@@ -3557,7 +3566,7 @@ export default memo(withGlobal<OwnProps>(
     const isAppConfigLoaded = global.isAppConfigLoaded;
     const insertingPeerIdMention = tabState.insertingPeerIdMention;
 
-    const webPagePreview = tabState.webPagePreviewId ? selectWebPage(global, tabState.webPagePreviewId) : undefined;
+    const webPagePreview = selectWebPagePreview(global, chatId, threadId);
 
     const canManageAutoDelete = type === 'messageList' && messageListType === 'thread' && threadId === MAIN_THREAD_ID
       && selectCanManageAutoDelete(global, chatId);

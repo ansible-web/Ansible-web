@@ -1,4 +1,4 @@
-import type { ElementRef, TeactNode } from '../../lib/teact/teact';
+import type { TeactNode } from '../../lib/teact/teact';
 
 import type {
   ApiMessageEntityFormattedDate, ApiRichText, ApiRichTextCustomEmoji, ApiRichTextDate,
@@ -39,8 +39,6 @@ export type RichTextProps = {
   isProtected?: boolean;
   observeIntersectionForLoading?: ObserveFn;
   observeIntersectionForPlaying?: ObserveFn;
-  sharedCanvasRef?: ElementRef<HTMLCanvasElement>;
-  sharedCanvasHqRef?: ElementRef<HTMLCanvasElement>;
 };
 
 const RichText = ({
@@ -56,8 +54,6 @@ const RichText = ({
   isProtected,
   observeIntersectionForLoading,
   observeIntersectionForPlaying,
-  sharedCanvasRef,
-  sharedCanvasHqRef,
 }: RichTextProps): TeactNode => {
   switch (text.type) {
     case 'button':
@@ -73,8 +69,6 @@ const RichText = ({
           pageUrl={pageUrl}
           observeIntersectionForLoading={observeIntersectionForLoading}
           observeIntersectionForPlaying={observeIntersectionForPlaying}
-          sharedCanvasRef={sharedCanvasRef}
-          sharedCanvasHqRef={sharedCanvasHqRef}
         />
       );
     case 'empty':
@@ -97,8 +91,6 @@ const RichText = ({
           isProtected={isProtected}
           observeIntersectionForLoading={observeIntersectionForLoading}
           observeIntersectionForPlaying={observeIntersectionForPlaying}
-          sharedCanvasRef={sharedCanvasRef}
-          sharedCanvasHqRef={sharedCanvasHqRef}
         />
       ));
     case 'bold':
@@ -144,7 +136,7 @@ const RichText = ({
           tryInstantView
           entityType={ApiMessageEntityTypes.TextUrl}
         >
-          {renderNestedText()}
+          {renderLinkText()}
         </SafeLink>
       );
     }
@@ -197,7 +189,7 @@ const RichText = ({
           threadId={threadId}
           entityType={ApiMessageEntityTypes.Url}
         >
-          {renderNestedText()}
+          {renderLinkText()}
         </SafeLink>
       );
     }
@@ -251,8 +243,13 @@ const RichText = ({
       );
     }
     case 'botCommand':
+      if (!chatId) return renderNestedText();
       return (
-        <a onClick={handleBotCommandClick} className="text-entity-link" dir="auto">
+        <a
+          onClick={(e) => handleBotCommandClick(e, chatId, threadId, messageId)}
+          className="text-entity-link"
+          dir="auto"
+        >
           {renderNestedText()}
         </a>
       );
@@ -287,10 +284,14 @@ const RichText = ({
         isProtected={isProtected}
         observeIntersectionForLoading={observeIntersectionForLoading}
         observeIntersectionForPlaying={observeIntersectionForPlaying}
-        sharedCanvasRef={sharedCanvasRef}
-        sharedCanvasHqRef={sharedCanvasHqRef}
       />
     );
+  }
+
+  // `SafeLink` skips its confirmation only for a plain string child, so don't wrap plain text in `RichText`
+  function renderLinkText() {
+    const nestedText = getNestedRichText(text);
+    return nestedText.type === 'plain' ? renderText(nestedText.text, ['emoji', 'br']) : renderNestedText();
   }
 
   function renderCustomEmoji(customEmojiText: ApiRichTextCustomEmoji) {
@@ -301,9 +302,7 @@ const RichText = ({
           sticker={customEmojiText.document}
           observeIntersectionForLoading={observeIntersectionForLoading}
           observeIntersectionForPlaying={observeIntersectionForPlaying}
-          withSharedAnimation={Boolean(sharedCanvasRef)}
-          sharedCanvasRef={sharedCanvasRef}
-          sharedCanvasHqRef={sharedCanvasHqRef}
+          withSharedAnimation
           isSelectable
         />
       );
@@ -315,9 +314,7 @@ const RichText = ({
         documentId={customEmojiText.documentId}
         observeIntersectionForLoading={observeIntersectionForLoading}
         observeIntersectionForPlaying={observeIntersectionForPlaying}
-        withSharedAnimation={Boolean(sharedCanvasRef)}
-        sharedCanvasRef={sharedCanvasRef}
-        sharedCanvasHqRef={sharedCanvasHqRef}
+        withSharedAnimation
         isSelectable
       />
     );

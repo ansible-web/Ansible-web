@@ -2,6 +2,7 @@ import { memo, useRef } from '../../../lib/teact/teact';
 import { getActions } from '../../../global';
 
 import type { IconName } from '../../../types/icons';
+import { MAIN_THREAD_ID } from '../../../api/types';
 
 import { MUTE_INDEFINITE_TIMESTAMP, UNMUTE_TIMESTAMP } from '../../../config';
 import buildClassName from '../../../util/buildClassName';
@@ -20,6 +21,7 @@ type OwnProps = {
   shouldJoinToSend?: boolean;
   shouldSendJoinRequest?: boolean;
   canStartBot?: boolean;
+  botStartParam?: string;
   canRestartBot?: boolean;
   canUnblock?: boolean;
   isChannelMuteBar?: boolean;
@@ -48,6 +50,7 @@ const FooterActionBar = ({
   shouldJoinToSend,
   shouldSendJoinRequest,
   canStartBot,
+  botStartParam,
   canRestartBot,
   canUnblock,
   isChannelMuteBar,
@@ -63,6 +66,7 @@ const FooterActionBar = ({
   const {
     joinChannel,
     sendBotCommand,
+    startBot,
     restartBot,
     unblockUser,
     updateChatMutedState,
@@ -77,7 +81,11 @@ const FooterActionBar = ({
   });
 
   const handleStartBot = useLastCallback(() => {
-    sendBotCommand({ command: '/start' });
+    if (botStartParam) {
+      startBot({ botId: chatId, param: botStartParam });
+      return;
+    }
+    sendBotCommand({ command: '/start', chatId, threadId: MAIN_THREAD_ID });
   });
 
   const handleRestartBot = useLastCallback(() => {

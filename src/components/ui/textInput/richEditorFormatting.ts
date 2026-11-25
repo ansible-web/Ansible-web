@@ -28,6 +28,30 @@ declare module '@tiptap/core' {
   }
 }
 
+export function clearRichEditorFormatting(editor: Editor) {
+  const { state, view } = editor;
+  const {
+    doc, schema, selection, storedMarks,
+  } = state;
+  if (selection.empty) {
+    const activeMarks = storedMarks || selection.$from.marks();
+    if (!activeMarks.length) {
+      return false;
+    }
+
+    view.dispatch(state.tr.setStoredMarks([]));
+    return true;
+  }
+
+  const hasSelectedMarks = Object.values(schema.marks)
+    .some((mark) => doc.rangeHasMark(selection.from, selection.to, mark));
+  if (!hasSelectedMarks) {
+    return false;
+  }
+
+  return editor.commands.unsetAllMarks({ ignoreClearable: true });
+}
+
 export function buildRichEditorFormatting(getIsRichInputExpanded: () => boolean) {
   return Extension.create({
     name: 'richEditorFormatting',
@@ -47,6 +71,11 @@ export function buildRichEditorFormatting(getIsRichInputExpanded: () => boolean)
 
           if (state.doc.rangeHasMark(range.from, range.to, state.schema.marks[CODE_MARK_TYPE])) {
             return commands.unsetMark(CODE_MARK_TYPE);
+          }
+
+          // Code can't hold custom emoji, and the text of the range would turn them into line breaks
+          if (hasCustomEmoji(state.doc, range.from, range.to)) {
+            return false;
           }
 
           const text = state.doc.textBetween(range.from, range.to, BLOCK_SEPARATOR, BLOCK_SEPARATOR).trim();
@@ -99,37 +128,6 @@ export function buildRichEditorFormatting(getIsRichInputExpanded: () => boolean)
           }
           return true;
         },
-      };
-    },
-
-    addKeyboardShortcuts() {
-      const handleClearFormatting = () => {
-        const { state, view } = this.editor;
-        const {
-          doc, schema, selection, storedMarks,
-        } = state;
-        if (selection.empty) {
-          const activeMarks = storedMarks || selection.$from.marks();
-          if (!activeMarks.length) {
-            return false;
-          }
-
-          view.dispatch(state.tr.setStoredMarks([]));
-          return true;
-        }
-
-        const hasSelectedMarks = Object.values(schema.marks)
-          .some((mark) => doc.rangeHasMark(selection.from, selection.to, mark));
-        if (!hasSelectedMarks) {
-          return false;
-        }
-
-        return this.editor.commands.unsetAllMarks({ ignoreClearable: true });
-      };
-
-      return {
-        'Mod-n': handleClearFormatting,
-        'Mod-N': handleClearFormatting,
       };
     },
 
@@ -299,4 +297,14 @@ function restoreMappedSelection(transaction: Transaction, range: EditorRange) {
     transaction.doc.resolve(Math.min(from, to)),
     transaction.doc.resolve(Math.max(from, to)),
   ));
+}
+
+export function hasCustomEmoji(doc: ProseMirrorNode, from: number, to: number) {
+  let result = false;
+  doc.nodesBetween(from, to, (node) => {
+    result ||= node.type.name === 'customEmoji';
+    return !result;
+  });
+
+  return result;
 }

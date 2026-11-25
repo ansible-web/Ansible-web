@@ -335,6 +335,11 @@
         .input-scroller-content {
           min-height: 100%;
           padding-top: var(--rich-editor-header-height);
+
+          // Custom emoji stay under the scroll hint, which covers the header
+          > .shared-canvas {
+            z-index: 0;
+          }
         }
 
         .form-control {
@@ -449,6 +454,10 @@
       .icon {
         font-size: var(--composer-icon-size);
       }
+    }
+
+    .composer-action-button.scheduled-button .icon {
+      font-size: 1.75rem;
     }
 
     .rich-editor-button {
@@ -937,7 +946,7 @@
 
     background: none !important;
 
-    &:not(.faded):not(.activated) {
+    &:not(.activated) {
       color: var(--color-composer-button);
     }
 
@@ -997,21 +1006,6 @@
 
     &.bot-commands {
       color: var(--color-primary) !important;
-    }
-
-    &.scheduled-button .icon::after {
-      content: "";
-
-      position: absolute;
-      top: 0.3125rem;
-      right: 0.3125rem;
-
-      box-sizing: content-box;
-      width: 0.5rem;
-      height: 0.5rem;
-      border-radius: 50%;
-
-      background: var(--color-active-darker);
     }
   }
 }
@@ -1077,6 +1071,8 @@
 
   & > .input-scroller-content {
     position: relative;
+    // The custom emoji canvas inside, while resized after the text, must not add to the scrolled height
+    overflow: clip;
   }
 
   body.no-message-composer-animations & {

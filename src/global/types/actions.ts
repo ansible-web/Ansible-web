@@ -136,6 +136,7 @@ import type { BrowserModalStateType, BrowserTab } from '../../types/browser';
 import type { MediaEditorSettings } from '../../types/mediaEditor';
 import type { ClipboardTextFormat, MessageCopyRequest } from '../../types/messageCopy';
 import type { WebApp, WebAppMediaKind, WebAppOutboundEvent } from '../../types/webapp';
+import type { KeyboardShortcutId } from '../../util/keyboardShortcuts/registry';
 import type { RegularLangFnParameters } from '../../util/localization';
 import type { DownloadableMedia } from '../helpers';
 import type { SharedState } from './sharedState';
@@ -224,6 +225,13 @@ export interface ActionPayloads {
   // settings
   setSettingOption: Partial<AccountSettings> | undefined;
   setSharedSettingOption: Partial<SharedState['settings']> | undefined;
+  setKeyboardShortcut: {
+    id: KeyboardShortcutId;
+    combo: string | false;
+  };
+  resetKeyboardShortcuts: {
+    id: KeyboardShortcutId;
+  } | undefined;
   updatePerformanceSettings: Partial<PerformanceType>;
   loadPasswordInfo: undefined;
   clearTwoFaError: undefined;
@@ -333,13 +341,18 @@ export interface ActionPayloads {
 
   // misc
   loadWebPagePreview: {
+    chatId: string;
+    threadId: ThreadId;
     text: ApiFormattedText;
-  } & WithTabId;
+  };
   loadWebPage: {
     url: string;
     hash?: number;
   };
-  clearWebPagePreview: WithTabId | undefined;
+  clearWebPagePreview: {
+    chatId: string;
+    threadId: ThreadId;
+  };
   loadWallpapers: undefined;
   uploadWallpaper: File;
   loadChatThemes: undefined;
@@ -805,6 +818,8 @@ export interface ActionPayloads {
     messageId?: number;
     commentId?: number;
     startParam?: string;
+    // Sends the start parameter at once; only for links the client itself opens
+    shouldStartBot?: boolean;
     startGroup?: string;
     ref?: string;
     startAttach?: string;
@@ -1173,7 +1188,10 @@ export interface ActionPayloads {
   scrollMessageListToBottom: WithTabId | undefined;
 
   updateDraftReplyInfo: (Partial<ApiInputMessageReplyInfo> | ApiInputEphemeralReplyInfo) & WithTabId;
-  resetDraftReplyInfo: WithTabId | undefined;
+  resetDraftReplyInfo: {
+    chatId: string;
+    threadId: ThreadId;
+  };
   updateDraftSuggestedPostInfo: Partial<ApiInputSuggestedPostInfo> & WithTabId;
   resetDraftSuggestedPostInfo: WithTabId | undefined;
   initDraftFromSuggestedMessage: {
@@ -2337,7 +2355,8 @@ export interface ActionPayloads {
   // Bots
   sendBotCommand: {
     command: string;
-    chatId?: string;
+    chatId: string;
+    threadId: ThreadId;
     botId?: string;
   } & WithTabId;
   loadTopPeers: {
@@ -2428,6 +2447,7 @@ export interface ActionPayloads {
     url?: string;
     botId: string;
     peerId: string;
+    threadId: ThreadId;
     theme?: ApiThemeParameters;
     isSilent?: boolean;
     buttonText: string;
@@ -2803,8 +2823,9 @@ export interface ActionPayloads {
   } & WithTabId;
   joinVoiceChatByLink: {
     username: string;
-    inviteHash: string;
+    inviteHash?: string;
   } & WithTabId;
+  closeJoinGroupCallModal: WithTabId | undefined;
   createGroupCallInviteLink: WithTabId | undefined;
 
   loadMoreGroupCallParticipants: undefined;

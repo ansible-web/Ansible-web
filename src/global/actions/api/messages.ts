@@ -227,6 +227,8 @@ const VIDEO_PROCESSING_PROGRESS_SHARE = 0.33;
 
 const ttlCleanupTimersByChatId = new Map<string, { timer: number; expiresAt: number }>();
 const audioForwardTokens = new Map<number, symbol>();
+// Latest preview request per thread, so a slower older response can't overwrite a newer one or a clear
+const webPagePreviewTokens = new Map<string, symbol>();
 
 const runDebouncedForMarkRead = debounce((cb) => cb(), 500, false);
 
@@ -576,8 +578,8 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
       topMsgId: threadId !== MAIN_THREAD_ID ? Number(threadId) : undefined,
       tabId,
     });
-    actions.resetDraftReplyInfo({ tabId });
-    actions.clearWebPagePreview({ tabId });
+    actions.resetDraftReplyInfo({ chatId: chatId!, threadId: threadId! });
+    actions.clearWebPagePreview({ chatId: chatId!, threadId: threadId! });
     return;
   }
 
@@ -602,8 +604,8 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
       topMsgId: replyMessage.ephemeralTopMsgId,
       tabId,
     });
-    actions.resetDraftReplyInfo({ tabId });
-    actions.clearWebPagePreview({ tabId });
+    actions.resetDraftReplyInfo({ chatId: chatId!, threadId: threadId! });
+    actions.clearWebPagePreview({ chatId: chatId!, threadId: threadId! });
     return;
   }
 
@@ -695,7 +697,7 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
   };
 
   if (!isStoryReply) {
-    actions.clearWebPagePreview({ tabId });
+    actions.clearWebPagePreview({ chatId: chatId!, threadId: threadId! });
   }
 
   // Create new bot forum topic
@@ -1076,12 +1078,7 @@ addActionHandler('updateDraftReplyInfo', (global, actions, payload): ActionRetur
 });
 
 addActionHandler('resetDraftReplyInfo', (global, actions, payload): ActionReturnType => {
-  const { tabId = getCurrentTabId() } = payload || {};
-  const currentMessageList = selectCurrentMessageList(global, tabId);
-  if (!currentMessageList) {
-    return;
-  }
-  const { chatId, threadId } = currentMessageList;
+  const { chatId, threadId } = payload;
   const chat = selectChat(global, chatId);
 
   const currentDraft = selectDraft(global, chatId, threadId);
@@ -1746,14 +1743,17 @@ addActionHandler('markMessagesRead', async (global, actions, payload): Promise<v
 });
 
 addActionHandler('loadWebPagePreview', async (global, actions, payload): Promise<void> => {
-  const { text, tabId = getCurrentTabId() } = payload;
+  const { chatId, threadId, text } = payload;
+  const tokenKey = `${chatId}_${threadId}`;
+  const token = Symbol('webPagePreview');
+  webPagePreviewTokens.set(tokenKey, token);
 
   const webPagePreview = await callApi('fetchWebPagePreview', { text });
+  if (webPagePreviewTokens.get(tokenKey) !== token) return;
+  webPagePreviewTokens.delete(tokenKey);
 
   global = getGlobal();
-  global = updateTabState(global, {
-    webPagePreviewId: webPagePreview?.id,
-  }, tabId);
+  global = replaceThreadLocalStateParam(global, chatId, threadId, 'webPagePreviewId', webPagePreview?.id);
   setGlobal(global);
 
   if (!webPagePreview) return;
@@ -1776,11 +1776,10 @@ addActionHandler('loadWebPage', async (global, actions, payload): Promise<void> 
 });
 
 addActionHandler('clearWebPagePreview', (global, actions, payload): ActionReturnType => {
-  const { tabId = getCurrentTabId() } = payload || {};
+  const { chatId, threadId } = payload;
+  webPagePreviewTokens.delete(`${chatId}_${threadId}`);
 
-  return updateTabState(global, {
-    webPagePreviewId: undefined,
-  }, tabId);
+  return replaceThreadLocalStateParam(global, chatId, threadId, 'webPagePreviewId', undefined);
 });
 
 addActionHandler('sendPollVote', (global, actions, payload): ActionReturnType => {

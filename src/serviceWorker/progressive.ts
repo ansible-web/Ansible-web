@@ -11,7 +11,7 @@ import { pause } from '../util/schedulers';
 
 declare const self: ServiceWorkerGlobalScope;
 
-type PartInfo = {
+export type PartInfo = {
   type: 'PartInfo';
   arrayBuffer: ArrayBuffer;
   mimeType: 'string';
@@ -27,6 +27,7 @@ const MB = 1024 * 1024;
 const DEFAULT_PART_SIZE = 0.5 * MB;
 const MAX_END_TO_CACHE = 2 * MB - 1; // We only cache the first 2 MB of each file
 const PART_TIMEOUT = 60000;
+const CLIENT_CHECK_INTERVAL = 3000;
 
 const requestStates = new Map<string, RequestStates>();
 
@@ -60,6 +61,7 @@ export async function respondForProgressive(e: FetchEvent) {
           ['Accept-Ranges', 'bytes'],
           ['Content-Length', '2'],
           ['Content-Type', mimeType],
+          ...MEDIA_SECURITY_HEADERS,
         ],
       });
     }
@@ -83,7 +85,7 @@ export async function respondForProgressive(e: FetchEvent) {
     return new Response(cachedArrayBuffer, {
       status: 206,
       statusText: 'Partial Content',
-      headers: cachedHeaders,
+      headers: [...(cachedHeaders || []), ...MEDIA_SECURITY_HEADERS],
     });
   }
 
@@ -131,7 +133,7 @@ export async function respondForProgressive(e: FetchEvent) {
   return new Response(arrayBufferPart, {
     status: 206,
     statusText: 'Partial Content',
-    headers,
+    headers: [...headers, ...MEDIA_SECURITY_HEADERS],
   });
 }
 
@@ -158,6 +160,12 @@ async function saveToCache(
   ]);
 }
 
+// Media bytes are sender-controlled, so they must never run as a page or a script on this origin
+export const MEDIA_SECURITY_HEADERS: [string, string][] = [
+  ['Content-Security-Policy', 'sandbox'],
+  ['X-Content-Type-Options', 'nosniff'],
+];
+
 export async function requestPart(
   e: FetchEvent,
   params: { url: string; start: number; end: number },
@@ -177,6 +185,14 @@ export async function requestPart(
     new Promise<PartInfo>((resolve, reject) => {
       Object.assign(requestState, { resolve, reject });
     }),
+    // A closed tab never answers, so fail early and let the caller retry with another one
+    (async () => {
+      while (!isResolved) {
+        await pause(CLIENT_CHECK_INTERVAL);
+        if (!isResolved && !await self.clients.get(client.id)) throw new Error('ERROR_PART_CLIENT_GONE');
+      }
+      return undefined;
+    })(),
   ]);
 
   requestStates.set(messageId, requestState);

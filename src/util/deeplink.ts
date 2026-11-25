@@ -61,6 +61,12 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
         });
         return true;
       }
+      case 'groupCallLink':
+        actions.joinVoiceChatByLink({
+          username: parsedLink.username,
+          inviteHash: parsedLink.inviteHash,
+        });
+        return true;
       case 'contactLink':
         actions.openChatByContactToken({
           token: parsedLink.token,
@@ -161,7 +167,6 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
     openChatByUsername,
     openChatByPhoneNumber,
     openStickerSet,
-    joinVoiceChatByLink,
     openInvoice,
     openChatWithDraft,
     checkChatlistInvite,
@@ -173,7 +178,7 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
   switch (method) {
     case 'resolve': {
       const {
-        domain, phone, post, comment, voicechat, livestream, start, startattach, attach, thread, topic,
+        domain, phone, post, comment, start, startattach, attach, thread, topic,
         appname, startapp, mode, story, text, free,
       } = params;
 
@@ -187,11 +192,6 @@ export const processDeepLink = (url: string, linkContext?: LinkContext): boolean
             mode,
             originalParts: [domain, appname],
             text,
-          });
-        } else if (params.hasOwnProperty('voicechat') || params.hasOwnProperty('livestream')) {
-          joinVoiceChatByLink({
-            username: domain,
-            inviteHash: voicechat || livestream,
           });
         } else if (phone) {
           openChatByPhoneNumber({

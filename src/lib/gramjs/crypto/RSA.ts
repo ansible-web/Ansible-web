@@ -1,14 +1,4 @@
-import { concat } from '../../../util/encoding/buffer';
-
-import {
-  generateRandomBytes,
-  modExp,
-  readBigIntFromBuffer,
-  readBufferFromBigInt,
-  sha1,
-} from '../Helpers';
-
-export const SERVER_KEYS = [
+export const PROD_SERVER_KEYS = [
   // MVSy (BeHappy) server RSA key — DC1 (silent-friend, K8s)
   // fingerprint: hardcoded ID announced by backend in ResPq (NOT sha1-derived)
   // n: actual modulus of server's current /opt/behappy/bh-mvsy/priv/rsa_private.pem
@@ -30,29 +20,4 @@ export const SERVER_KEYS = [
   return acc;
 }, new Map<bigint, { n: bigint; e: number }>());
 
-/**
- * Encrypts the given data known the fingerprint to be used
- * in the way Telegram requires us to do so (sha1(data) + data + padding)
-
- * @param fingerprint the fingerprint of the RSA key.
- * @param data the data to be encrypted.
- * @returns the cipher text, or undefined if no key matching this fingerprint is found.
- */
-export async function encrypt(fingerprint: bigint, data: Uint8Array): Promise<Uint8Array | undefined> {
-  const key = SERVER_KEYS.get(fingerprint);
-  if (!key) {
-    return undefined;
-  }
-
-  // len(sha1.digest) is always 20, so we're left with 255 - 20 - x padding
-  const rand = generateRandomBytes(235 - data.length);
-
-  const toEncrypt = concat(await sha1(data), data, rand);
-
-  // rsa module rsa.encrypt adds 11 bits for padding which we don't want
-  // rsa module uses rsa.transform.bytes2int(to_encrypt), easier way:
-  const payload = readBigIntFromBuffer(toEncrypt, false);
-  const encrypted = modExp(payload, BigInt(key.e), key.n);
-  // rsa module uses transform.int2bytes(encrypted, keylength), easier:
-  return readBufferFromBigInt(encrypted, 256, false);
-}
+export const TEST_SERVER_KEYS = new Map<bigint, { n: bigint; e: number }>();

@@ -43,6 +43,7 @@ const SafeLinkModal = ({ modal, isOpen, isWidget }: OwnProps & StateProps) => {
 
   const handleOpen = useLastCallback(() => {
     window.open(ensureProtocol(modal), '_blank', 'noopener noreferrer');
+
     toggleSafeLinkModal({ url: undefined });
   });
 
