@@ -6,10 +6,10 @@ inventory is retained in `UPSTREAM_THIRD_PARTY_NOTICES.md`; its native packages,
 demo libraries and alternative renderers are not part of this integration.
 
 The prebuilt QuickJS engine is the TelegramMessenger/quickjs fork, revision
-`b526a817f188ef861eea7666d68361c7851673a0` (`b526a81` in
+`c8af6d202d9d9d72f964e6e96feb6cc8a4d303a0` (`c8af6d2` in
 `quickjs/prebuilt/QUICKJS_VERSION`), not the vanilla npm QuickJS binary.
 The vendored WASM SHA-256 is
-`8045387ba4c7fc3f51da8292e86129ad958bf6802d8dadbd11b3878bd451aaab`.
+`924d5c91badc2d54e2fcc0b926968da14e28e402a93ab402b0325a149b5b2d08`.
 Its MIT license and the quickjs-emscripten MIT license are retained in
 `quickjs/`. The build uses quickjs-emscripten FFI/core `0.32.0`. Rebuilding that
 binary requires an explicit checkout of the same fork revision, Emscripten,
